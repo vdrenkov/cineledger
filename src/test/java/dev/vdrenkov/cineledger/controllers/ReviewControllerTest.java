@@ -1,11 +1,11 @@
 package dev.vdrenkov.cineledger.controllers;
 
 import dev.vdrenkov.cineledger.services.ReviewService;
-import dev.vdrenkov.cineledger.testUtils.constants.CinemaConstants;
-import dev.vdrenkov.cineledger.testUtils.constants.MovieConstants;
-import dev.vdrenkov.cineledger.testUtils.constants.UserConstants;
-import dev.vdrenkov.cineledger.testUtils.factories.CinemaFactory;
-import dev.vdrenkov.cineledger.testUtils.factories.ReviewFactory;
+import dev.vdrenkov.cineledger.testutils.constants.CinemaConstants;
+import dev.vdrenkov.cineledger.testutils.constants.MovieConstants;
+import dev.vdrenkov.cineledger.testutils.constants.UserConstants;
+import dev.vdrenkov.cineledger.testutils.factories.CinemaFactory;
+import dev.vdrenkov.cineledger.testutils.factories.ReviewFactory;
 import dev.vdrenkov.cineledger.utils.constants.URIConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,10 +19,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import tools.jackson.databind.ObjectMapper;
 
-import static dev.vdrenkov.cineledger.testUtils.constants.ReviewConstants.DATE_MODIFIED;
-import static dev.vdrenkov.cineledger.testUtils.constants.ReviewConstants.ID;
-import static dev.vdrenkov.cineledger.testUtils.constants.ReviewConstants.RATING;
-import static dev.vdrenkov.cineledger.testUtils.constants.ReviewConstants.REVIEW_TEXT;
+import static dev.vdrenkov.cineledger.testutils.constants.ReviewConstants.DATE_MODIFIED;
+import static dev.vdrenkov.cineledger.testutils.constants.ReviewConstants.ID;
+import static dev.vdrenkov.cineledger.testutils.constants.ReviewConstants.RATING;
+import static dev.vdrenkov.cineledger.testutils.constants.ReviewConstants.REVIEW_TEXT;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -35,14 +35,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+/**
+ * Tests review controller behavior.
+ */
 @ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc
-public class ReviewControllerTest {
+class ReviewControllerTest {
 
     private static final String REVIEW_ID_PATH_PLACEHOLDER = "/reviews/1";
     private static final String RETURN_OLD = "returnOld";
 
-    private final static ObjectMapper objectMapper = new ObjectMapper();
+    private static final ObjectMapper objectMapper = new ObjectMapper();
     private MockMvc mockMvc;
 
     @Mock
@@ -51,15 +54,21 @@ public class ReviewControllerTest {
     @InjectMocks
     private ReviewController reviewController;
 
+    /**
+     * Initializes the test fixture before each test case.
+     */
     @BeforeEach
-    public void setup() {
+    void setup() {
         mockMvc = MockMvcBuilders.standaloneSetup(reviewController).build();
     }
 
+    /**
+     * Verifies that add Cinema Review review Added success.
+     */
     @Test
-    public void testAddCinemaReview_reviewAdded_success() throws Exception {
+    void testAddCinemaReview_reviewAdded_success() throws Exception {
         when(reviewService.addCinemaReview(any(), anyInt())).thenReturn(ReviewFactory.getDefaultReview());
-        String json = objectMapper.writeValueAsString(ReviewFactory.getDefaultReviewRequest());
+        final String json = objectMapper.writeValueAsString(ReviewFactory.getDefaultReviewRequest());
 
         mockMvc
             .perform(post(URIConstants.CINEMAS_ID_REVIEWS_PATH, CinemaConstants.ID)
@@ -69,10 +78,13 @@ public class ReviewControllerTest {
             .andExpect(header().string("Location", REVIEW_ID_PATH_PLACEHOLDER));
     }
 
+    /**
+     * Verifies that add Movie Review review Added success.
+     */
     @Test
-    public void testAddMovieReview_reviewAdded_success() throws Exception {
+    void testAddMovieReview_reviewAdded_success() throws Exception {
         when(reviewService.addMovieReview(any(), anyInt())).thenReturn(ReviewFactory.getDefaultReview());
-        String json = objectMapper.writeValueAsString(ReviewFactory.getDefaultReviewRequest());
+        final String json = objectMapper.writeValueAsString(ReviewFactory.getDefaultReviewRequest());
 
         mockMvc
             .perform(post(URIConstants.MOVIES_ID_REVIEWS_PATH, MovieConstants.ID)
@@ -82,8 +94,11 @@ public class ReviewControllerTest {
             .andExpect(header().string("Location", REVIEW_ID_PATH_PLACEHOLDER));
     }
 
+    /**
+     * Verifies that get Reviews By Cinema Id no Exceptions success.
+     */
     @Test
-    public void testGetReviewsByCinemaId_noExceptions_success() throws Exception {
+    void testGetReviewsByCinemaId_noExceptions_success() throws Exception {
         when(reviewService.getReviewsByCinemaId(anyInt())).thenReturn(ReviewFactory.getDefaultReviewDtoList());
 
         mockMvc
@@ -106,8 +121,11 @@ public class ReviewControllerTest {
             .andExpect(jsonPath("$[0].user.joinDate").value(UserConstants.JOIN_DATE.toString()));
     }
 
+    /**
+     * Verifies that get Reviews By Movie Id no Exceptions success.
+     */
     @Test
-    public void testGetReviewsByMovieId_noExceptions_success() throws Exception {
+    void testGetReviewsByMovieId_noExceptions_success() throws Exception {
         when(reviewService.getReviewsByMovieId(anyInt())).thenReturn(ReviewFactory.getDefaultReviewDtoList());
 
         mockMvc
@@ -130,8 +148,11 @@ public class ReviewControllerTest {
             .andExpect(jsonPath("$[0].user.joinDate").value(UserConstants.JOIN_DATE.toString()));
     }
 
+    /**
+     * Verifies that get Movie Reviews By User Id no Exceptions success.
+     */
     @Test
-    public void testGetMovieReviewsByUserId_noExceptions_success() throws Exception {
+    void testGetMovieReviewsByUserId_noExceptions_success() throws Exception {
         when(reviewService.getMovieReviewsByUserId(anyInt())).thenReturn(ReviewFactory.getDefaultReviewDtoList());
 
         mockMvc
@@ -154,8 +175,11 @@ public class ReviewControllerTest {
             .andExpect(jsonPath("$[0].user.joinDate").value(UserConstants.JOIN_DATE.toString()));
     }
 
+    /**
+     * Verifies that get Cinema Reviews By User Id no Exceptions success.
+     */
     @Test
-    public void testGetCinemaReviewsByUserId_noExceptions_success() throws Exception {
+    void testGetCinemaReviewsByUserId_noExceptions_success() throws Exception {
         when(reviewService.getCinemaReviewsByUserId(anyInt())).thenReturn(ReviewFactory.getDefaultReviewDtoList());
 
         mockMvc
@@ -178,10 +202,13 @@ public class ReviewControllerTest {
             .andExpect(jsonPath("$[0].user.joinDate").value(UserConstants.JOIN_DATE.toString()));
     }
 
+    /**
+     * Verifies that update Review return Old True success.
+     */
     @Test
-    public void testUpdateReview_returnOldTrue_success() throws Exception {
+    void testUpdateReview_returnOldTrue_success() throws Exception {
         when(reviewService.updateReview(any(), anyInt())).thenReturn(ReviewFactory.getDefaultReviewDto());
-        String json = objectMapper.writeValueAsString(ReviewFactory.getDefaultReviewRequest());
+        final String json = objectMapper.writeValueAsString(ReviewFactory.getDefaultReviewRequest());
 
         mockMvc
             .perform(put(URIConstants.REVIEWS_ID_PATH, ID)
@@ -206,10 +233,13 @@ public class ReviewControllerTest {
             .andExpect(jsonPath("$.user.joinDate").value(UserConstants.JOIN_DATE.toString()));
     }
 
+    /**
+     * Verifies that update Review return Old False success.
+     */
     @Test
-    public void testUpdateReview_returnOldFalse_success() throws Exception {
+    void testUpdateReview_returnOldFalse_success() throws Exception {
         when(reviewService.updateReview(any(), anyInt())).thenReturn(ReviewFactory.getDefaultReviewDto());
-        String json = objectMapper.writeValueAsString(ReviewFactory.getDefaultReviewRequest());
+        final String json = objectMapper.writeValueAsString(ReviewFactory.getDefaultReviewRequest());
 
         mockMvc
             .perform(put(URIConstants.REVIEWS_ID_PATH, ID)
@@ -219,8 +249,11 @@ public class ReviewControllerTest {
             .andExpect(status().isNoContent());
     }
 
+    /**
+     * Verifies that delete Review return Old True success.
+     */
     @Test
-    public void testDeleteReview_returnOldTrue_success() throws Exception {
+    void testDeleteReview_returnOldTrue_success() throws Exception {
         when(reviewService.deleteReview(anyInt())).thenReturn(ReviewFactory.getDefaultReviewDto());
 
         mockMvc
@@ -243,8 +276,11 @@ public class ReviewControllerTest {
             .andExpect(jsonPath("$.user.joinDate").value(UserConstants.JOIN_DATE.toString()));
     }
 
+    /**
+     * Verifies that delete Review return Old False success.
+     */
     @Test
-    public void testDeleteReview_returnOldFalse_success() throws Exception {
+    void testDeleteReview_returnOldFalse_success() throws Exception {
         when(reviewService.deleteReview(anyInt())).thenReturn(ReviewFactory.getDefaultReviewDto());
 
         mockMvc

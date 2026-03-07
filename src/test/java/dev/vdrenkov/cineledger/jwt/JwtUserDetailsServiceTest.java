@@ -2,7 +2,7 @@ package dev.vdrenkov.cineledger.jwt;
 
 import dev.vdrenkov.cineledger.exceptions.UserNotFoundException;
 import dev.vdrenkov.cineledger.repositories.UserRepository;
-import dev.vdrenkov.cineledger.testUtils.factories.UserFactory;
+import dev.vdrenkov.cineledger.testutils.factories.UserFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -12,15 +12,18 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Optional;
 
-import static dev.vdrenkov.cineledger.testUtils.constants.UserConstants.PASSWORD;
-import static dev.vdrenkov.cineledger.testUtils.constants.UserConstants.USERNAME;
+import static dev.vdrenkov.cineledger.testutils.constants.UserConstants.PASSWORD;
+import static dev.vdrenkov.cineledger.testutils.constants.UserConstants.USERNAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
+/**
+ * Tests jwt user details service behavior.
+ */
 @ExtendWith(MockitoExtension.class)
-public class JwtUserDetailsServiceTest {
+class JwtUserDetailsServiceTest {
 
     @Mock
     private UserRepository userRepository;
@@ -28,19 +31,25 @@ public class JwtUserDetailsServiceTest {
     @InjectMocks
     private JwtUserDetailsService jwtUserDetailsService;
 
+    /**
+     * Verifies that load User By Username user Found success.
+     */
     @Test
-    public void testLoadUserByUsername_userFound_success() {
+    void testLoadUserByUsername_userFound_success() {
         when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
 
-        UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(USERNAME);
+        final UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(USERNAME);
 
         assertEquals(USERNAME, userDetails.getUsername());
         assertEquals(PASSWORD, userDetails.getPassword());
         assertEquals(1, userDetails.getAuthorities().size());
     }
 
+    /**
+     * Verifies that load User By Username user Not Found throws User Not Found Exception.
+     */
     @Test
-    public void testLoadUserByUsername_userNotFound_throwsUserNotFoundException() {
+    void testLoadUserByUsername_userNotFound_throwsUserNotFoundException() {
         assertThrows(UserNotFoundException.class, () -> {
 
             when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.empty());

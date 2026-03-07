@@ -14,6 +14,9 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
+/**
+ * Represents a persisted program entity.
+ */
 @Entity
 @Table(name = "programs")
 @AllArgsConstructor
@@ -32,6 +35,14 @@ public class Program {
     @JoinColumn(name = "cinema_id")
     private Cinema cinema;
 
+    /**
+     * Creates a new program with its required collaborators.
+     *
+     * @param programDate
+     *     program date value to evaluate
+     * @param cinema
+     *     cinema entity to transform
+     */
     public Program(LocalDate programDate, Cinema cinema) {
         this.programDate = programDate;
         this.cinema = cinema;

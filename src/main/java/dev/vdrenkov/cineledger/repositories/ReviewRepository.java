@@ -6,6 +6,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+/**
+ * Provides persistence access for review entities.
+ */
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, Integer> {
 

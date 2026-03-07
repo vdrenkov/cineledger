@@ -20,6 +20,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.util.List;
 
+/**
+ * Exposes REST endpoints for managing ticket data.
+ */
 @RestController
 public class TicketController {
 
@@ -27,14 +30,27 @@ public class TicketController {
 
     private final TicketService ticketService;
 
+    /**
+     * Creates a new ticket controller with its required collaborators.
+     *
+     * @param ticketService
+     *     ticket service used by the operation
+     */
     @Autowired
     public TicketController(TicketService ticketService) {
         this.ticketService = ticketService;
     }
 
+    /**
+     * Creates and persists ticket.
+     *
+     * @param request
+     *     request payload containing the submitted data
+     * @return HTTP response describing the operation result
+     */
     @PostMapping(URIConstants.TICKETS_PATH)
     public ResponseEntity<Void> addTicket(@RequestBody @Valid TicketRequest request) {
-        Ticket ticket = ticketService.addTicket(request);
+        final Ticket ticket = ticketService.addTicket(request);
         log.info("A request for a ticket to be added has been submitted");
 
         URI location = UriComponentsBuilder
@@ -45,9 +61,16 @@ public class TicketController {
         return ResponseEntity.created(location).build();
     }
 
+    /**
+     * Returns tickets matching the supplied criteria.
+     *
+     * @param id
+     *     identifier of the target resource
+     * @return HTTP response describing the operation result
+     */
     @GetMapping(URIConstants.PROJECTIONS_ID_TICKETS_PATH)
     public ResponseEntity<List<TicketDto>> getTicketsByProjectionId(@PathVariable int id) {
-        List<TicketDto> ticketDtos = ticketService.getTicketsByProjectionId(id);
+        final List<TicketDto> ticketDtos = ticketService.getTicketsByProjectionId(id);
         log.info(String.format("All tickets with projection id %d were requested from the database", id));
 
         return ResponseEntity.ok(ticketDtos);

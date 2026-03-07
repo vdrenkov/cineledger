@@ -15,10 +15,10 @@ class CsrfControllerTest {
 
     @Test
     void csrf_returnsTokenPayload() {
-        CsrfToken csrfToken = mock(CsrfToken.class);
+        final CsrfToken csrfToken = mock(CsrfToken.class);
         when(csrfToken.getToken()).thenReturn("csrf-token");
 
-        Map<String, String> body = csrfController.csrf(csrfToken).getBody();
+        final Map<String, String> body = csrfController.csrf(csrfToken).getBody();
 
         assertEquals(Map.of("token", "csrf-token"), body);
     }

@@ -9,6 +9,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
+/**
+ * Captures the API request payload for program operations.
+ */
 @AllArgsConstructor
 @NoArgsConstructor
 @Data

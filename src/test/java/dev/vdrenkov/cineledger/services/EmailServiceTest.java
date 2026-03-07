@@ -1,13 +1,13 @@
 package dev.vdrenkov.cineledger.services;
 
-import dev.vdrenkov.cineledger.models.entities.Order;
-import dev.vdrenkov.cineledger.models.entities.User;
-import dev.vdrenkov.cineledger.testUtils.constants.UserConstants;
-import dev.vdrenkov.cineledger.testUtils.factories.OrderFactory;
-import dev.vdrenkov.cineledger.testUtils.factories.UserFactory;
 import com.mailjet.client.MailjetResponse;
 import com.mailjet.client.errors.MailjetException;
 import com.mailjet.client.errors.MailjetSocketTimeoutException;
+import dev.vdrenkov.cineledger.models.entities.Order;
+import dev.vdrenkov.cineledger.models.entities.User;
+import dev.vdrenkov.cineledger.testutils.constants.UserConstants;
+import dev.vdrenkov.cineledger.testutils.factories.OrderFactory;
+import dev.vdrenkov.cineledger.testutils.factories.UserFactory;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -20,8 +20,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
+/**
+ * Tests email service behavior.
+ */
 @ExtendWith(MockitoExtension.class)
-public class EmailServiceTest {
+class EmailServiceTest {
 
     @Mock
     private MailjetResponse mailjetResponse;
@@ -29,11 +32,14 @@ public class EmailServiceTest {
     @InjectMocks
     private EmailService emailService;
 
+    /**
+     * Verifies that send Order Confirmation Email.
+     */
     @Test
-    public void testSendOrderConfirmationEmail() throws JSONException, MailjetSocketTimeoutException, MailjetException {
-        User user = UserFactory.getDefaultUser();
-        Order order = OrderFactory.getDefaultOrder();
-        JSONObject data = new JSONObject();
+    void testSendOrderConfirmationEmail() throws JSONException, MailjetSocketTimeoutException, MailjetException {
+        final User user = UserFactory.getDefaultUser();
+        final Order order = OrderFactory.getDefaultOrder();
+        final JSONObject data = new JSONObject();
         when(mailjetResponse.getStatus()).thenReturn(200);
         data.put("Email", user.getEmail());
         when(mailjetResponse.getData()).thenReturn(new JSONArray().put(data));
@@ -44,11 +50,13 @@ public class EmailServiceTest {
         assertEquals(user.getEmail(), mailjetResponse.getData().getJSONObject(0).getString("Email"));
     }
 
+    /**
+     * Verifies that send Password Confirmation Email.
+     */
     @Test
-    public void testSendPasswordConfirmationEmail()
-        throws JSONException, MailjetSocketTimeoutException, MailjetException {
-        User user = UserFactory.getDefaultUser();
-        JSONObject data = new JSONObject();
+    void testSendPasswordConfirmationEmail() throws JSONException, MailjetSocketTimeoutException, MailjetException {
+        final User user = UserFactory.getDefaultUser();
+        final JSONObject data = new JSONObject();
         when(mailjetResponse.getStatus()).thenReturn(200);
         data.put("Email", user.getEmail());
         when(mailjetResponse.getData()).thenReturn(new JSONArray().put(data));
@@ -59,13 +67,15 @@ public class EmailServiceTest {
         assertEquals(user.getEmail(), mailjetResponse.getData().getJSONObject(0).getString("Email"));
     }
 
+    /**
+     * Verifies that send Registration Confirmation Email.
+     */
     @Test
-    public void testSendRegistrationConfirmationEmail()
-        throws JSONException, MailjetSocketTimeoutException, MailjetException {
+    void testSendRegistrationConfirmationEmail() throws JSONException, MailjetSocketTimeoutException, MailjetException {
 
-        User user = UserFactory.getDefaultUser();
+        final User user = UserFactory.getDefaultUser();
 
-        JSONObject data = new JSONObject();
+        final JSONObject data = new JSONObject();
         when(mailjetResponse.getStatus()).thenReturn(200);
         data.put("Email", user.getEmail());
         when(mailjetResponse.getData()).thenReturn(new JSONArray().put(data));

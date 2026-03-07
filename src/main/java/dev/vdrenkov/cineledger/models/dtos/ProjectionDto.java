@@ -5,6 +5,9 @@ import lombok.Data;
 
 import java.time.LocalTime;
 
+/**
+ * Represents the API response payload for projection data.
+ */
 @AllArgsConstructor
 @Data
 public class ProjectionDto {

@@ -1,9 +1,9 @@
 package dev.vdrenkov.cineledger.mappers;
 
 import dev.vdrenkov.cineledger.models.dtos.MovieDto;
-import dev.vdrenkov.cineledger.testUtils.constants.MovieConstants;
-import dev.vdrenkov.cineledger.testUtils.factories.CategoryFactory;
-import dev.vdrenkov.cineledger.testUtils.factories.MovieFactory;
+import dev.vdrenkov.cineledger.testutils.constants.MovieConstants;
+import dev.vdrenkov.cineledger.testutils.factories.CategoryFactory;
+import dev.vdrenkov.cineledger.testutils.factories.MovieFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,8 +18,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+/**
+ * Tests movie mapper behavior.
+ */
 @ExtendWith(MockitoExtension.class)
-public class MovieMapperTest {
+class MovieMapperTest {
 
     @Mock
     private CategoryMapper categoryMapper;
@@ -27,11 +30,14 @@ public class MovieMapperTest {
     @InjectMocks
     private MovieMapper movieMapper;
 
+    /**
+     * Verifies that map Movie To Movie DTO success.
+     */
     @Test
-    public void testMapMovieToMovieDto_success() {
+    void testMapMovieToMovieDto_success() {
         when(categoryMapper.mapCategoryToCategoryDto(any())).thenReturn(CategoryFactory.getDefaultCategoryDto());
 
-        MovieDto movieDto = movieMapper.mapMovieToMovieDto(MovieFactory.getDefaultMovie());
+        final MovieDto movieDto = movieMapper.mapMovieToMovieDto(MovieFactory.getDefaultMovie());
 
         Assertions.assertEquals(MovieConstants.ID, movieDto.getId());
         Assertions.assertEquals(MovieConstants.TITLE, movieDto.getTitle());
@@ -42,12 +48,15 @@ public class MovieMapperTest {
         assertTrue(Objects.nonNull(movieDto.getCategory()));
     }
 
+    /**
+     * Verifies that map Movie List To Movie DTO List success.
+     */
     @Test
-    public void testMapMovieListToMovieDtoList_success() {
+    void testMapMovieListToMovieDtoList_success() {
         when(categoryMapper.mapCategoryToCategoryDto(any())).thenReturn(CategoryFactory.getDefaultCategoryDto());
 
-        List<MovieDto> movieDtos = movieMapper.mapMovieListToMovieDtoList(MovieFactory.getDefaultMovieList());
-        MovieDto movieDto = movieDtos.get(0);
+        final List<MovieDto> movieDtos = movieMapper.mapMovieListToMovieDtoList(MovieFactory.getDefaultMovieList());
+        final MovieDto movieDto = movieDtos.get(0);
 
         Assertions.assertEquals(MovieConstants.ID, movieDto.getId());
         Assertions.assertEquals(MovieConstants.TITLE, movieDto.getTitle());

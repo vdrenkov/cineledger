@@ -11,6 +11,9 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * Calculates income-focused reporting data for the cinema domain.
+ */
 @Service
 public class IncomeReportService {
 
@@ -24,6 +27,24 @@ public class IncomeReportService {
     private final OrderService orderService;
     private final TicketService ticketService;
 
+    /**
+     * Creates a new income report service with its required collaborators.
+     *
+     * @param cinemaService
+     *     cinema service used by the operation
+     * @param hallService
+     *     hall service used by the operation
+     * @param itemService
+     *     item service used by the operation
+     * @param movieService
+     *     movie service used by the operation
+     * @param userService
+     *     user service used by the operation
+     * @param orderService
+     *     order service used by the operation
+     * @param ticketService
+     *     ticket service used by the operation
+     */
     @Autowired
     public IncomeReportService(CinemaService cinemaService, HallService hallService, ItemService itemService,
         MovieService movieService, UserService userService, OrderService orderService, TicketService ticketService) {
@@ -36,12 +57,23 @@ public class IncomeReportService {
         this.ticketService = ticketService;
     }
 
+    /**
+     * Returns all incomes matching the supplied criteria.
+     *
+     * @param id
+     *     identifier of the target resource
+     * @param startDate
+     *     start date of the requested interval
+     * @param endDate
+     *     end date of the requested interval
+     * @return requested double value
+     */
     public double getAllIncomesByCinemaId(int id, LocalDate startDate, LocalDate endDate) {
         double incomes = 0;
 
         cinemaService.getCinemaById(id);
 
-        List<Order> allOrders = orderService.getOrdersByDateBetween(startDate, endDate);
+        final List<Order> allOrders = orderService.getOrdersByDateBetween(startDate, endDate);
 
         for (Order order : allOrders) {
             if (isOrderWithinDateRange(order, startDate, endDate) && isOrderFromCinema(order, id)) {
@@ -54,12 +86,23 @@ public class IncomeReportService {
         return incomes;
     }
 
+    /**
+     * Returns all incomes matching the supplied criteria.
+     *
+     * @param id
+     *     identifier of the target resource
+     * @param startDate
+     *     start date of the requested interval
+     * @param endDate
+     *     end date of the requested interval
+     * @return requested double value
+     */
     public double getAllIncomesByHallId(int id, LocalDate startDate, LocalDate endDate) {
         double incomes = 0;
 
         hallService.getHallById(id);
 
-        List<Order> allOrders = orderService.getOrdersByDateBetween(startDate, endDate);
+        final List<Order> allOrders = orderService.getOrdersByDateBetween(startDate, endDate);
 
         for (Order order : allOrders) {
             if (isOrderWithinDateRange(order, startDate, endDate) && isOrderFromHall(order, id)) {
@@ -72,12 +115,23 @@ public class IncomeReportService {
         return incomes;
     }
 
+    /**
+     * Returns all incomes matching the supplied criteria.
+     *
+     * @param id
+     *     identifier of the target resource
+     * @param startDate
+     *     start date of the requested interval
+     * @param endDate
+     *     end date of the requested interval
+     * @return requested double value
+     */
     public double getAllIncomesByItemId(int id, LocalDate startDate, LocalDate endDate) {
         double incomes = 0;
 
         itemService.getItemDtoById(id);
 
-        List<Order> allOrders = orderService.getOrdersByDateBetween(startDate, endDate);
+        final List<Order> allOrders = orderService.getOrdersByDateBetween(startDate, endDate);
 
         for (Order order : allOrders) {
             if (isOrderWithinDateRange(order, startDate, endDate)) {
@@ -94,12 +148,23 @@ public class IncomeReportService {
         return incomes;
     }
 
+    /**
+     * Returns all incomes matching the supplied criteria.
+     *
+     * @param id
+     *     identifier of the target resource
+     * @param startDate
+     *     start date of the requested interval
+     * @param endDate
+     *     end date of the requested interval
+     * @return requested double value
+     */
     public double getAllIncomesByMovieId(int id, LocalDate startDate, LocalDate endDate) {
         double incomes = 0;
 
         movieService.getMovieById(id);
 
-        List<Ticket> allTickets = ticketService.getTicketsByDateBetween(startDate, endDate);
+        final List<Ticket> allTickets = ticketService.getTicketsByDateBetween(startDate, endDate);
 
         for (Ticket ticket : allTickets) {
             if (isTicketWithinDateRange(ticket, startDate, endDate) && isTicketForMovie(ticket, id)) {
@@ -112,12 +177,23 @@ public class IncomeReportService {
         return incomes;
     }
 
+    /**
+     * Returns all incomes matching the supplied criteria.
+     *
+     * @param id
+     *     identifier of the target resource
+     * @param startDate
+     *     start date of the requested interval
+     * @param endDate
+     *     end date of the requested interval
+     * @return requested double value
+     */
     public double getAllIncomesByUserId(int id, LocalDate startDate, LocalDate endDate) {
         double incomes = 0;
 
         userService.getUserById(id);
 
-        List<Order> allOrders = orderService.getOrdersByDateBetween(startDate, endDate);
+        final List<Order> allOrders = orderService.getOrdersByDateBetween(startDate, endDate);
 
         for (Order order : allOrders) {
             if (isOrderWithinDateRange(order, startDate, endDate) && isOrderFromUser(order, id)) {
@@ -131,7 +207,7 @@ public class IncomeReportService {
     }
 
     private boolean isOrderFromCinema(Order order, int cinemaId) {
-        List<Ticket> tickets = order.getTickets();
+        final List<Ticket> tickets = order.getTickets();
 
         for (Ticket ticket : tickets) {
             if (cinemaId == ticket.getProjection().getHall().getCinema().getId()) {
@@ -148,7 +224,7 @@ public class IncomeReportService {
     }
 
     private boolean isOrderFromHall(Order order, int hallId) {
-        List<Ticket> tickets = order.getTickets();
+        final List<Ticket> tickets = order.getTickets();
 
         for (Ticket ticket : tickets) {
             if (hallId == ticket.getProjection().getHall().getId()) {
@@ -173,14 +249,14 @@ public class IncomeReportService {
     }
 
     private boolean isTicketWithinDateRange(Ticket ticket, LocalDate startDate, LocalDate endDate) {
-        LocalDate ticketDate = ticket.getDateOfPurchase();
+        final LocalDate ticketDate = ticket.getDateOfPurchase();
 
         return ticketDate.isEqual(startDate) || ticketDate.isEqual(endDate) || (ticketDate.isAfter(startDate)
             && ticketDate.isBefore(endDate));
     }
 
     private boolean isOrderWithinDateRange(Order order, LocalDate startDate, LocalDate endDate) {
-        LocalDate orderDate = order.getDateOfPurchase();
+        final LocalDate orderDate = order.getDateOfPurchase();
 
         return orderDate.isEqual(startDate) || (orderDate.isAfter(startDate) && orderDate.isBefore(endDate));
     }

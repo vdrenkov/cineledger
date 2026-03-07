@@ -1,8 +1,8 @@
 package dev.vdrenkov.cineledger.controllers;
 
 import dev.vdrenkov.cineledger.services.HallService;
-import dev.vdrenkov.cineledger.testUtils.factories.CinemaFactory;
-import dev.vdrenkov.cineledger.testUtils.factories.HallFactory;
+import dev.vdrenkov.cineledger.testutils.factories.CinemaFactory;
+import dev.vdrenkov.cineledger.testutils.factories.HallFactory;
 import dev.vdrenkov.cineledger.utils.constants.URIConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,8 +17,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import tools.jackson.databind.ObjectMapper;
 
-import static dev.vdrenkov.cineledger.testUtils.constants.HallConstants.CAPACITY;
-import static dev.vdrenkov.cineledger.testUtils.constants.HallConstants.ID;
+import static dev.vdrenkov.cineledger.testutils.constants.HallConstants.CAPACITY;
+import static dev.vdrenkov.cineledger.testutils.constants.HallConstants.ID;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
@@ -29,12 +29,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+/**
+ * Tests hall controller behavior.
+ */
 @AutoConfigureMockMvc
 @ExtendWith(MockitoExtension.class)
-public class HallControllerTest {
+class HallControllerTest {
 
     private static final String RETURN_OLD = "returnOld";
-    private final static ObjectMapper objectMapper = new ObjectMapper();
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     private MockMvc mockMvc;
 
@@ -44,14 +47,20 @@ public class HallControllerTest {
     @InjectMocks
     private HallController hallController;
 
+    /**
+     * Initializes the test fixture before each test case.
+     */
     @BeforeEach
-    public void setup() {
+    void setup() {
         mockMvc = MockMvcBuilders.standaloneSetup(hallController).build();
     }
 
+    /**
+     * Verifies that add Hall hall Added success.
+     */
     @Test
-    public void testAddHall_hallAdded_success() throws Exception {
-        String json = objectMapper.writeValueAsString(HallFactory.getDefaultHallRequest());
+    void testAddHall_hallAdded_success() throws Exception {
+        final String json = objectMapper.writeValueAsString(HallFactory.getDefaultHallRequest());
         when(hallService.addHall(any())).thenReturn(HallFactory.getDefaultHall());
 
         mockMvc
@@ -63,8 +72,11 @@ public class HallControllerTest {
             .andExpect(header().stringValues("Location", URIConstants.HALLS_PATH + "/" + ID));
     }
 
+    /**
+     * Verifies that get Halls By Cinema Id no Exceptions success.
+     */
     @Test
-    public void testGetHallsByCinemaId_noExceptions_success() throws Exception {
+    void testGetHallsByCinemaId_noExceptions_success() throws Exception {
         when(hallService.getHallsByCinemaId(anyInt())).thenReturn(HallFactory.getDefaultHallDtoList());
 
         mockMvc
@@ -77,10 +89,13 @@ public class HallControllerTest {
             .andExpect(jsonPath("$[0].cinema.city").value(CinemaFactory.getDefaultCinemaDto().getCity()));
     }
 
+    /**
+     * Verifies that update Hall return Old True success.
+     */
     @Test
-    public void testUpdateHall_returnOldTrue_success() throws Exception {
+    void testUpdateHall_returnOldTrue_success() throws Exception {
         when(hallService.updateHall(any(), anyInt())).thenReturn(HallFactory.getDefaultHallDto());
-        String json = objectMapper.writeValueAsString(HallFactory.getDefaultHallRequest());
+        final String json = objectMapper.writeValueAsString(HallFactory.getDefaultHallRequest());
 
         mockMvc
             .perform(put(URIConstants.HALLS_ID_PATH, ID)
@@ -95,18 +110,24 @@ public class HallControllerTest {
             .andExpect(jsonPath("$.cinema.city").value(CinemaFactory.getDefaultCinemaDto().getCity()));
     }
 
+    /**
+     * Verifies that update Hall return Old False success.
+     */
     @Test
-    public void testUpdateHall_returnOldFalse_success() throws Exception {
+    void testUpdateHall_returnOldFalse_success() throws Exception {
         when(hallService.updateHall(any(), anyInt())).thenReturn(HallFactory.getDefaultHallDto());
-        String json = objectMapper.writeValueAsString(HallFactory.getDefaultHallRequest());
+        final String json = objectMapper.writeValueAsString(HallFactory.getDefaultHallRequest());
 
         mockMvc
             .perform(put(URIConstants.HALLS_ID_PATH, ID).contentType(MediaType.APPLICATION_JSON).content(json))
             .andExpect(status().isNoContent());
     }
 
+    /**
+     * Verifies that delete Hall return Old True success.
+     */
     @Test
-    public void testDeleteHall_returnOldTrue_success() throws Exception {
+    void testDeleteHall_returnOldTrue_success() throws Exception {
         when(hallService.deleteHall(anyInt())).thenReturn(HallFactory.getDefaultHallDto());
 
         mockMvc
@@ -119,8 +140,11 @@ public class HallControllerTest {
             .andExpect(jsonPath("$.cinema.city").value(CinemaFactory.getDefaultCinemaDto().getCity()));
     }
 
+    /**
+     * Verifies that delete Hall return Old False success.
+     */
     @Test
-    public void testDeleteHall_returnOldFalse_success() throws Exception {
+    void testDeleteHall_returnOldFalse_success() throws Exception {
         when(hallService.deleteHall(anyInt())).thenReturn(HallFactory.getDefaultHallDto());
 
         mockMvc.perform(delete(URIConstants.HALLS_ID_PATH, ID)).andExpect(status().isNoContent());

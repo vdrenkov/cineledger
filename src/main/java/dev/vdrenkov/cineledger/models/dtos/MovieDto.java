@@ -6,6 +6,9 @@ import lombok.Data;
 import java.time.Duration;
 import java.time.LocalDate;
 
+/**
+ * Represents the API response payload for movie data.
+ */
 @AllArgsConstructor
 @Data
 public class MovieDto {

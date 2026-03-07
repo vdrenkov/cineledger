@@ -2,11 +2,11 @@ package dev.vdrenkov.cineledger.services;
 
 import dev.vdrenkov.cineledger.models.dtos.ItemDto;
 import dev.vdrenkov.cineledger.models.entities.Category;
-import dev.vdrenkov.cineledger.testUtils.constants.ItemConstants;
-import dev.vdrenkov.cineledger.testUtils.constants.MovieConstants;
-import dev.vdrenkov.cineledger.testUtils.constants.ReportConstants;
-import dev.vdrenkov.cineledger.testUtils.factories.OrderFactory;
-import dev.vdrenkov.cineledger.testUtils.factories.TicketFactory;
+import dev.vdrenkov.cineledger.testutils.constants.ItemConstants;
+import dev.vdrenkov.cineledger.testutils.constants.MovieConstants;
+import dev.vdrenkov.cineledger.testutils.constants.ReportConstants;
+import dev.vdrenkov.cineledger.testutils.factories.OrderFactory;
+import dev.vdrenkov.cineledger.testutils.factories.TicketFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,8 +23,11 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
+/**
+ * Tests statistics report service behavior.
+ */
 @ExtendWith(MockitoExtension.class)
-public class StatisticsReportServiceTest {
+class StatisticsReportServiceTest {
 
     @Mock
     private CategoryService categoryService;
@@ -44,8 +47,11 @@ public class StatisticsReportServiceTest {
     @InjectMocks
     private StatisticsReportService statisticsReportService;
 
+    /**
+     * Verifies that get Purchased Tickets Count By Movie Category success.
+     */
     @Test
-    public void testGetPurchasedTicketsCountByMovieCategory_success() {
+    void testGetPurchasedTicketsCountByMovieCategory_success() {
         when(categoryService.getCategoryById(anyInt())).thenReturn(new Category());
         when(ticketService.getTicketsByDateBetween(any(), any())).thenReturn(TicketFactory.getDefaultTicketList());
 
@@ -55,9 +61,12 @@ public class StatisticsReportServiceTest {
         assertEquals(1, result);
     }
 
+    /**
+     * Verifies that get Purchased Tickets Count By Movie Title success.
+     */
     @Test
-    public void testGetPurchasedTicketsCountByMovieTitle_success() {
-        List<Integer> movieIds = Arrays.asList(1, 2, 3);
+    void testGetPurchasedTicketsCountByMovieTitle_success() {
+        final List<Integer> movieIds = Arrays.asList(1, 2, 3);
         when(movieService.getIdsOfMoviesByTitle(anyString())).thenReturn(movieIds);
         when(ticketService.getTicketsByDateBetween(any(), any())).thenReturn(TicketFactory.getDefaultTicketList());
 
@@ -67,8 +76,11 @@ public class StatisticsReportServiceTest {
         assertEquals(1, result);
     }
 
+    /**
+     * Verifies that get Purchased Items Count By Item Name success.
+     */
     @Test
-    public void testGetPurchasedItemsCountByItemName_success() {
+    void testGetPurchasedItemsCountByItemName_success() {
         when(itemService.getItemDtoByName(anyString())).thenReturn(new ItemDto());
         when(orderService.getOrdersByDateBetween(any(), any())).thenReturn(OrderFactory.getDefaultOrderList());
 

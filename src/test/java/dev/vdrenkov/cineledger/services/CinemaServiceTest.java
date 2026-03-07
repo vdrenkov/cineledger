@@ -6,8 +6,8 @@ import dev.vdrenkov.cineledger.mappers.CinemaMapper;
 import dev.vdrenkov.cineledger.models.dtos.CinemaDto;
 import dev.vdrenkov.cineledger.models.entities.Cinema;
 import dev.vdrenkov.cineledger.repositories.CinemaRepository;
-import dev.vdrenkov.cineledger.testUtils.constants.CinemaConstants;
-import dev.vdrenkov.cineledger.testUtils.factories.CinemaFactory;
+import dev.vdrenkov.cineledger.testutils.constants.CinemaConstants;
+import dev.vdrenkov.cineledger.testutils.factories.CinemaFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -24,8 +24,11 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
+/**
+ * Tests cinema service behavior.
+ */
 @ExtendWith(MockitoExtension.class)
-public class CinemaServiceTest {
+class CinemaServiceTest {
 
     @Mock
     private CinemaRepository cinemaRepository;
@@ -36,18 +39,24 @@ public class CinemaServiceTest {
     @InjectMocks
     private CinemaService cinemaService;
 
+    /**
+     * Verifies that add Cinema no Exceptions success.
+     */
     @Test
-    public void testAddCinema_noExceptions_success() {
-        Cinema expected = CinemaFactory.getDefaultCinema();
+    void testAddCinema_noExceptions_success() {
+        final Cinema expected = CinemaFactory.getDefaultCinema();
         when(cinemaRepository.save(any())).thenReturn(expected);
 
-        Cinema cinema = cinemaService.addCinema(CinemaFactory.getDefaultCinemaRequest());
+        final Cinema cinema = cinemaService.addCinema(CinemaFactory.getDefaultCinemaRequest());
 
         assertEquals(expected, cinema);
     }
 
+    /**
+     * Verifies that add Cinema cinema Exists success.
+     */
     @Test
-    public void testAddCinema_cinemaExists_success() {
+    void testAddCinema_cinemaExists_success() {
         assertThrows(CinemaAlreadyExistsException.class, () -> {
 
             when(cinemaRepository.findByCityAndAddress(anyString(), anyString())).thenReturn(Optional.of(new Cinema()));
@@ -57,8 +66,11 @@ public class CinemaServiceTest {
         });
     }
 
+    /**
+     * Verifies that get All Cinemas city And Address Null throws Illegal Argument Exception.
+     */
     @Test
-    public void testGetAllCinemas_cityAndAddressNull_throwsIllegalArgumentException() {
+    void testGetAllCinemas_cityAndAddressNull_throwsIllegalArgumentException() {
         assertThrows(IllegalArgumentException.class, () -> {
 
             cinemaService.getAllCinemas(null, null);
@@ -66,52 +78,67 @@ public class CinemaServiceTest {
         });
     }
 
+    /**
+     * Verifies that get All Cinemas city And Address Not Null success.
+     */
     @Test
-    public void testGetAllCinemas_cityAndAddressNotNull_success() {
-        List<CinemaDto> expected = CinemaFactory.getDefaultCinemaDtoList();
+    void testGetAllCinemas_cityAndAddressNotNull_success() {
+        final List<CinemaDto> expected = CinemaFactory.getDefaultCinemaDtoList();
         when(cinemaMapper.mapCinemaToCinemaDtoList(any())).thenReturn(expected);
         when(cinemaRepository.findAllByCityAndAddress(anyString(), anyString())).thenReturn(
             CinemaFactory.getDefaultCinemaList());
 
-        List<CinemaDto> result = cinemaService.getAllCinemas(CinemaConstants.CITY, CinemaConstants.ADDRESS);
+        final List<CinemaDto> result = cinemaService.getAllCinemas(CinemaConstants.CITY, CinemaConstants.ADDRESS);
 
         assertEquals(expected, result);
     }
 
+    /**
+     * Verifies that get All Cinemas city Not Null success.
+     */
     @Test
-    public void testGetAllCinemas_cityNotNull_success() {
-        List<CinemaDto> expected = CinemaFactory.getDefaultCinemaDtoList();
+    void testGetAllCinemas_cityNotNull_success() {
+        final List<CinemaDto> expected = CinemaFactory.getDefaultCinemaDtoList();
         when(cinemaMapper.mapCinemaToCinemaDtoList(any())).thenReturn(expected);
         when(cinemaRepository.findAllByCity(anyString())).thenReturn(CinemaFactory.getDefaultCinemaList());
 
-        List<CinemaDto> result = cinemaService.getAllCinemas(CinemaConstants.CITY, null);
+        final List<CinemaDto> result = cinemaService.getAllCinemas(CinemaConstants.CITY, null);
 
         assertEquals(expected, result);
     }
 
+    /**
+     * Verifies that get All Cinemas address Not Null success.
+     */
     @Test
-    public void testGetAllCinemas_addressNotNull_success() {
-        List<CinemaDto> expected = CinemaFactory.getDefaultCinemaDtoList();
+    void testGetAllCinemas_addressNotNull_success() {
+        final List<CinemaDto> expected = CinemaFactory.getDefaultCinemaDtoList();
         when(cinemaMapper.mapCinemaToCinemaDtoList(any())).thenReturn(expected);
         when(cinemaRepository.findAllByAddress(anyString())).thenReturn(CinemaFactory.getDefaultCinemaList());
 
-        List<CinemaDto> result = cinemaService.getAllCinemas(null, CinemaConstants.ADDRESS);
+        final List<CinemaDto> result = cinemaService.getAllCinemas(null, CinemaConstants.ADDRESS);
 
         assertEquals(expected, result);
     }
 
+    /**
+     * Verifies that get Cinema By Id cinema Found success.
+     */
     @Test
-    public void testGetCinemaById_cinemaFound_success() {
-        Cinema expected = CinemaFactory.getDefaultCinema();
+    void testGetCinemaById_cinemaFound_success() {
+        final Cinema expected = CinemaFactory.getDefaultCinema();
         when(cinemaRepository.findById(anyInt())).thenReturn(Optional.of(CinemaFactory.getDefaultCinema()));
 
-        Cinema cinema = cinemaService.getCinemaById(CinemaConstants.ID);
+        final Cinema cinema = cinemaService.getCinemaById(CinemaConstants.ID);
 
         assertEquals(expected, cinema);
     }
 
+    /**
+     * Verifies that get Cinema By Id cinema Not Found throws Cinema Not Found Exception.
+     */
     @Test
-    public void testGetCinemaById_cinemaNotFound_throwsCinemaNotFoundException() {
+    void testGetCinemaById_cinemaNotFound_throwsCinemaNotFoundException() {
         assertThrows(CinemaNotFoundException.class, () -> {
 
             cinemaService.getCinemaById(CinemaConstants.ID);
@@ -119,48 +146,61 @@ public class CinemaServiceTest {
         });
     }
 
+    /**
+     * Verifies that get Cinema DTO By Id cinema DTO Found success.
+     */
     @Test
-    public void testGetCinemaDtoById_cinemaDtoFound_success() {
-        CinemaDto expected = CinemaFactory.getDefaultCinemaDto();
+    void testGetCinemaDtoById_cinemaDtoFound_success() {
+        final CinemaDto expected = CinemaFactory.getDefaultCinemaDto();
         when(cinemaMapper.mapCinemaToCinemaDto(any())).thenReturn(expected);
         when(cinemaRepository.findById(anyInt())).thenReturn(Optional.of(new Cinema()));
 
-        CinemaDto cinemaDto = cinemaService.getCinemaDtoById(CinemaConstants.ID);
+        final CinemaDto cinemaDto = cinemaService.getCinemaDtoById(CinemaConstants.ID);
 
         assertEquals(expected, cinemaDto);
     }
 
+    /**
+     * Verifies that update Cinema cinema Updated success.
+     */
     @Test
-    public void testUpdateCinema_cinemaUpdated_success() {
-        CinemaDto expected = CinemaFactory.getDefaultCinemaDto();
+    void testUpdateCinema_cinemaUpdated_success() {
+        final CinemaDto expected = CinemaFactory.getDefaultCinemaDto();
         when(cinemaMapper.mapCinemaToCinemaDto(any())).thenReturn(expected);
         when(cinemaRepository.findById(anyInt())).thenReturn(Optional.of(CinemaFactory.getDefaultCinema()));
         when(cinemaRepository.save(any())).thenReturn(CinemaFactory.getDefaultCinema());
 
-        CinemaDto cinemaDto = cinemaService.updateCinema(CinemaFactory.getDefaultCinemaRequest(), CinemaConstants.ID);
+        final CinemaDto cinemaDto = cinemaService.updateCinema(CinemaFactory.getDefaultCinemaRequest(),
+            CinemaConstants.ID);
 
         assertEquals(expected, cinemaDto);
     }
 
+    /**
+     * Verifies that delete Cinema cinema Deleted success.
+     */
     @Test
-    public void testDeleteCinema_cinemaDeleted_success() {
-        CinemaDto expected = CinemaFactory.getDefaultCinemaDto();
+    void testDeleteCinema_cinemaDeleted_success() {
+        final CinemaDto expected = CinemaFactory.getDefaultCinemaDto();
         when(cinemaMapper.mapCinemaToCinemaDto(any())).thenReturn(expected);
         when(cinemaRepository.findById(anyInt())).thenReturn(Optional.of(CinemaFactory.getDefaultCinema()));
 
-        CinemaDto cinemaDto = cinemaService.deleteCinema(CinemaConstants.ID);
+        final CinemaDto cinemaDto = cinemaService.deleteCinema(CinemaConstants.ID);
 
         assertEquals(expected, cinemaDto);
     }
 
+    /**
+     * Verifies that update Cinema Average Rating success.
+     */
     @Test
-    public void testUpdateCinemaAverageRating_success() {
-        double newRating = 4.5;
+    void testUpdateCinemaAverageRating_success() {
+        final double newRating = 4.5;
 
         when(cinemaMapper.mapCinemaToCinemaDto(any())).thenReturn(CinemaFactory.getDefaultCinemaDto());
         when(cinemaRepository.findById(anyInt())).thenReturn(Optional.of(CinemaFactory.getDefaultCinema()));
 
-        CinemaDto result = cinemaService.updateCinemaAverageRating(newRating, CinemaConstants.ID);
+        final CinemaDto result = cinemaService.updateCinemaAverageRating(newRating, CinemaConstants.ID);
 
         assertEquals(newRating, result.getAverageRating(), 0.01);
     }

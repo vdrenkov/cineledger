@@ -20,6 +20,9 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Contains business logic for review operations.
+ */
 @Service
 public class ReviewService {
 
@@ -31,6 +34,20 @@ public class ReviewService {
     private final MovieService movieService;
     private final CinemaService cinemaService;
 
+    /**
+     * Creates a new review service with its required collaborators.
+     *
+     * @param reviewRepository
+     *     review repository used by the operation
+     * @param reviewMapper
+     *     review mapper used by the operation
+     * @param userService
+     *     user service used by the operation
+     * @param movieService
+     *     movie service used by the operation
+     * @param cinemaService
+     *     cinema service used by the operation
+     */
     @Autowired
     public ReviewService(ReviewRepository reviewRepository, ReviewMapper reviewMapper, UserService userService,
         MovieService movieService, CinemaService cinemaService) {
@@ -41,38 +58,63 @@ public class ReviewService {
         this.cinemaService = cinemaService;
     }
 
+    /**
+     * Creates and persists movie review.
+     *
+     * @param request
+     *     request payload containing the submitted data
+     * @param movieId
+     *     identifier of the target movie
+     * @return requested review value
+     */
     public Review addMovieReview(ReviewRequest request, int movieId) {
-        User user = userService.getCurrentUser();
-        Movie movie = movieService.getMovieById(movieId);
-        LocalDate now = LocalDate.now();
-        Review review = new Review(request.getRating(), request.getReviewText(), now, movie, user);
+        final User user = userService.getCurrentUser();
+        final Movie movie = movieService.getMovieById(movieId);
+        final LocalDate now = LocalDate.now();
+        final Review review = new Review(request.getRating(), request.getReviewText(), now, movie, user);
 
         log.info("An attempt to add a new review in the database");
 
         reviewRepository.save(review);
 
-        double averageRating = calculateAverageRatingForMovie(movieId);
+        final double averageRating = calculateAverageRatingForMovie(movieId);
         movieService.updateMovieAverageRating(averageRating, movieId);
 
         return review;
     }
 
+    /**
+     * Creates and persists cinema review.
+     *
+     * @param request
+     *     request payload containing the submitted data
+     * @param cinemaId
+     *     identifier of the target cinema
+     * @return requested review value
+     */
     public Review addCinemaReview(ReviewRequest request, int cinemaId) {
-        User user = userService.getCurrentUser();
-        Cinema cinema = cinemaService.getCinemaById(cinemaId);
-        LocalDate now = LocalDate.now();
-        Review review = new Review(request.getRating(), request.getReviewText(), now, cinema, user);
+        final User user = userService.getCurrentUser();
+        final Cinema cinema = cinemaService.getCinemaById(cinemaId);
+        final LocalDate now = LocalDate.now();
+        final Review review = new Review(request.getRating(), request.getReviewText(), now, cinema, user);
 
         log.info("An attempt to add a new review in the database");
 
         reviewRepository.save(review);
 
-        double averageRating = calculateAverageRatingForCinema(cinemaId);
+        final double averageRating = calculateAverageRatingForCinema(cinemaId);
         cinemaService.updateCinemaAverageRating(averageRating, cinemaId);
 
         return review;
     }
 
+    /**
+     * Returns reviews matching the supplied criteria.
+     *
+     * @param movieId
+     *     identifier of the target movie
+     * @return matching review dto values
+     */
     public List<ReviewDto> getReviewsByMovieId(int movieId) {
         movieService.getMovieById(movieId);
 
@@ -85,6 +127,13 @@ public class ReviewService {
             .collect(Collectors.toList());
     }
 
+    /**
+     * Returns reviews matching the supplied criteria.
+     *
+     * @param cinemaId
+     *     identifier of the target cinema
+     * @return matching review dto values
+     */
     public List<ReviewDto> getReviewsByCinemaId(int cinemaId) {
         cinemaService.getCinemaById(cinemaId);
 
@@ -97,6 +146,13 @@ public class ReviewService {
             .collect(Collectors.toList());
     }
 
+    /**
+     * Returns movie reviews matching the supplied criteria.
+     *
+     * @param userId
+     *     identifier of the target user
+     * @return matching review dto values
+     */
     public List<ReviewDto> getMovieReviewsByUserId(int userId) {
         if (userService.isCurrentUserAuthorized(userId)) {
             return reviewMapper.mapReviewListToReviewDtoList(
@@ -106,6 +162,13 @@ public class ReviewService {
         }
     }
 
+    /**
+     * Returns cinema reviews matching the supplied criteria.
+     *
+     * @param userId
+     *     identifier of the target user
+     * @return matching review dto values
+     */
     public List<ReviewDto> getCinemaReviewsByUserId(int userId) {
         if (userService.isCurrentUserAuthorized(userId)) {
             return reviewMapper.mapReviewListToReviewDtoList(
@@ -115,6 +178,15 @@ public class ReviewService {
         }
     }
 
+    /**
+     * Updates review and returns the previous state when needed.
+     *
+     * @param request
+     *     request payload containing the submitted data
+     * @param reviewId
+     *     identifier of the target review
+     * @return review dto result
+     */
     public ReviewDto updateReview(ReviewRequest request, int reviewId) {
         Review review = reviewRepository.findById(reviewId).orElseThrow(() -> {
             log.error(String.format("Exception caught: " + ExceptionMessages.REVIEW_NOT_FOUND_MESSAGE));
@@ -128,7 +200,7 @@ public class ReviewService {
             throw new NotAuthorizedException(ExceptionMessages.NOT_AUTHORIZED_MESSAGE);
         }
 
-        ReviewDto reviewDto = reviewMapper.mapReviewToReviewDto(review);
+        final ReviewDto reviewDto = reviewMapper.mapReviewToReviewDto(review);
 
         review.setReviewText(request.getReviewText());
         review.setRating(request.getRating());
@@ -151,6 +223,13 @@ public class ReviewService {
         return reviewDto;
     }
 
+    /**
+     * Deletes review and returns the removed state when needed.
+     *
+     * @param reviewId
+     *     identifier of the target review
+     * @return review dto result
+     */
     public ReviewDto deleteReview(int reviewId) {
         Review review = reviewRepository.findById(reviewId).orElseThrow(() -> {
             log.error(String.format("Exception caught: " + ExceptionMessages.REVIEW_NOT_FOUND_MESSAGE));
@@ -164,7 +243,7 @@ public class ReviewService {
             throw new NotAuthorizedException(ExceptionMessages.NOT_AUTHORIZED_MESSAGE);
         }
 
-        ReviewDto reviewDto = reviewMapper.mapReviewToReviewDto(review);
+        final ReviewDto reviewDto = reviewMapper.mapReviewToReviewDto(review);
 
         reviewRepository.delete(review);
 
@@ -183,20 +262,20 @@ public class ReviewService {
     }
 
     private double calculateAverageRatingForCinema(int cinemaId) {
-        List<ReviewDto> reviews = getReviewsByCinemaId(cinemaId);
+        final List<ReviewDto> reviews = getReviewsByCinemaId(cinemaId);
 
         return calculateAverageRating(reviews);
     }
 
     private double calculateAverageRatingForMovie(int movieId) {
-        List<ReviewDto> reviews = getReviewsByMovieId(movieId);
+        final List<ReviewDto> reviews = getReviewsByMovieId(movieId);
 
         return calculateAverageRating(reviews);
     }
 
     private double calculateAverageRating(List<ReviewDto> reviews) {
         double sum = 0;
-        int numberOfReviews = reviews.size();
+        final int numberOfReviews = reviews.size();
 
         for (ReviewDto review : reviews) {
             sum += review.getRating();

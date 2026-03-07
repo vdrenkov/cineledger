@@ -8,6 +8,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Captures the API request payload for discount operations.
+ */
 @AllArgsConstructor
 @NoArgsConstructor
 @Data

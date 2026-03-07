@@ -11,12 +11,15 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
+/**
+ * Tests web security configuration behavior.
+ */
 @ExtendWith(MockitoExtension.class)
-public class WebSecurityConfigurationTest {
+class WebSecurityConfigurationTest {
 
     @Mock
     private JwtRequestFilter jwtRequestFilter;
@@ -30,15 +33,21 @@ public class WebSecurityConfigurationTest {
     @InjectMocks
     private WebSecurityConfiguration webSecurityConfiguration;
 
+    /**
+     * Exercises the password encoder_ should return b crypt password encoder test scenario.
+     */
     @Test
-    public void passwordEncoder_ShouldReturnBCryptPasswordEncoder() {
+    void passwordEncoder_ShouldReturnBCryptPasswordEncoder() {
         final PasswordEncoder passwordEncoder = webSecurityConfiguration.passwordEncoder();
 
-        assertTrue(passwordEncoder instanceof BCryptPasswordEncoder);
+        assertInstanceOf(BCryptPasswordEncoder.class, passwordEncoder);
     }
 
+    /**
+     * Exercises the authentication manager_ should return configured authentication manager test scenario.
+     */
     @Test
-    public void authenticationManager_ShouldReturnConfiguredAuthenticationManager() throws Exception {
+    void authenticationManager_ShouldReturnConfiguredAuthenticationManager() throws Exception {
         when(authenticationConfiguration.getAuthenticationManager()).thenReturn(authenticationManager);
 
         final AuthenticationManager result = webSecurityConfiguration.authenticationManager(

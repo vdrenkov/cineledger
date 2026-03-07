@@ -1,7 +1,7 @@
 package dev.vdrenkov.cineledger.controllers;
 
 import dev.vdrenkov.cineledger.services.CategoryService;
-import dev.vdrenkov.cineledger.testUtils.factories.CategoryFactory;
+import dev.vdrenkov.cineledger.testutils.factories.CategoryFactory;
 import dev.vdrenkov.cineledger.utils.constants.URIConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,8 +18,8 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.util.Collections;
 
-import static dev.vdrenkov.cineledger.testUtils.constants.CategoryConstants.ID;
-import static dev.vdrenkov.cineledger.testUtils.constants.CategoryConstants.NAME;
+import static dev.vdrenkov.cineledger.testutils.constants.CategoryConstants.ID;
+import static dev.vdrenkov.cineledger.testutils.constants.CategoryConstants.NAME;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -30,9 +30,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+/**
+ * Tests category controller behavior.
+ */
 @ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc
-public class CategoryControllerTest {
+class CategoryControllerTest {
 
     private MockMvc mockMvc;
 
@@ -42,15 +45,21 @@ public class CategoryControllerTest {
     @InjectMocks
     private CategoryController categoryController;
 
+    /**
+     * Initializes the test fixture before each test case.
+     */
     @BeforeEach
-    public void setup() {
+    void setup() {
         mockMvc = MockMvcBuilders.standaloneSetup(categoryController).build();
     }
 
+    /**
+     * Verifies that add Category no Exceptions success.
+     */
     @Test
-    public void testAddCategory_noExceptions_success() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
-        String json = mapper.writeValueAsString(CategoryFactory.getDefaultCategoryRequest());
+    void testAddCategory_noExceptions_success() throws Exception {
+        final ObjectMapper mapper = new ObjectMapper();
+        final String json = mapper.writeValueAsString(CategoryFactory.getDefaultCategoryRequest());
 
         when(categoryService.addCategory(any())).thenReturn(CategoryFactory.getDefaultCategory());
 
@@ -63,8 +72,11 @@ public class CategoryControllerTest {
             .andExpect(header().string("Location", URIConstants.CATEGORIES_PATH + "/" + ID));
     }
 
+    /**
+     * Verifies that get All Categories single Category success.
+     */
     @Test
-    public void testGetAllCategories_singleCategory_success() throws Exception {
+    void testGetAllCategories_singleCategory_success() throws Exception {
         when(categoryService.getAllCategories()).thenReturn(
             Collections.singletonList(CategoryFactory.getDefaultCategoryDto()));
 
@@ -75,8 +87,11 @@ public class CategoryControllerTest {
             .andExpect(jsonPath("$[0].name").value(NAME));
     }
 
+    /**
+     * Verifies that get All Categories empty List success.
+     */
     @Test
-    public void testGetAllCategories_emptyList_success() throws Exception {
+    void testGetAllCategories_emptyList_success() throws Exception {
         when(categoryService.getAllCategories()).thenReturn(
             Collections.singletonList(CategoryFactory.getDefaultCategoryDto()));
 
@@ -88,8 +103,11 @@ public class CategoryControllerTest {
             .andExpect(jsonPath("$[0].name").value(NAME));
     }
 
+    /**
+     * Verifies that get Category By Name category Found success.
+     */
     @Test
-    public void testGetCategoryByName_categoryFound_success() throws Exception {
+    void testGetCategoryByName_categoryFound_success() throws Exception {
         when(categoryService.getCategoryDtoByName(anyString())).thenReturn(CategoryFactory.getDefaultCategoryDto());
 
         mockMvc
@@ -100,10 +118,13 @@ public class CategoryControllerTest {
             .andExpect(jsonPath("$.name").value(NAME));
     }
 
+    /**
+     * Verifies that update Category no Response success.
+     */
     @Test
-    public void testUpdateCategory_noResponse_success() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
-        String json = mapper.writeValueAsString(CategoryFactory.getDefaultCategoryRequest());
+    void testUpdateCategory_noResponse_success() throws Exception {
+        final ObjectMapper mapper = new ObjectMapper();
+        final String json = mapper.writeValueAsString(CategoryFactory.getDefaultCategoryRequest());
 
         when(categoryService.updateCategory(any(), eq(ID))).thenReturn(CategoryFactory.getDefaultCategoryDto());
 
@@ -112,10 +133,13 @@ public class CategoryControllerTest {
             .andExpect(status().isNoContent());
     }
 
+    /**
+     * Verifies that update Category requested Response success.
+     */
     @Test
-    public void testUpdateCategory_requestedResponse_success() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
-        String json = mapper.writeValueAsString(CategoryFactory.getDefaultCategoryRequest());
+    void testUpdateCategory_requestedResponse_success() throws Exception {
+        final ObjectMapper mapper = new ObjectMapper();
+        final String json = mapper.writeValueAsString(CategoryFactory.getDefaultCategoryRequest());
 
         when(categoryService.updateCategory(any(), eq(ID))).thenReturn(CategoryFactory.getDefaultCategoryDto());
 
@@ -129,15 +153,21 @@ public class CategoryControllerTest {
             .andExpect(jsonPath("$.name").value(NAME));
     }
 
+    /**
+     * Verifies that delete Category no Response success.
+     */
     @Test
-    public void testDeleteCategory_noResponse_success() throws Exception {
+    void testDeleteCategory_noResponse_success() throws Exception {
         when(categoryService.deleteCategory(eq(ID))).thenReturn(CategoryFactory.getDefaultCategoryDto());
 
         mockMvc.perform(delete(URIConstants.CATEGORIES_ID_PATH, ID)).andExpect(status().isNoContent());
     }
 
+    /**
+     * Verifies that delete Category requested Response success.
+     */
     @Test
-    public void testDeleteCategory_requestedResponse_success() throws Exception {
+    void testDeleteCategory_requestedResponse_success() throws Exception {
         when(categoryService.deleteCategory(eq(ID))).thenReturn(CategoryFactory.getDefaultCategoryDto());
 
         mockMvc

@@ -23,6 +23,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.util.List;
 
+/**
+ * Exposes REST endpoints for managing discount data.
+ */
 @RestController
 public class DiscountController {
 
@@ -30,14 +33,27 @@ public class DiscountController {
 
     private final DiscountService discountService;
 
+    /**
+     * Creates a new discount controller with its required collaborators.
+     *
+     * @param discountService
+     *     discount service used by the operation
+     */
     @Autowired
     public DiscountController(DiscountService discountService) {
         this.discountService = discountService;
     }
 
+    /**
+     * Creates and persists discount.
+     *
+     * @param discountRequest
+     *     request payload for the discount operation
+     * @return HTTP response describing the operation result
+     */
     @PostMapping(URIConstants.DISCOUNTS_PATH)
     public ResponseEntity<Void> addDiscount(@RequestBody @Valid DiscountRequest discountRequest) {
-        Discount discount = discountService.addDiscount(discountRequest);
+        final Discount discount = discountService.addDiscount(discountRequest);
         log.info("A request for a discount to be added has been submitted");
 
         URI location = UriComponentsBuilder
@@ -48,37 +64,69 @@ public class DiscountController {
         return ResponseEntity.created(location).build();
     }
 
+    /**
+     * Returns all discounts matching the supplied criteria.
+     *
+     * @return HTTP response describing the operation result
+     */
     @GetMapping(URIConstants.DISCOUNTS_PATH)
     public ResponseEntity<List<DiscountDto>> getAllDiscounts() {
-        List<DiscountDto> discounts = discountService.getAllDiscountDtos();
+        final List<DiscountDto> discounts = discountService.getAllDiscountDtos();
         log.info("All discounts were requested from the database");
 
         return ResponseEntity.ok(discounts);
     }
 
+    /**
+     * Returns discount matching the supplied criteria.
+     *
+     * @param type
+     *     type used by the operation
+     * @return HTTP response describing the operation result
+     */
     @GetMapping(value = URIConstants.DISCOUNTS_PATH, params = "type")
     public ResponseEntity<DiscountDto> getDiscountByType(@RequestParam String type) {
-        DiscountDto discount = discountService.getDiscountDtoByType(type);
+        final DiscountDto discount = discountService.getDiscountDtoByType(type);
         log.info(String.format("Discount with type %s has been requested from database", type));
 
         return ResponseEntity.ok(discount);
     }
 
+    /**
+     * Updates discount and returns the previous state when needed.
+     *
+     * @param request
+     *     request payload containing the submitted data
+     * @param id
+     *     identifier of the target resource
+     * @param returnOld
+     *     whether the previous persisted state should be returned
+     * @return HTTP response describing the operation result
+     */
     @PutMapping(URIConstants.DISCOUNTS_ID_PATH)
     public ResponseEntity<DiscountDto> updateDiscount(@RequestBody @Valid DiscountRequest request, @PathVariable int id,
         @RequestParam(required = false) boolean returnOld) {
 
-        DiscountDto discountDto = discountService.updateDiscount(request, id);
+        final DiscountDto discountDto = discountService.updateDiscount(request, id);
         log.info(String.format("Discount with id %d was updated", id));
 
         return returnOld ? ResponseEntity.ok(discountDto) : ResponseEntity.noContent().build();
     }
 
+    /**
+     * Deletes discount and returns the removed state when needed.
+     *
+     * @param id
+     *     identifier of the target resource
+     * @param returnOld
+     *     whether the previous persisted state should be returned
+     * @return HTTP response describing the operation result
+     */
     @DeleteMapping(URIConstants.DISCOUNTS_ID_PATH)
     public ResponseEntity<DiscountDto> deleteDiscount(@PathVariable int id,
         @RequestParam(required = false) boolean returnOld) {
 
-        DiscountDto discountDto = discountService.deleteDiscount(id);
+        final DiscountDto discountDto = discountService.deleteDiscount(id);
         log.info(String.format("Discount with id %d was deleted", id));
 
         return returnOld ? ResponseEntity.ok(discountDto) : ResponseEntity.noContent().build();

@@ -1,13 +1,13 @@
 package dev.vdrenkov.cineledger.services;
 
-import dev.vdrenkov.cineledger.models.entities.Order;
-import dev.vdrenkov.cineledger.models.entities.User;
 import com.mailjet.client.ClientOptions;
 import com.mailjet.client.MailjetClient;
 import com.mailjet.client.MailjetRequest;
 import com.mailjet.client.errors.MailjetException;
 import com.mailjet.client.errors.MailjetSocketTimeoutException;
 import com.mailjet.client.resource.Emailv31;
+import dev.vdrenkov.cineledger.models.entities.Order;
+import dev.vdrenkov.cineledger.models.entities.User;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -17,6 +17,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+/**
+ * Sends transactional emails related to account lifecycle events and order processing. The service degrades gracefully
+ * when Mailjet credentials are not configured.
+ */
 @Service
 public class EmailService {
 
@@ -35,9 +39,17 @@ public class EmailService {
         this.senderName = senderName;
     }
 
+    /**
+     * Sends an order confirmation email to the user who placed the order.
+     *
+     * @param user
+     *     recipient of the email
+     * @param orderDetails
+     *     persisted order details included in the email body
+     */
     public void sendOrderConfirmationEmail(User user, Order orderDetails) {
-        String recipientEmail = user.getEmail();
-        String recipientName = user.getFirstName() + " " + user.getLastName();
+        final String recipientEmail = user.getEmail();
+        final String recipientName = user.getFirstName() + " " + user.getLastName();
 
         final MailjetRequest request = new MailjetRequest(Emailv31.resource).property(Emailv31.MESSAGES,
             new JSONArray().put(new JSONObject()
@@ -53,9 +65,17 @@ public class EmailService {
         sendEmail(request, "order confirmation");
     }
 
+    /**
+     * Sends a password recovery email containing the newly generated password.
+     *
+     * @param user
+     *     recipient of the email
+     * @param newPassword
+     *     newly generated password communicated to the user
+     */
     public void sendPasswordConfirmationEmail(User user, String newPassword) {
-        String recipientEmail = user.getEmail();
-        String recipientName = user.getFirstName() + " " + user.getLastName();
+        final String recipientEmail = user.getEmail();
+        final String recipientName = user.getFirstName() + " " + user.getLastName();
 
         final MailjetRequest request = new MailjetRequest(Emailv31.resource).property(Emailv31.MESSAGES,
             new JSONArray().put(new JSONObject()
@@ -70,11 +90,17 @@ public class EmailService {
         sendEmail(request, "password recovery");
     }
 
+    /**
+     * Sends a registration confirmation email after a successful user signup.
+     *
+     * @param user
+     *     newly registered user
+     */
     public void sendRegistrationConfirmationEmail(User user) {
-        String recipientEmail = user.getEmail();
-        String recipientName = user.getFirstName() + " " + user.getLastName();
+        final String recipientEmail = user.getEmail();
+        final String recipientName = user.getFirstName() + " " + user.getLastName();
 
-        String discountMessage = "As our user here is your discount code for online reservation: 5555";
+        final String discountMessage = "As our user here is your discount code for online reservation: 5555";
 
         final MailjetRequest request = new MailjetRequest(Emailv31.resource).property(Emailv31.MESSAGES,
             new JSONArray().put(new JSONObject()
@@ -102,4 +128,3 @@ public class EmailService {
         }
     }
 }
-

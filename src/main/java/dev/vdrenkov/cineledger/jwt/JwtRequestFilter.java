@@ -19,6 +19,9 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.Arrays;
 
+/**
+ * Restores Spring Security authentication from the JWT cookie on each request.
+ */
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
 
@@ -27,12 +30,30 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     private final JwtTokenUtil tokenUtil;
     private final JwtUserDetailsService userDetailsService;
 
+    /**
+     * Creates a new jwt request filter with its required collaborators.
+     *
+     * @param tokenUtil
+     *     token util used by the operation
+     * @param userDetailsService
+     *     user details service used by the operation
+     */
     @Autowired
     public JwtRequestFilter(final JwtTokenUtil tokenUtil, final JwtUserDetailsService userDetailsService) {
         this.tokenUtil = tokenUtil;
         this.userDetailsService = userDetailsService;
     }
 
+    /**
+     * Restores authentication from the JWT cookie when a valid token is present.
+     *
+     * @param request
+     *     request payload containing the submitted data
+     * @param response
+     *     current HTTP response
+     * @param chain
+     *     remaining servlet filter chain
+     */
     @Override
     protected void doFilterInternal(final HttpServletRequest request, final HttpServletResponse response,
         final FilterChain chain) throws ServletException, IOException {

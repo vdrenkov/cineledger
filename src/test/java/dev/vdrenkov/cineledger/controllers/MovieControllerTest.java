@@ -2,8 +2,8 @@ package dev.vdrenkov.cineledger.controllers;
 
 import dev.vdrenkov.cineledger.models.dtos.MovieDto;
 import dev.vdrenkov.cineledger.services.MovieService;
-import dev.vdrenkov.cineledger.testUtils.factories.CategoryFactory;
-import dev.vdrenkov.cineledger.testUtils.factories.MovieFactory;
+import dev.vdrenkov.cineledger.testutils.factories.CategoryFactory;
+import dev.vdrenkov.cineledger.testutils.factories.MovieFactory;
 import dev.vdrenkov.cineledger.utils.constants.URIConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,15 +21,15 @@ import tools.jackson.databind.ObjectMapper;
 import java.util.Collections;
 import java.util.List;
 
-import static dev.vdrenkov.cineledger.testUtils.constants.MovieConstants.DESCRIPTION;
-import static dev.vdrenkov.cineledger.testUtils.constants.MovieConstants.ID;
-import static dev.vdrenkov.cineledger.testUtils.constants.MovieConstants.RATING;
-import static dev.vdrenkov.cineledger.testUtils.constants.MovieConstants.RELEASE_DATE;
-import static dev.vdrenkov.cineledger.testUtils.constants.MovieConstants.RUNTIME;
-import static dev.vdrenkov.cineledger.testUtils.constants.MovieConstants.TITLE;
-import static dev.vdrenkov.cineledger.testUtils.factories.MovieFactory.getDefaultMovieDto;
-import static dev.vdrenkov.cineledger.testUtils.factories.MovieFactory.getDefaultMovieDtoList;
-import static dev.vdrenkov.cineledger.testUtils.factories.MovieFactory.getDefaultMovieRequest;
+import static dev.vdrenkov.cineledger.testutils.constants.MovieConstants.DESCRIPTION;
+import static dev.vdrenkov.cineledger.testutils.constants.MovieConstants.ID;
+import static dev.vdrenkov.cineledger.testutils.constants.MovieConstants.RATING;
+import static dev.vdrenkov.cineledger.testutils.constants.MovieConstants.RELEASE_DATE;
+import static dev.vdrenkov.cineledger.testutils.constants.MovieConstants.RUNTIME;
+import static dev.vdrenkov.cineledger.testutils.constants.MovieConstants.TITLE;
+import static dev.vdrenkov.cineledger.testutils.factories.MovieFactory.getDefaultMovieDto;
+import static dev.vdrenkov.cineledger.testutils.factories.MovieFactory.getDefaultMovieDtoList;
+import static dev.vdrenkov.cineledger.testutils.factories.MovieFactory.getDefaultMovieRequest;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyDouble;
@@ -44,12 +44,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+/**
+ * Tests movie controller behavior.
+ */
 @AutoConfigureMockMvc
 @ExtendWith(MockitoExtension.class)
-public class MovieControllerTest {
+class MovieControllerTest {
 
     private static final String RETURN_OLD = "returnOld";
-    private final static ObjectMapper objectMapper = new ObjectMapper();
+    private static final ObjectMapper objectMapper = new ObjectMapper();
     private MockMvc mockMvc;
     @Mock
     private MovieService movieService;
@@ -57,13 +60,19 @@ public class MovieControllerTest {
     @InjectMocks
     private MovieController movieController;
 
+    /**
+     * Initializes the test fixture before each test case.
+     */
     @BeforeEach
-    public void setup() {
+    void setup() {
         mockMvc = MockMvcBuilders.standaloneSetup(movieController).build();
     }
 
+    /**
+     * Verifies that get Movies By Title success.
+     */
     @Test
-    public void testGetMoviesByTitle_success() throws Exception {
+    void testGetMoviesByTitle_success() throws Exception {
         when(movieService.getMoviesByTitle(anyString(), anyDouble())).thenReturn(getDefaultMovieDtoList());
 
         mockMvc
@@ -82,10 +91,13 @@ public class MovieControllerTest {
             .andExpect(jsonPath("$[0].category.name").value(CategoryFactory.getDefaultCategoryDto().getName()));
     }
 
+    /**
+     * Verifies that get Movies By Category success.
+     */
     @Test
-    public void testGetMoviesByCategory_success() throws Exception {
-        List<MovieDto> movieDtoList = getDefaultMovieDtoList();
-        MovieDto movieDto = movieDtoList.get(0);
+    void testGetMoviesByCategory_success() throws Exception {
+        final List<MovieDto> movieDtoList = getDefaultMovieDtoList();
+        final MovieDto movieDto = movieDtoList.getFirst();
         when(movieService.getMoviesByCategory(anyInt(), anyDouble())).thenReturn(movieDtoList);
         mockMvc
             .perform(get(URIConstants.CATEGORIES_ID_MOVIES_PATH, ID).param("minRating", String.valueOf(RATING)))
@@ -100,8 +112,11 @@ public class MovieControllerTest {
             .andExpect(jsonPath("$[0].category.name").value(CategoryFactory.getDefaultCategoryDto().getName()));
     }
 
+    /**
+     * Verifies that get Movies By Release Date After success.
+     */
     @Test
-    public void testGetMoviesByReleaseDateAfter_success() throws Exception {
+    void testGetMoviesByReleaseDateAfter_success() throws Exception {
         when(movieService.getMoviesByReleaseDate(any(), any(Double.class), anyBoolean())).thenReturn(
             Collections.singletonList(getDefaultMovieDto()));
         mockMvc
@@ -121,8 +136,11 @@ public class MovieControllerTest {
             .andExpect(jsonPath("$[0].category.name").value(CategoryFactory.getDefaultCategoryDto().getName()));
     }
 
+    /**
+     * Verifies that get Movies By Min Rating success.
+     */
     @Test
-    public void testGetMoviesByMinRating_success() throws Exception {
+    void testGetMoviesByMinRating_success() throws Exception {
         when(movieService.getMoviesByMinRating(anyDouble())).thenReturn(getDefaultMovieDtoList());
 
         mockMvc
@@ -138,11 +156,14 @@ public class MovieControllerTest {
             .andExpect(jsonPath("$[0].category.name").value(CategoryFactory.getDefaultCategoryDto().getName()));
     }
 
+    /**
+     * Verifies that add Movie success.
+     */
     @Test
-    public void testAddMovie_success() throws Exception {
+    void testAddMovie_success() throws Exception {
         when(movieService.addMovie(any())).thenReturn(MovieFactory.getDefaultMovie());
 
-        String json = objectMapper.writeValueAsString(getDefaultMovieRequest());
+        final String json = objectMapper.writeValueAsString(getDefaultMovieRequest());
 
         mockMvc
             .perform(MockMvcRequestBuilders
@@ -153,11 +174,14 @@ public class MovieControllerTest {
             .andExpect(header().string("Location", URIConstants.MOVIES_PATH + "/" + ID));
     }
 
+    /**
+     * Verifies that update Movie return Old True success.
+     */
     @Test
-    public void testUpdateMovie_returnOldTrue_success() throws Exception {
+    void testUpdateMovie_returnOldTrue_success() throws Exception {
         when(movieService.updateMovie(any(), anyInt())).thenReturn(MovieFactory.getDefaultMovieDto());
 
-        String json = objectMapper.writeValueAsString(getDefaultMovieRequest());
+        final String json = objectMapper.writeValueAsString(getDefaultMovieRequest());
 
         mockMvc
             .perform(put(URIConstants.MOVIES_ID_PATH, ID)
@@ -175,10 +199,13 @@ public class MovieControllerTest {
             .andExpect(jsonPath("$.category.name").value(CategoryFactory.getDefaultCategoryDto().getName()));
     }
 
+    /**
+     * Verifies that get Movies By IMDb Test.
+     */
     @Test
-    public void testGetMoviesByImdbTest() throws Exception {
-        String imdb = "top";
-        String movies = "[{\"title\":\"title1\", \"year\":\"2001\"},{\"title\":\"title2\", \"year\":\"2002\"}]";
+    void testGetMoviesByImdbTest() throws Exception {
+        final String imdb = "top";
+        final String movies = "[{\"title\":\"title1\", \"year\":\"2001\"},{\"title\":\"title2\", \"year\":\"2002\"}]";
 
         when(movieService.getImdbMovies(imdb)).thenReturn(movies);
 
@@ -193,11 +220,14 @@ public class MovieControllerTest {
             .andExpect(content().json(movies));
     }
 
+    /**
+     * Verifies that update Movie return Old False success.
+     */
     @Test
-    public void testUpdateMovie_returnOldFalse_success() throws Exception {
+    void testUpdateMovie_returnOldFalse_success() throws Exception {
         when(movieService.updateMovie(any(), anyInt())).thenReturn(MovieFactory.getDefaultMovieDto());
 
-        String json = objectMapper.writeValueAsString(getDefaultMovieRequest());
+        final String json = objectMapper.writeValueAsString(getDefaultMovieRequest());
 
         mockMvc
             .perform(put(URIConstants.MOVIES_ID_PATH, ID)
@@ -207,8 +237,11 @@ public class MovieControllerTest {
             .andExpect(status().isNoContent());
     }
 
+    /**
+     * Verifies that delete Movie return Old True success.
+     */
     @Test
-    public void testDeleteMovie_returnOldTrue_success() throws Exception {
+    void testDeleteMovie_returnOldTrue_success() throws Exception {
         when(movieService.deleteMovie(anyInt())).thenReturn(MovieFactory.getDefaultMovieDto());
 
         mockMvc
@@ -224,8 +257,11 @@ public class MovieControllerTest {
             .andExpect(jsonPath("$.category.name").value(CategoryFactory.getDefaultCategoryDto().getName()));
     }
 
+    /**
+     * Verifies that delete Movie return Old False success.
+     */
     @Test
-    public void testDeleteMovie_returnOldFalse_success() throws Exception {
+    void testDeleteMovie_returnOldFalse_success() throws Exception {
         when(movieService.deleteMovie(anyInt())).thenReturn(MovieFactory.getDefaultMovieDto());
 
         mockMvc.perform(delete(URIConstants.MOVIES_ID_PATH, ID)).andExpect(status().isNoContent());

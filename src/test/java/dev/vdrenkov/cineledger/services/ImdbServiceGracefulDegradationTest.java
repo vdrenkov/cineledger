@@ -20,9 +20,9 @@ class ImdbServiceGracefulDegradationTest {
 
     @Test
     void getMovies_withoutApiKey_returnsEmptyPayload() {
-        ImdbService imdbService = new ImdbService(restTemplate, "", "https://imdb-api.com/en/API/");
+        final ImdbService imdbService = new ImdbService(restTemplate, "", "https://imdb-api.com/en/API/");
 
-        String response = imdbService.getMovies("top");
+        final String response = imdbService.getMovies("top");
 
         assertEquals(0, new JSONObject(response).getJSONArray("movies").length());
         verifyNoInteractions(restTemplate);
@@ -30,11 +30,11 @@ class ImdbServiceGracefulDegradationTest {
 
     @Test
     void getMovies_whenRemoteLookupFails_returnsEmptyPayload() {
-        ImdbService imdbService = new ImdbService(restTemplate, "imdb-key", "https://imdb-api.com/en/API/");
+        final ImdbService imdbService = new ImdbService(restTemplate, "imdb-key", "https://imdb-api.com/en/API/");
         when(restTemplate.getForObject("https://imdb-api.com/en/API/Top250Movies/imdb-key", String.class)).thenThrow(
             new RestClientException("boom"));
 
-        String response = imdbService.getMovies("top");
+        final String response = imdbService.getMovies("top");
 
         assertEquals(0, new JSONObject(response).getJSONArray("movies").length());
     }

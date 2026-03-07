@@ -8,6 +8,9 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalTime;
 
+/**
+ * Captures the API request payload for projection operations.
+ */
 @AllArgsConstructor
 @NoArgsConstructor
 @Data

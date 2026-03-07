@@ -3,11 +3,11 @@ package dev.vdrenkov.cineledger.mappers;
 import dev.vdrenkov.cineledger.models.dtos.CinemaDto;
 import dev.vdrenkov.cineledger.models.dtos.MovieDto;
 import dev.vdrenkov.cineledger.models.dtos.ReviewDto;
-import dev.vdrenkov.cineledger.testUtils.constants.ReviewConstants;
-import dev.vdrenkov.cineledger.testUtils.factories.CinemaFactory;
-import dev.vdrenkov.cineledger.testUtils.factories.MovieFactory;
-import dev.vdrenkov.cineledger.testUtils.factories.ReviewFactory;
-import dev.vdrenkov.cineledger.testUtils.factories.UserFactory;
+import dev.vdrenkov.cineledger.testutils.constants.ReviewConstants;
+import dev.vdrenkov.cineledger.testutils.factories.CinemaFactory;
+import dev.vdrenkov.cineledger.testutils.factories.MovieFactory;
+import dev.vdrenkov.cineledger.testutils.factories.ReviewFactory;
+import dev.vdrenkov.cineledger.testutils.factories.UserFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,8 +22,11 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+/**
+ * Tests review mapper behavior.
+ */
 @ExtendWith(MockitoExtension.class)
-public class ReviewMapperTest {
+class ReviewMapperTest {
 
     @Mock
     private MovieMapper movieMapper;
@@ -34,14 +37,17 @@ public class ReviewMapperTest {
     @InjectMocks
     private ReviewMapper reviewMapper;
 
+    /**
+     * Verifies that map Review To Review DTO cinema Null success.
+     */
     @Test
-    public void testMapReviewToReviewDto_cinemaNull_success() {
-        MovieDto movie = MovieFactory.getDefaultMovieDto();
+    void testMapReviewToReviewDto_cinemaNull_success() {
+        final MovieDto movie = MovieFactory.getDefaultMovieDto();
 
         when(movieMapper.mapMovieToMovieDto(any())).thenReturn(movie);
         when(userMapper.mapUserToUserDto(any())).thenReturn(UserFactory.getDefaultUserDto());
 
-        ReviewDto reviewDto = reviewMapper.mapReviewToReviewDto(ReviewFactory.getDefaultReview());
+        final ReviewDto reviewDto = reviewMapper.mapReviewToReviewDto(ReviewFactory.getDefaultReview());
 
         Assertions.assertEquals(ReviewConstants.ID, reviewDto.getId());
         Assertions.assertEquals(ReviewConstants.RATING, reviewDto.getRating(), 0.0);
@@ -52,14 +58,17 @@ public class ReviewMapperTest {
         Assertions.assertEquals(UserFactory.getDefaultUserDto(), reviewDto.getUser());
     }
 
+    /**
+     * Verifies that map Review To Review DTO movie Null success.
+     */
     @Test
-    public void testMapReviewToReviewDto_movieNull_success() {
-        CinemaDto cinema = CinemaFactory.getDefaultCinemaDto();
+    void testMapReviewToReviewDto_movieNull_success() {
+        final CinemaDto cinema = CinemaFactory.getDefaultCinemaDto();
 
         when(cinemaMapper.mapCinemaToCinemaDto(any())).thenReturn(cinema);
         when(userMapper.mapUserToUserDto(any())).thenReturn(UserFactory.getDefaultUserDto());
 
-        ReviewDto reviewDto = reviewMapper.mapReviewToReviewDto(ReviewFactory.getDefaultReviewWithCinema());
+        final ReviewDto reviewDto = reviewMapper.mapReviewToReviewDto(ReviewFactory.getDefaultReviewWithCinema());
 
         Assertions.assertEquals(ReviewConstants.ID, reviewDto.getId());
         Assertions.assertEquals(ReviewConstants.RATING, reviewDto.getRating(), 0.0);
@@ -70,14 +79,18 @@ public class ReviewMapperTest {
         Assertions.assertEquals(UserFactory.getDefaultUserDto(), reviewDto.getUser());
     }
 
+    /**
+     * Verifies that map Review List To Review DTO List cinema Null success.
+     */
     @Test
-    public void testMapReviewListToReviewDtoList_cinemaNull_success() {
-        MovieDto movie = MovieFactory.getDefaultMovieDto();
+    void testMapReviewListToReviewDtoList_cinemaNull_success() {
+        final MovieDto movie = MovieFactory.getDefaultMovieDto();
         when(movieMapper.mapMovieToMovieDto(any())).thenReturn(movie);
         when(userMapper.mapUserToUserDto(any())).thenReturn(UserFactory.getDefaultUserDto());
 
-        List<ReviewDto> reviewDtos = reviewMapper.mapReviewListToReviewDtoList(ReviewFactory.getDefaultReviewList());
-        ReviewDto reviewDto = reviewDtos.get(0);
+        final List<ReviewDto> reviewDtos = reviewMapper.mapReviewListToReviewDtoList(
+            ReviewFactory.getDefaultReviewList());
+        final ReviewDto reviewDto = reviewDtos.get(0);
 
         Assertions.assertEquals(ReviewConstants.ID, reviewDto.getId());
         Assertions.assertEquals(ReviewConstants.RATING, reviewDto.getRating(), 0.0);
@@ -88,16 +101,19 @@ public class ReviewMapperTest {
         Assertions.assertEquals(UserFactory.getDefaultUserDto(), reviewDto.getUser());
     }
 
+    /**
+     * Verifies that map Review List To Review DTO List movie Null success.
+     */
     @Test
-    public void testMapReviewListToReviewDtoList_movieNull_success() {
-        CinemaDto cinema = CinemaFactory.getDefaultCinemaDto();
+    void testMapReviewListToReviewDtoList_movieNull_success() {
+        final CinemaDto cinema = CinemaFactory.getDefaultCinemaDto();
 
         when(cinemaMapper.mapCinemaToCinemaDto(any())).thenReturn(cinema);
         when(userMapper.mapUserToUserDto(any())).thenReturn(UserFactory.getDefaultUserDto());
 
         List<ReviewDto> reviewDtos = reviewMapper.mapReviewListToReviewDtoList(
             ReviewFactory.getDefaultReviewListWithCinema());
-        ReviewDto reviewDto = reviewDtos.get(0);
+        final ReviewDto reviewDto = reviewDtos.get(0);
 
         Assertions.assertEquals(ReviewConstants.ID, reviewDto.getId());
         Assertions.assertEquals(ReviewConstants.RATING, reviewDto.getRating(), 0.0);

@@ -18,6 +18,9 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+/**
+ * Contains business logic for item operations.
+ */
 @Service
 public class ItemService {
 
@@ -26,12 +29,27 @@ public class ItemService {
     private final ItemRepository itemRepository;
     private final ItemMapper itemMapper;
 
+    /**
+     * Creates a new item service with its required collaborators.
+     *
+     * @param itemRepository
+     *     item repository used by the operation
+     * @param itemMapper
+     *     item mapper used by the operation
+     */
     @Autowired
     public ItemService(ItemRepository itemRepository, ItemMapper itemMapper) {
         this.itemRepository = itemRepository;
         this.itemMapper = itemMapper;
     }
 
+    /**
+     * Creates and persists item.
+     *
+     * @param itemRequest
+     *     request payload for the item operation
+     * @return requested item value
+     */
     public Item addItem(ItemRequest itemRequest) {
         log.info(String.format("An attempt to add item with name '%s' in thee database", itemRequest.getName()));
 
@@ -46,12 +64,26 @@ public class ItemService {
         return itemRepository.save(new Item(itemRequest.getName(), itemRequest.getPrice(), itemRequest.getQuantity()));
     }
 
+    /**
+     * Returns item matching the supplied criteria.
+     *
+     * @param id
+     *     identifier of the target resource
+     * @return item dto result
+     */
     public ItemDto getItemDtoById(int id) {
         log.info(String.format("An attempt to extract item DTO with id %d from the database", id));
 
         return itemMapper.mapItemToItemDto(getItemById(id));
     }
 
+    /**
+     * Returns item matching the supplied criteria.
+     *
+     * @param id
+     *     identifier of the target resource
+     * @return requested item value
+     */
     public Item getItemById(int id) {
         log.info(String.format("An attempt to extract item with id %d from the database", id));
 
@@ -63,6 +95,13 @@ public class ItemService {
         });
     }
 
+    /**
+     * Returns item matching the supplied criteria.
+     *
+     * @param itemName
+     *     item name used by the operation
+     * @return item dto result
+     */
     public ItemDto getItemDtoByName(String itemName) {
         log.info(String.format("An attempt to extract item with name %s from the database", itemName));
 
@@ -73,9 +112,18 @@ public class ItemService {
         }));
     }
 
+    /**
+     * Returns items matching the supplied criteria.
+     *
+     * @param quantity
+     *     quantity used by the operation
+     * @param isBelow
+     *     whether below should be applied
+     * @return matching item dto values
+     */
     public List<ItemDto> getItemsByQuantity(int quantity, Boolean isBelow) {
-        List<ItemDto> filteredItems = new ArrayList<>();
-        List<ItemDto> itemList = getAllItems();
+        final List<ItemDto> filteredItems = new ArrayList<>();
+        final List<ItemDto> itemList = getAllItems();
 
         for (ItemDto item : itemList) {
 
@@ -96,17 +144,31 @@ public class ItemService {
         return filteredItems;
     }
 
+    /**
+     * Returns all items matching the supplied criteria.
+     *
+     * @return matching item dto values
+     */
     public List<ItemDto> getAllItems() {
         log.info("An attempt to extract all items from the database");
 
-        List<ItemDto> itemDtos = itemMapper.mapItemToItemDtoList(itemRepository.findAll());
+        final List<ItemDto> itemDtos = itemMapper.mapItemToItemDtoList(itemRepository.findAll());
         itemDtos.sort(Comparator.comparing(ItemDto::getId));
 
         return itemDtos;
     }
 
+    /**
+     * Executes the edit item operation for item.
+     *
+     * @param itemRequest
+     *     request payload for the item operation
+     * @param id
+     *     identifier of the target resource
+     * @return item dto result
+     */
     public ItemDto editItem(ItemRequest itemRequest, int id) {
-        ItemDto itemDto = getItemDtoById(id);
+        final ItemDto itemDto = getItemDtoById(id);
 
         log.info(String.format("An attempt to update item with id %d in the database", id));
 
@@ -115,8 +177,15 @@ public class ItemService {
         return itemDto;
     }
 
+    /**
+     * Executes the remove item operation for item.
+     *
+     * @param id
+     *     identifier of the target resource
+     * @return item dto result
+     */
     public ItemDto removeItem(int id) {
-        ItemDto itemDto = getItemDtoById(id);
+        final ItemDto itemDto = getItemDtoById(id);
 
         itemRepository.deleteById(id);
 
@@ -125,18 +194,32 @@ public class ItemService {
         return itemDto;
     }
 
+    /**
+     * Executes the increment item quantity operation for item.
+     *
+     * @param item
+     *     item entity to transform
+     * @return requested int value
+     */
     public int incrementItemQuantity(Item item) {
-        int currentQuantity = item.getQuantity();
-        int incrementedQuantity = currentQuantity + 1;
+        final int currentQuantity = item.getQuantity();
+        final int incrementedQuantity = currentQuantity + 1;
 
         item.setQuantity(incrementedQuantity);
 
         return incrementedQuantity;
     }
 
+    /**
+     * Executes the decrement item quantity operation for item.
+     *
+     * @param item
+     *     item entity to transform
+     * @return requested int value
+     */
     public int decrementItemQuantity(Item item) {
-        int currentQuantity = item.getQuantity();
-        int decrementedQuantity = currentQuantity - 1;
+        final int currentQuantity = item.getQuantity();
+        final int decrementedQuantity = currentQuantity - 1;
 
         item.setQuantity(decrementedQuantity);
 

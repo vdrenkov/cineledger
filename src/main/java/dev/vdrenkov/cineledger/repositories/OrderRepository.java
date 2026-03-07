@@ -7,6 +7,9 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * Provides persistence access for order entities.
+ */
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Integer> {
 

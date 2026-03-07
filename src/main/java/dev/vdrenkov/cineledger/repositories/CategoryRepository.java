@@ -6,6 +6,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+/**
+ * Provides persistence access for category entities.
+ */
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Integer> {
 

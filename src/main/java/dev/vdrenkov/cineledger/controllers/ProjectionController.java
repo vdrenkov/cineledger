@@ -25,6 +25,9 @@ import java.net.URI;
 import java.time.LocalTime;
 import java.util.List;
 
+/**
+ * Exposes REST endpoints for managing projection data.
+ */
 @RestController
 public class ProjectionController {
 
@@ -32,14 +35,27 @@ public class ProjectionController {
 
     private final ProjectionService projectionService;
 
+    /**
+     * Creates a new projection controller with its required collaborators.
+     *
+     * @param projectionService
+     *     projection service used by the operation
+     */
     @Autowired
     public ProjectionController(ProjectionService projectionService) {
         this.projectionService = projectionService;
     }
 
+    /**
+     * Creates and persists projection.
+     *
+     * @param request
+     *     request payload containing the submitted data
+     * @return HTTP response describing the operation result
+     */
     @PostMapping(URIConstants.PROJECTIONS_PATH)
     public ResponseEntity<Void> addProjection(@RequestBody @Valid ProjectionRequest request) {
-        Projection projection = this.projectionService.addProjection(request);
+        final Projection projection = this.projectionService.addProjection(request);
         log.info("A request for a projection to be added has been submitted");
 
         URI location = UriComponentsBuilder
@@ -50,47 +66,91 @@ public class ProjectionController {
         return ResponseEntity.created(location).build();
     }
 
+    /**
+     * Returns projections matching the supplied criteria.
+     *
+     * @param id
+     *     identifier of the target resource
+     * @return HTTP response describing the operation result
+     */
     @GetMapping(URIConstants.PROGRAMS_ID_PROJECTIONS_PATH)
     public ResponseEntity<List<ProjectionDto>> getProjectionsByProgramId(@PathVariable int id) {
-        List<ProjectionDto> projectionsDtos = this.projectionService.getProjectionsByProgramId(id);
+        final List<ProjectionDto> projectionsDtos = this.projectionService.getProjectionsByProgramId(id);
         log.info("All projections by program id were requested from the database");
 
         return ResponseEntity.ok(projectionsDtos);
     }
 
+    /**
+     * Returns projections matching the supplied criteria.
+     *
+     * @param id
+     *     identifier of the target resource
+     * @return HTTP response describing the operation result
+     */
     @GetMapping(URIConstants.MOVIES_ID_PROJECTIONS_PATH)
     public ResponseEntity<List<ProjectionDto>> getProjectionsByMovieId(@PathVariable int id) {
-        List<ProjectionDto> projectionsDtos = this.projectionService.getProjectionsByMovieId(id);
+        final List<ProjectionDto> projectionsDtos = this.projectionService.getProjectionsByMovieId(id);
         log.info("All projections by movie id were requested from the database");
 
         return ResponseEntity.ok(projectionsDtos);
     }
 
+    /**
+     * Returns projections matching the supplied criteria.
+     *
+     * @param startTime
+     *     start time used by the operation
+     * @param isBefore
+     *     whether to match data before the provided boundary
+     * @return HTTP response describing the operation result
+     */
     @GetMapping(URIConstants.PROJECTIONS_PATH)
     public ResponseEntity<List<ProjectionDto>> getProjectionsByStartTime(
         @RequestParam @DateTimeFormat(pattern = "HH:mm:ss") LocalTime startTime, @RequestParam boolean isBefore) {
 
-        List<ProjectionDto> projectionDtos = this.projectionService.getProjectionsByStartTime(startTime, isBefore);
+        final List<ProjectionDto> projectionDtos = this.projectionService.getProjectionsByStartTime(startTime,
+            isBefore);
         log.info("All projections by start time were requested from the database");
 
         return ResponseEntity.ok(projectionDtos);
     }
 
+    /**
+     * Updates projection and returns the previous state when needed.
+     *
+     * @param request
+     *     request payload containing the submitted data
+     * @param id
+     *     identifier of the target resource
+     * @param returnOld
+     *     whether the previous persisted state should be returned
+     * @return HTTP response describing the operation result
+     */
     @PutMapping(URIConstants.PROJECTIONS_ID_PATH)
     public ResponseEntity<ProjectionDto> updateProjection(@RequestBody @Valid ProjectionRequest request,
         @PathVariable int id, @RequestParam(required = false) boolean returnOld) {
 
-        ProjectionDto projectionDto = this.projectionService.updateProjection(request, id);
+        final ProjectionDto projectionDto = this.projectionService.updateProjection(request, id);
         log.info(String.format("Projection with id %d was updated", id));
 
         return returnOld ? ResponseEntity.ok(projectionDto) : ResponseEntity.noContent().build();
     }
 
+    /**
+     * Deletes projection and returns the removed state when needed.
+     *
+     * @param id
+     *     identifier of the target resource
+     * @param returnOld
+     *     whether the previous persisted state should be returned
+     * @return HTTP response describing the operation result
+     */
     @DeleteMapping(URIConstants.PROJECTIONS_ID_PATH)
     public ResponseEntity<ProjectionDto> deleteProjection(@PathVariable int id,
         @RequestParam(required = false) boolean returnOld) {
 
-        ProjectionDto projectionDto = this.projectionService.deleteProjection(id);
+        final ProjectionDto projectionDto = this.projectionService.deleteProjection(id);
         log.info(String.format("Projection with id %d was deleted", id));
 
         return returnOld ? ResponseEntity.ok(projectionDto) : ResponseEntity.noContent().build();

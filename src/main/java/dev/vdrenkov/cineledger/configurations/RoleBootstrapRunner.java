@@ -7,7 +7,6 @@ import dev.vdrenkov.cineledger.repositories.UserRepository;
 import dev.vdrenkov.cineledger.utils.constants.RoleConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -17,6 +16,9 @@ import org.springframework.util.StringUtils;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * Seeds required roles and an optional bootstrap administrator during application startup.
+ */
 @Component
 public class RoleBootstrapRunner implements CommandLineRunner {
 
@@ -25,35 +27,38 @@ public class RoleBootstrapRunner implements CommandLineRunner {
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final boolean bootstrapRoles;
-    private final String bootstrapAdminUsername;
-    private final String bootstrapAdminPassword;
-    private final String bootstrapAdminEmail;
-    private final String bootstrapAdminFirstName;
-    private final String bootstrapAdminLastName;
+    private final BootstrapProperties bootstrapProperties;
 
+    /**
+     * Creates a new role bootstrap runner with its required collaborators.
+     *
+     * @param roleRepository
+     *     role repository used by the operation
+     * @param userRepository
+     *     user repository used by the operation
+     * @param passwordEncoder
+     *     password encoder used by the operation
+     * @param bootstrapProperties
+     *     bootstrap properties used by the operation
+     */
     public RoleBootstrapRunner(final RoleRepository roleRepository, final UserRepository userRepository,
-        final PasswordEncoder passwordEncoder, @Value("${app.bootstrap.roles:true}") final boolean bootstrapRoles,
-        @Value("${app.bootstrap.admin.username:}") final String bootstrapAdminUsername,
-        @Value("${app.bootstrap.admin.password:}") final String bootstrapAdminPassword,
-        @Value("${app.bootstrap.admin.email:}") final String bootstrapAdminEmail,
-        @Value("${app.bootstrap.admin.first-name:}") final String bootstrapAdminFirstName,
-        @Value("${app.bootstrap.admin.last-name:}") final String bootstrapAdminLastName) {
+        final PasswordEncoder passwordEncoder, final BootstrapProperties bootstrapProperties) {
         this.roleRepository = roleRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.bootstrapRoles = bootstrapRoles;
-        this.bootstrapAdminUsername = bootstrapAdminUsername;
-        this.bootstrapAdminPassword = bootstrapAdminPassword;
-        this.bootstrapAdminEmail = bootstrapAdminEmail;
-        this.bootstrapAdminFirstName = bootstrapAdminFirstName;
-        this.bootstrapAdminLastName = bootstrapAdminLastName;
+        this.bootstrapProperties = bootstrapProperties;
     }
 
+    /**
+     * Bootstraps required roles and an optional administrator account at startup.
+     *
+     * @param args
+     *     application startup arguments
+     */
     @Override
     @Transactional
     public void run(final String... args) {
-        if (!bootstrapRoles) {
+        if (!bootstrapProperties.isRoles()) {
             log.info("Role bootstrap disabled by configuration");
             return;
         }
@@ -72,12 +77,14 @@ public class RoleBootstrapRunner implements CommandLineRunner {
     }
 
     private void bootstrapAdminUserIfConfigured() {
-        if (!StringUtils.hasText(bootstrapAdminUsername) || !StringUtils.hasText(bootstrapAdminPassword)
-            || !StringUtils.hasText(bootstrapAdminEmail)) {
+        final BootstrapProperties.Admin admin = bootstrapProperties.getAdmin();
+
+        if (!StringUtils.hasText(admin.getUsername()) || !StringUtils.hasText(admin.getPassword())
+            || !StringUtils.hasText(admin.getEmail())) {
             return;
         }
 
-        if (userRepository.existsByUsername(bootstrapAdminUsername)) {
+        if (userRepository.existsByUsername(admin.getUsername())) {
             return;
         }
 
@@ -85,12 +92,12 @@ public class RoleBootstrapRunner implements CommandLineRunner {
             .findRoleByName(RoleConstants.DEFAULT_ADMIN_ROLE)
             .orElseThrow(() -> new IllegalStateException("ADMIN role is missing"));
 
-        final User admin = new User(bootstrapAdminUsername, passwordEncoder.encode(bootstrapAdminPassword),
-            bootstrapAdminEmail, StringUtils.hasText(bootstrapAdminFirstName) ? bootstrapAdminFirstName : "Admin",
-            StringUtils.hasText(bootstrapAdminLastName) ? bootstrapAdminLastName : "User", LocalDate.now(),
+        final User bootstrappedAdmin = new User(admin.getUsername(), passwordEncoder.encode(admin.getPassword()),
+            admin.getEmail(), StringUtils.hasText(admin.getFirstName()) ? admin.getFirstName() : "Admin",
+            StringUtils.hasText(admin.getLastName()) ? admin.getLastName() : "User", LocalDate.now(),
             List.of(adminRole));
 
-        userRepository.save(admin);
-        log.info("Bootstrapped initial admin user '{}'", bootstrapAdminUsername);
+        userRepository.save(bootstrappedAdmin);
+        log.info("Bootstrapped initial admin user '{}'", admin.getUsername());
     }
 }

@@ -10,6 +10,9 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Maps program domain models to DTO representations used by the API.
+ */
 @Component
 public class ProgramMapper {
 
@@ -17,17 +20,37 @@ public class ProgramMapper {
 
     private final CinemaMapper cinemaMapper;
 
+    /**
+     * Creates a new program mapper with its required collaborators.
+     *
+     * @param cinemaMapper
+     *     cinema mapper used by the operation
+     */
     @Autowired
     public ProgramMapper(CinemaMapper cinemaMapper) {
         this.cinemaMapper = cinemaMapper;
     }
 
+    /**
+     * Maps program values to program dto values.
+     *
+     * @param program
+     *     program entity to transform
+     * @return program dto result
+     */
     public ProgramDto mapProgramToProgramDto(Program program) {
         log.info(String.format("The program with an id %d is being mapped to a program DTO", program.getId()));
         return new ProgramDto(program.getId(), program.getProgramDate(),
             cinemaMapper.mapCinemaToCinemaDto(program.getCinema()));
     }
 
+    /**
+     * Maps program list values to program dto list values.
+     *
+     * @param programs
+     *     program entities to transform
+     * @return matching program dto values
+     */
     public List<ProgramDto> mapProgramListToProgramDtoList(List<Program> programs) {
         return programs.stream().map(this::mapProgramToProgramDto).collect(Collectors.toList());
     }

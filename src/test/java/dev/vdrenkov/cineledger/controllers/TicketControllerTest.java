@@ -2,7 +2,7 @@ package dev.vdrenkov.cineledger.controllers;
 
 import dev.vdrenkov.cineledger.models.dtos.TicketDto;
 import dev.vdrenkov.cineledger.services.TicketService;
-import dev.vdrenkov.cineledger.testUtils.factories.TicketFactory;
+import dev.vdrenkov.cineledger.testutils.factories.TicketFactory;
 import dev.vdrenkov.cineledger.utils.constants.URIConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,8 +19,8 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
 
-import static dev.vdrenkov.cineledger.testUtils.constants.ProjectionConstants.ID;
-import static dev.vdrenkov.cineledger.testUtils.constants.TicketConstants.DATE_OF_PURCHASE;
+import static dev.vdrenkov.cineledger.testutils.constants.ProjectionConstants.ID;
+import static dev.vdrenkov.cineledger.testutils.constants.TicketConstants.DATE_OF_PURCHASE;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
@@ -29,11 +29,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+/**
+ * Tests ticket controller behavior.
+ */
 @AutoConfigureMockMvc
 @ExtendWith(MockitoExtension.class)
-public class TicketControllerTest {
+class TicketControllerTest {
 
-    private final static ObjectMapper objectMapper = new ObjectMapper();
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     private MockMvc mockMvc;
 
@@ -43,14 +46,20 @@ public class TicketControllerTest {
     @InjectMocks
     private TicketController ticketController;
 
+    /**
+     * Initializes the test fixture before each test case.
+     */
     @BeforeEach
-    public void setup() {
+    void setup() {
         mockMvc = MockMvcBuilders.standaloneSetup(ticketController).build();
     }
 
+    /**
+     * Verifies that add Ticket ticket Added success.
+     */
     @Test
-    public void testAddTicket_ticketAdded_success() throws Exception {
-        String json = objectMapper.writeValueAsString(TicketFactory.getDefaultTicketRequest());
+    void testAddTicket_ticketAdded_success() throws Exception {
+        final String json = objectMapper.writeValueAsString(TicketFactory.getDefaultTicketRequest());
         when(ticketService.addTicket(any())).thenReturn(TicketFactory.getDefaultTicket());
 
         mockMvc
@@ -62,10 +71,13 @@ public class TicketControllerTest {
             .andExpect(header().string("Location", URIConstants.TICKETS_PATH + "/" + ID));
     }
 
+    /**
+     * Verifies that get Tickets By Projection Id.
+     */
     @Test
-    public void testGetTicketsByProjectionId() throws Exception {
-        List<TicketDto> defaultTicketDtoList = TicketFactory.getDefaultTicketDtoList();
-        TicketDto defaultTicketDto = defaultTicketDtoList.get(0);
+    void testGetTicketsByProjectionId() throws Exception {
+        final List<TicketDto> defaultTicketDtoList = TicketFactory.getDefaultTicketDtoList();
+        final TicketDto defaultTicketDto = defaultTicketDtoList.getFirst();
         when(ticketService.getTicketsByProjectionId(anyInt())).thenReturn(defaultTicketDtoList);
 
         mockMvc

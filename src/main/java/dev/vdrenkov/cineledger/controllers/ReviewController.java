@@ -23,6 +23,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.util.List;
 
+/**
+ * Exposes REST endpoints for managing review data.
+ */
 @RestController
 public class ReviewController {
 
@@ -30,14 +33,29 @@ public class ReviewController {
 
     private final ReviewService reviewService;
 
+    /**
+     * Creates a new review controller with its required collaborators.
+     *
+     * @param reviewService
+     *     review service used by the operation
+     */
     @Autowired
     public ReviewController(ReviewService reviewService) {
         this.reviewService = reviewService;
     }
 
+    /**
+     * Creates and persists cinema review.
+     *
+     * @param request
+     *     request payload containing the submitted data
+     * @param id
+     *     identifier of the target resource
+     * @return HTTP response describing the operation result
+     */
     @PostMapping(URIConstants.CINEMAS_ID_REVIEWS_PATH)
     public ResponseEntity<Void> addCinemaReview(@RequestBody @Valid ReviewRequest request, @PathVariable int id) {
-        Review review = this.reviewService.addCinemaReview(request, id);
+        final Review review = this.reviewService.addCinemaReview(request, id);
         log.info("A request for a cinema review to be added has been submitted");
 
         URI location = UriComponentsBuilder
@@ -48,9 +66,18 @@ public class ReviewController {
         return ResponseEntity.created(location).build();
     }
 
+    /**
+     * Creates and persists movie review.
+     *
+     * @param request
+     *     request payload containing the submitted data
+     * @param id
+     *     identifier of the target resource
+     * @return HTTP response describing the operation result
+     */
     @PostMapping(URIConstants.MOVIES_ID_REVIEWS_PATH)
     public ResponseEntity<Void> addMovieReview(@RequestBody @Valid ReviewRequest request, @PathVariable int id) {
-        Review review = this.reviewService.addMovieReview(request, id);
+        final Review review = this.reviewService.addMovieReview(request, id);
         log.info("A request for a movie review to be added has been submitted");
 
         URI location = UriComponentsBuilder
@@ -61,53 +88,101 @@ public class ReviewController {
         return ResponseEntity.created(location).build();
     }
 
+    /**
+     * Returns reviews matching the supplied criteria.
+     *
+     * @param id
+     *     identifier of the target resource
+     * @return HTTP response describing the operation result
+     */
     @GetMapping(value = URIConstants.MOVIES_ID_REVIEWS_PATH)
     public ResponseEntity<List<ReviewDto>> getReviewsByMovieId(@PathVariable int id) {
-        List<ReviewDto> reviewDtos = this.reviewService.getReviewsByMovieId(id);
+        final List<ReviewDto> reviewDtos = this.reviewService.getReviewsByMovieId(id);
         log.info("All reviews by movie title were requested from the database");
 
         return ResponseEntity.ok(reviewDtos);
     }
 
+    /**
+     * Returns reviews matching the supplied criteria.
+     *
+     * @param id
+     *     identifier of the target resource
+     * @return HTTP response describing the operation result
+     */
     @GetMapping(URIConstants.CINEMAS_ID_REVIEWS_PATH)
     public ResponseEntity<List<ReviewDto>> getReviewsByCinemaId(@PathVariable int id) {
-        List<ReviewDto> reviewDtos = this.reviewService.getReviewsByCinemaId(id);
+        final List<ReviewDto> reviewDtos = this.reviewService.getReviewsByCinemaId(id);
         log.info("All reviews by cinema id were requested from the database");
 
         return ResponseEntity.ok(reviewDtos);
     }
 
+    /**
+     * Returns movie reviews matching the supplied criteria.
+     *
+     * @param id
+     *     identifier of the target resource
+     * @return HTTP response describing the operation result
+     */
     @GetMapping(URIConstants.USERS_ID_MOVIES_REVIEWS_PATH)
     public ResponseEntity<List<ReviewDto>> getMovieReviewsByUserId(@PathVariable int id) {
-        List<ReviewDto> reviewDtos = this.reviewService.getMovieReviewsByUserId(id);
+        final List<ReviewDto> reviewDtos = this.reviewService.getMovieReviewsByUserId(id);
         log.info("All movie reviews by user id were requested from the database");
 
         return ResponseEntity.ok(reviewDtos);
     }
 
+    /**
+     * Returns cinema reviews matching the supplied criteria.
+     *
+     * @param id
+     *     identifier of the target resource
+     * @return HTTP response describing the operation result
+     */
     @GetMapping(URIConstants.USERS_ID_CINEMAS_REVIEWS_PATH)
     public ResponseEntity<List<ReviewDto>> getCinemaReviewsByUserId(@PathVariable int id) {
-        List<ReviewDto> reviewDtos = this.reviewService.getCinemaReviewsByUserId(id);
+        final List<ReviewDto> reviewDtos = this.reviewService.getCinemaReviewsByUserId(id);
         log.info("All cinema reviews by user id were requested from the database");
 
         return ResponseEntity.ok(reviewDtos);
     }
 
+    /**
+     * Updates review and returns the previous state when needed.
+     *
+     * @param request
+     *     request payload containing the submitted data
+     * @param id
+     *     identifier of the target resource
+     * @param returnOld
+     *     whether the previous persisted state should be returned
+     * @return HTTP response describing the operation result
+     */
     @PutMapping(URIConstants.REVIEWS_ID_PATH)
     public ResponseEntity<ReviewDto> updateReview(@RequestBody @Valid ReviewRequest request, @PathVariable int id,
         @RequestParam(required = false) boolean returnOld) {
 
-        ReviewDto reviewDto = this.reviewService.updateReview(request, id);
+        final ReviewDto reviewDto = this.reviewService.updateReview(request, id);
         log.info(String.format("Review with id %d was updated", id));
 
         return returnOld ? ResponseEntity.ok(reviewDto) : ResponseEntity.noContent().build();
     }
 
+    /**
+     * Deletes review and returns the removed state when needed.
+     *
+     * @param id
+     *     identifier of the target resource
+     * @param returnOld
+     *     whether the previous persisted state should be returned
+     * @return HTTP response describing the operation result
+     */
     @DeleteMapping(URIConstants.REVIEWS_ID_PATH)
     public ResponseEntity<ReviewDto> deleteReview(@PathVariable int id,
         @RequestParam(required = false) boolean returnOld) {
 
-        ReviewDto reviewDto = this.reviewService.deleteReview(id);
+        final ReviewDto reviewDto = this.reviewService.deleteReview(id);
         log.info(String.format("Review with id %d was deleted", id));
 
         return returnOld ? ResponseEntity.ok(reviewDto) : ResponseEntity.noContent().build();

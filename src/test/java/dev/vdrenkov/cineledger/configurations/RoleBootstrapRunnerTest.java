@@ -39,8 +39,8 @@ class RoleBootstrapRunnerTest {
 
     @Test
     void run_bootstrapDisabled_skipsAllBootstrapWork() {
-        RoleBootstrapRunner runner = new RoleBootstrapRunner(roleRepository, userRepository, passwordEncoder, false, "",
-            "", "", "", "");
+        final RoleBootstrapRunner runner = new RoleBootstrapRunner(roleRepository, userRepository, passwordEncoder,
+            bootstrapProperties(false, "", "", "", "", ""));
 
         runner.run();
 
@@ -50,13 +50,13 @@ class RoleBootstrapRunnerTest {
 
     @Test
     void run_missingRoles_bootstrapsRequiredRoles() {
-        RoleBootstrapRunner runner = new RoleBootstrapRunner(roleRepository, userRepository, passwordEncoder, true, "",
-            "", "", "", "");
+        RoleBootstrapRunner runner = new RoleBootstrapRunner(roleRepository, userRepository, passwordEncoder,
+            bootstrapProperties(true, "", "", "", "", ""));
         when(roleRepository.existsByName(any())).thenReturn(false);
 
         runner.run();
 
-        ArgumentCaptor<Role> roleCaptor = ArgumentCaptor.forClass(Role.class);
+        final ArgumentCaptor<Role> roleCaptor = ArgumentCaptor.forClass(Role.class);
         verify(roleRepository, times(3)).save(roleCaptor.capture());
         assertIterableEquals(List.of(DEFAULT_ADMIN_ROLE, DEFAULT_VENDOR_ROLE, DEFAULT_USER_ROLE),
             roleCaptor.getAllValues().stream().map(Role::getName).toList());
@@ -65,9 +65,9 @@ class RoleBootstrapRunnerTest {
 
     @Test
     void run_adminConfigured_bootstrapsInitialAdminUser() {
-        RoleBootstrapRunner runner = new RoleBootstrapRunner(roleRepository, userRepository, passwordEncoder, true,
-            "admin", "secret", "admin@cineledger.dev", "", "");
-        Role adminRole = new Role(DEFAULT_ADMIN_ROLE);
+        RoleBootstrapRunner runner = new RoleBootstrapRunner(roleRepository, userRepository, passwordEncoder,
+            bootstrapProperties(true, "admin", "secret", "admin@cineledger.dev", "", ""));
+        final Role adminRole = new Role(DEFAULT_ADMIN_ROLE);
 
         when(roleRepository.existsByName(any())).thenReturn(true);
         when(userRepository.existsByUsername("admin")).thenReturn(false);
@@ -76,16 +76,30 @@ class RoleBootstrapRunnerTest {
 
         runner.run();
 
-        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+        final ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
         verify(userRepository).save(userCaptor.capture());
 
-        User bootstrappedAdmin = userCaptor.getValue();
+        final User bootstrappedAdmin = userCaptor.getValue();
         assertEquals("admin", bootstrappedAdmin.getUsername());
         assertEquals("encoded-secret", bootstrappedAdmin.getPassword());
         assertEquals("admin@cineledger.dev", bootstrappedAdmin.getEmail());
         assertEquals("Admin", bootstrappedAdmin.getFirstName());
         assertEquals("User", bootstrappedAdmin.getLastName());
         assertEquals(List.of(adminRole), bootstrappedAdmin.getRoles());
+    }
+
+    private static BootstrapProperties bootstrapProperties(final boolean roles, final String username,
+        final String password, final String email, final String firstName, final String lastName) {
+        final BootstrapProperties bootstrapProperties = new BootstrapProperties();
+        final BootstrapProperties.Admin admin = bootstrapProperties.getAdmin();
+
+        bootstrapProperties.setRoles(roles);
+        admin.setUsername(username);
+        admin.setPassword(password);
+        admin.setEmail(email);
+        admin.setFirstName(firstName);
+        admin.setLastName(lastName);
+        return bootstrapProperties;
     }
 }
 

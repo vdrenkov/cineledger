@@ -1,8 +1,8 @@
 package dev.vdrenkov.cineledger.mappers;
 
 import dev.vdrenkov.cineledger.models.dtos.ProjectionDto;
-import dev.vdrenkov.cineledger.testUtils.constants.ProjectionConstants;
-import dev.vdrenkov.cineledger.testUtils.factories.ProjectionFactory;
+import dev.vdrenkov.cineledger.testutils.constants.ProjectionConstants;
+import dev.vdrenkov.cineledger.testutils.factories.ProjectionFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,8 +15,11 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+/**
+ * Tests projection mapper behavior.
+ */
 @ExtendWith(MockitoExtension.class)
-public class ProjectionMapperTest {
+class ProjectionMapperTest {
 
     @Mock
     private HallMapper hallMapper;
@@ -30,8 +33,11 @@ public class ProjectionMapperTest {
     @InjectMocks
     private ProjectionMapper projectionMapper;
 
+    /**
+     * Verifies that map Projection To Projection DTO no Exceptions success.
+     */
     @Test
-    public void testMapProjectionToProjectionDto_noExceptions_success() {
+    void testMapProjectionToProjectionDto_noExceptions_success() {
         when(hallMapper.mapHallToHallDto(any())).thenReturn(ProjectionConstants.PROJECTION_HALL_DTO);
         when(movieMapper.mapMovieToMovieDto(any())).thenReturn(ProjectionConstants.PROJECTION_MOVIE_DTO);
         when(programMapper.mapProgramToProgramDto(any())).thenReturn(ProjectionConstants.PROJECTION_PROGRAM_DTO);
@@ -52,8 +58,11 @@ public class ProjectionMapperTest {
         Assertions.assertEquals(ProjectionConstants.START_TIME, resultDto.getStartTime());
     }
 
+    /**
+     * Verifies that map Projection List To Projection DTO List no Exceptions success.
+     */
     @Test
-    public void testMapProjectionListToProjectionDtoList_noExceptions_success() {
+    void testMapProjectionListToProjectionDtoList_noExceptions_success() {
         when(hallMapper.mapHallToHallDto(any())).thenReturn(ProjectionConstants.PROJECTION_HALL_DTO);
         when(movieMapper.mapMovieToMovieDto(any())).thenReturn(ProjectionConstants.PROJECTION_MOVIE_DTO);
         when(programMapper.mapProgramToProgramDto(any())).thenReturn(ProjectionConstants.PROJECTION_PROGRAM_DTO);
@@ -61,7 +70,7 @@ public class ProjectionMapperTest {
         List<ProjectionDto> resultList = projectionMapper.mapProjectionListToProjectionDtoList(
             ProjectionFactory.getDefaultProjectionList());
 
-        ProjectionDto resultDto = resultList.get(0);
+        final ProjectionDto resultDto = resultList.get(0);
 
         Assertions.assertEquals(ProjectionConstants.ID, resultDto.getId());
         Assertions.assertEquals(ProjectionConstants.PROJECTION_HALL_DTO.getId(), resultDto.getHall().getId());

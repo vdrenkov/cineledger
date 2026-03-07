@@ -6,6 +6,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+/**
+ * Provides persistence access for discount entities.
+ */
 @Repository
 public interface DiscountRepository extends JpaRepository<Discount, Integer> {
 

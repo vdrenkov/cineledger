@@ -19,6 +19,9 @@ import org.springframework.stereotype.Service;
 import java.time.LocalTime;
 import java.util.List;
 
+/**
+ * Contains business logic for projection operations.
+ */
 @Service
 public class ProjectionService {
 
@@ -30,6 +33,20 @@ public class ProjectionService {
     private final HallService hallService;
     private final MovieService movieService;
 
+    /**
+     * Creates a new projection service with its required collaborators.
+     *
+     * @param projectionRepository
+     *     projection repository used by the operation
+     * @param projectionMapper
+     *     projection mapper used by the operation
+     * @param programService
+     *     program service used by the operation
+     * @param hallService
+     *     hall service used by the operation
+     * @param movieService
+     *     movie service used by the operation
+     */
     @Autowired
     public ProjectionService(ProjectionRepository projectionRepository, ProjectionMapper projectionMapper,
         ProgramService programService, HallService hallService, MovieService movieService) {
@@ -40,28 +57,42 @@ public class ProjectionService {
         this.movieService = movieService;
     }
 
+    /**
+     * Creates and persists projection.
+     *
+     * @param request
+     *     request payload containing the submitted data
+     * @return requested projection value
+     */
     public Projection addProjection(ProjectionRequest request) {
-        Hall hall = hallService.getHallById(request.getHallId());
-        Program program = programService.getProgramById(request.getProgramId());
-        Movie movie = movieService.getMovieById(request.getMovieId());
-        LocalTime startTime = request.getStartTime();
+        final Hall hall = hallService.getHallById(request.getHallId());
+        final Program program = programService.getProgramById(request.getProgramId());
+        final Movie movie = movieService.getMovieById(request.getMovieId());
+        final LocalTime startTime = request.getStartTime();
 
-        boolean isHallAvailable = isHallAvailable(hall.getId(), program.getId(), startTime);
+        final boolean isHallAvailable = isHallAvailable(hall.getId(), program.getId(), startTime);
         if (!isHallAvailable) {
             log.error(String.format("Exception caught: %s", ExceptionMessages.HALL_NOT_AVAILABLE_EXCEPTION));
 
             throw new HallNotAvailableException(ExceptionMessages.HALL_NOT_AVAILABLE_EXCEPTION);
         }
 
-        Projection projection = new Projection(request.getPrice(), hall, program, movie, request.getStartTime());
+        final Projection projection = new Projection(request.getPrice(), hall, program, movie, request.getStartTime());
 
         log.info("An attempt to add a new projection in the database");
 
         return projectionRepository.save(projection);
     }
 
+    /**
+     * Returns projections matching the supplied criteria.
+     *
+     * @param programId
+     *     identifier of the target program
+     * @return matching projection dto values
+     */
     public List<ProjectionDto> getProjectionsByProgramId(int programId) {
-        Program program = programService.getProgramById(programId);
+        final Program program = programService.getProgramById(programId);
 
         log.info(String.format("All projections with program id %d were requested from the database", programId));
 
@@ -69,8 +100,15 @@ public class ProjectionService {
             projectionRepository.findProjectionsByProgramId(program.getId()));
     }
 
+    /**
+     * Returns projections matching the supplied criteria.
+     *
+     * @param movieId
+     *     identifier of the target movie
+     * @return matching projection dto values
+     */
     public List<ProjectionDto> getProjectionsByMovieId(int movieId) {
-        Movie movie = movieService.getMovieById(movieId);
+        final Movie movie = movieService.getMovieById(movieId);
 
         log.info(String.format("All projections with movie id %d were requested from the database", movieId));
 
@@ -78,6 +116,15 @@ public class ProjectionService {
             projectionRepository.findProjectionsByMovieId(movie.getId()));
     }
 
+    /**
+     * Returns projections matching the supplied criteria.
+     *
+     * @param startTime
+     *     start time used by the operation
+     * @param isBefore
+     *     whether to match data before the provided boundary
+     * @return matching projection dto values
+     */
     public List<ProjectionDto> getProjectionsByStartTime(LocalTime startTime, Boolean isBefore) {
         List<Projection> projections;
 
@@ -96,6 +143,13 @@ public class ProjectionService {
         return projectionMapper.mapProjectionListToProjectionDtoList(projections);
     }
 
+    /**
+     * Returns projection matching the supplied criteria.
+     *
+     * @param id
+     *     identifier of the target resource
+     * @return requested projection value
+     */
     public Projection getProjectionById(int id) {
         log.info(String.format("An attempt to extract a projection with an id %d from the database", id));
 
@@ -106,27 +160,43 @@ public class ProjectionService {
         });
     }
 
+    /**
+     * Returns projection matching the supplied criteria.
+     *
+     * @param id
+     *     identifier of the target resource
+     * @return projection dto result
+     */
     public ProjectionDto getProjectionDtoById(int id) {
         log.info(String.format("An attempt to extract a projection DTO with an id %d from the database", id));
 
         return projectionMapper.mapProjectionToProjectionDto(getProjectionById(id));
     }
 
+    /**
+     * Updates projection and returns the previous state when needed.
+     *
+     * @param request
+     *     request payload containing the submitted data
+     * @param id
+     *     identifier of the target resource
+     * @return projection dto result
+     */
     public ProjectionDto updateProjection(ProjectionRequest request, int id) {
-        ProjectionDto projectionDto = getProjectionDtoById(id);
-        Hall hall = hallService.getHallById(request.getHallId());
-        Program program = programService.getProgramById(request.getProgramId());
-        Movie movie = movieService.getMovieById(request.getMovieId());
-        LocalTime startTime = request.getStartTime();
+        final ProjectionDto projectionDto = getProjectionDtoById(id);
+        final Hall hall = hallService.getHallById(request.getHallId());
+        final Program program = programService.getProgramById(request.getProgramId());
+        final Movie movie = movieService.getMovieById(request.getMovieId());
+        final LocalTime startTime = request.getStartTime();
 
-        boolean isHallAvailable = isHallAvailable(hall.getId(), program.getId(), startTime);
+        final boolean isHallAvailable = isHallAvailable(hall.getId(), program.getId(), startTime);
         if (!isHallAvailable) {
             log.error(String.format("Exception caught: %s", ExceptionMessages.HALL_NOT_AVAILABLE_EXCEPTION));
 
             throw new HallNotAvailableException(ExceptionMessages.HALL_NOT_AVAILABLE_EXCEPTION);
         }
 
-        Projection projection = new Projection(id, request.getPrice(), hall, program, movie, startTime);
+        final Projection projection = new Projection(id, request.getPrice(), hall, program, movie, startTime);
         projectionRepository.save(projection);
 
         log.info(String.format("Projection with an id %d has been updated", id));
@@ -134,8 +204,15 @@ public class ProjectionService {
         return projectionDto;
     }
 
+    /**
+     * Deletes projection and returns the removed state when needed.
+     *
+     * @param id
+     *     identifier of the target resource
+     * @return projection dto result
+     */
     public ProjectionDto deleteProjection(int id) {
-        ProjectionDto projectionDto = getProjectionDtoById(id);
+        final ProjectionDto projectionDto = getProjectionDtoById(id);
 
         projectionRepository.deleteById(id);
 
@@ -144,9 +221,20 @@ public class ProjectionService {
         return projectionDto;
     }
 
+    /**
+     * Checks whether hall available satisfies the required condition.
+     *
+     * @param hallId
+     *     identifier of the target hall
+     * @param programId
+     *     identifier of the target program
+     * @param startTime
+     *     start time used by the operation
+     * @return true when the requested condition holds; otherwise false
+     */
     public boolean isHallAvailable(int hallId, int programId, LocalTime startTime) {
-        LocalTime before = startTime.minusHours(3).minusMinutes(59);
-        LocalTime after = startTime.plusHours(3).plusMinutes(59);
+        final LocalTime before = startTime.minusHours(3).minusMinutes(59);
+        final LocalTime after = startTime.plusHours(3).plusMinutes(59);
 
         if (before.isAfter(after)) {
             return isHallAvailableInPeriod(hallId, programId, before, LocalTime.MAX) && isHallAvailableInPeriod(hallId,
@@ -156,6 +244,19 @@ public class ProjectionService {
         }
     }
 
+    /**
+     * Checks whether hall available in period satisfies the required condition.
+     *
+     * @param hallId
+     *     identifier of the target hall
+     * @param programId
+     *     identifier of the target program
+     * @param start
+     *     start used by the operation
+     * @param end
+     *     end used by the operation
+     * @return true when the requested condition holds; otherwise false
+     */
     public boolean isHallAvailableInPeriod(int hallId, int programId, LocalTime start, LocalTime end) {
         List<Projection> projections = projectionRepository.findProjectionsByHallIdAndStartTimeBetween(hallId, start,
             end);

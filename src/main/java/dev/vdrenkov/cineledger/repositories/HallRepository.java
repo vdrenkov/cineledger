@@ -6,6 +6,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+/**
+ * Provides persistence access for hall entities.
+ */
 @Repository
 public interface HallRepository extends JpaRepository<Hall, Integer> {
 

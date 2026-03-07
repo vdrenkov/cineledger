@@ -8,9 +8,9 @@ import dev.vdrenkov.cineledger.models.dtos.ProgramDto;
 import dev.vdrenkov.cineledger.models.entities.Program;
 import dev.vdrenkov.cineledger.models.requests.ProgramRequest;
 import dev.vdrenkov.cineledger.repositories.ProgramRepository;
-import dev.vdrenkov.cineledger.testUtils.constants.ProgramConstants;
-import dev.vdrenkov.cineledger.testUtils.factories.CinemaFactory;
-import dev.vdrenkov.cineledger.testUtils.factories.ProgramFactory;
+import dev.vdrenkov.cineledger.testutils.constants.ProgramConstants;
+import dev.vdrenkov.cineledger.testutils.factories.CinemaFactory;
+import dev.vdrenkov.cineledger.testutils.factories.ProgramFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -28,8 +28,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 
+/**
+ * Tests program service behavior.
+ */
 @ExtendWith(MockitoExtension.class)
-public class ProgramServiceTest {
+class ProgramServiceTest {
 
     @Mock
     private ProgramRepository programRepository;
@@ -43,23 +46,29 @@ public class ProgramServiceTest {
     @InjectMocks
     private ProgramService programService;
 
+    /**
+     * Verifies that add Program no Exceptions success.
+     */
     @Test
-    public void testAddProgram_noExceptions_success() {
-        Program expected = ProgramFactory.getDefaultProgram();
+    void testAddProgram_noExceptions_success() {
+        final Program expected = ProgramFactory.getDefaultProgram();
 
         when(programRepository.save(any())).thenReturn(expected);
         when(cinemaService.getCinemaById(anyInt())).thenReturn(CinemaFactory.getDefaultCinema());
 
-        Program program = programService.addProgram(ProgramFactory.getDefaultProgramRequest());
+        final Program program = programService.addProgram(ProgramFactory.getDefaultProgramRequest());
 
         assertEquals(expected, program);
     }
 
+    /**
+     * Verifies that add Program date Not Present throws Date Not Valid Exception.
+     */
     @Test
-    public void testAddProgram_dateNotPresent_throwsDateNotValidException() {
+    void testAddProgram_dateNotPresent_throwsDateNotValidException() {
         assertThrows(DateNotValidException.class, () -> {
 
-            ProgramRequest request = ProgramFactory.getDefaultProgramRequest();
+            final ProgramRequest request = ProgramFactory.getDefaultProgramRequest();
             request.setProgramDate(ProgramConstants.PAST_DATE);
 
             programService.addProgram(request);
@@ -67,8 +76,11 @@ public class ProgramServiceTest {
         });
     }
 
+    /**
+     * Verifies that add Program program Already Exists throws Program Already Exists Exception.
+     */
     @Test
-    public void testAddProgram_programAlreadyExists_throwsProgramAlreadyExistsException() {
+    void testAddProgram_programAlreadyExists_throwsProgramAlreadyExistsException() {
         assertThrows(ProgramAlreadyExistsException.class, () -> {
 
             when(programRepository.findByProgramDateAndCinemaId(any(), anyInt())).thenReturn(
@@ -79,56 +91,71 @@ public class ProgramServiceTest {
         });
     }
 
+    /**
+     * Verifies that get All Programs date Not Null success.
+     */
     @Test
-    public void testGetAllPrograms_dateNotNull_success() {
-        List<ProgramDto> expected = ProgramFactory.getDefaultProgramDtoList();
+    void testGetAllPrograms_dateNotNull_success() {
+        final List<ProgramDto> expected = ProgramFactory.getDefaultProgramDtoList();
 
         when(programMapper.mapProgramListToProgramDtoList(any())).thenReturn(ProgramFactory.getDefaultProgramDtoList());
         when(programRepository.findAllByProgramDate(any())).thenReturn(ProgramFactory.getDefaultProgramList());
 
-        List<ProgramDto> resultList = programService.getAllPrograms(ProgramConstants.DATE);
+        final List<ProgramDto> resultList = programService.getAllPrograms(ProgramConstants.DATE);
 
         assertEquals(expected, resultList);
     }
 
+    /**
+     * Verifies that get All Programs date Null success.
+     */
     @Test
-    public void testGetAllPrograms_dateNull_success() {
-        List<ProgramDto> expected = ProgramFactory.getDefaultProgramDtoList();
+    void testGetAllPrograms_dateNull_success() {
+        final List<ProgramDto> expected = ProgramFactory.getDefaultProgramDtoList();
 
         when(programMapper.mapProgramListToProgramDtoList(any())).thenReturn(expected);
         when(programRepository.findAll()).thenReturn(ProgramFactory.getDefaultProgramList());
 
-        List<ProgramDto> resultList = programService.getAllPrograms(null);
+        final List<ProgramDto> resultList = programService.getAllPrograms(null);
 
         assertEquals(expected, resultList);
     }
 
+    /**
+     * Verifies that get Programs By Cinema Id cinema Found success.
+     */
     @Test
-    public void testGetProgramsByCinemaId_cinemaFound_success() {
-        List<ProgramDto> expected = ProgramFactory.getDefaultProgramDtoList();
+    void testGetProgramsByCinemaId_cinemaFound_success() {
+        final List<ProgramDto> expected = ProgramFactory.getDefaultProgramDtoList();
 
         when(cinemaService.getCinemaById(anyInt())).thenReturn(CinemaFactory.getDefaultCinema());
         when(programMapper.mapProgramListToProgramDtoList(any())).thenReturn(expected);
         when(programRepository.findAllByCinemaId(anyInt())).thenReturn(ProgramFactory.getDefaultProgramList());
 
-        List<ProgramDto> resultList = programService.getProgramsByCinemaId(ProgramConstants.ID);
+        final List<ProgramDto> resultList = programService.getProgramsByCinemaId(ProgramConstants.ID);
 
         assertEquals(expected, resultList);
     }
 
+    /**
+     * Verifies that get Program By Id program Found success.
+     */
     @Test
-    public void testGetProgramById_programFound_success() {
-        Program expected = ProgramFactory.getDefaultProgram();
+    void testGetProgramById_programFound_success() {
+        final Program expected = ProgramFactory.getDefaultProgram();
 
         when(programRepository.findById(anyInt())).thenReturn(Optional.of(expected));
 
-        Program program = programService.getProgramById(ProgramConstants.ID);
+        final Program program = programService.getProgramById(ProgramConstants.ID);
 
         assertEquals(expected, program);
     }
 
+    /**
+     * Verifies that get Program By Id program Not Found throws Program Not Found Exception.
+     */
     @Test
-    public void testGetProgramById_programNotFound_throwsProgramNotFoundException() {
+    void testGetProgramById_programNotFound_throwsProgramNotFoundException() {
         assertThrows(ProgramNotFoundException.class, () -> {
 
             programService.getProgramById(ProgramConstants.ID);
@@ -136,21 +163,27 @@ public class ProgramServiceTest {
         });
     }
 
+    /**
+     * Verifies that get Program DTO By Id program DTO Found success.
+     */
     @Test
-    public void testGetProgramDtoById_programDtoFound_success() {
-        ProgramDto expected = ProgramFactory.getDefaultProgramDto();
+    void testGetProgramDtoById_programDtoFound_success() {
+        final ProgramDto expected = ProgramFactory.getDefaultProgramDto();
 
         when(programMapper.mapProgramToProgramDto(any())).thenReturn(expected);
         when(programRepository.findById(anyInt())).thenReturn(Optional.of(new Program()));
 
-        ProgramDto program = programService.getProgramDtoById(ProgramConstants.ID);
+        final ProgramDto program = programService.getProgramDtoById(ProgramConstants.ID);
 
         assertEquals(expected, program);
     }
 
+    /**
+     * Verifies that update Program program Updated success.
+     */
     @Test
-    public void testUpdateProgram_programUpdated_success() {
-        ProgramDto expected = ProgramFactory.getDefaultProgramDto();
+    void testUpdateProgram_programUpdated_success() {
+        final ProgramDto expected = ProgramFactory.getDefaultProgramDto();
 
         when(programMapper.mapProgramToProgramDto(any())).thenReturn(expected);
         when(programRepository.findById(anyInt())).thenReturn(Optional.of(ProgramFactory.getDefaultProgram()));
@@ -163,11 +196,14 @@ public class ProgramServiceTest {
 
     }
 
+    /**
+     * Verifies that update Program date Not Present throws Date Not Valid Exception.
+     */
     @Test
-    public void testUpdateProgram_dateNotPresent_throwsDateNotValidException() {
+    void testUpdateProgram_dateNotPresent_throwsDateNotValidException() {
         assertThrows(DateNotValidException.class, () -> {
 
-            ProgramRequest request = ProgramFactory.getDefaultProgramRequest();
+            final ProgramRequest request = ProgramFactory.getDefaultProgramRequest();
             request.setProgramDate(ProgramConstants.PAST_DATE);
 
             when(programMapper.mapProgramToProgramDto(any())).thenReturn(ProgramFactory.getDefaultProgramDto());
@@ -178,21 +214,27 @@ public class ProgramServiceTest {
         });
     }
 
+    /**
+     * Verifies that delete Program program Deleted success.
+     */
     @Test
-    public void testDeleteProgram_programDeleted_success() {
-        ProgramDto expected = ProgramFactory.getDefaultProgramDto();
+    void testDeleteProgram_programDeleted_success() {
+        final ProgramDto expected = ProgramFactory.getDefaultProgramDto();
 
         when(programMapper.mapProgramToProgramDto(any())).thenReturn(expected);
         when(programRepository.findById(anyInt())).thenReturn(Optional.of(ProgramFactory.getDefaultProgram()));
 
-        ProgramDto program = programService.deleteProgram(ProgramConstants.ID);
+        final ProgramDto program = programService.deleteProgram(ProgramConstants.ID);
 
         assertEquals(expected, program);
     }
 
+    /**
+     * Verifies that is Date Not Valid.
+     */
     @Test
-    public void testIsDateNotValid() {
-        boolean result = programService.isDateNotValid(LocalDate.of(2000, 1, 1));
+    void testIsDateNotValid() {
+        final boolean result = programService.isDateNotValid(LocalDate.of(2000, 1, 1));
 
         assertTrue(result);
     }

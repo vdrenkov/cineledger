@@ -26,6 +26,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+/**
+ * Contains business logic for order operations.
+ */
 @Service
 public class OrderService {
 
@@ -38,6 +41,24 @@ public class OrderService {
     private final ItemService itemService;
     private final EmailService emailService;
 
+    /**
+     * Creates a new order service with its required collaborators.
+     *
+     * @param discountService
+     *     discount service used by the operation
+     * @param orderMapper
+     *     order mapper used by the operation
+     * @param orderRepository
+     *     order repository used by the operation
+     * @param userService
+     *     user service used by the operation
+     * @param ticketService
+     *     ticket service used by the operation
+     * @param itemService
+     *     item service used by the operation
+     * @param emailService
+     *     email service used by the operation
+     */
     @Autowired
     public OrderService(DiscountService discountService, OrderMapper orderMapper, OrderRepository orderRepository,
         UserService userService, TicketService ticketService, ItemService itemService, EmailService emailService) {
@@ -50,6 +71,13 @@ public class OrderService {
         this.emailService = emailService;
     }
 
+    /**
+     * Creates an order, applies pricing rules, and sends a confirmation email.
+     *
+     * @param request
+     *     request payload containing the submitted data
+     * @return requested order value
+     */
     @Transactional(rollbackFor = Exception.class)
     public Order addOrder(final OrderRequest request) {
         List<Ticket> tickets = request
@@ -68,11 +96,11 @@ public class OrderService {
             }
         }
 
-        User user = userService.getUserById(request.getUserId());
+        final User user = userService.getUserById(request.getUserId());
 
         double price = calculateOrderPrice(items, tickets);
 
-        String discountCode = request.getDiscountCode();
+        final String discountCode = request.getDiscountCode();
         if (Objects.nonNull(discountCode) && isDiscountCodeValid(discountCode)) {
             price = discountService.applyDiscount(price, discountCode);
         }
@@ -88,13 +116,24 @@ public class OrderService {
         return order;
     }
 
+    /**
+     * Creates a reservation-only order for the specified user.
+     *
+     * @param requests
+     *     request payloads to process
+     * @param userId
+     *     identifier of the target user
+     * @param discountCode
+     *     discount code to validate or apply
+     * @return requested order value
+     */
     @Transactional(rollbackFor = Exception.class)
     public Order makeReservationWithUserId(final List<TicketRequest> requests, final int userId,
         final String discountCode) {
-        List<Item> items = Collections.emptyList();
-        List<Ticket> tickets = new ArrayList<>();
+        final List<Item> items = Collections.emptyList();
+        final List<Ticket> tickets = new ArrayList<>();
 
-        User user = userService.getUserById(userId);
+        final User user = userService.getUserById(userId);
 
         if (!userService.isCurrentUserAuthorized(userId)) {
             log.error(String.format("Exception caught: %s", ExceptionMessages.NOT_AUTHORIZED_MESSAGE));
@@ -113,13 +152,20 @@ public class OrderService {
 
         log.info("An attempt to add a new order in the database");
 
-        Order order = orderRepository.save(new Order(LocalDate.now(), user, tickets, items, price));
+        final Order order = orderRepository.save(new Order(LocalDate.now(), user, tickets, items, price));
 
         emailService.sendOrderConfirmationEmail(user, order);
 
         return order;
     }
 
+    /**
+     * Returns orders matching the supplied criteria.
+     *
+     * @param userId
+     *     identifier of the target user
+     * @return matching order dto values
+     */
     public List<OrderDto> getOrdersByUserId(final int userId) {
         final User currentUser = userService.getCurrentUser();
 
@@ -139,12 +185,30 @@ public class OrderService {
         return this.orderMapper.mapOrderToOrderDtoList(orderRepository.findOrderByUserId(userId));
     }
 
+    /**
+     * Returns orders matching the supplied criteria.
+     *
+     * @param startDate
+     *     start date of the requested interval
+     * @param endDate
+     *     end date of the requested interval
+     * @return matching order values
+     */
     public List<Order> getOrdersByDateBetween(final LocalDate startDate, final LocalDate endDate) {
         log.info(String.format("All orders with date between %s and %s were requested from the database", startDate,
             endDate));
         return orderRepository.findOrdersByDateOfPurchaseBetween(startDate, endDate);
     }
 
+    /**
+     * Updates order and returns the previous state when needed.
+     *
+     * @param request
+     *     request payload containing the submitted data
+     * @param id
+     *     identifier of the target resource
+     * @return order dto result
+     */
     @Transactional(rollbackFor = Exception.class)
     public OrderDto updateOrder(final OrderRequest request, final int id) {
         final Order order = orderRepository.findById(id).orElseThrow(() -> {
@@ -168,7 +232,7 @@ public class OrderService {
 
         final User user = userService.getUserById(request.getUserId());
 
-        double price = calculateOrderPrice(items, tickets);
+        final double price = calculateOrderPrice(items, tickets);
 
         if (!items.isEmpty()) {
             final List<Item> existingItems = new ArrayList<>(order.getItems());
@@ -202,6 +266,13 @@ public class OrderService {
         return orderDto;
     }
 
+    /**
+     * Deletes order and returns the removed state when needed.
+     *
+     * @param id
+     *     identifier of the target resource
+     * @return order dto result
+     */
     @Transactional
     public OrderDto deleteOrder(final int id) {
         final Order order = orderRepository.findById(id).orElseThrow(() -> {

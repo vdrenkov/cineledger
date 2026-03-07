@@ -19,6 +19,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+/**
+ * Generates, parses, and validates JWT tokens for authenticated users.
+ */
 @Component
 public class JwtTokenUtil implements Serializable {
 
@@ -27,20 +30,49 @@ public class JwtTokenUtil implements Serializable {
     @Value("${jwt.secret}")
     private String secret;
 
+    /**
+     * Overrides the JWT signing secret, primarily for tests.
+     *
+     * @param secret
+     *     JWT signing secret
+     */
     public void setSecret(final String secret) {
         this.secret = secret;
     }
 
+    /**
+     * Extracts the username stored in the supplied JWT token.
+     *
+     * @param token
+     *     JWT token value
+     * @return resulting string value
+     */
     public String getUsernameFromToken(final String token) {
         log.info("An attempt to extract the username from the JWT token");
         return getClaimFromToken(token, Claims::getSubject);
     }
 
+    /**
+     * Extracts the expiration timestamp from the supplied JWT token.
+     *
+     * @param token
+     *     JWT token value
+     * @return requested date value
+     */
     public Date getExpirationDateFromToken(final String token) {
         log.info("An attempt to extract the expiration date from the JWT token");
         return getClaimFromToken(token, Claims::getExpiration);
     }
 
+    /**
+     * Extracts a claim from the supplied JWT token.
+     *
+     * @param token
+     *     JWT token value
+     * @param claimsResolver
+     *     function used to extract a claim from the token
+     * @return requested t value
+     */
     public <T> T getClaimFromToken(final String token, final Function<Claims, T> claimsResolver) {
         final Claims claims = getAllClaimsFromToken(token);
         log.info("An attempt to extract the claim from the JWT token");
@@ -58,6 +90,13 @@ public class JwtTokenUtil implements Serializable {
         return expiration.before(new Date());
     }
 
+    /**
+     * Generates a signed JWT token for the supplied user.
+     *
+     * @param userDetails
+     *     authenticated user details
+     * @return resulting string value
+     */
     public String generateToken(final UserDetails userDetails) {
         final Map<String, Object> claims = new HashMap<>();
         log.info("An attempt to generate a JWT token");
@@ -78,6 +117,15 @@ public class JwtTokenUtil implements Serializable {
             .compact();
     }
 
+    /**
+     * Validates that the supplied token belongs to the given user and is still active.
+     *
+     * @param token
+     *     JWT token value
+     * @param userDetails
+     *     authenticated user details
+     * @return true when the requested condition holds; otherwise false
+     */
     public boolean validateToken(final String token, final UserDetails userDetails) {
         final String username = getUsernameFromToken(token);
         log.info("An attempt to validate a JWT token");

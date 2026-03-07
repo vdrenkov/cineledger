@@ -17,6 +17,9 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Loads application users for Spring Security authentication.
+ */
 @Service
 public class JwtUserDetailsService implements UserDetailsService {
 
@@ -24,11 +27,24 @@ public class JwtUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
+    /**
+     * Creates a new jwt user details service with its required collaborators.
+     *
+     * @param userRepository
+     *     user repository used by the operation
+     */
     @Autowired
     public JwtUserDetailsService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
+    /**
+     * Loads the security principal for the supplied username.
+     *
+     * @param username
+     *     username to search for
+     * @return requested user details value
+     */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findUserByUsername(username).orElseThrow(() -> {
@@ -36,7 +52,7 @@ public class JwtUserDetailsService implements UserDetailsService {
             throw new UserNotFoundException(ExceptionMessages.USER_NOT_FOUND_MESSAGE);
         });
 
-        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        final List<SimpleGrantedAuthority> authorities = new ArrayList<>();
         for (Role role : user.getRoles()) {
             authorities.add(new SimpleGrantedAuthority(role.getName()));
         }

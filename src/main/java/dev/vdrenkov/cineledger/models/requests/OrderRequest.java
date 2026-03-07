@@ -8,6 +8,9 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+/**
+ * Captures the API request payload for order operations.
+ */
 @AllArgsConstructor
 @NoArgsConstructor
 @Data

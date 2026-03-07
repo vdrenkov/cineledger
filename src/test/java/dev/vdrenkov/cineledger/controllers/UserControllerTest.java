@@ -1,10 +1,10 @@
 package dev.vdrenkov.cineledger.controllers;
 
 import dev.vdrenkov.cineledger.services.UserService;
-import dev.vdrenkov.cineledger.testUtils.constants.RoleConstants;
-import dev.vdrenkov.cineledger.testUtils.constants.UserConstants;
-import dev.vdrenkov.cineledger.testUtils.factories.HttpCookieFactory;
-import dev.vdrenkov.cineledger.testUtils.factories.UserFactory;
+import dev.vdrenkov.cineledger.testutils.constants.RoleConstants;
+import dev.vdrenkov.cineledger.testutils.constants.UserConstants;
+import dev.vdrenkov.cineledger.testutils.factories.HttpCookieFactory;
+import dev.vdrenkov.cineledger.testutils.factories.UserFactory;
 import dev.vdrenkov.cineledger.utils.constants.URIConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,15 +19,15 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import tools.jackson.databind.ObjectMapper;
 
-import static dev.vdrenkov.cineledger.testUtils.constants.HttpCookieConstants.COOKIE_NAME;
-import static dev.vdrenkov.cineledger.testUtils.constants.HttpCookieConstants.COOKIE_VALUE;
-import static dev.vdrenkov.cineledger.testUtils.constants.RoleConstants.NAME;
-import static dev.vdrenkov.cineledger.testUtils.constants.UserConstants.EMAIL;
-import static dev.vdrenkov.cineledger.testUtils.constants.UserConstants.FIRST_NAME;
-import static dev.vdrenkov.cineledger.testUtils.constants.UserConstants.ID;
-import static dev.vdrenkov.cineledger.testUtils.constants.UserConstants.JOIN_DATE;
-import static dev.vdrenkov.cineledger.testUtils.constants.UserConstants.LAST_NAME;
-import static dev.vdrenkov.cineledger.testUtils.constants.UserConstants.USERNAME;
+import static dev.vdrenkov.cineledger.testutils.constants.HttpCookieConstants.COOKIE_NAME;
+import static dev.vdrenkov.cineledger.testutils.constants.HttpCookieConstants.COOKIE_VALUE;
+import static dev.vdrenkov.cineledger.testutils.constants.RoleConstants.NAME;
+import static dev.vdrenkov.cineledger.testutils.constants.UserConstants.EMAIL;
+import static dev.vdrenkov.cineledger.testutils.constants.UserConstants.FIRST_NAME;
+import static dev.vdrenkov.cineledger.testutils.constants.UserConstants.ID;
+import static dev.vdrenkov.cineledger.testutils.constants.UserConstants.JOIN_DATE;
+import static dev.vdrenkov.cineledger.testutils.constants.UserConstants.LAST_NAME;
+import static dev.vdrenkov.cineledger.testutils.constants.UserConstants.USERNAME;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -40,11 +40,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+/**
+ * Tests user controller behavior.
+ */
 @AutoConfigureMockMvc
 @ExtendWith(MockitoExtension.class)
-public class UserControllerTest {
+class UserControllerTest {
 
+    /**
+     * Provides the default cookie used in tests.
+     */
     public static final String COOKIE = COOKIE_NAME + "=" + COOKIE_VALUE;
+    /**
+     * Provides the default return old used in tests.
+     */
     public static final String RETURN_OLD = "returnOld";
     private static final String SET_COOKIE = "Set-Cookie";
     private static final String JOIN_DATE_STRING = "joinDate";
@@ -61,14 +70,20 @@ public class UserControllerTest {
     @InjectMocks
     private UserController userController;
 
+    /**
+     * Initializes the test fixture before each test case.
+     */
     @BeforeEach
-    public void setup() {
+    void setup() {
         mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
     }
 
+    /**
+     * Verifies that login cookie Obtained success.
+     */
     @Test
-    public void testLogin_cookieObtained_success() throws Exception {
-        String json = objectMapper.writeValueAsString(UserFactory.getDefaultUserRequest());
+    void testLogin_cookieObtained_success() throws Exception {
+        final String json = objectMapper.writeValueAsString(UserFactory.getDefaultUserRequest());
         when(userService.login(any())).thenReturn(HttpCookieFactory.getDefaultHttpCookie());
 
         mockMvc
@@ -80,9 +95,12 @@ public class UserControllerTest {
             .andExpect(header().string(SET_COOKIE, COOKIE));
     }
 
+    /**
+     * Verifies that register User cookie Obtained success.
+     */
     @Test
-    public void testRegisterUser_cookieObtained_success() throws Exception {
-        String json = objectMapper.writeValueAsString(UserFactory.getDefaultUserRequest());
+    void testRegisterUser_cookieObtained_success() throws Exception {
+        final String json = objectMapper.writeValueAsString(UserFactory.getDefaultUserRequest());
         when(userService.registerUser(any())).thenReturn(HttpCookieFactory.getDefaultHttpCookie());
 
         mockMvc
@@ -94,9 +112,12 @@ public class UserControllerTest {
             .andExpect(header().string(SET_COOKIE, COOKIE));
     }
 
+    /**
+     * Verifies that register User By Admin created Without Cookie success.
+     */
     @Test
-    public void testRegisterUserByAdmin_createdWithoutCookie_success() throws Exception {
-        String json = objectMapper.writeValueAsString(UserFactory.getDefaultAdminRequest());
+    void testRegisterUserByAdmin_createdWithoutCookie_success() throws Exception {
+        final String json = objectMapper.writeValueAsString(UserFactory.getDefaultAdminRequest());
 
         mockMvc
             .perform(MockMvcRequestBuilders
@@ -107,8 +128,11 @@ public class UserControllerTest {
             .andExpect(header().doesNotExist(SET_COOKIE));
     }
 
+    /**
+     * Verifies that get User By Username user Found success.
+     */
     @Test
-    public void testGetUserByUsername_userFound_success() throws Exception {
+    void testGetUserByUsername_userFound_success() throws Exception {
         when(userService.getUserDtoByUsername(anyString())).thenReturn(UserFactory.getDefaultUserDto());
 
         mockMvc
@@ -124,8 +148,11 @@ public class UserControllerTest {
             .andExpect(jsonPath("$.roles[0].name").value(NAME));
     }
 
+    /**
+     * Verifies that get User By Email user Found success.
+     */
     @Test
-    public void testGetUserByEmail_userFound_success() throws Exception {
+    void testGetUserByEmail_userFound_success() throws Exception {
         when(userService.getUserDtoByEmail(anyString())).thenReturn(UserFactory.getDefaultUserDto());
 
         mockMvc
@@ -141,8 +168,11 @@ public class UserControllerTest {
             .andExpect(jsonPath("$.roles[0].name").value(NAME));
     }
 
+    /**
+     * Verifies that get User By Role Name user Found success.
+     */
     @Test
-    public void testGetUserByRoleName_userFound_success() throws Exception {
+    void testGetUserByRoleName_userFound_success() throws Exception {
         when(userService.getUsersDtoByRoleName(anyString())).thenReturn(UserFactory.getDefaultUserDtoList());
 
         mockMvc
@@ -158,8 +188,11 @@ public class UserControllerTest {
             .andExpect(jsonPath("$[0].roles[0].name").value(NAME));
     }
 
+    /**
+     * Verifies that get Users By Join Date returns Users List success.
+     */
     @Test
-    public void testGetUsersByJoinDate_returnsUsersList_success() throws Exception {
+    void testGetUsersByJoinDate_returnsUsersList_success() throws Exception {
         when(userService.getUsersDtosByJoinDate(any(), anyBoolean())).thenReturn(UserFactory.getDefaultUserDtoList());
 
         mockMvc
@@ -178,10 +211,13 @@ public class UserControllerTest {
             .andExpect(jsonPath("$[0].roles[0].name").value(NAME));
     }
 
+    /**
+     * Verifies that update User return Old True success.
+     */
     @Test
-    public void testUpdateUser_returnOldTrue_success() throws Exception {
+    void testUpdateUser_returnOldTrue_success() throws Exception {
         when(userService.updateUser(any(), anyInt())).thenReturn(UserFactory.getDefaultUserDto());
-        String json = objectMapper.writeValueAsString(UserFactory.getDefaultUserRequest());
+        final String json = objectMapper.writeValueAsString(UserFactory.getDefaultUserRequest());
 
         mockMvc
             .perform(put(URIConstants.USERS_ID_PATH, ID)
@@ -199,20 +235,26 @@ public class UserControllerTest {
             .andExpect(jsonPath("$.roles[0].name").value(NAME));
     }
 
+    /**
+     * Verifies that update User return Old False success.
+     */
     @Test
-    public void testUpdateUser_returnOldFalse_success() throws Exception {
+    void testUpdateUser_returnOldFalse_success() throws Exception {
         when(userService.updateUser(any(), anyInt())).thenReturn(UserFactory.getDefaultUserDto());
-        String json = objectMapper.writeValueAsString(UserFactory.getDefaultUserRequest());
+        final String json = objectMapper.writeValueAsString(UserFactory.getDefaultUserRequest());
 
         mockMvc
             .perform(put(URIConstants.USERS_ID_PATH, ID).contentType(MediaType.APPLICATION_JSON).content(json))
             .andExpect(status().isNoContent());
     }
 
+    /**
+     * Verifies that update User By Admin return Old True success.
+     */
     @Test
-    public void testUpdateUserByAdmin_returnOldTrue_success() throws Exception {
+    void testUpdateUserByAdmin_returnOldTrue_success() throws Exception {
         when(userService.updateUserByAdmin(any(), anyInt())).thenReturn(UserFactory.getDefaultUserDto());
-        String json = objectMapper.writeValueAsString(UserFactory.getDefaultAdminRequest());
+        final String json = objectMapper.writeValueAsString(UserFactory.getDefaultAdminRequest());
 
         mockMvc
             .perform(put(URIConstants.ADMINS_ID_PATH, ID)
@@ -230,18 +272,24 @@ public class UserControllerTest {
             .andExpect(jsonPath("$.roles[0].name").value(NAME));
     }
 
+    /**
+     * Verifies that update User By Admin return Old False success.
+     */
     @Test
-    public void testUpdateUserByAdmin_returnOldFalse_success() throws Exception {
+    void testUpdateUserByAdmin_returnOldFalse_success() throws Exception {
         when(userService.updateUserByAdmin(any(), anyInt())).thenReturn(UserFactory.getDefaultUserDto());
-        String json = objectMapper.writeValueAsString(UserFactory.getDefaultAdminRequest());
+        final String json = objectMapper.writeValueAsString(UserFactory.getDefaultAdminRequest());
 
         mockMvc
             .perform(put(URIConstants.ADMINS_ID_PATH, ID).contentType(MediaType.APPLICATION_JSON).content(json))
             .andExpect(status().isNoContent());
     }
 
+    /**
+     * Verifies that delete User return Old True success.
+     */
     @Test
-    public void testDeleteUser_returnOldTrue_success() throws Exception {
+    void testDeleteUser_returnOldTrue_success() throws Exception {
         when(userService.deleteUser(anyInt())).thenReturn(UserFactory.getDefaultUserDto());
 
         mockMvc
@@ -257,15 +305,21 @@ public class UserControllerTest {
             .andExpect(jsonPath("$.roles[0].name").value(NAME));
     }
 
+    /**
+     * Verifies that delete User return Old False success.
+     */
     @Test
-    public void testDeleteUser_returnOldFalse_success() throws Exception {
+    void testDeleteUser_returnOldFalse_success() throws Exception {
         when(userService.deleteUser(anyInt())).thenReturn(UserFactory.getDefaultUserDto());
 
         mockMvc.perform(delete(URIConstants.USERS_ID_PATH, ID)).andExpect(status().isNoContent());
     }
 
+    /**
+     * Verifies that recover Password returns Ok success.
+     */
     @Test
-    public void testRecoverPassword_returnsOk_success() throws Exception {
+    void testRecoverPassword_returnsOk_success() throws Exception {
         when(userService.recoverPassword(anyString())).thenReturn(UserFactory.getDefaultUser());
 
         mockMvc.perform(patch(RECOVER_PASSWORD_PATH).queryParam("username", USERNAME)).andExpect(status().isOk());

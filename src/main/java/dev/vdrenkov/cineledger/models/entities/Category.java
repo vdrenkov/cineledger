@@ -10,6 +10,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Represents a persisted category entity.
+ */
 @Entity
 @Table(name = "categories")
 @AllArgsConstructor
@@ -24,6 +27,12 @@ public class Category {
     @Column
     private String name;
 
+    /**
+     * Creates a new category with its required collaborators.
+     *
+     * @param name
+     *     name used by the operation
+     */
     public Category(String name) {
         this.name = name;
     }

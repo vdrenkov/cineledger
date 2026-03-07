@@ -17,6 +17,9 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * Represents a persisted user entity.
+ */
 @Entity
 @Table(name = "users")
 @AllArgsConstructor
@@ -51,6 +54,24 @@ public class User {
         inverseJoinColumns = @JoinColumn(name = "role_id"))
     private List<Role> roles;
 
+    /**
+     * Creates a new user with its required collaborators.
+     *
+     * @param username
+     *     username to search for
+     * @param password
+     *     password used by the operation
+     * @param email
+     *     email address to search for
+     * @param firstName
+     *     first name used by the operation
+     * @param lastName
+     *     last name used by the operation
+     * @param joinDate
+     *     join date boundary to filter by
+     * @param roles
+     *     role entities to transform
+     */
     public User(String username, String password, String email, String firstName, String lastName, LocalDate joinDate,
         List<Role> roles) {
         this.username = username;

@@ -5,6 +5,9 @@ import lombok.Data;
 
 import java.time.LocalDate;
 
+/**
+ * Represents the API response payload for program data.
+ */
 @AllArgsConstructor
 @Data
 public class ProgramDto {

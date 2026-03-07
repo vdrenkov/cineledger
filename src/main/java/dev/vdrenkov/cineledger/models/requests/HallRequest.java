@@ -8,6 +8,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Captures the API request payload for hall operations.
+ */
 @AllArgsConstructor
 @NoArgsConstructor
 @Data

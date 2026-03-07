@@ -6,6 +6,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+/**
+ * Provides persistence access for item entities.
+ */
 @Repository
 public interface ItemRepository extends JpaRepository<Item, Integer> {
 

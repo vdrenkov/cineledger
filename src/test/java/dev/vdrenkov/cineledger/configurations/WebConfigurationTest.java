@@ -6,31 +6,25 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.client.RestTemplate;
 
-import java.security.SecureRandom;
-import java.util.Random;
-
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
+/**
+ * Tests web configuration behavior.
+ */
 @ExtendWith(MockitoExtension.class)
-public class WebConfigurationTest {
+class WebConfigurationTest {
 
     @Spy
     private WebConfiguration webConfiguration;
 
+    /**
+     * Verifies that REST Template is created.
+     */
     @Test
-    public void testRestTemplate() {
-        RestTemplate restTemplate = webConfiguration.restTemplate();
+    void testRestTemplate() {
+        final RestTemplate restTemplate = webConfiguration.restTemplate();
 
         assertNotNull(restTemplate);
-    }
-
-    @Test
-    public void testRandom() {
-        Random random = webConfiguration.random();
-
-        assertNotNull(random);
-        assertTrue(random instanceof SecureRandom);
     }
 }
 

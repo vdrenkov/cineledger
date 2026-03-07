@@ -14,6 +14,9 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
+/**
+ * Represents a persisted ticket entity.
+ */
 @Entity
 @Table(name = "tickets")
 @AllArgsConstructor
@@ -32,6 +35,14 @@ public class Ticket {
     @JoinColumn(name = "projection_id")
     private Projection projection;
 
+    /**
+     * Creates a new ticket with its required collaborators.
+     *
+     * @param dateOfPurchase
+     *     date of purchase used by the operation
+     * @param projection
+     *     projection entity to transform
+     */
     public Ticket(LocalDate dateOfPurchase, Projection projection) {
         this.dateOfPurchase = dateOfPurchase;
         this.projection = projection;

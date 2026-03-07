@@ -19,6 +19,9 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Contains business logic for ticket operations.
+ */
 @Service
 public class TicketService {
 
@@ -28,6 +31,16 @@ public class TicketService {
     private final TicketMapper ticketMapper;
     private final TicketRepository ticketRepository;
 
+    /**
+     * Creates a new ticket service with its required collaborators.
+     *
+     * @param projectionService
+     *     projection service used by the operation
+     * @param ticketMapper
+     *     ticket mapper used by the operation
+     * @param ticketRepository
+     *     ticket repository used by the operation
+     */
     @Autowired
     public TicketService(ProjectionService projectionService, TicketMapper ticketMapper,
         TicketRepository ticketRepository) {
@@ -36,11 +49,18 @@ public class TicketService {
         this.ticketRepository = ticketRepository;
     }
 
+    /**
+     * Creates and persists ticket.
+     *
+     * @param request
+     *     request payload containing the submitted data
+     * @return requested ticket value
+     */
     public Ticket addTicket(TicketRequest request) {
-        Projection projection = projectionService.getProjectionById(request.getProjectionId());
+        final Projection projection = projectionService.getProjectionById(request.getProjectionId());
 
-        LocalDate programDate = projection.getProgram().getProgramDate();
-        LocalDate dateOfPurchase = LocalDate.now();
+        final LocalDate programDate = projection.getProgram().getProgramDate();
+        final LocalDate dateOfPurchase = LocalDate.now();
 
         if (programDate.isBefore(dateOfPurchase)) {
             log.error(String.format("Exception caught: %s", ExceptionMessages.DATE_NOT_VALID_MESSAGE));
@@ -49,23 +69,37 @@ public class TicketService {
 
         calculateAvailableTickets(projection);
 
-        Ticket ticket = new Ticket(dateOfPurchase, projection);
+        final Ticket ticket = new Ticket(dateOfPurchase, projection);
 
         log.info("An attempt to add a new ticket in the database");
 
         return ticketRepository.save(ticket);
     }
 
+    /**
+     * Returns tickets matching the supplied criteria.
+     *
+     * @param id
+     *     identifier of the target resource
+     * @return matching ticket dto values
+     */
     public List<TicketDto> getTicketsByProjectionId(int id) {
-        Projection projection = this.projectionService.getProjectionById(id);
+        final Projection projection = this.projectionService.getProjectionById(id);
 
-        List<Ticket> tickets = ticketRepository.findTicketByProjectionId(projection.getId());
+        final List<Ticket> tickets = ticketRepository.findTicketByProjectionId(projection.getId());
 
         log.info(String.format("All tickets with projection id %d were requested from the database", id));
 
         return tickets.stream().map(ticketMapper::mapTicketToTicketDto).collect(Collectors.toList());
     }
 
+    /**
+     * Returns ticket matching the supplied criteria.
+     *
+     * @param id
+     *     identifier of the target resource
+     * @return requested ticket value
+     */
     public Ticket getTicketById(int id) {
         log.info(String.format("Retrieving ticket with id %d from database", id));
 
@@ -76,6 +110,15 @@ public class TicketService {
         });
     }
 
+    /**
+     * Returns tickets matching the supplied criteria.
+     *
+     * @param startDate
+     *     start date of the requested interval
+     * @param endDate
+     *     end date of the requested interval
+     * @return matching ticket values
+     */
     public List<Ticket> getTicketsByDateBetween(LocalDate startDate, LocalDate endDate) {
         log.info(String.format("All tickets with date between %s and %s were requested from the database", startDate,
             endDate));
@@ -83,10 +126,17 @@ public class TicketService {
         return ticketRepository.findTicketsByDateOfPurchaseBetween(startDate, endDate);
     }
 
+    /**
+     * Executes the calculate available tickets operation for ticket.
+     *
+     * @param projection
+     *     projection entity to transform
+     * @return requested int value
+     */
     public int calculateAvailableTickets(Projection projection) {
-        int capacity = projection.getHall().getCapacity();
-        int totalTickets = ticketRepository.countByProjectionId(projection.getId());
-        int availableTickets = capacity - totalTickets;
+        final int capacity = projection.getHall().getCapacity();
+        final int totalTickets = ticketRepository.countByProjectionId(projection.getId());
+        final int availableTickets = capacity - totalTickets;
 
         if (availableTickets <= 0) {
             log.error(String.format("Exception caught: %s", ExceptionMessages.NO_AVAILABLE_TICKETS_EXCEPTION));

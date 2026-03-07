@@ -8,6 +8,9 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Provides persistence access for program entities.
+ */
 @Repository
 public interface ProgramRepository extends JpaRepository<Program, Integer> {
 

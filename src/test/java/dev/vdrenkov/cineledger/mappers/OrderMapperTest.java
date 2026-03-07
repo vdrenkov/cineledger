@@ -5,11 +5,11 @@ import dev.vdrenkov.cineledger.models.dtos.OrderDto;
 import dev.vdrenkov.cineledger.models.dtos.TicketDto;
 import dev.vdrenkov.cineledger.models.dtos.UserDto;
 import dev.vdrenkov.cineledger.models.entities.Order;
-import dev.vdrenkov.cineledger.testUtils.constants.OrderConstants;
-import dev.vdrenkov.cineledger.testUtils.factories.ItemFactory;
-import dev.vdrenkov.cineledger.testUtils.factories.OrderFactory;
-import dev.vdrenkov.cineledger.testUtils.factories.TicketFactory;
-import dev.vdrenkov.cineledger.testUtils.factories.UserFactory;
+import dev.vdrenkov.cineledger.testutils.constants.OrderConstants;
+import dev.vdrenkov.cineledger.testutils.factories.ItemFactory;
+import dev.vdrenkov.cineledger.testutils.factories.OrderFactory;
+import dev.vdrenkov.cineledger.testutils.factories.TicketFactory;
+import dev.vdrenkov.cineledger.testutils.factories.UserFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,8 +23,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+/**
+ * Tests order mapper behavior.
+ */
 @ExtendWith(MockitoExtension.class)
-public class OrderMapperTest {
+class OrderMapperTest {
 
     @Mock
     private ItemMapper itemMapper;
@@ -35,18 +38,21 @@ public class OrderMapperTest {
     @InjectMocks
     private OrderMapper orderMapper;
 
+    /**
+     * Verifies that map Order To Order DTO success.
+     */
     @Test
-    public void testMapOrderToOrderDto_success() {
-        Order order = OrderFactory.getDefaultOrder();
-        UserDto userDto = UserFactory.getDefaultUserDto();
-        List<TicketDto> ticketDtoList = TicketFactory.getDefaultTicketDtoList();
-        List<ItemDto> itemDtoList = ItemFactory.getDefaultItemDtoList();
+    void testMapOrderToOrderDto_success() {
+        final Order order = OrderFactory.getDefaultOrder();
+        final UserDto userDto = UserFactory.getDefaultUserDto();
+        final List<TicketDto> ticketDtoList = TicketFactory.getDefaultTicketDtoList();
+        final List<ItemDto> itemDtoList = ItemFactory.getDefaultItemDtoList();
 
         when(userMapper.mapUserToUserDto(any())).thenReturn(userDto);
         when(ticketMapper.mapTicketToDtoList(any())).thenReturn(ticketDtoList);
         when(itemMapper.mapItemToItemDtoList(any())).thenReturn(itemDtoList);
 
-        OrderDto orderDto = orderMapper.mapOrderToOrderDto(order);
+        final OrderDto orderDto = orderMapper.mapOrderToOrderDto(order);
 
         Assertions.assertEquals(OrderConstants.ID, orderDto.getId());
         assertEquals(userDto, orderDto.getUser());
@@ -56,18 +62,21 @@ public class OrderMapperTest {
         Assertions.assertEquals(OrderConstants.DATE_OF_PURCHASE, orderDto.getDateOfPurchase());
     }
 
+    /**
+     * Verifies that map Order To Order DTO List success.
+     */
     @Test
-    public void testMapOrderToOrderDtoList_success() {
-        UserDto userDto = UserFactory.getDefaultUserDto();
-        List<TicketDto> ticketDtoList = TicketFactory.getDefaultTicketDtoList();
-        List<ItemDto> itemDtoList = ItemFactory.getDefaultItemDtoList();
+    void testMapOrderToOrderDtoList_success() {
+        final UserDto userDto = UserFactory.getDefaultUserDto();
+        final List<TicketDto> ticketDtoList = TicketFactory.getDefaultTicketDtoList();
+        final List<ItemDto> itemDtoList = ItemFactory.getDefaultItemDtoList();
 
         when(userMapper.mapUserToUserDto(any())).thenReturn(userDto);
         when(ticketMapper.mapTicketToDtoList(any())).thenReturn(ticketDtoList);
         when(itemMapper.mapItemToItemDtoList(any())).thenReturn(itemDtoList);
 
-        List<OrderDto> orderDtos = orderMapper.mapOrderToOrderDtoList(OrderFactory.getDefaultOrderList());
-        OrderDto orderDto = orderDtos.get(0);
+        final List<OrderDto> orderDtos = orderMapper.mapOrderToOrderDtoList(OrderFactory.getDefaultOrderList());
+        final OrderDto orderDto = orderDtos.get(0);
 
         Assertions.assertEquals(OrderConstants.ID, orderDto.getId());
         assertEquals(userDto, orderDto.getUser());

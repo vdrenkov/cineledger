@@ -10,6 +10,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Represents a persisted role entity.
+ */
 @Entity
 @Table(name = "roles")
 @AllArgsConstructor
@@ -24,6 +27,12 @@ public class Role {
     @Column
     private String name;
 
+    /**
+     * Creates a new role with its required collaborators.
+     *
+     * @param name
+     *     name used by the operation
+     */
     public Role(String name) {
         this.name = name;
     }

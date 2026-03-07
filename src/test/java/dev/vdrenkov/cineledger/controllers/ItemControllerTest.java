@@ -1,7 +1,7 @@
 package dev.vdrenkov.cineledger.controllers;
 
 import dev.vdrenkov.cineledger.services.ItemService;
-import dev.vdrenkov.cineledger.testUtils.factories.ItemFactory;
+import dev.vdrenkov.cineledger.testutils.factories.ItemFactory;
 import dev.vdrenkov.cineledger.utils.constants.URIConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,11 +18,11 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.util.Collections;
 
-import static dev.vdrenkov.cineledger.testUtils.constants.ItemConstants.ID;
-import static dev.vdrenkov.cineledger.testUtils.constants.ItemConstants.IS_BELLOW;
-import static dev.vdrenkov.cineledger.testUtils.constants.ItemConstants.NAME;
-import static dev.vdrenkov.cineledger.testUtils.constants.ItemConstants.PRICE;
-import static dev.vdrenkov.cineledger.testUtils.constants.ItemConstants.QUANTITY;
+import static dev.vdrenkov.cineledger.testutils.constants.ItemConstants.ID;
+import static dev.vdrenkov.cineledger.testutils.constants.ItemConstants.IS_BELLOW;
+import static dev.vdrenkov.cineledger.testutils.constants.ItemConstants.NAME;
+import static dev.vdrenkov.cineledger.testutils.constants.ItemConstants.PRICE;
+import static dev.vdrenkov.cineledger.testutils.constants.ItemConstants.QUANTITY;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -35,9 +35,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+/**
+ * Tests item controller behavior.
+ */
 @ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc
-public class ItemControllerTest {
+class ItemControllerTest {
 
     private MockMvc mockMvc;
 
@@ -46,15 +49,21 @@ public class ItemControllerTest {
     @InjectMocks
     private ItemController itemController;
 
+    /**
+     * Initializes the test fixture before each test case.
+     */
     @BeforeEach
-    public void setup() {
+    void setup() {
         mockMvc = MockMvcBuilders.standaloneSetup(itemController).build();
     }
 
+    /**
+     * Verifies that add Item no Exceptions success.
+     */
     @Test
-    public void testAddItem_noExceptions_success() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
-        String json = mapper.writeValueAsString(ItemFactory.getDefaultItemRequest());
+    void testAddItem_noExceptions_success() throws Exception {
+        final ObjectMapper mapper = new ObjectMapper();
+        final String json = mapper.writeValueAsString(ItemFactory.getDefaultItemRequest());
 
         when(itemService.addItem(any())).thenReturn(ItemFactory.getDefaultItem());
 
@@ -67,8 +76,11 @@ public class ItemControllerTest {
             .andExpect(header().string("Location", URIConstants.ITEMS_PATH + "/" + ID));
     }
 
+    /**
+     * Verifies that get All Items success.
+     */
     @Test
-    public void testGetAllItems_success() throws Exception {
+    void testGetAllItems_success() throws Exception {
         when(itemService.getAllItems()).thenReturn(Collections.singletonList(ItemFactory.getDefaultItemDto()));
 
         mockMvc
@@ -81,8 +93,11 @@ public class ItemControllerTest {
             .andExpect(jsonPath("$[0].quantity").value(QUANTITY));
     }
 
+    /**
+     * Verifies that get Item By Name item Found success.
+     */
     @Test
-    public void testGetItemByName_itemFound_success() throws Exception {
+    void testGetItemByName_itemFound_success() throws Exception {
         when(itemService.getItemDtoByName(anyString())).thenReturn(ItemFactory.getDefaultItemDto());
 
         mockMvc
@@ -93,10 +108,13 @@ public class ItemControllerTest {
             .andExpect(jsonPath("$.name").value(NAME));
     }
 
+    /**
+     * Verifies that edit Item no Response success.
+     */
     @Test
-    public void testEditItem_noResponse_sucess() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
-        String json = mapper.writeValueAsString(ItemFactory.getDefaultItemRequest());
+    void testEditItem_noResponse_success() throws Exception {
+        final ObjectMapper mapper = new ObjectMapper();
+        final String json = mapper.writeValueAsString(ItemFactory.getDefaultItemRequest());
 
         when(itemService.editItem(any(), eq(ID))).thenReturn(ItemFactory.getDefaultItemDto());
 
@@ -105,10 +123,13 @@ public class ItemControllerTest {
             .andExpect(status().isNoContent());
     }
 
+    /**
+     * Verifies that edit Item requested Response success.
+     */
     @Test
-    public void testEditItem_requestedResponse_success() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
-        String json = mapper.writeValueAsString(ItemFactory.getDefaultItemRequest());
+    void testEditItem_requestedResponse_success() throws Exception {
+        final ObjectMapper mapper = new ObjectMapper();
+        final String json = mapper.writeValueAsString(ItemFactory.getDefaultItemRequest());
 
         when(itemService.editItem(any(), eq(ID))).thenReturn(ItemFactory.getDefaultItemDto());
 
@@ -121,16 +142,22 @@ public class ItemControllerTest {
             .andExpect(jsonPath("$.id").value(ID));
     }
 
+    /**
+     * Verifies that delete Item no Response success.
+     */
     @Test
-    public void testDeleteItem_noResponse_success() throws Exception {
-        when(itemService.removeItem(eq(ID))).thenReturn(ItemFactory.getDefaultItemDto());
+    void testDeleteItem_noResponse_success() throws Exception {
+        when(itemService.removeItem(ID)).thenReturn(ItemFactory.getDefaultItemDto());
 
         mockMvc.perform(delete(URIConstants.ITEMS_ID_PATH, ID)).andExpect(status().isNoContent());
     }
 
+    /**
+     * Verifies that delete Item requested Response success.
+     */
     @Test
-    public void testDeleteItem_requestedResponse_success() throws Exception {
-        when(itemService.removeItem(eq(ID))).thenReturn(ItemFactory.getDefaultItemDto());
+    void testDeleteItem_requestedResponse_success() throws Exception {
+        when(itemService.removeItem(ID)).thenReturn(ItemFactory.getDefaultItemDto());
 
         mockMvc
             .perform(delete(URIConstants.ITEMS_ID_PATH, ID).queryParam("returnOld", "true"))
@@ -138,8 +165,11 @@ public class ItemControllerTest {
             .andExpect(jsonPath("$.id").value(ID));
     }
 
+    /**
+     * Verifies that get Items By Quantity.
+     */
     @Test
-    public void testGetItemsByQuantity() throws Exception {
+    void testGetItemsByQuantity() throws Exception {
         when(itemService.getItemsByQuantity(anyInt(), anyBoolean())).thenReturn(ItemFactory.getDefaultItemDtoList());
 
         mockMvc

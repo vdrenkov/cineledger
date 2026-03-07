@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
 
+/**
+ * Exposes REST endpoints for managing statistics report data.
+ */
 @RestController
 public class StatisticsReportController {
 
@@ -21,11 +24,28 @@ public class StatisticsReportController {
 
     private final StatisticsReportService statisticsReportService;
 
+    /**
+     * Creates a new statistics report controller with its required collaborators.
+     *
+     * @param statisticsReportService
+     *     statistics report service used by the operation
+     */
     @Autowired
     public StatisticsReportController(StatisticsReportService statisticsReportService) {
         this.statisticsReportService = statisticsReportService;
     }
 
+    /**
+     * Returns purchased tickets count matching the supplied criteria.
+     *
+     * @param id
+     *     identifier of the target resource
+     * @param startDate
+     *     start date of the requested interval
+     * @param endDate
+     *     end date of the requested interval
+     * @return HTTP response describing the operation result
+     */
     @GetMapping(URIConstants.REPORTS_MOVIES_CATEGORIES_ID_TICKETS_COUNT_PATH)
     public ResponseEntity<Integer> getPurchasedTicketsCountByMovieCategory(@PathVariable int id,
         @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
@@ -38,6 +58,17 @@ public class StatisticsReportController {
         return ResponseEntity.ok(movieCategoryTicketCount);
     }
 
+    /**
+     * Returns purchased tickets count matching the supplied criteria.
+     *
+     * @param title
+     *     title text to search for
+     * @param startDate
+     *     start date of the requested interval
+     * @param endDate
+     *     end date of the requested interval
+     * @return HTTP response describing the operation result
+     */
     @GetMapping(URIConstants.REPORTS_MOVIES_TICKETS_COUNT_PATH)
     public ResponseEntity<Integer> getPurchasedTicketsCountByMovieTitle(@RequestParam String title,
         @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
@@ -50,12 +81,23 @@ public class StatisticsReportController {
         return ResponseEntity.ok(movieTitleTicketCount);
     }
 
+    /**
+     * Returns purchased items count matching the supplied criteria.
+     *
+     * @param name
+     *     name used by the operation
+     * @param startDate
+     *     start date of the requested interval
+     * @param endDate
+     *     end date of the requested interval
+     * @return HTTP response describing the operation result
+     */
     @GetMapping(URIConstants.REPORTS_ITEMS_ITEMS_COUNT_PATH)
     public ResponseEntity<Integer> getPurchasedItemsCountByItemName(@RequestParam String name,
         @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
         @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
 
-        int itemNameCount = statisticsReportService.getPurchasedItemsCountByItemName(name, startDate, endDate);
+        final int itemNameCount = statisticsReportService.getPurchasedItemsCountByItemName(name, startDate, endDate);
         log.info("Received request to get purchased tickets count by movie title");
 
         return ResponseEntity.ok(itemNameCount);

@@ -1,8 +1,8 @@
 package dev.vdrenkov.cineledger.mappers;
 
 import dev.vdrenkov.cineledger.models.dtos.ItemDto;
-import dev.vdrenkov.cineledger.testUtils.constants.ItemConstants;
-import dev.vdrenkov.cineledger.testUtils.factories.ItemFactory;
+import dev.vdrenkov.cineledger.testutils.constants.ItemConstants;
+import dev.vdrenkov.cineledger.testutils.factories.ItemFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,15 +11,21 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
+/**
+ * Tests item mapper behavior.
+ */
 @ExtendWith(MockitoExtension.class)
-public class ItemMapperTest {
+class ItemMapperTest {
 
     @InjectMocks
     private ItemMapper itemMapper;
 
+    /**
+     * Verifies that map Item To Item DTO success.
+     */
     @Test
-    public void testMapItemToItemDto_success() {
-        ItemDto itemDto = itemMapper.mapItemToItemDto(ItemFactory.getDefaultItem());
+    void testMapItemToItemDto_success() {
+        final ItemDto itemDto = itemMapper.mapItemToItemDto(ItemFactory.getDefaultItem());
 
         Assertions.assertEquals(itemDto.getId(), ItemConstants.ID);
         Assertions.assertEquals(itemDto.getName(), ItemConstants.NAME);
@@ -27,11 +33,14 @@ public class ItemMapperTest {
         Assertions.assertEquals(itemDto.getQuantity(), ItemConstants.QUANTITY);
     }
 
+    /**
+     * Verifies that map Item To Item DTO List success.
+     */
     @Test
-    public void testMapItemToItemDtoList_success() {
-        List<ItemDto> itemDtos = itemMapper.mapItemToItemDtoList(ItemFactory.getDefaultItemList());
+    void testMapItemToItemDtoList_success() {
+        final List<ItemDto> itemDtos = itemMapper.mapItemToItemDtoList(ItemFactory.getDefaultItemList());
 
-        ItemDto itemDto = itemDtos.get(0);
+        final ItemDto itemDto = itemDtos.get(0);
         Assertions.assertEquals(itemDto.getId(), ItemConstants.ID);
         Assertions.assertEquals(itemDto.getName(), ItemConstants.NAME);
         Assertions.assertEquals(itemDto.getPrice(), ItemConstants.PRICE, 0.0);

@@ -7,8 +7,8 @@ import dev.vdrenkov.cineledger.mappers.ItemMapper;
 import dev.vdrenkov.cineledger.models.dtos.ItemDto;
 import dev.vdrenkov.cineledger.models.entities.Item;
 import dev.vdrenkov.cineledger.repositories.ItemRepository;
-import dev.vdrenkov.cineledger.testUtils.constants.ItemConstants;
-import dev.vdrenkov.cineledger.testUtils.factories.ItemFactory;
+import dev.vdrenkov.cineledger.testutils.constants.ItemConstants;
+import dev.vdrenkov.cineledger.testutils.factories.ItemFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -25,8 +25,11 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
+/**
+ * Tests item service behavior.
+ */
 @ExtendWith(MockitoExtension.class)
-public class ItemServiceTest {
+class ItemServiceTest {
 
     @Mock
     private ItemRepository itemRepository;
@@ -37,30 +40,39 @@ public class ItemServiceTest {
     @InjectMocks
     private ItemService itemService;
 
+    /**
+     * Verifies that get All Items no Exceptions success.
+     */
     @Test
-    public void testGetAllItems_noExceptions_success() {
-        List<ItemDto> expected = ItemFactory.getDefaultItemDtoList();
+    void testGetAllItems_noExceptions_success() {
+        final List<ItemDto> expected = ItemFactory.getDefaultItemDtoList();
         when(itemMapper.mapItemToItemDtoList(any())).thenReturn(expected);
         when(itemRepository.findAll()).thenReturn(ItemFactory.getDefaultItemList());
 
-        List<ItemDto> actual = itemService.getAllItems();
+        final List<ItemDto> actual = itemService.getAllItems();
 
         assertEquals(expected, actual);
     }
 
+    /**
+     * Verifies that get Item DTO By Id item Found success.
+     */
     @Test
-    public void testGetItemDtoById_itemFound_success() {
-        ItemDto expected = ItemFactory.getDefaultItemDto();
+    void testGetItemDtoById_itemFound_success() {
+        final ItemDto expected = ItemFactory.getDefaultItemDto();
         when(itemMapper.mapItemToItemDto(any())).thenReturn(expected);
         when(itemRepository.findById(anyInt())).thenReturn(Optional.of(ItemFactory.getDefaultItem()));
 
-        ItemDto item = itemService.getItemDtoById(ItemConstants.ID);
+        final ItemDto item = itemService.getItemDtoById(ItemConstants.ID);
 
         assertEquals(expected, item);
     }
 
+    /**
+     * Verifies that get Item DTO By Id item Not Found throws Item Not Found Exception.
+     */
     @Test
-    public void testGetItemDtoById_itemNotFound_throwsItemNotFoundException() {
+    void testGetItemDtoById_itemNotFound_throwsItemNotFoundException() {
         assertThrows(ItemNotFoundException.class, () -> {
 
             when(itemRepository.findById(anyInt())).thenThrow(new ItemNotFoundException(anyString()));
@@ -69,18 +81,24 @@ public class ItemServiceTest {
         });
     }
 
+    /**
+     * Verifies that find Item By Id item Found success.
+     */
     @Test
-    public void testFindItemById_itemFound_success() {
-        Item expected = ItemFactory.getDefaultItem();
+    void testFindItemById_itemFound_success() {
+        final Item expected = ItemFactory.getDefaultItem();
         when(itemRepository.findById(anyInt())).thenReturn(Optional.of(expected));
 
-        Item item = itemService.getItemById(ItemConstants.ID);
+        final Item item = itemService.getItemById(ItemConstants.ID);
 
         assertEquals(expected, item);
     }
 
+    /**
+     * Verifies that find Item By Id item Not Found throws Item Not Found Exception.
+     */
     @Test
-    public void testFindItemById_itemNotFound_throwsItemNotFoundException() {
+    void testFindItemById_itemNotFound_throwsItemNotFoundException() {
         assertThrows(ItemNotFoundException.class, () -> {
 
             when(itemRepository.findById(anyInt())).thenReturn(Optional.empty());
@@ -89,19 +107,25 @@ public class ItemServiceTest {
         });
     }
 
+    /**
+     * Verifies that get Item DTO By Name no Exceptions success.
+     */
     @Test
-    public void testGetItemDtoByName_noExceptions_success() {
-        ItemDto expected = ItemFactory.getDefaultItemDto();
+    void testGetItemDtoByName_noExceptions_success() {
+        final ItemDto expected = ItemFactory.getDefaultItemDto();
         when(itemMapper.mapItemToItemDto(any())).thenReturn(expected);
         when(itemRepository.findByName(anyString())).thenReturn(Optional.of(ItemFactory.getDefaultItem()));
 
-        ItemDto itemDto = itemService.getItemDtoByName(ItemConstants.NAME);
+        final ItemDto itemDto = itemService.getItemDtoByName(ItemConstants.NAME);
 
         assertEquals(expected, itemDto);
     }
 
+    /**
+     * Verifies that get Item DTO By Name throws Category Not Found Exception.
+     */
     @Test
-    public void testGetItemDtoByName_throwsCategoryNotFoundException() {
+    void testGetItemDtoByName_throwsCategoryNotFoundException() {
         assertThrows(ItemNotFoundException.class, () -> {
 
             when(itemRepository.findByName(anyString())).thenReturn(Optional.empty());
@@ -111,18 +135,24 @@ public class ItemServiceTest {
         });
     }
 
+    /**
+     * Verifies that add Item no Exceptions success.
+     */
     @Test
-    public void testAddItem_noExceptions_success() {
-        Item expected = ItemFactory.getDefaultItem();
+    void testAddItem_noExceptions_success() {
+        final Item expected = ItemFactory.getDefaultItem();
         when(itemRepository.save(any())).thenReturn(expected);
 
-        Item item = itemService.addItem(ItemFactory.getDefaultItemRequest());
+        final Item item = itemService.addItem(ItemFactory.getDefaultItemRequest());
 
         assertEquals(expected, item);
     }
 
+    /**
+     * Verifies that add Item item Already Exists throws Existing Item Exception.
+     */
     @Test
-    public void testAddItem_itemAlreadyExists_throwsExistingItemException() {
+    void testAddItem_itemAlreadyExists_throwsExistingItemException() {
         assertThrows(ItemAlreadyExistsException.class, () -> {
 
             when(itemRepository.findByName(anyString())).thenReturn(Optional.of(new Item()));
@@ -132,56 +162,71 @@ public class ItemServiceTest {
         });
     }
 
+    /**
+     * Verifies that update Item item Updated success.
+     */
     @Test
-    public void testUpdateItem_itemUpdated_success() {
-        ItemDto expected = ItemFactory.getDefaultItemDto();
+    void testUpdateItem_itemUpdated_success() {
+        final ItemDto expected = ItemFactory.getDefaultItemDto();
         when(itemMapper.mapItemToItemDto(any())).thenReturn(expected);
         when(itemRepository.findById(anyInt())).thenReturn(Optional.of(ItemFactory.getDefaultItem()));
         when(itemRepository.save(any())).thenReturn(ItemFactory.getDefaultItem());
 
-        ItemDto itemDto = itemService.editItem(ItemFactory.getDefaultItemRequest(), ItemConstants.ID);
+        final ItemDto itemDto = itemService.editItem(ItemFactory.getDefaultItemRequest(), ItemConstants.ID);
 
         assertEquals(expected, itemDto);
     }
 
+    /**
+     * Verifies that delete Item item Deleted success.
+     */
     @Test
-    public void testDeleteItem_itemDeleted_success() {
-        ItemDto expected = ItemFactory.getDefaultItemDto();
+    void testDeleteItem_itemDeleted_success() {
+        final ItemDto expected = ItemFactory.getDefaultItemDto();
         when(itemMapper.mapItemToItemDto(any())).thenReturn(expected);
         when(itemRepository.findById(anyInt())).thenReturn(Optional.of(ItemFactory.getDefaultItem()));
 
-        ItemDto itemDto = itemService.removeItem(ItemConstants.ID);
+        final ItemDto itemDto = itemService.removeItem(ItemConstants.ID);
 
         assertEquals(expected, itemDto);
     }
 
+    /**
+     * Verifies that increment Item Quantity should Incremented Item Quantity success.
+     */
     @Test
-    public void testIncrementItemQuantity_shouldIncrementedItemQuantity_success() {
-        Item item = new Item();
+    void testIncrementItemQuantity_shouldIncrementedItemQuantity_success() {
+        final Item item = new Item();
         item.setQuantity(5);
 
-        int incrementedQuantity = itemService.incrementItemQuantity(item);
+        final int incrementedQuantity = itemService.incrementItemQuantity(item);
 
         assertEquals(6, incrementedQuantity);
         assertEquals(6, item.getQuantity());
     }
 
+    /**
+     * Verifies that decrement Item Quantity should Decrement Item Quantity success.
+     */
     @Test
-    public void testDecrementItemQuantity_shouldDecrementItemQuantity_success() {
-        Item item = new Item();
+    void testDecrementItemQuantity_shouldDecrementItemQuantity_success() {
+        final Item item = new Item();
         item.setQuantity(5);
 
-        int decrementedQuantity = itemService.decrementItemQuantity(item);
+        final int decrementedQuantity = itemService.decrementItemQuantity(item);
 
         assertEquals(4, decrementedQuantity);
         assertEquals(4, item.getQuantity());
     }
 
+    /**
+     * Verifies that decrement Item Quantity should Throw No Available Items Exception.
+     */
     @Test
-    public void testDecrementItemQuantity_shouldThrowNoAvailableItemsException() {
+    void testDecrementItemQuantity_shouldThrowNoAvailableItemsException() {
         assertThrows(NoAvailableItemsException.class, () -> {
 
-            Item item = new Item();
+            final Item item = new Item();
             item.setQuantity(0);
 
             itemService.decrementItemQuantity(item);
@@ -189,24 +234,31 @@ public class ItemServiceTest {
         });
     }
 
+    /**
+     * Verifies that get Items By Quantity no Exceptions is Below False success.
+     */
     @Test
-    public void testGetItemsByQuantity_noExceptions_isBelowFalse_success() {
-        List<ItemDto> expected = ItemFactory.getDefaultItemDtoList();
+    void testGetItemsByQuantity_noExceptions_isBelowFalse_success() {
+        final List<ItemDto> expected = ItemFactory.getDefaultItemDtoList();
         when(itemRepository.findAll()).thenReturn(ItemFactory.getDefaultItemList());
         when(itemMapper.mapItemToItemDtoList(any())).thenReturn(expected);
 
-        List<ItemDto> resultList = itemService.getItemsByQuantity(ItemConstants.QUANTITY - 1, ItemConstants.IS_BELLOW);
+        final List<ItemDto> resultList = itemService.getItemsByQuantity(ItemConstants.QUANTITY - 1,
+            ItemConstants.IS_BELLOW);
 
         assertEquals(expected, resultList);
     }
 
+    /**
+     * Verifies that get Items By Quantity no Exceptions is Below True success.
+     */
     @Test
-    public void testGetItemsByQuantity_noExceptions_isBelowTrue_success() {
-        List<ItemDto> expected = ItemFactory.getDefaultItemDtoList();
+    void testGetItemsByQuantity_noExceptions_isBelowTrue_success() {
+        final List<ItemDto> expected = ItemFactory.getDefaultItemDtoList();
         when(itemRepository.findAll()).thenReturn(ItemFactory.getDefaultItemList());
         when(itemMapper.mapItemToItemDtoList(any())).thenReturn(expected);
 
-        List<ItemDto> resultList = itemService.getItemsByQuantity(ItemConstants.QUANTITY + 1, true);
+        final List<ItemDto> resultList = itemService.getItemsByQuantity(ItemConstants.QUANTITY + 1, true);
 
         assertEquals(expected, resultList);
     }

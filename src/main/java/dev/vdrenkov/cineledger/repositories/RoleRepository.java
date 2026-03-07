@@ -6,6 +6,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+/**
+ * Provides persistence access for role entities.
+ */
 @Repository
 public interface RoleRepository extends JpaRepository<Role, Integer> {
 

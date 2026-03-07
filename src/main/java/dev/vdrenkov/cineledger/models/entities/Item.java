@@ -10,6 +10,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Represents a persisted item entity.
+ */
 @Entity
 @Table(name = "items")
 @AllArgsConstructor
@@ -30,6 +33,16 @@ public class Item {
     @Column
     private int quantity;
 
+    /**
+     * Creates a new item with its required collaborators.
+     *
+     * @param name
+     *     name used by the operation
+     * @param price
+     *     price used by the operation
+     * @param quantity
+     *     quantity used by the operation
+     */
     public Item(String name, double price, int quantity) {
         this.name = name;
         this.price = price;

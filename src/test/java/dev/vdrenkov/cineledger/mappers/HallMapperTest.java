@@ -1,9 +1,9 @@
 package dev.vdrenkov.cineledger.mappers;
 
 import dev.vdrenkov.cineledger.models.dtos.HallDto;
-import dev.vdrenkov.cineledger.testUtils.constants.HallConstants;
-import dev.vdrenkov.cineledger.testUtils.factories.CinemaFactory;
-import dev.vdrenkov.cineledger.testUtils.factories.HallFactory;
+import dev.vdrenkov.cineledger.testutils.constants.HallConstants;
+import dev.vdrenkov.cineledger.testutils.factories.CinemaFactory;
+import dev.vdrenkov.cineledger.testutils.factories.HallFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,8 +17,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+/**
+ * Tests hall mapper behavior.
+ */
 @ExtendWith(MockitoExtension.class)
-public class HallMapperTest {
+class HallMapperTest {
 
     @Mock
     private CinemaMapper cinemaMapper;
@@ -26,23 +29,29 @@ public class HallMapperTest {
     @InjectMocks
     private HallMapper hallMapper;
 
+    /**
+     * Verifies that map Hall To Hall DTO success.
+     */
     @Test
-    public void testMapHallToHallDto_success() {
+    void testMapHallToHallDto_success() {
         when(cinemaMapper.mapCinemaToCinemaDto(any())).thenReturn(CinemaFactory.getDefaultCinemaDto());
 
-        HallDto hallDto = hallMapper.mapHallToHallDto(HallFactory.getDefaultHall());
+        final HallDto hallDto = hallMapper.mapHallToHallDto(HallFactory.getDefaultHall());
 
         Assertions.assertEquals(HallConstants.ID, hallDto.getId());
         Assertions.assertEquals(HallConstants.CAPACITY, hallDto.getCapacity());
         assertNotNull(hallDto.getCinema());
     }
 
+    /**
+     * Verifies that map Hall List To Hall DTO List success.
+     */
     @Test
-    public void testMapHallListToHallDtoList_success() {
+    void testMapHallListToHallDtoList_success() {
         when(cinemaMapper.mapCinemaToCinemaDto(any())).thenReturn(CinemaFactory.getDefaultCinemaDto());
 
-        List<HallDto> hallDtoList = hallMapper.mapHallListToHallDtoList(HallFactory.getDefaultHallList());
-        HallDto hallDto = hallDtoList.get(0);
+        final List<HallDto> hallDtoList = hallMapper.mapHallListToHallDtoList(HallFactory.getDefaultHallList());
+        final HallDto hallDto = hallDtoList.get(0);
 
         Assertions.assertEquals(HallConstants.ID, hallDto.getId());
         Assertions.assertEquals(HallConstants.CAPACITY, hallDto.getCapacity());

@@ -23,6 +23,9 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import java.util.Arrays;
 
+/**
+ * Configures Spring Security, JWT authentication, and endpoint authorization rules.
+ */
 @EnableWebSecurity
 @Configuration
 public class WebSecurityConfiguration {
@@ -53,6 +56,12 @@ public class WebSecurityConfiguration {
 
     private final JwtRequestFilter jwtRequestFilter;
 
+    /**
+     * Creates a new web security configuration with its required collaborators.
+     *
+     * @param jwtRequestFilter
+     *     jwt request filter used by the operation
+     */
     @Autowired
     public WebSecurityConfiguration(final JwtRequestFilter jwtRequestFilter) {
         this.jwtRequestFilter = jwtRequestFilter;
@@ -88,11 +97,23 @@ public class WebSecurityConfiguration {
         return httpSecurity.build();
     }
 
+    /**
+     * Creates the password encoder bean used for credential hashing.
+     *
+     * @return requested password encoder value
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * Exposes the Spring Security authentication manager bean.
+     *
+     * @param authenticationConfiguration
+     *     authentication configuration used to expose the manager bean
+     * @return requested authentication manager value
+     */
     @Bean
     public AuthenticationManager authenticationManager(final AuthenticationConfiguration authenticationConfiguration)
         throws Exception {

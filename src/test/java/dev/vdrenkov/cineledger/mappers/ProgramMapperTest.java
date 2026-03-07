@@ -1,9 +1,9 @@
 package dev.vdrenkov.cineledger.mappers;
 
 import dev.vdrenkov.cineledger.models.dtos.ProgramDto;
-import dev.vdrenkov.cineledger.testUtils.constants.ProgramConstants;
-import dev.vdrenkov.cineledger.testUtils.factories.CinemaFactory;
-import dev.vdrenkov.cineledger.testUtils.factories.ProgramFactory;
+import dev.vdrenkov.cineledger.testutils.constants.ProgramConstants;
+import dev.vdrenkov.cineledger.testutils.factories.CinemaFactory;
+import dev.vdrenkov.cineledger.testutils.factories.ProgramFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,19 +16,25 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+/**
+ * Tests program mapper behavior.
+ */
 @ExtendWith(MockitoExtension.class)
-public class ProgramMapperTest {
+class ProgramMapperTest {
 
     @Mock
     private CinemaMapper cinemaMapper;
     @InjectMocks
     private ProgramMapper programMapper;
 
+    /**
+     * Verifies that map Program To Program DTO Test no Exceptions success.
+     */
     @Test
-    public void testMapProgramToProgramDtoTest_noExceptions_success() {
+    void testMapProgramToProgramDtoTest_noExceptions_success() {
         when(cinemaMapper.mapCinemaToCinemaDto(any())).thenReturn(CinemaFactory.getDefaultCinemaDto());
 
-        ProgramDto resultDto = programMapper.mapProgramToProgramDto(ProgramFactory.getDefaultProgram());
+        final ProgramDto resultDto = programMapper.mapProgramToProgramDto(ProgramFactory.getDefaultProgram());
 
         Assertions.assertEquals(ProgramConstants.ID, resultDto.getId());
         Assertions.assertEquals(ProgramConstants.DATE, resultDto.getProgramDate());
@@ -37,13 +43,16 @@ public class ProgramMapperTest {
         Assertions.assertEquals(ProgramConstants.PROGRAM_CINEMA.getCity(), resultDto.getCinema().getCity());
     }
 
+    /**
+     * Verifies that map Program List To Program DTO List no Exceptions success.
+     */
     @Test
-    public void testMapProgramListToProgramDtoList_noExceptions_success() {
+    void testMapProgramListToProgramDtoList_noExceptions_success() {
         when(cinemaMapper.mapCinemaToCinemaDto(any())).thenReturn(CinemaFactory.getDefaultCinemaDto());
         List<ProgramDto> resultList = programMapper.mapProgramListToProgramDtoList(
             ProgramFactory.getDefaultProgramList());
 
-        ProgramDto resultDto = resultList.get(0);
+        final ProgramDto resultDto = resultList.get(0);
 
         Assertions.assertEquals(ProgramConstants.ID, resultDto.getId());
         Assertions.assertEquals(ProgramConstants.DATE, resultDto.getProgramDate());

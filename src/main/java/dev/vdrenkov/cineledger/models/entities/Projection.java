@@ -14,6 +14,9 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalTime;
 
+/**
+ * Represents a persisted projection entity.
+ */
 @Entity
 @Table(name = "projections")
 @AllArgsConstructor
@@ -43,6 +46,20 @@ public class Projection {
     @Column(name = "start_time")
     private LocalTime startTime;
 
+    /**
+     * Creates a new projection with its required collaborators.
+     *
+     * @param price
+     *     price used by the operation
+     * @param hall
+     *     hall entity to transform
+     * @param program
+     *     program entity to transform
+     * @param movie
+     *     movie entity to transform
+     * @param startTime
+     *     start time used by the operation
+     */
     public Projection(double price, Hall hall, Program program, Movie movie, LocalTime startTime) {
         this.price = price;
         this.hall = hall;

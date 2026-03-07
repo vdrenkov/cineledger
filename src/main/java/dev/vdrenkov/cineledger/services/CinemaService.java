@@ -16,6 +16,9 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Contains business logic for cinema operations.
+ */
 @Service
 public class CinemaService {
 
@@ -24,12 +27,27 @@ public class CinemaService {
     private final CinemaRepository cinemaRepository;
     private final CinemaMapper cinemaMapper;
 
+    /**
+     * Creates a new cinema service with its required collaborators.
+     *
+     * @param cinemaRepository
+     *     cinema repository used by the operation
+     * @param cinemaMapper
+     *     cinema mapper used by the operation
+     */
     @Autowired
     public CinemaService(CinemaRepository cinemaRepository, CinemaMapper cinemaMapper) {
         this.cinemaRepository = cinemaRepository;
         this.cinemaMapper = cinemaMapper;
     }
 
+    /**
+     * Creates and persists cinema.
+     *
+     * @param cinemaRequest
+     *     request payload for the cinema operation
+     * @return requested cinema value
+     */
     public Cinema addCinema(CinemaRequest cinemaRequest) {
         log.info("An attempt to add a new cinema in the database");
 
@@ -38,6 +56,15 @@ public class CinemaService {
         return cinemaRepository.save(new Cinema(cinemaRequest.getAddress(), cinemaRequest.getCity(), 0));
     }
 
+    /**
+     * Returns all cinemas matching the supplied criteria.
+     *
+     * @param city
+     *     city used by the operation
+     * @param address
+     *     address used by the operation
+     * @return matching cinema dto values
+     */
     public List<CinemaDto> getAllCinemas(String city, String address) {
         if (Objects.isNull(city) && Objects.isNull(address)) {
 
@@ -63,6 +90,13 @@ public class CinemaService {
         }
     }
 
+    /**
+     * Returns cinema matching the supplied criteria.
+     *
+     * @param id
+     *     identifier of the target resource
+     * @return requested cinema value
+     */
     public Cinema getCinemaById(int id) {
         log.info(String.format("An attempt to extract a cinema with id %d from the database", id));
 
@@ -74,14 +108,30 @@ public class CinemaService {
         });
     }
 
+    /**
+     * Returns cinema matching the supplied criteria.
+     *
+     * @param id
+     *     identifier of the target resource
+     * @return cinema dto result
+     */
     public CinemaDto getCinemaDtoById(int id) {
         log.info(String.format("An attempt to extract a cinemaDto with id %d from the database", id));
 
         return cinemaMapper.mapCinemaToCinemaDto(getCinemaById(id));
     }
 
+    /**
+     * Updates cinema and returns the previous state when needed.
+     *
+     * @param cinemaRequest
+     *     request payload for the cinema operation
+     * @param id
+     *     identifier of the target resource
+     * @return cinema dto result
+     */
     public CinemaDto updateCinema(CinemaRequest cinemaRequest, int id) {
-        CinemaDto cinemaDto = getCinemaDtoById(id);
+        final CinemaDto cinemaDto = getCinemaDtoById(id);
 
         cinemaRepository.save(
             new Cinema(id, cinemaRequest.getAddress(), cinemaRequest.getCity(), cinemaDto.getAverageRating()));
@@ -91,9 +141,18 @@ public class CinemaService {
         return cinemaDto;
     }
 
+    /**
+     * Updates cinema average rating and returns the previous state when needed.
+     *
+     * @param newRating
+     *     replacement rating value
+     * @param cinemaId
+     *     identifier of the target cinema
+     * @return cinema dto result
+     */
     public CinemaDto updateCinemaAverageRating(double newRating, int cinemaId) {
-        Cinema cinema = getCinemaById(cinemaId);
-        CinemaDto cinemaDto = cinemaMapper.mapCinemaToCinemaDto(cinema);
+        final Cinema cinema = getCinemaById(cinemaId);
+        final CinemaDto cinemaDto = cinemaMapper.mapCinemaToCinemaDto(cinema);
         cinema.setAverageRating(newRating);
         cinemaDto.setAverageRating(newRating);
 
@@ -104,8 +163,15 @@ public class CinemaService {
         return cinemaDto;
     }
 
+    /**
+     * Deletes cinema and returns the removed state when needed.
+     *
+     * @param id
+     *     identifier of the target resource
+     * @return cinema dto result
+     */
     public CinemaDto deleteCinema(int id) {
-        CinemaDto cinemaDto = getCinemaDtoById(id);
+        final CinemaDto cinemaDto = getCinemaDtoById(id);
 
         cinemaRepository.deleteById(id);
 

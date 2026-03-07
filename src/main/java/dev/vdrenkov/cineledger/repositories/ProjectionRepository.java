@@ -7,6 +7,9 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalTime;
 import java.util.List;
 
+/**
+ * Provides persistence access for projection entities.
+ */
 @Repository
 public interface ProjectionRepository extends JpaRepository<Projection, Integer> {
 

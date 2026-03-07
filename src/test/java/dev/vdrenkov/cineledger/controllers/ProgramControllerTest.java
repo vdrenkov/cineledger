@@ -1,8 +1,8 @@
 package dev.vdrenkov.cineledger.controllers;
 
 import dev.vdrenkov.cineledger.services.ProgramService;
-import dev.vdrenkov.cineledger.testUtils.constants.CinemaConstants;
-import dev.vdrenkov.cineledger.testUtils.factories.ProgramFactory;
+import dev.vdrenkov.cineledger.testutils.constants.CinemaConstants;
+import dev.vdrenkov.cineledger.testutils.factories.ProgramFactory;
 import dev.vdrenkov.cineledger.utils.constants.URIConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,11 +20,10 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.time.format.DateTimeFormatter;
 
-import static dev.vdrenkov.cineledger.testUtils.constants.ProgramConstants.DATE;
-import static dev.vdrenkov.cineledger.testUtils.constants.ProgramConstants.ID;
+import static dev.vdrenkov.cineledger.testutils.constants.ProgramConstants.DATE;
+import static dev.vdrenkov.cineledger.testutils.constants.ProgramConstants.ID;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -33,28 +32,37 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+/**
+ * Tests program controller behavior.
+ */
 @ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc
-public class ProgramControllerTest {
+class ProgramControllerTest {
 
     private static final String RETURN_OLD = "returnOld";
-    private final static ObjectMapper objectMapper = new ObjectMapper();
+    private static final ObjectMapper objectMapper = new ObjectMapper();
     private MockMvc mvc;
     @Mock
     private ProgramService programService;
     @InjectMocks
     private ProgramController programController;
 
+    /**
+     * Initializes the test fixture before each test case.
+     */
     @BeforeEach
-    public void setup() {
+    void setup() {
         mvc = MockMvcBuilders.standaloneSetup(programController).build();
     }
 
+    /**
+     * Verifies that add Program program Added success.
+     */
     @Test
-    public void testAddProgram_programAdded_success() throws Exception {
+    void testAddProgram_programAdded_success() throws Exception {
         when(programService.addProgram(any())).thenReturn(ProgramFactory.getDefaultProgram());
 
-        String json = objectMapper.writeValueAsString(ProgramFactory.getDefaultProgramRequest());
+        final String json = objectMapper.writeValueAsString(ProgramFactory.getDefaultProgramRequest());
 
         mvc
             .perform(MockMvcRequestBuilders
@@ -65,9 +73,12 @@ public class ProgramControllerTest {
             .andExpect(header().string(HttpHeaders.LOCATION, URIConstants.PROGRAMS_PATH + "/" + ID));
     }
 
+    /**
+     * Verifies that get All Programs Test get By Program Date success.
+     */
     @Test
-    public void testGetAllProgramsTest_getByProgramDate_success() throws Exception {
-        when(programService.getAllPrograms(eq(DATE))).thenReturn(ProgramFactory.getDefaultProgramDtoList());
+    void testGetAllProgramsTest_getByProgramDate_success() throws Exception {
+        when(programService.getAllPrograms(DATE)).thenReturn(ProgramFactory.getDefaultProgramDtoList());
 
         mvc
             .perform(MockMvcRequestBuilders
@@ -81,9 +92,11 @@ public class ProgramControllerTest {
             .andExpect(jsonPath("$[0].cinema.address").value(CinemaConstants.ADDRESS));
     }
 
+    /**
+     * Verifies that get All Programs Test get A Ll Programs success.
+     */
     @Test
-
-    public void testGetAllProgramsTest_getALlPrograms_success() throws Exception {
+    void testGetAllProgramsTest_getALlPrograms_success() throws Exception {
         when(programService.getAllPrograms(null)).thenReturn(ProgramFactory.getDefaultProgramDtoList());
 
         mvc
@@ -96,8 +109,11 @@ public class ProgramControllerTest {
             .andExpect(jsonPath("$[0].cinema.address").value(CinemaConstants.ADDRESS));
     }
 
+    /**
+     * Verifies that get Programs By Cinema Id success.
+     */
     @Test
-    public void testGetProgramsByCinemaId_success() throws Exception {
+    void testGetProgramsByCinemaId_success() throws Exception {
         when(programService.getProgramsByCinemaId(CinemaConstants.ID)).thenReturn(
             ProgramFactory.getDefaultProgramDtoList());
 
@@ -111,11 +127,14 @@ public class ProgramControllerTest {
             .andExpect(jsonPath("$[0].cinema.address").value(CinemaConstants.ADDRESS));
     }
 
+    /**
+     * Verifies that update Program return Old True success.
+     */
     @Test
-    public void testUpdateProgram_returnOldTrue_success() throws Exception {
+    void testUpdateProgram_returnOldTrue_success() throws Exception {
         when(programService.updateProgram(any(), anyInt())).thenReturn(ProgramFactory.getDefaultProgramDto());
 
-        String json = objectMapper.writeValueAsString(ProgramFactory.getDefaultProgramRequest());
+        final String json = objectMapper.writeValueAsString(ProgramFactory.getDefaultProgramRequest());
 
         mvc
             .perform(put(URIConstants.PROGRAMS_ID_PATH, ID)
@@ -130,19 +149,25 @@ public class ProgramControllerTest {
             .andExpect(jsonPath("$.cinema.address").value(CinemaConstants.ADDRESS));
     }
 
+    /**
+     * Verifies that update Program return Old False success.
+     */
     @Test
-    public void testUpdateProgram_returnOldFalse_success() throws Exception {
+    void testUpdateProgram_returnOldFalse_success() throws Exception {
         when(programService.updateProgram(any(), anyInt())).thenReturn(ProgramFactory.getDefaultProgramDto());
 
-        String json = objectMapper.writeValueAsString(ProgramFactory.getDefaultProgramRequest());
+        final String json = objectMapper.writeValueAsString(ProgramFactory.getDefaultProgramRequest());
 
         mvc
             .perform(put(URIConstants.PROGRAMS_ID_PATH, ID).contentType(MediaType.APPLICATION_JSON).content(json))
             .andExpect(status().isNoContent());
     }
 
+    /**
+     * Verifies that delete Program return Old True success.
+     */
     @Test
-    public void testDeleteProgram_returnOldTrue_success() throws Exception {
+    void testDeleteProgram_returnOldTrue_success() throws Exception {
         when(programService.deleteProgram(anyInt())).thenReturn(ProgramFactory.getDefaultProgramDto());
 
         mvc
@@ -155,8 +180,11 @@ public class ProgramControllerTest {
             .andExpect(jsonPath("$.cinema.address").value(CinemaConstants.ADDRESS));
     }
 
+    /**
+     * Verifies that delete Program return Old False success.
+     */
     @Test
-    public void testDeleteProgram_returnOldFalse_success() throws Exception {
+    void testDeleteProgram_returnOldFalse_success() throws Exception {
         when(programService.deleteProgram(anyInt())).thenReturn(ProgramFactory.getDefaultProgramDto());
         mvc.perform(delete(URIConstants.PROGRAMS_ID_PATH, ID)).andExpect(status().isNoContent());
     }

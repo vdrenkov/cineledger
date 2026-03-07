@@ -18,6 +18,9 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * Represents a persisted order entity.
+ */
 @Entity
 @Table(name = "orders")
 @AllArgsConstructor
@@ -47,6 +50,20 @@ public class Order {
     @Column(name = "total_price")
     private double totalPrice;
 
+    /**
+     * Creates a new order with its required collaborators.
+     *
+     * @param dateOfPurchase
+     *     date of purchase used by the operation
+     * @param user
+     *     user entity to transform
+     * @param tickets
+     *     ticket entities or values to process
+     * @param items
+     *     item entities or values to process
+     * @param totalPrice
+     *     total price used by the operation
+     */
     public Order(LocalDate dateOfPurchase, User user, List<Ticket> tickets, List<Item> items, double totalPrice) {
         this.dateOfPurchase = dateOfPurchase;
         this.user = user;

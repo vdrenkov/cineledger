@@ -1,8 +1,8 @@
 package dev.vdrenkov.cineledger.mappers;
 
 import dev.vdrenkov.cineledger.models.dtos.CinemaDto;
-import dev.vdrenkov.cineledger.testUtils.constants.CinemaConstants;
-import dev.vdrenkov.cineledger.testUtils.factories.CinemaFactory;
+import dev.vdrenkov.cineledger.testutils.constants.CinemaConstants;
+import dev.vdrenkov.cineledger.testutils.factories.CinemaFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,15 +11,21 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
+/**
+ * Tests cinema mapper behavior.
+ */
 @ExtendWith(MockitoExtension.class)
-public class CinemaMapperTest {
+class CinemaMapperTest {
 
     @InjectMocks
     private CinemaMapper cinemaMapper;
 
+    /**
+     * Verifies that map Cinema To Cinema DTO success.
+     */
     @Test
-    public void testMapCinemaToCinemaDto_success() {
-        CinemaDto cinemaDto = cinemaMapper.mapCinemaToCinemaDto(CinemaFactory.getDefaultCinema());
+    void testMapCinemaToCinemaDto_success() {
+        final CinemaDto cinemaDto = cinemaMapper.mapCinemaToCinemaDto(CinemaFactory.getDefaultCinema());
 
         Assertions.assertEquals(cinemaDto.getId(), CinemaConstants.ID);
         Assertions.assertEquals(cinemaDto.getAddress(), CinemaConstants.ADDRESS);
@@ -27,11 +33,14 @@ public class CinemaMapperTest {
         Assertions.assertEquals(cinemaDto.getAverageRating(), CinemaConstants.AVERAGE_RATING, 0.0);
     }
 
+    /**
+     * Verifies that map Cinema To Cinema DTO List.
+     */
     @Test
-    public void testMapCinemaToCinemaDtoList() {
-        List<CinemaDto> cinemaDtos = cinemaMapper.mapCinemaToCinemaDtoList(CinemaFactory.getDefaultCinemaList());
+    void testMapCinemaToCinemaDtoList() {
+        final List<CinemaDto> cinemaDtos = cinemaMapper.mapCinemaToCinemaDtoList(CinemaFactory.getDefaultCinemaList());
 
-        CinemaDto cinemaDto = cinemaDtos.get(0);
+        final CinemaDto cinemaDto = cinemaDtos.get(0);
         Assertions.assertEquals(cinemaDto.getId(), CinemaConstants.ID);
         Assertions.assertEquals(cinemaDto.getAddress(), CinemaConstants.ADDRESS);
         Assertions.assertEquals(cinemaDto.getCity(), CinemaConstants.CITY);

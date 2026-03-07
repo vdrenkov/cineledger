@@ -1,8 +1,8 @@
 package dev.vdrenkov.cineledger.controllers;
 
 import dev.vdrenkov.cineledger.services.StatisticsReportService;
-import dev.vdrenkov.cineledger.testUtils.constants.ItemConstants;
-import dev.vdrenkov.cineledger.testUtils.constants.MovieConstants;
+import dev.vdrenkov.cineledger.testutils.constants.ItemConstants;
+import dev.vdrenkov.cineledger.testutils.constants.MovieConstants;
 import dev.vdrenkov.cineledger.utils.constants.URIConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,9 +14,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static dev.vdrenkov.cineledger.testUtils.constants.MovieConstants.ID;
-import static dev.vdrenkov.cineledger.testUtils.constants.ReportConstants.END_DATE;
-import static dev.vdrenkov.cineledger.testUtils.constants.ReportConstants.START_DATE;
+import static dev.vdrenkov.cineledger.testutils.constants.MovieConstants.ID;
+import static dev.vdrenkov.cineledger.testutils.constants.ReportConstants.END_DATE;
+import static dev.vdrenkov.cineledger.testutils.constants.ReportConstants.START_DATE;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -25,8 +25,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+/**
+ * Tests statistics report controller behavior.
+ */
 @ExtendWith(MockitoExtension.class)
-public class StatisticsReportControllerTest {
+class StatisticsReportControllerTest {
 
     private MockMvc mockMvc;
 
@@ -36,13 +39,19 @@ public class StatisticsReportControllerTest {
     @InjectMocks
     private StatisticsReportController statisticsReportController;
 
+    /**
+     * Initializes the test fixture before each test case.
+     */
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(statisticsReportController).build();
     }
 
+    /**
+     * Verifies that get Purchased Tickets Count By Movie Category integer Returned success.
+     */
     @Test
-    public void testGetPurchasedTicketsCountByMovieCategory_integerReturned_success() throws Exception {
+    void testGetPurchasedTicketsCountByMovieCategory_integerReturned_success() throws Exception {
         when(statisticsReportService.getPurchasedTicketsCountByMovieCategory(anyInt(), any(), any())).thenReturn(1000);
 
         mockMvc
@@ -53,8 +62,11 @@ public class StatisticsReportControllerTest {
             .andExpect(jsonPath("$").value(1000));
     }
 
+    /**
+     * Verifies that get Purchased Tickets Count By Movie Title integer Returned success.
+     */
     @Test
-    public void testGetPurchasedTicketsCountByMovieTitle_integerReturned_success() throws Exception {
+    void testGetPurchasedTicketsCountByMovieTitle_integerReturned_success() throws Exception {
         when(statisticsReportService.getPurchasedTicketsCountByMovieTitle(anyString(), any(), any())).thenReturn(10);
 
         mockMvc
@@ -67,8 +79,11 @@ public class StatisticsReportControllerTest {
             .andExpect(jsonPath("$").value(10));
     }
 
+    /**
+     * Verifies that get Purchased Items Count By Item Name integer Returned success.
+     */
     @Test
-    public void testGetPurchasedItemsCountByItemName_integerReturned_success() throws Exception {
+    void testGetPurchasedItemsCountByItemName_integerReturned_success() throws Exception {
         when(statisticsReportService.getPurchasedItemsCountByItemName(anyString(), any(), any())).thenReturn(10);
 
         mockMvc

@@ -1,11 +1,11 @@
 package dev.vdrenkov.cineledger.controllers;
 
 import dev.vdrenkov.cineledger.services.ProjectionService;
-import dev.vdrenkov.cineledger.testUtils.constants.MovieConstants;
-import dev.vdrenkov.cineledger.testUtils.constants.ProgramConstants;
-import dev.vdrenkov.cineledger.testUtils.factories.CategoryFactory;
-import dev.vdrenkov.cineledger.testUtils.factories.CinemaFactory;
-import dev.vdrenkov.cineledger.testUtils.factories.HallFactory;
+import dev.vdrenkov.cineledger.testutils.constants.MovieConstants;
+import dev.vdrenkov.cineledger.testutils.constants.ProgramConstants;
+import dev.vdrenkov.cineledger.testutils.factories.CategoryFactory;
+import dev.vdrenkov.cineledger.testutils.factories.CinemaFactory;
+import dev.vdrenkov.cineledger.testutils.factories.HallFactory;
 import dev.vdrenkov.cineledger.utils.constants.URIConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,13 +20,13 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import tools.jackson.databind.ObjectMapper;
 
-import static dev.vdrenkov.cineledger.testUtils.constants.ProjectionConstants.ID;
-import static dev.vdrenkov.cineledger.testUtils.constants.ProjectionConstants.PRICE;
-import static dev.vdrenkov.cineledger.testUtils.constants.ProjectionConstants.START_TIME;
-import static dev.vdrenkov.cineledger.testUtils.factories.ProjectionFactory.getDefaultProjection;
-import static dev.vdrenkov.cineledger.testUtils.factories.ProjectionFactory.getDefaultProjectionDto;
-import static dev.vdrenkov.cineledger.testUtils.factories.ProjectionFactory.getDefaultProjectionDtoList;
-import static dev.vdrenkov.cineledger.testUtils.factories.ProjectionFactory.getDefaultProjectionRequest;
+import static dev.vdrenkov.cineledger.testutils.constants.ProjectionConstants.ID;
+import static dev.vdrenkov.cineledger.testutils.constants.ProjectionConstants.PRICE;
+import static dev.vdrenkov.cineledger.testutils.constants.ProjectionConstants.START_TIME;
+import static dev.vdrenkov.cineledger.testutils.factories.ProjectionFactory.getDefaultProjection;
+import static dev.vdrenkov.cineledger.testutils.factories.ProjectionFactory.getDefaultProjectionDto;
+import static dev.vdrenkov.cineledger.testutils.factories.ProjectionFactory.getDefaultProjectionDtoList;
+import static dev.vdrenkov.cineledger.testutils.factories.ProjectionFactory.getDefaultProjectionRequest;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -39,15 +39,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+/**
+ * Tests projection controller behavior.
+ */
 @AutoConfigureMockMvc
 @ExtendWith(MockitoExtension.class)
-public class ProjectionControllerTest {
+class ProjectionControllerTest {
 
     private static final String START_TIME_STRING = "startTime";
     private static final String RETURN_OLD = "returnOld";
     private static final String IS_BEFORE = "isBefore";
 
-    private final static ObjectMapper objectMapper = new ObjectMapper();
+    private static final ObjectMapper objectMapper = new ObjectMapper();
     private MockMvc mockMvc;
 
     @Mock
@@ -56,16 +59,22 @@ public class ProjectionControllerTest {
     @InjectMocks
     private ProjectionController projectionController;
 
+    /**
+     * Initializes the test fixture before each test case.
+     */
     @BeforeEach
-    public void setup() {
+    void setup() {
         mockMvc = MockMvcBuilders.standaloneSetup(projectionController).build();
     }
 
+    /**
+     * Verifies that add Projection projection Added success.
+     */
     @Test
-    public void testAddProjection_projectionAdded_success() throws Exception {
+    void testAddProjection_projectionAdded_success() throws Exception {
         when(projectionService.addProjection(any())).thenReturn(getDefaultProjection());
 
-        String json = objectMapper.writeValueAsString(getDefaultProjectionRequest());
+        final String json = objectMapper.writeValueAsString(getDefaultProjectionRequest());
 
         mockMvc
             .perform(MockMvcRequestBuilders
@@ -76,8 +85,11 @@ public class ProjectionControllerTest {
             .andExpect(header().string("Location", URIConstants.PROJECTIONS_PATH + "/" + ID));
     }
 
+    /**
+     * Verifies that get Projections By Program Id no Exceptions success.
+     */
     @Test
-    public void testGetProjectionsByProgramId_noExceptions_success() throws Exception {
+    void testGetProjectionsByProgramId_noExceptions_success() throws Exception {
         when(projectionService.getProjectionsByProgramId(anyInt())).thenReturn(getDefaultProjectionDtoList());
 
         mockMvc
@@ -99,8 +111,11 @@ public class ProjectionControllerTest {
             .andExpect(jsonPath("$[0].startTime", is(START_TIME.toString())));
     }
 
+    /**
+     * Verifies that get Projections By Movie Id no Exceptions success.
+     */
     @Test
-    public void testGetProjectionsByMovieId_noExceptions_success() throws Exception {
+    void testGetProjectionsByMovieId_noExceptions_success() throws Exception {
         when(projectionService.getProjectionsByMovieId(anyInt())).thenReturn(getDefaultProjectionDtoList());
 
         mockMvc
@@ -122,8 +137,11 @@ public class ProjectionControllerTest {
             .andExpect(jsonPath("$[0].startTime", is(START_TIME.toString())));
     }
 
+    /**
+     * Verifies that get Projections By Start Time returns Projections List success.
+     */
     @Test
-    public void testGetProjectionsByStartTime_returnsProjectionsList_success() throws Exception {
+    void testGetProjectionsByStartTime_returnsProjectionsList_success() throws Exception {
         when(projectionService.getProjectionsByStartTime(any(), anyBoolean())).thenReturn(
             getDefaultProjectionDtoList());
 
@@ -149,11 +167,14 @@ public class ProjectionControllerTest {
             .andExpect(jsonPath("$[0].startTime", is(START_TIME.toString())));
     }
 
+    /**
+     * Verifies that update Projection return Old True success.
+     */
     @Test
-    public void testUpdateProjection_returnOldTrue_success() throws Exception {
+    void testUpdateProjection_returnOldTrue_success() throws Exception {
         when(projectionService.updateProjection(any(), anyInt())).thenReturn(getDefaultProjectionDto());
 
-        String json = objectMapper.writeValueAsString(getDefaultProjectionRequest());
+        final String json = objectMapper.writeValueAsString(getDefaultProjectionRequest());
 
         mockMvc
             .perform(put(URIConstants.PROJECTIONS_ID_PATH, ID)
@@ -177,11 +198,14 @@ public class ProjectionControllerTest {
             .andExpect(jsonPath("$.startTime", is(START_TIME.toString())));
     }
 
+    /**
+     * Verifies that update Projection return Old False success.
+     */
     @Test
-    public void testUpdateProjection_returnOldFalse_success() throws Exception {
+    void testUpdateProjection_returnOldFalse_success() throws Exception {
         when(projectionService.updateProjection(any(), anyInt())).thenReturn(getDefaultProjectionDto());
 
-        String json = objectMapper.writeValueAsString(getDefaultProjectionRequest());
+        final String json = objectMapper.writeValueAsString(getDefaultProjectionRequest());
 
         mockMvc
             .perform(put(URIConstants.PROJECTIONS_ID_PATH, ID)
@@ -191,8 +215,11 @@ public class ProjectionControllerTest {
             .andExpect(status().isNoContent());
     }
 
+    /**
+     * Verifies that delete Projection return Old True success.
+     */
     @Test
-    public void testDeleteProjection_returnOldTrue_success() throws Exception {
+    void testDeleteProjection_returnOldTrue_success() throws Exception {
         when(projectionService.deleteProjection(anyInt())).thenReturn(getDefaultProjectionDto());
 
         mockMvc
@@ -214,8 +241,11 @@ public class ProjectionControllerTest {
             .andExpect(jsonPath("$.startTime", is(START_TIME.toString())));
     }
 
+    /**
+     * Verifies that delete Projection return Old False success.
+     */
     @Test
-    public void testDeleteProjection_returnOldFalse_success() throws Exception {
+    void testDeleteProjection_returnOldFalse_success() throws Exception {
         when(projectionService.deleteProjection(anyInt())).thenReturn(getDefaultProjectionDto());
 
         mockMvc.perform(delete(URIConstants.PROJECTIONS_ID_PATH, ID)).andExpect(status().isNoContent());

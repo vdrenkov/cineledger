@@ -12,10 +12,10 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static dev.vdrenkov.cineledger.testUtils.constants.ReportConstants.END_DATE;
-import static dev.vdrenkov.cineledger.testUtils.constants.ReportConstants.ID;
-import static dev.vdrenkov.cineledger.testUtils.constants.ReportConstants.INCOMES;
-import static dev.vdrenkov.cineledger.testUtils.constants.ReportConstants.START_DATE;
+import static dev.vdrenkov.cineledger.testutils.constants.ReportConstants.END_DATE;
+import static dev.vdrenkov.cineledger.testutils.constants.ReportConstants.ID;
+import static dev.vdrenkov.cineledger.testutils.constants.ReportConstants.INCOMES;
+import static dev.vdrenkov.cineledger.testutils.constants.ReportConstants.START_DATE;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
@@ -23,9 +23,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+/**
+ * Tests income report controller behavior.
+ */
 @ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc
-public class IncomeReportControllerTest {
+class IncomeReportControllerTest {
 
     private MockMvc mockMvc;
 
@@ -35,13 +38,19 @@ public class IncomeReportControllerTest {
     @InjectMocks
     private IncomeReportController incomeReportController;
 
+    /**
+     * Initializes the test fixture before each test case.
+     */
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(incomeReportController).build();
     }
 
+    /**
+     * Verifies that get All Incomes By Cinema Id double Returned success.
+     */
     @Test
-    public void testGetAllIncomesByCinemaId_doubleReturned_success() throws Exception {
+    void testGetAllIncomesByCinemaId_doubleReturned_success() throws Exception {
         when(incomeReportService.getAllIncomesByCinemaId(anyInt(), any(), any())).thenReturn(INCOMES);
 
         mockMvc
@@ -52,8 +61,11 @@ public class IncomeReportControllerTest {
             .andExpect(jsonPath("$").value(INCOMES));
     }
 
+    /**
+     * Verifies that get All Incomes By Hall Id double Returned success.
+     */
     @Test
-    public void testGetAllIncomesByHallId_doubleReturned_success() throws Exception {
+    void testGetAllIncomesByHallId_doubleReturned_success() throws Exception {
         when(incomeReportService.getAllIncomesByHallId(anyInt(), any(), any())).thenReturn(INCOMES);
 
         mockMvc
@@ -64,8 +76,11 @@ public class IncomeReportControllerTest {
             .andExpect(jsonPath("$").value(INCOMES));
     }
 
+    /**
+     * Verifies that get All Incomes By Item Id double Returned success.
+     */
     @Test
-    public void testGetAllIncomesByItemId_doubleReturned_success() throws Exception {
+    void testGetAllIncomesByItemId_doubleReturned_success() throws Exception {
         when(incomeReportService.getAllIncomesByItemId(anyInt(), any(), any())).thenReturn(INCOMES);
 
         mockMvc
@@ -76,8 +91,11 @@ public class IncomeReportControllerTest {
             .andExpect(jsonPath("$").value(INCOMES));
     }
 
+    /**
+     * Verifies that get All Incomes By Movie Id double Returned success.
+     */
     @Test
-    public void testGetAllIncomesByMovieId_doubleReturned_success() throws Exception {
+    void testGetAllIncomesByMovieId_doubleReturned_success() throws Exception {
         when(incomeReportService.getAllIncomesByMovieId(anyInt(), any(), any())).thenReturn(INCOMES);
 
         mockMvc
@@ -88,8 +106,11 @@ public class IncomeReportControllerTest {
             .andExpect(jsonPath("$").value(INCOMES));
     }
 
+    /**
+     * Verifies that get All Incomes By User Id double Returned success.
+     */
     @Test
-    public void testGetAllIncomesByUserId_doubleReturned_success() throws Exception {
+    void testGetAllIncomesByUserId_doubleReturned_success() throws Exception {
         when(incomeReportService.getAllIncomesByUserId(anyInt(), any(), any())).thenReturn(INCOMES);
 
         mockMvc

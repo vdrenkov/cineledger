@@ -3,6 +3,9 @@ package dev.vdrenkov.cineledger.models.dtos;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+/**
+ * Represents the API response payload for discount data.
+ */
 @AllArgsConstructor
 @Data
 public class DiscountDto {

@@ -19,6 +19,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Contains business logic for movie operations.
+ */
 @Service
 public class MovieService {
 
@@ -29,6 +32,18 @@ public class MovieService {
     private final CategoryService categoryService;
     private final ImdbService imdbService;
 
+    /**
+     * Creates a new movie service with its required collaborators.
+     *
+     * @param movieRepository
+     *     movie repository used by the operation
+     * @param movieMapper
+     *     movie mapper used by the operation
+     * @param categoryService
+     *     category service used by the operation
+     * @param imdbService
+     *     imdb service used by the operation
+     */
     @Autowired
     public MovieService(MovieRepository movieRepository, MovieMapper movieMapper, CategoryService categoryService,
         ImdbService imdbService) {
@@ -38,6 +53,13 @@ public class MovieService {
         this.imdbService = imdbService;
     }
 
+    /**
+     * Creates and persists movie.
+     *
+     * @param request
+     *     request payload containing the submitted data
+     * @return requested movie value
+     */
     public Movie addMovie(MovieRequest request) {
         log.info("An attempt to add a new movie in the database");
 
@@ -59,6 +81,15 @@ public class MovieService {
                 categoryService.getCategoryById(request.getCategoryId())));
     }
 
+    /**
+     * Returns movies matching the supplied criteria.
+     *
+     * @param title
+     *     title text to search for
+     * @param minRating
+     *     minimum rating threshold
+     * @return matching movie dto values
+     */
     public List<MovieDto> getMoviesByTitle(String title, double minRating) {
         if (title == null || title.isEmpty()) {
 
@@ -83,6 +114,15 @@ public class MovieService {
         }
     }
 
+    /**
+     * Returns movies matching the supplied criteria.
+     *
+     * @param categoryId
+     *     identifier of the target category
+     * @param minRating
+     *     minimum rating threshold
+     * @return matching movie dto values
+     */
     public List<MovieDto> getMoviesByCategory(Integer categoryId, double minRating) {
         List<MovieDto> movies;
 
@@ -102,6 +142,17 @@ public class MovieService {
         return movies;
     }
 
+    /**
+     * Returns movies matching the supplied criteria.
+     *
+     * @param releaseDate
+     *     release date to validate or persist
+     * @param minRating
+     *     minimum rating threshold
+     * @param isAfter
+     *     whether to match data after the provided boundary
+     * @return matching movie dto values
+     */
     public List<MovieDto> getMoviesByReleaseDate(LocalDate releaseDate, Double minRating, boolean isAfter) {
         List<Movie> movies;
 
@@ -120,12 +171,26 @@ public class MovieService {
         return movieMapper.mapMovieListToMovieDtoList(movies);
     }
 
+    /**
+     * Returns movies matching the supplied criteria.
+     *
+     * @param rating
+     *     rating value to apply or filter by
+     * @return matching movie dto values
+     */
     public List<MovieDto> getMoviesByMinRating(double rating) {
         log.info(String.format("All movies with rating of %.2f were requested from the database", rating));
 
         return movieMapper.mapMovieListToMovieDtoList(movieRepository.findByAverageRatingGreaterThanEqual(rating));
     }
 
+    /**
+     * Returns movie matching the supplied criteria.
+     *
+     * @param title
+     *     title text to search for
+     * @return requested movie value
+     */
     public Movie getMovieByTitle(String title) {
         return movieRepository.findByTitle(title).orElseThrow(() -> {
 
@@ -135,12 +200,26 @@ public class MovieService {
         });
     }
 
+    /**
+     * Returns movie matching the supplied criteria.
+     *
+     * @param id
+     *     identifier of the target resource
+     * @return movie dto result
+     */
     public MovieDto getMovieDtoById(int id) {
         log.info(String.format("An attempt to extract a movie DTO with an id %d from the database", id));
 
         return movieMapper.mapMovieToMovieDto(getMovieById(id));
     }
 
+    /**
+     * Returns movie matching the supplied criteria.
+     *
+     * @param id
+     *     identifier of the target resource
+     * @return requested movie value
+     */
     public Movie getMovieById(int id) {
         log.info(String.format("An attempt to extract a movie with an id %d from the database", id));
 
@@ -152,20 +231,43 @@ public class MovieService {
         });
     }
 
+    /**
+     * Returns ids of movies matching the supplied criteria.
+     *
+     * @param title
+     *     title text to search for
+     * @return matching integer values
+     */
     public List<Integer> getIdsOfMoviesByTitle(String title) {
         log.info(String.format("All movies IDs with title %s were requested from the database", title));
 
-        List<Movie> movies = movieRepository.findByTitleContaining(title);
+        final List<Movie> movies = movieRepository.findByTitleContaining(title);
 
         return movies.stream().map(Movie::getId).collect(Collectors.toList());
     }
 
+    /**
+     * Retrieves matching movies from the IMDb integration.
+     *
+     * @param filter
+     *     external filter value
+     * @return resulting string value
+     */
     public String getImdbMovies(String filter) {
         return imdbService.getMovies(filter);
     }
 
+    /**
+     * Updates movie and returns the previous state when needed.
+     *
+     * @param request
+     *     request payload containing the submitted data
+     * @param id
+     *     identifier of the target resource
+     * @return movie dto result
+     */
     public MovieDto updateMovie(MovieRequest request, int id) {
-        MovieDto movieDto = getMovieDtoById(id);
+        final MovieDto movieDto = getMovieDtoById(id);
 
         if (isDateNotValid(request.getReleaseDate())) {
             log.error(String.format("Exception caught: %s", ExceptionMessages.DATE_NOT_VALID_MESSAGE));
@@ -182,10 +284,19 @@ public class MovieService {
         return movieDto;
     }
 
+    /**
+     * Updates movie average rating and returns the previous state when needed.
+     *
+     * @param newRating
+     *     replacement rating value
+     * @param movieId
+     *     identifier of the target movie
+     * @return movie dto result
+     */
     public MovieDto updateMovieAverageRating(double newRating, int movieId) {
-        Movie movie = getMovieById(movieId);
+        final Movie movie = getMovieById(movieId);
 
-        MovieDto movieDto = movieMapper.mapMovieToMovieDto(movie);
+        final MovieDto movieDto = movieMapper.mapMovieToMovieDto(movie);
 
         movie.setAverageRating(newRating);
         movieDto.setAverageRating(newRating);
@@ -197,8 +308,15 @@ public class MovieService {
         return movieDto;
     }
 
+    /**
+     * Deletes movie and returns the removed state when needed.
+     *
+     * @param id
+     *     identifier of the target resource
+     * @return movie dto result
+     */
     public MovieDto deleteMovie(int id) {
-        MovieDto movieDto = getMovieDtoById(id);
+        final MovieDto movieDto = getMovieDtoById(id);
 
         movieRepository.deleteById(id);
 
@@ -207,6 +325,13 @@ public class MovieService {
         return movieDto;
     }
 
+    /**
+     * Checks whether the supplied release date violates the application rule set.
+     *
+     * @param releaseDate
+     *     release date to validate or persist
+     * @return true when the requested condition holds; otherwise false
+     */
     public boolean isDateNotValid(LocalDate releaseDate) {
         return releaseDate.isBefore(LocalDate.now());
     }

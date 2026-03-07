@@ -8,6 +8,9 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Provides persistence access for movie entities.
+ */
 @Repository
 public interface MovieRepository extends JpaRepository<Movie, Integer> {
 

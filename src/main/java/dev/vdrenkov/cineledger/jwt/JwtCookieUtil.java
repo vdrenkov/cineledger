@@ -10,6 +10,9 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+/**
+ * Builds HTTP cookies that carry JWT authentication tokens.
+ */
 @Component
 public class JwtCookieUtil {
 
@@ -19,6 +22,16 @@ public class JwtCookieUtil {
     private final boolean secureCookie;
     private final String sameSitePolicy;
 
+    /**
+     * Creates a new jwt cookie util with its required collaborators.
+     *
+     * @param tokenUtil
+     *     token util used by the operation
+     * @param secureCookie
+     *     secure cookie used by the operation
+     * @param sameSitePolicy
+     *     same site policy used by the operation
+     */
     @Autowired
     public JwtCookieUtil(final JwtTokenUtil tokenUtil, @Value("${jwt.cookie.secure:true}") final boolean secureCookie,
         @Value("${jwt.cookie.same-site:Lax}") final String sameSitePolicy) {
@@ -27,6 +40,13 @@ public class JwtCookieUtil {
         this.sameSitePolicy = sameSitePolicy;
     }
 
+    /**
+     * Creates an HTTP-only JWT cookie for the authenticated user.
+     *
+     * @param userDetails
+     *     authenticated user details
+     * @return generated JWT cookie
+     */
     public HttpCookie createJWTCookie(final UserDetails userDetails) {
         final String jwt = tokenUtil.generateToken(userDetails);
 

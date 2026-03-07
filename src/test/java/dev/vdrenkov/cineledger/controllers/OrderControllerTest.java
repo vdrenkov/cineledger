@@ -2,8 +2,8 @@ package dev.vdrenkov.cineledger.controllers;
 
 import dev.vdrenkov.cineledger.models.dtos.OrderDto;
 import dev.vdrenkov.cineledger.services.OrderService;
-import dev.vdrenkov.cineledger.testUtils.factories.OrderFactory;
-import dev.vdrenkov.cineledger.testUtils.factories.TicketFactory;
+import dev.vdrenkov.cineledger.testutils.factories.OrderFactory;
+import dev.vdrenkov.cineledger.testutils.factories.TicketFactory;
 import dev.vdrenkov.cineledger.utils.constants.URIConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,14 +21,14 @@ import tools.jackson.databind.ObjectMapper;
 import java.util.Collections;
 import java.util.List;
 
-import static dev.vdrenkov.cineledger.testUtils.constants.DiscountConstants.CODE;
-import static dev.vdrenkov.cineledger.testUtils.constants.RoleConstants.NAME;
-import static dev.vdrenkov.cineledger.testUtils.constants.UserConstants.EMAIL;
-import static dev.vdrenkov.cineledger.testUtils.constants.UserConstants.FIRST_NAME;
-import static dev.vdrenkov.cineledger.testUtils.constants.UserConstants.ID;
-import static dev.vdrenkov.cineledger.testUtils.constants.UserConstants.JOIN_DATE;
-import static dev.vdrenkov.cineledger.testUtils.constants.UserConstants.LAST_NAME;
-import static dev.vdrenkov.cineledger.testUtils.constants.UserConstants.USERNAME;
+import static dev.vdrenkov.cineledger.testutils.constants.DiscountConstants.CODE;
+import static dev.vdrenkov.cineledger.testutils.constants.RoleConstants.NAME;
+import static dev.vdrenkov.cineledger.testutils.constants.UserConstants.EMAIL;
+import static dev.vdrenkov.cineledger.testutils.constants.UserConstants.FIRST_NAME;
+import static dev.vdrenkov.cineledger.testutils.constants.UserConstants.ID;
+import static dev.vdrenkov.cineledger.testutils.constants.UserConstants.JOIN_DATE;
+import static dev.vdrenkov.cineledger.testutils.constants.UserConstants.LAST_NAME;
+import static dev.vdrenkov.cineledger.testutils.constants.UserConstants.USERNAME;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -41,12 +41,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+/**
+ * Tests order controller behavior.
+ */
 @AutoConfigureMockMvc
 @ExtendWith(MockitoExtension.class)
-public class OrderControllerTest {
+class OrderControllerTest {
 
     private static final String RETURN_OLD = "returnOld";
-    private final static ObjectMapper objectMapper = new ObjectMapper();
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     private MockMvc mockMvc;
 
@@ -56,14 +59,20 @@ public class OrderControllerTest {
     @InjectMocks
     private OrderController orderController;
 
+    /**
+     * Initializes the test fixture before each test case.
+     */
     @BeforeEach
-    public void setup() {
+    void setup() {
         mockMvc = MockMvcBuilders.standaloneSetup(orderController).build();
     }
 
+    /**
+     * Verifies that add Order order Added success.
+     */
     @Test
-    public void testAddOrder_orderAdded_success() throws Exception {
-        String json = objectMapper.writeValueAsString(OrderFactory.getDefaultOrderRequest());
+    void testAddOrder_orderAdded_success() throws Exception {
+        final String json = objectMapper.writeValueAsString(OrderFactory.getDefaultOrderRequest());
         when(orderService.addOrder(any())).thenReturn(OrderFactory.getDefaultOrder());
 
         mockMvc
@@ -76,8 +85,11 @@ public class OrderControllerTest {
             .andExpect(header().string("Location", URIConstants.ORDERS_PATH + "/" + ID));
     }
 
+    /**
+     * Verifies that make Reservation With User Id order Added success.
+     */
     @Test
-    public void testMakeReservationWithUserId_orderAdded_success() throws Exception {
+    void testMakeReservationWithUserId_orderAdded_success() throws Exception {
         String json = objectMapper.writeValueAsString(
             Collections.singletonList(TicketFactory.getDefaultTicketRequest()));
         when(orderService.makeReservationWithUserId(any(), anyInt(), anyString())).thenReturn(
@@ -89,10 +101,13 @@ public class OrderControllerTest {
             .andExpect(header().string("Location", URIConstants.ORDERS_PATH + "/" + ID));
     }
 
+    /**
+     * Verifies that get Orders By User Id no Exceptions success.
+     */
     @Test
-    public void testGetOrdersByUserId_noExceptions_success() throws Exception {
-        List<OrderDto> defaultOrderDtoList = OrderFactory.getDefaultOrderDtoList();
-        OrderDto orderDto = defaultOrderDtoList.get(0);
+    void testGetOrdersByUserId_noExceptions_success() throws Exception {
+        final List<OrderDto> defaultOrderDtoList = OrderFactory.getDefaultOrderDtoList();
+        final OrderDto orderDto = defaultOrderDtoList.getFirst();
         when(orderService.getOrdersByUserId(anyInt())).thenReturn(defaultOrderDtoList);
 
         mockMvc
@@ -105,16 +120,19 @@ public class OrderControllerTest {
             .andExpect(jsonPath("$[0].user.lastName").value(LAST_NAME))
             .andExpect(jsonPath("$[0].user.joinDate").value(JOIN_DATE.toString()))
             .andExpect(jsonPath("$[0].user.roles[0].name").value(NAME))
-            .andExpect(jsonPath("$[0].tickets[0].id").value(orderDto.getTickets().get(0).getId()))
-            .andExpect(jsonPath("$[0].items[0]").value(orderDto.getItems().get(0)))
+            .andExpect(jsonPath("$[0].tickets[0].id").value(orderDto.getTickets().getFirst().getId()))
+            .andExpect(jsonPath("$[0].items[0]").value(orderDto.getItems().getFirst()))
             .andExpect(jsonPath("$[0].totalPrice").value(orderDto.getTotalPrice()));
     }
 
+    /**
+     * Verifies that update Order return Old True success.
+     */
     @Test
-    public void testUpdateOrder_returnOldTrue_success() throws Exception {
-        OrderDto orderDto = OrderFactory.getDefaultOrderDto();
+    void testUpdateOrder_returnOldTrue_success() throws Exception {
+        final OrderDto orderDto = OrderFactory.getDefaultOrderDto();
         when(orderService.updateOrder(any(), anyInt())).thenReturn(orderDto);
-        String json = objectMapper.writeValueAsString(OrderFactory.getDefaultOrderRequest());
+        final String json = objectMapper.writeValueAsString(OrderFactory.getDefaultOrderRequest());
 
         mockMvc
             .perform(put(URIConstants.ORDERS_ID_PATH, ID)
@@ -129,24 +147,30 @@ public class OrderControllerTest {
             .andExpect(jsonPath("$.user.lastName").value(LAST_NAME))
             .andExpect(jsonPath("$.user.joinDate").value(JOIN_DATE.toString()))
             .andExpect(jsonPath("$.user.roles[0].name").value(NAME))
-            .andExpect(jsonPath("$.tickets[0].id").value(orderDto.getTickets().get(0).getId()))
-            .andExpect(jsonPath("$.items[0]").value(orderDto.getItems().get(0)))
+            .andExpect(jsonPath("$.tickets[0].id").value(orderDto.getTickets().getFirst().getId()))
+            .andExpect(jsonPath("$.items[0]").value(orderDto.getItems().getFirst()))
             .andExpect(jsonPath("$.totalPrice").value(orderDto.getTotalPrice()));
     }
 
+    /**
+     * Verifies that update Order return Old False success.
+     */
     @Test
-    public void testUpdateOrder_returnOldFalse_success() throws Exception {
+    void testUpdateOrder_returnOldFalse_success() throws Exception {
         when(orderService.updateOrder(any(), anyInt())).thenReturn(OrderFactory.getDefaultOrderDto());
-        String json = objectMapper.writeValueAsString(OrderFactory.getDefaultOrderRequest());
+        final String json = objectMapper.writeValueAsString(OrderFactory.getDefaultOrderRequest());
 
         mockMvc
             .perform(put(URIConstants.ORDERS_ID_PATH, ID).contentType(MediaType.APPLICATION_JSON).content(json))
             .andExpect(status().isNoContent());
     }
 
+    /**
+     * Verifies that delete Order return Old True success.
+     */
     @Test
-    public void testDeleteOrder_returnOldTrue_success() throws Exception {
-        OrderDto orderDto = OrderFactory.getDefaultOrderDto();
+    void testDeleteOrder_returnOldTrue_success() throws Exception {
+        final OrderDto orderDto = OrderFactory.getDefaultOrderDto();
         when(orderService.deleteOrder(anyInt())).thenReturn(orderDto);
 
         mockMvc
@@ -159,13 +183,16 @@ public class OrderControllerTest {
             .andExpect(jsonPath("$.user.lastName").value(LAST_NAME))
             .andExpect(jsonPath("$.user.joinDate").value(JOIN_DATE.toString()))
             .andExpect(jsonPath("$.user.roles[0].name").value(NAME))
-            .andExpect(jsonPath("$.tickets[0].id").value(orderDto.getTickets().get(0).getId()))
-            .andExpect(jsonPath("$.items[0]").value(orderDto.getItems().get(0)))
+            .andExpect(jsonPath("$.tickets[0].id").value(orderDto.getTickets().getFirst().getId()))
+            .andExpect(jsonPath("$.items[0]").value(orderDto.getItems().getFirst()))
             .andExpect(jsonPath("$.totalPrice").value(orderDto.getTotalPrice()));
     }
 
+    /**
+     * Verifies that delete Order return Old False success.
+     */
     @Test
-    public void testDeleteOrder_returnOldFalse_success() throws Exception {
+    void testDeleteOrder_returnOldFalse_success() throws Exception {
         when(orderService.deleteOrder(anyInt())).thenReturn(OrderFactory.getDefaultOrderDto());
 
         mockMvc.perform(delete(URIConstants.ORDERS_ID_PATH, ID)).andExpect(status().isNoContent());

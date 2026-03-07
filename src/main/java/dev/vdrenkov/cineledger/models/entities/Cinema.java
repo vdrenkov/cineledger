@@ -10,6 +10,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Represents a persisted cinema entity.
+ */
 @Entity
 @Table(name = "cinemas")
 @AllArgsConstructor
@@ -30,6 +33,16 @@ public class Cinema {
     @Column(name = "average_rating")
     private double averageRating;
 
+    /**
+     * Creates a new cinema with its required collaborators.
+     *
+     * @param address
+     *     address used by the operation
+     * @param city
+     *     city used by the operation
+     * @param averageRating
+     *     average rating used by the operation
+     */
     public Cinema(String address, String city, double averageRating) {
         this.address = address;
         this.city = city;

@@ -13,6 +13,9 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
+/**
+ * Represents a persisted review entity.
+ */
 @Entity
 @Table(name = "reviews")
 @AllArgsConstructor
@@ -40,6 +43,20 @@ public class Review {
     @ManyToOne
     private User user;
 
+    /**
+     * Creates a new review with its required collaborators.
+     *
+     * @param rating
+     *     rating value to apply or filter by
+     * @param reviewText
+     *     review text used by the operation
+     * @param dateModified
+     *     date modified used by the operation
+     * @param movie
+     *     movie entity to transform
+     * @param user
+     *     user entity to transform
+     */
     public Review(double rating, String reviewText, LocalDate dateModified, Movie movie, User user) {
         this.rating = rating;
         this.reviewText = reviewText;
@@ -48,6 +65,20 @@ public class Review {
         this.user = user;
     }
 
+    /**
+     * Creates a new review with its required collaborators.
+     *
+     * @param rating
+     *     rating value to apply or filter by
+     * @param reviewText
+     *     review text used by the operation
+     * @param dateModified
+     *     date modified used by the operation
+     * @param cinema
+     *     cinema entity to transform
+     * @param user
+     *     user entity to transform
+     */
     public Review(double rating, String reviewText, LocalDate dateModified, Cinema cinema, User user) {
         this.rating = rating;
         this.reviewText = reviewText;

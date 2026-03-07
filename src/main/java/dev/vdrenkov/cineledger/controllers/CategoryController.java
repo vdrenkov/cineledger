@@ -23,20 +23,36 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.util.List;
 
+/**
+ * Exposes REST endpoints for managing category data.
+ */
 @RestController
 public class CategoryController {
 
     private static final Logger log = LoggerFactory.getLogger(CategoryController.class);
     private final CategoryService categoryService;
 
+    /**
+     * Creates a new category controller with its required collaborators.
+     *
+     * @param categoryService
+     *     category service used by the operation
+     */
     @Autowired
     public CategoryController(CategoryService categoryService) {
         this.categoryService = categoryService;
     }
 
+    /**
+     * Creates and persists category.
+     *
+     * @param categoryRequest
+     *     request payload for the category operation
+     * @return HTTP response describing the operation result
+     */
     @PostMapping(URIConstants.CATEGORIES_PATH)
     public ResponseEntity<Void> addCategory(@RequestBody @Valid CategoryRequest categoryRequest) {
-        Category category = categoryService.addCategory(categoryRequest);
+        final Category category = categoryService.addCategory(categoryRequest);
         log.info("A request for a category to be added has been submitted");
 
         URI location = UriComponentsBuilder
@@ -47,37 +63,69 @@ public class CategoryController {
         return ResponseEntity.created(location).build();
     }
 
+    /**
+     * Returns all categories matching the supplied criteria.
+     *
+     * @return HTTP response describing the operation result
+     */
     @GetMapping(URIConstants.CATEGORIES_PATH)
     public ResponseEntity<List<CategoryDto>> getAllCategories() {
-        List<CategoryDto> categories = categoryService.getAllCategories();
+        final List<CategoryDto> categories = categoryService.getAllCategories();
         log.info("All categories were requested from the database");
 
         return ResponseEntity.ok(categories);
     }
 
+    /**
+     * Returns category matching the supplied criteria.
+     *
+     * @param categoryName
+     *     category name used by the operation
+     * @return HTTP response describing the operation result
+     */
     @GetMapping(value = URIConstants.CATEGORIES_PATH, params = "categoryName")
     public ResponseEntity<CategoryDto> getCategoryByName(@RequestParam String categoryName) {
-        CategoryDto category = categoryService.getCategoryDtoByName(categoryName);
+        final CategoryDto category = categoryService.getCategoryDtoByName(categoryName);
         log.info(String.format("Category with name %s has been requested from database", categoryName));
 
         return ResponseEntity.ok(category);
     }
 
+    /**
+     * Updates category and returns the previous state when needed.
+     *
+     * @param categoryRequest
+     *     request payload for the category operation
+     * @param id
+     *     identifier of the target resource
+     * @param returnOld
+     *     whether the previous persisted state should be returned
+     * @return HTTP response describing the operation result
+     */
     @PutMapping(URIConstants.CATEGORIES_ID_PATH)
     public ResponseEntity<CategoryDto> updateCategory(@RequestBody @Valid CategoryRequest categoryRequest,
         @PathVariable int id, @RequestParam(required = false) boolean returnOld) {
 
-        CategoryDto categoryDto = categoryService.updateCategory(categoryRequest, id);
+        final CategoryDto categoryDto = categoryService.updateCategory(categoryRequest, id);
         log.info(String.format("Category with id %d was updated", id));
 
         return returnOld ? ResponseEntity.ok(categoryDto) : ResponseEntity.noContent().build();
     }
 
+    /**
+     * Deletes category and returns the removed state when needed.
+     *
+     * @param id
+     *     identifier of the target resource
+     * @param returnOld
+     *     whether the previous persisted state should be returned
+     * @return HTTP response describing the operation result
+     */
     @DeleteMapping(URIConstants.CATEGORIES_ID_PATH)
     public ResponseEntity<CategoryDto> deleteCategory(@PathVariable int id,
         @RequestParam(required = false) boolean returnOld) {
 
-        CategoryDto categoryDto = categoryService.deleteCategory(id);
+        final CategoryDto categoryDto = categoryService.deleteCategory(id);
         log.info(String.format("Category with id %d was deleted", id));
 
         return returnOld ? ResponseEntity.ok(categoryDto) : ResponseEntity.noContent().build();

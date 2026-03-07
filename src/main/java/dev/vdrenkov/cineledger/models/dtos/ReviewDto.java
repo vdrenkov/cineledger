@@ -6,6 +6,9 @@ import lombok.Data;
 
 import java.time.LocalDate;
 
+/**
+ * Represents the API response payload for review data.
+ */
 @AllArgsConstructor
 @Data
 public class ReviewDto {

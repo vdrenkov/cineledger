@@ -7,6 +7,9 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * Provides persistence access for ticket entities.
+ */
 @Repository
 public interface TicketRepository extends JpaRepository<Ticket, Integer> {
 

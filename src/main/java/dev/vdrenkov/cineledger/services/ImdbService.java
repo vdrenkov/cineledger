@@ -10,6 +10,9 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+/**
+ * Coordinates outbound IMDb API requests used to enrich movie searches.
+ */
 @Service
 public class ImdbService {
 
@@ -21,6 +24,16 @@ public class ImdbService {
 
     private String baseUrl;
 
+    /**
+     * Creates a new imdb service with its required collaborators.
+     *
+     * @param restTemplate
+     *     rest template used by the operation
+     * @param imdbKey
+     *     imdb key used by the operation
+     * @param baseUrl
+     *     base url used by the operation
+     */
     public ImdbService(RestTemplate restTemplate, @Value("${imdb.key}") String imdbKey,
         @Value("${imdb.url}") String baseUrl) {
         this.restTemplate = restTemplate;
@@ -28,14 +41,33 @@ public class ImdbService {
         this.baseUrl = baseUrl;
     }
 
+    /**
+     * Executes the set imdb key operation for imdb.
+     *
+     * @param imdbKey
+     *     imdb key used by the operation
+     */
     public void setImdbKey(String imdbKey) {
         this.imdbKey = imdbKey;
     }
 
+    /**
+     * Executes the set base url operation for imdb.
+     *
+     * @param baseUrl
+     *     base url used by the operation
+     */
     public void setBaseUrl(String baseUrl) {
         this.baseUrl = baseUrl;
     }
 
+    /**
+     * Returns movies matching the supplied criteria.
+     *
+     * @param filter
+     *     external filter value
+     * @return resulting string value
+     */
     public String getMovies(String filter) {
         String searchUrl;
 
@@ -55,7 +87,7 @@ public class ImdbService {
         }
 
         try {
-            String unfilteredMovies = restTemplate.getForObject(searchUrl, String.class);
+            final String unfilteredMovies = restTemplate.getForObject(searchUrl, String.class);
             return filterMoviesTopMovies(unfilteredMovies);
         } catch (RestClientException exception) {
             log.warn("IMDb lookup failed for filter '{}'", filter, exception);
@@ -64,13 +96,13 @@ public class ImdbService {
     }
 
     private String filterMoviesTopMovies(String responseBody) {
-        JSONObject responseJson = new JSONObject(responseBody);
-        JSONArray movies = responseJson.getJSONArray("items");
-        JSONArray filteredMovies = new JSONArray();
+        final JSONObject responseJson = new JSONObject(responseBody);
+        final JSONArray movies = responseJson.getJSONArray("items");
+        final JSONArray filteredMovies = new JSONArray();
 
         for (int i = 0; i < movies.length(); i++) {
-            JSONObject movie = movies.getJSONObject(i);
-            JSONObject filteredMovie = new JSONObject();
+            final JSONObject movie = movies.getJSONObject(i);
+            final JSONObject filteredMovie = new JSONObject();
 
             filteredMovie.put("title", movie.getString("title"));
             filteredMovie.put("year", movie.getString("year"));
@@ -82,7 +114,7 @@ public class ImdbService {
             filteredMovies.put(filteredMovie);
         }
 
-        JSONObject resultJson = new JSONObject();
+        final JSONObject resultJson = new JSONObject();
         resultJson.put("movies", filteredMovies);
 
         return resultJson.toString(2);

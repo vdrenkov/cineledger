@@ -15,6 +15,9 @@ import lombok.NoArgsConstructor;
 import java.time.Duration;
 import java.time.LocalDate;
 
+/**
+ * Represents a persisted movie entity.
+ */
 @Entity
 @Table(name = "movies")
 @AllArgsConstructor
@@ -45,6 +48,20 @@ public class Movie {
     @JoinColumn(name = "category_id")
     private Category category;
 
+    /**
+     * Creates a new movie with its required collaborators.
+     *
+     * @param title
+     *     title text to search for
+     * @param description
+     *     description used by the operation
+     * @param releaseDate
+     *     release date to validate or persist
+     * @param runtime
+     *     runtime used by the operation
+     * @param category
+     *     category entity to transform
+     */
     public Movie(String title, String description, LocalDate releaseDate, Duration runtime, Category category) {
         this.title = title;
         this.description = description;
@@ -53,6 +70,22 @@ public class Movie {
         this.category = category;
     }
 
+    /**
+     * Creates a new movie with its required collaborators.
+     *
+     * @param id
+     *     identifier of the target resource
+     * @param title
+     *     title text to search for
+     * @param description
+     *     description used by the operation
+     * @param releaseDate
+     *     release date to validate or persist
+     * @param runtime
+     *     runtime used by the operation
+     * @param category
+     *     category entity to transform
+     */
     public Movie(int id, String title, String description, LocalDate releaseDate, Duration runtime, Category category) {
         this.id = id;
         this.title = title;

@@ -12,6 +12,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Represents a persisted hall entity.
+ */
 @Entity
 @Table(name = "halls")
 @AllArgsConstructor
@@ -30,6 +33,14 @@ public class Hall {
     @JoinColumn(name = "cinema_id")
     private Cinema cinema;
 
+    /**
+     * Creates a new hall with its required collaborators.
+     *
+     * @param capacity
+     *     capacity used by the operation
+     * @param cinema
+     *     cinema entity to transform
+     */
     public Hall(int capacity, Cinema cinema) {
         this.capacity = capacity;
         this.cinema = cinema;

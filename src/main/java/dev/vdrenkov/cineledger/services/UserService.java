@@ -30,13 +30,16 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Random;
 import java.util.stream.Collectors;
 
+/**
+ * Contains business logic for user operations.
+ */
 @Service
 public class UserService {
 
@@ -49,24 +52,48 @@ public class UserService {
     private final EmailService emailService;
     private final JwtCookieUtil jwtCookieUtil;
     private final UserRepository userRepository;
-    private final Random random;
     private final RoleService roleService;
     private final UserMapper userMapper;
+    private final SecureRandom passwordRandom = new SecureRandom();
 
+    /**
+     * Creates a new user service with its required collaborators.
+     *
+     * @param authenticationManager
+     *     authentication manager used by the operation
+     * @param passwordEncoder
+     *     password encoder used by the operation
+     * @param emailService
+     *     email service used by the operation
+     * @param jwtCookieUtil
+     *     jwt cookie util used by the operation
+     * @param userRepository
+     *     user repository used by the operation
+     * @param roleService
+     *     role service used by the operation
+     * @param userMapper
+     *     user mapper used by the operation
+     */
     @Autowired
     public UserService(final AuthenticationManager authenticationManager, final BCryptPasswordEncoder passwordEncoder,
         final EmailService emailService, final JwtCookieUtil jwtCookieUtil, final UserRepository userRepository,
-        final Random random, final RoleService roleService, final UserMapper userMapper) {
+        final RoleService roleService, final UserMapper userMapper) {
         this.authenticationManager = authenticationManager;
         this.passwordEncoder = passwordEncoder;
         this.emailService = emailService;
         this.jwtCookieUtil = jwtCookieUtil;
         this.userRepository = userRepository;
-        this.random = random;
         this.roleService = roleService;
         this.userMapper = userMapper;
     }
 
+    /**
+     * Authenticates the submitted credentials and returns a JWT cookie.
+     *
+     * @param request
+     *     request payload containing the submitted data
+     * @return generated JWT cookie
+     */
     public HttpCookie login(final LoginRequest request) {
         final UserDetails userDetails = (UserDetails) authenticationManager
             .authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()))
@@ -77,6 +104,13 @@ public class UserService {
         return jwtCookieUtil.createJWTCookie(userDetails);
     }
 
+    /**
+     * Registers a new end user and returns the authentication cookie.
+     *
+     * @param userRequest
+     *     request payload for the user operation
+     * @return generated JWT cookie
+     */
     public HttpCookie registerUser(final UserRequest userRequest) {
         addUser(userRequest);
 
@@ -85,10 +119,23 @@ public class UserService {
         return login(new LoginRequest(userRequest.getUsername(), userRequest.getPassword()));
     }
 
+    /**
+     * Registers a user with administrator-provided roles.
+     *
+     * @param request
+     *     request payload containing the submitted data
+     */
     public void registerUserByAdmin(final AdminRequest request) {
         addUserByAdmin(request);
     }
 
+    /**
+     * Creates and persists user.
+     *
+     * @param userRequest
+     *     request payload for the user operation
+     * @return requested user value
+     */
     public User addUser(final UserRequest userRequest) {
         final String password = passwordEncoder.encode(userRequest.getPassword());
 
@@ -104,6 +151,13 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    /**
+     * Creates and persists user.
+     *
+     * @param request
+     *     request payload containing the submitted data
+     * @return requested user value
+     */
     public User addUserByAdmin(final AdminRequest request) {
         final String password = passwordEncoder.encode(request.getPassword());
         userValidation(request.getUsername(), request.getEmail());
@@ -116,18 +170,37 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    /**
+     * Returns role matching the supplied criteria.
+     *
+     * @param roleName
+     *     role name to search for
+     * @return requested role value
+     */
     public Role getRoleByName(final String roleName) {
         log.info(String.format("Trying to retrieve the user role %s", roleName));
 
         return roleService.getRoleByName(roleName);
     }
 
+    /**
+     * Returns default role list matching the supplied criteria.
+     *
+     * @return matching role values
+     */
     public List<Role> getDefaultRoleList() {
         log.info("Trying to retrieve the default user role");
 
         return Collections.singletonList(getRoleByName(RoleConstants.DEFAULT_USER_ROLE));
     }
 
+    /**
+     * Returns user roles matching the supplied criteria.
+     *
+     * @param roleNames
+     *     role names to resolve
+     * @return matching role values
+     */
     public List<Role> getUserRoles(final List<String> roleNames) {
         if (Objects.nonNull(roleNames) && roleNames.size() > 0) {
 
@@ -139,6 +212,13 @@ public class UserService {
         }
     }
 
+    /**
+     * Returns user matching the supplied criteria.
+     *
+     * @param id
+     *     identifier of the target resource
+     * @return requested user value
+     */
     public User getUserById(final int id) {
         log.info(String.format("Trying to retrieve user with id %d", id));
 
@@ -149,12 +229,26 @@ public class UserService {
         });
     }
 
+    /**
+     * Returns user matching the supplied criteria.
+     *
+     * @param id
+     *     identifier of the target resource
+     * @return user dto result
+     */
     public UserDto getUserDtoById(final int id) {
         log.info(String.format("Trying to retrieve user DTO with id %d", id));
 
         return userMapper.mapUserToUserDto(getUserById(id));
     }
 
+    /**
+     * Returns user matching the supplied criteria.
+     *
+     * @param username
+     *     username to search for
+     * @return requested user value
+     */
     public User getUserByUsername(final String username) {
         log.info(String.format("Trying to retrieve user with username %s", username));
 
@@ -165,12 +259,26 @@ public class UserService {
         });
     }
 
+    /**
+     * Returns user matching the supplied criteria.
+     *
+     * @param username
+     *     username to search for
+     * @return user dto result
+     */
     public UserDto getUserDtoByUsername(final String username) {
         log.info(String.format("Trying to retrieve user DTO with username %s", username));
 
         return userMapper.mapUserToUserDto(getUserByUsername(username));
     }
 
+    /**
+     * Returns user matching the supplied criteria.
+     *
+     * @param email
+     *     email address to search for
+     * @return requested user value
+     */
     public User getUserByEmail(final String email) {
         log.info(String.format("Trying to retrieve user with email %s", email));
 
@@ -181,30 +289,69 @@ public class UserService {
         });
     }
 
+    /**
+     * Returns user matching the supplied criteria.
+     *
+     * @param email
+     *     email address to search for
+     * @return user dto result
+     */
     public UserDto getUserDtoByEmail(final String email) {
         log.info(String.format("Trying to retrieve user DTO with email %s", email));
 
         return userMapper.mapUserToUserDto(getUserByEmail(email));
     }
 
+    /**
+     * Returns users matching the supplied criteria.
+     *
+     * @param roleName
+     *     role name to search for
+     * @return matching user values
+     */
     public List<User> getUsersByRoleName(final String roleName) {
         log.info(String.format("Trying to retrieve users with role %s", roleName));
 
         return userRepository.findAllByRolesName(roleName.toUpperCase());
     }
 
+    /**
+     * Returns users matching the supplied criteria.
+     *
+     * @param roleName
+     *     role name to search for
+     * @return matching user dto values
+     */
     public List<UserDto> getUsersDtoByRoleName(final String roleName) {
         log.info(String.format("Trying to retrieve user DTOS with role %s", roleName));
 
         return userMapper.mapUsersToUserDtos(getUsersByRoleName(roleName));
     }
 
+    /**
+     * Returns users matching the supplied criteria.
+     *
+     * @param joinDate
+     *     join date boundary to filter by
+     * @param isBefore
+     *     whether to match data before the provided boundary
+     * @return matching user values
+     */
     public List<User> getUsersByJoinDate(final LocalDate joinDate, final boolean isBefore) {
         return isBefore ?
             userRepository.findAllByJoinDateBefore(joinDate) :
             userRepository.findAllByJoinDateAfter(joinDate);
     }
 
+    /**
+     * Returns users matching the supplied criteria.
+     *
+     * @param joinDate
+     *     join date boundary to filter by
+     * @param isBefore
+     *     whether to match data before the provided boundary
+     * @return matching user dto values
+     */
     public List<UserDto> getUsersDtosByJoinDate(final LocalDate joinDate, final boolean isBefore) {
         return userMapper.mapUsersToUserDtos(getUsersByJoinDate(joinDate, isBefore));
     }
@@ -217,6 +364,11 @@ public class UserService {
         });
     }
 
+    /**
+     * Returns current user matching the supplied criteria.
+     *
+     * @return requested user value
+     */
     public User getCurrentUser() {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         final String currentUsername = authentication.getName();
@@ -224,6 +376,15 @@ public class UserService {
         return getUserByUsername(currentUsername);
     }
 
+    /**
+     * Updates user and returns the previous state when needed.
+     *
+     * @param request
+     *     request payload containing the submitted data
+     * @param id
+     *     identifier of the target resource
+     * @return user dto result
+     */
     public UserDto updateUserByAdmin(final AdminRequest request, final int id) {
         final UserDto userDto = getUserDtoById(id);
         final String password = passwordEncoder.encode(request.getPassword());
@@ -236,6 +397,15 @@ public class UserService {
         return userDto;
     }
 
+    /**
+     * Updates user and returns the previous state when needed.
+     *
+     * @param userRequest
+     *     request payload for the user operation
+     * @param id
+     *     identifier of the target resource
+     * @return user dto result
+     */
     public UserDto updateUser(final UserRequest userRequest, final int id) {
         final User user = getUserById(id);
         final UserDto oldUser = userMapper.mapUserToUserDto(user);
@@ -256,6 +426,13 @@ public class UserService {
         return oldUser;
     }
 
+    /**
+     * Deletes user and returns the removed state when needed.
+     *
+     * @param id
+     *     identifier of the target resource
+     * @return user dto result
+     */
     public UserDto deleteUser(final int id) {
         final UserDto userDto = getUserDtoById(id);
 
@@ -276,8 +453,13 @@ public class UserService {
         return userDto;
     }
 
+    /**
+     * Checks whether the current authenticated user has administrative authority.
+     *
+     * @return true when the requested condition holds; otherwise false
+     */
     public boolean isCurrentUserAdmin() {
-        User currentUser = getCurrentUser();
+        final User currentUser = getCurrentUser();
 
         return currentUser
             .getRoles()
@@ -285,6 +467,13 @@ public class UserService {
             .anyMatch(role -> Objects.equals(RoleConstants.DEFAULT_ADMIN_ROLE, role.getName()));
     }
 
+    /**
+     * Checks whether the current authenticated user can act on the supplied user.
+     *
+     * @param userId
+     *     identifier of the target user
+     * @return true when the requested condition holds; otherwise false
+     */
     public boolean isCurrentUserAuthorized(final int userId) {
         final User currentUser = getCurrentUser();
 
@@ -295,6 +484,13 @@ public class UserService {
         return currentUser.getId() == userId;
     }
 
+    /**
+     * Generates a replacement password, stores it, and emails it to the user.
+     *
+     * @param username
+     *     username to search for
+     * @return requested user value
+     */
     public User recoverPassword(final String username) {
         final User user = getUserByUsername(username);
         final String newPassword = generateRandomPassword();
@@ -351,7 +547,7 @@ public class UserService {
         final StringBuilder password = new StringBuilder(RECOVERY_PASSWORD_LENGTH);
 
         for (int i = 0; i < RECOVERY_PASSWORD_LENGTH; i++) {
-            final int charIndex = random.nextInt(RECOVERY_PASSWORD_CHARACTERS.length());
+            final int charIndex = passwordRandom.nextInt(RECOVERY_PASSWORD_CHARACTERS.length());
             password.append(RECOVERY_PASSWORD_CHARACTERS.charAt(charIndex));
         }
 

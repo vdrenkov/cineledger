@@ -10,6 +10,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.time.Duration;
 import java.time.LocalDate;
 
+/**
+ * Captures the API request payload for movie operations.
+ */
 @AllArgsConstructor
 @NoArgsConstructor
 @Data

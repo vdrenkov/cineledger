@@ -8,6 +8,9 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Provides persistence access for user entities.
+ */
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
 

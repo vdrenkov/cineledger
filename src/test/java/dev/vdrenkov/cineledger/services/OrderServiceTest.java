@@ -1,5 +1,7 @@
 package dev.vdrenkov.cineledger.services;
 
+import com.mailjet.client.errors.MailjetException;
+import com.mailjet.client.errors.MailjetSocketTimeoutException;
 import dev.vdrenkov.cineledger.exceptions.DiscountNotValidException;
 import dev.vdrenkov.cineledger.exceptions.NotAuthorizedException;
 import dev.vdrenkov.cineledger.exceptions.OrderNotFoundException;
@@ -11,16 +13,14 @@ import dev.vdrenkov.cineledger.models.entities.Ticket;
 import dev.vdrenkov.cineledger.models.entities.User;
 import dev.vdrenkov.cineledger.models.requests.OrderRequest;
 import dev.vdrenkov.cineledger.repositories.OrderRepository;
-import dev.vdrenkov.cineledger.testUtils.constants.DiscountConstants;
-import dev.vdrenkov.cineledger.testUtils.constants.OrderConstants;
-import dev.vdrenkov.cineledger.testUtils.constants.ReportConstants;
-import dev.vdrenkov.cineledger.testUtils.factories.ItemFactory;
-import dev.vdrenkov.cineledger.testUtils.factories.OrderFactory;
-import dev.vdrenkov.cineledger.testUtils.factories.ProjectionFactory;
-import dev.vdrenkov.cineledger.testUtils.factories.TicketFactory;
-import dev.vdrenkov.cineledger.testUtils.factories.UserFactory;
-import com.mailjet.client.errors.MailjetException;
-import com.mailjet.client.errors.MailjetSocketTimeoutException;
+import dev.vdrenkov.cineledger.testutils.constants.DiscountConstants;
+import dev.vdrenkov.cineledger.testutils.constants.OrderConstants;
+import dev.vdrenkov.cineledger.testutils.constants.ReportConstants;
+import dev.vdrenkov.cineledger.testutils.factories.ItemFactory;
+import dev.vdrenkov.cineledger.testutils.factories.OrderFactory;
+import dev.vdrenkov.cineledger.testutils.factories.ProjectionFactory;
+import dev.vdrenkov.cineledger.testutils.factories.TicketFactory;
+import dev.vdrenkov.cineledger.testutils.factories.UserFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -45,8 +45,11 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+/**
+ * Tests order service behavior.
+ */
 @ExtendWith(MockitoExtension.class)
-public class OrderServiceTest {
+class OrderServiceTest {
 
     @Mock
     private OrderMapper orderMapper;
@@ -72,9 +75,12 @@ public class OrderServiceTest {
     @InjectMocks
     private OrderService orderService;
 
+    /**
+     * Verifies that add Order no Exceptions success.
+     */
     @Test
-    public void testAddOrder_noExceptions_success() throws MailjetSocketTimeoutException, MailjetException {
-        Order expected = OrderFactory.getDefaultOrder();
+    void testAddOrder_noExceptions_success() throws MailjetSocketTimeoutException, MailjetException {
+        final Order expected = OrderFactory.getDefaultOrder();
 
         when(ticketService.getTicketById(anyInt())).thenReturn(TicketFactory.getDefaultTicket());
         when(itemService.getItemById(anyInt())).thenReturn(ItemFactory.getDefaultItem());
@@ -82,14 +88,17 @@ public class OrderServiceTest {
         when(orderRepository.save(any())).thenReturn(OrderFactory.getDefaultOrder());
         when(discountService.applyDiscount(anyDouble(), anyString())).thenReturn(OrderConstants.TOTAL_PRICE);
 
-        Order order = orderService.addOrder(OrderFactory.getDefaultOrderRequest());
+        final Order order = orderService.addOrder(OrderFactory.getDefaultOrderRequest());
 
         assertEquals(expected, order);
         verify(emailService).sendOrderConfirmationEmail(any(), any());
     }
 
+    /**
+     * Verifies that add Order discount Code Not Valid throws Discount Not Found Exception.
+     */
     @Test
-    public void testAddOrder_discountCodeNotValid_throwsDiscountNotFoundException()
+    void testAddOrder_discountCodeNotValid_throwsDiscountNotFoundException()
         throws MailjetSocketTimeoutException, MailjetException {
         assertThrows(DiscountNotValidException.class, () -> {
 
@@ -97,18 +106,20 @@ public class OrderServiceTest {
             when(itemService.getItemById(anyInt())).thenReturn(ItemFactory.getDefaultItem());
             when(userService.getUserById(anyInt())).thenReturn(UserFactory.getDefaultUser());
 
-            OrderRequest orderRequest = OrderFactory.getDefaultOrderRequest();
+            final OrderRequest orderRequest = OrderFactory.getDefaultOrderRequest();
             orderRequest.setDiscountCode("Code");
             orderService.addOrder(orderRequest);
 
         });
     }
 
+    /**
+     * Verifies that make Reservation With User Id no Exceptions success.
+     */
     @Test
-    public void testMakeReservationWithUserId_noExceptions_success()
-        throws MailjetSocketTimeoutException, MailjetException {
-        Order expected = OrderFactory.getDefaultOrder();
-        Ticket ticket = new Ticket();
+    void testMakeReservationWithUserId_noExceptions_success() throws MailjetSocketTimeoutException, MailjetException {
+        final Order expected = OrderFactory.getDefaultOrder();
+        final Ticket ticket = new Ticket();
         ticket.setId(OrderConstants.ID);
         ticket.setDateOfPurchase(LocalDate.now());
         ticket.setProjection(ProjectionFactory.getDefaultProjection());
@@ -126,17 +137,20 @@ public class OrderServiceTest {
         assertEquals(expected, order);
     }
 
+    /**
+     * Verifies that make Reservation With User Id discount Code Not Valid throws Discount Not Found Exception.
+     */
     @Test
-    public void testMakeReservationWithUserId_discountCodeNotValid_throwsDiscountNotFoundException()
+    void testMakeReservationWithUserId_discountCodeNotValid_throwsDiscountNotFoundException()
         throws MailjetSocketTimeoutException, MailjetException {
         assertThrows(DiscountNotValidException.class, () -> {
 
-            Ticket ticket = new Ticket();
+            final Ticket ticket = new Ticket();
             ticket.setId(OrderConstants.ID);
             ticket.setDateOfPurchase(LocalDate.now());
             ticket.setProjection(ProjectionFactory.getDefaultProjection());
 
-            String invalidDiscount = "ABC";
+            final String invalidDiscount = "ABC";
 
             when(ticketService.addTicket(any())).thenReturn(ticket);
             when(userService.getUserById(anyInt())).thenReturn(UserFactory.getDefaultUser());
@@ -148,8 +162,11 @@ public class OrderServiceTest {
         });
     }
 
+    /**
+     * Verifies that make Reservation With User Id invalid User Id throws Not Authorized Exception.
+     */
     @Test
-    public void testMakeReservationWithUserId_invalidUserId_throwsNotAuthorizedException()
+    void testMakeReservationWithUserId_invalidUserId_throwsNotAuthorizedException()
         throws MailjetSocketTimeoutException, MailjetException {
         assertThrows(NotAuthorizedException.class, () -> {
 
@@ -161,40 +178,49 @@ public class OrderServiceTest {
         });
     }
 
+    /**
+     * Verifies that get Orders By User Id no Exceptions success.
+     */
     @Test
-    public void testGetOrdersByUserId_noExceptions_success() {
-        User user = UserFactory.getDefaultUser();
+    void testGetOrdersByUserId_noExceptions_success() {
+        final User user = UserFactory.getDefaultUser();
 
         when(userService.getCurrentUser()).thenReturn(user);
         when(orderRepository.findOrderByUserId(anyInt())).thenReturn(OrderFactory.getDefaultOrderList());
 
-        List<OrderDto> orderDtos = OrderFactory.getDefaultOrderDtoList();
+        final List<OrderDto> orderDtos = OrderFactory.getDefaultOrderDtoList();
         when(orderMapper.mapOrderToOrderDtoList(OrderFactory.getDefaultOrderList())).thenReturn(orderDtos);
         when(orderRepository.findOrderByUserId(anyInt())).thenReturn(OrderFactory.getDefaultOrderList());
 
-        List<OrderDto> result = orderService.getOrdersByUserId(OrderConstants.ID);
+        final List<OrderDto> result = orderService.getOrdersByUserId(OrderConstants.ID);
 
         assertEquals(orderDtos, result);
     }
 
+    /**
+     * Verifies that get Orders By User Id invalid User Id throws Not Authorized Exception.
+     */
     @Test
-    public void testGetOrdersByUserId_invalidUserId_throwsNotAuthorizedException() {
+    void testGetOrdersByUserId_invalidUserId_throwsNotAuthorizedException() {
         assertThrows(NotAuthorizedException.class, () -> {
 
-            User user = UserFactory.getDefaultUser();
+            final User user = UserFactory.getDefaultUser();
 
             when(userService.getCurrentUser()).thenReturn(user);
 
-            int invalidUserId = 999;
+            final int invalidUserId = 999;
 
             orderService.getOrdersByUserId(invalidUserId);
 
         });
     }
 
+    /**
+     * Verifies that update Order no Exceptions success.
+     */
     @Test
-    public void testUpdateOrder_noExceptions_success() throws MailjetSocketTimeoutException, MailjetException {
-        OrderDto expected = OrderFactory.getDefaultOrderDto();
+    void testUpdateOrder_noExceptions_success() throws MailjetSocketTimeoutException, MailjetException {
+        final OrderDto expected = OrderFactory.getDefaultOrderDto();
 
         when(orderRepository.findById(anyInt())).thenReturn(Optional.of(OrderFactory.getDefaultOrder()));
         when(orderMapper.mapOrderToOrderDto(any())).thenReturn(OrderFactory.getDefaultOrderDto());
@@ -202,13 +228,13 @@ public class OrderServiceTest {
         when(userService.getUserById(anyInt())).thenReturn(UserFactory.getDefaultUser());
         when(orderRepository.save(any())).thenReturn(OrderFactory.getDefaultOrder());
 
-        Item newItem = ItemFactory.getDefaultItem();
+        final Item newItem = ItemFactory.getDefaultItem();
         newItem.setId(999);
         when(itemService.getItemById(newItem.getId())).thenReturn(newItem);
 
-        OrderRequest request = OrderFactory.getDefaultOrderRequest();
+        final OrderRequest request = OrderFactory.getDefaultOrderRequest();
         request.setItemsIds(Collections.singletonList(newItem.getId()));
-        OrderDto result = orderService.updateOrder(request, OrderConstants.ID);
+        final OrderDto result = orderService.updateOrder(request, OrderConstants.ID);
 
         request.setItemsIds(new ArrayList<>());
         orderService.updateOrder(request, OrderConstants.ID);
@@ -216,8 +242,11 @@ public class OrderServiceTest {
         assertEquals(expected, result);
     }
 
+    /**
+     * Verifies that update Order Order Not Found Exception fail.
+     */
     @Test
-    public void testUpdateOrder_OrderNotFoundException_fail() throws MailjetSocketTimeoutException, MailjetException {
+    void testUpdateOrder_OrderNotFoundException_fail() throws MailjetSocketTimeoutException, MailjetException {
         assertThrows(OrderNotFoundException.class, () -> {
 
             when(orderRepository.findById(anyInt())).thenReturn(Optional.empty());
@@ -227,20 +256,26 @@ public class OrderServiceTest {
         });
     }
 
+    /**
+     * Verifies that delete Order no Exceptions fail.
+     */
     @Test
-    public void testDeleteOrder_noExceptions_fail() {
-        OrderDto expected = OrderFactory.getDefaultOrderDto();
+    void testDeleteOrder_noExceptions_fail() {
+        final OrderDto expected = OrderFactory.getDefaultOrderDto();
 
         when(orderRepository.findById(anyInt())).thenReturn(Optional.of(new Order()));
         when(orderMapper.mapOrderToOrderDto(any())).thenReturn(expected);
 
-        OrderDto result = orderService.deleteOrder(OrderConstants.ID);
+        final OrderDto result = orderService.deleteOrder(OrderConstants.ID);
 
         assertEquals(expected, result);
     }
 
+    /**
+     * Verifies that delete Order Order Not Found Exception fail.
+     */
     @Test
-    public void testDeleteOrder_OrderNotFoundException_fail() {
+    void testDeleteOrder_OrderNotFoundException_fail() {
         assertThrows(OrderNotFoundException.class, () -> {
 
             when(orderRepository.findById(anyInt())).thenReturn(Optional.empty());
@@ -250,24 +285,31 @@ public class OrderServiceTest {
         });
     }
 
+    /**
+     * Verifies that get Orders By Date Between.
+     */
     @Test
-    public void testGetOrdersByDateBetween() {
-        List<Order> expected = OrderFactory.getDefaultOrderList();
+    void testGetOrdersByDateBetween() {
+        final List<Order> expected = OrderFactory.getDefaultOrderList();
 
         when(orderRepository.findOrdersByDateOfPurchaseBetween(any(), any())).thenReturn(expected);
 
-        List<Order> orders = orderService.getOrdersByDateBetween(ReportConstants.START_DATE, ReportConstants.END_DATE);
+        final List<Order> orders = orderService.getOrdersByDateBetween(ReportConstants.START_DATE,
+            ReportConstants.END_DATE);
 
         assertEquals(expected, orders);
     }
 
+    /**
+     * Verifies that order Mutations are Transactional.
+     */
     @Test
-    public void testOrderMutations_areTransactional() throws NoSuchMethodException {
-        Method addOrder = OrderService.class.getMethod("addOrder", OrderRequest.class);
-        Method updateOrder = OrderService.class.getMethod("updateOrder", OrderRequest.class, int.class);
+    void testOrderMutations_areTransactional() throws NoSuchMethodException {
+        final Method addOrder = OrderService.class.getMethod("addOrder", OrderRequest.class);
+        final Method updateOrder = OrderService.class.getMethod("updateOrder", OrderRequest.class, int.class);
         Method reserveOrder = OrderService.class.getMethod("makeReservationWithUserId", List.class, int.class,
             String.class);
-        Method deleteOrder = OrderService.class.getMethod("deleteOrder", int.class);
+        final Method deleteOrder = OrderService.class.getMethod("deleteOrder", int.class);
 
         assertTrue(addOrder.isAnnotationPresent(Transactional.class));
         assertTrue(updateOrder.isAnnotationPresent(Transactional.class));

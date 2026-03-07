@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Represents the API response payload for item data.
+ */
 @AllArgsConstructor
 @NoArgsConstructor
 @Data

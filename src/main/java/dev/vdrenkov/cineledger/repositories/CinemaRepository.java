@@ -7,6 +7,9 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Provides persistence access for cinema entities.
+ */
 @Repository
 public interface CinemaRepository extends JpaRepository<Cinema, Integer> {
 

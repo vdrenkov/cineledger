@@ -6,8 +6,8 @@ import dev.vdrenkov.cineledger.mappers.RoleMapper;
 import dev.vdrenkov.cineledger.models.dtos.RoleDto;
 import dev.vdrenkov.cineledger.models.entities.Role;
 import dev.vdrenkov.cineledger.repositories.RoleRepository;
-import dev.vdrenkov.cineledger.testUtils.constants.RoleConstants;
-import dev.vdrenkov.cineledger.testUtils.factories.RoleFactory;
+import dev.vdrenkov.cineledger.testutils.constants.RoleConstants;
+import dev.vdrenkov.cineledger.testutils.factories.RoleFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -24,8 +24,11 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
+/**
+ * Tests role service behavior.
+ */
 @ExtendWith(MockitoExtension.class)
-public class RoleServiceTest {
+class RoleServiceTest {
 
     @Mock
     private RoleRepository roleRepository;
@@ -36,53 +39,68 @@ public class RoleServiceTest {
     @InjectMocks
     private RoleService roleService;
 
+    /**
+     * Verifies that add Role no Exceptions success.
+     */
     @Test
-    public void testAddRole_noExceptions_success() {
-        Role expected = RoleFactory.getDefaultRole();
+    void testAddRole_noExceptions_success() {
+        final Role expected = RoleFactory.getDefaultRole();
 
         when(roleRepository.save(any())).thenReturn(expected);
 
-        Role role = roleService.addRole(RoleFactory.getDefaultRoleRequest());
+        final Role role = roleService.addRole(RoleFactory.getDefaultRoleRequest());
 
         assertEquals(expected, role);
     }
 
+    /**
+     * Verifies that get All Roles roles Found success.
+     */
     @Test
-    public void testGetAllRoles_rolesFound_success() {
-        List<Role> expected = RoleFactory.getDefaultRoleList();
+    void testGetAllRoles_rolesFound_success() {
+        final List<Role> expected = RoleFactory.getDefaultRoleList();
 
         when(roleRepository.findAll()).thenReturn(expected);
 
-        List<Role> roles = roleService.getAllRoles();
+        final List<Role> roles = roleService.getAllRoles();
 
         assertEquals(expected, roles);
     }
 
+    /**
+     * Verifies that get All Roles DTO roles Found success.
+     */
     @Test
-    public void testGetAllRolesDto_rolesFound_success() {
-        List<RoleDto> expected = RoleFactory.getDefaultRoleDtoList();
+    void testGetAllRolesDto_rolesFound_success() {
+        final List<RoleDto> expected = RoleFactory.getDefaultRoleDtoList();
 
         when(roleRepository.findAll()).thenReturn(RoleFactory.getDefaultRoleList());
         when(roleMapper.mapRolesToRoleDtos(any())).thenReturn(expected);
 
-        List<RoleDto> roles = roleService.getAllRolesDto();
+        final List<RoleDto> roles = roleService.getAllRolesDto();
 
         assertEquals(expected, roles);
     }
 
+    /**
+     * Verifies that get Role By Id role Found success.
+     */
     @Test
-    public void testGetRoleById_roleFound_success() {
-        Role expected = RoleFactory.getDefaultRole();
+    void testGetRoleById_roleFound_success() {
+        final Role expected = RoleFactory.getDefaultRole();
 
         when(roleRepository.findById(anyInt())).thenReturn(Optional.of(expected));
 
-        Role role = roleService.getRoleById(RoleConstants.ID);
+        final Role role = roleService.getRoleById(RoleConstants.ID);
 
         assertEquals(expected, role);
     }
 
+    /**
+     * Verifies that get Role By Id role Not Found throws Role Not Found Exception.
+     */
     @Test
-    public void testGetRoleById_roleNotFound_throwsRoleNotFoundException() {
+    void testGetRoleById_roleNotFound_throwsRoleNotFoundException() {
         assertThrows(RoleNotFoundException.class, () -> {
 
             roleService.getRoleById(RoleConstants.ID);
@@ -90,31 +108,40 @@ public class RoleServiceTest {
         });
     }
 
+    /**
+     * Verifies that get Role DTO By Id role DTO Found success.
+     */
     @Test
-    public void testGetRoleDtoById_roleDtoFound_success() {
-        RoleDto expected = RoleFactory.getDefaultRoleDto();
+    void testGetRoleDtoById_roleDtoFound_success() {
+        final RoleDto expected = RoleFactory.getDefaultRoleDto();
 
         when(roleMapper.mapRoleToRoleDto(any())).thenReturn(expected);
         when(roleRepository.findById(anyInt())).thenReturn(Optional.of(RoleFactory.getDefaultRole()));
 
-        RoleDto role = roleService.getRoleDtoById(RoleConstants.ID);
+        final RoleDto role = roleService.getRoleDtoById(RoleConstants.ID);
 
         assertEquals(expected, role);
     }
 
+    /**
+     * Verifies that get Role By Name role Found success.
+     */
     @Test
-    public void testGetRoleByName_roleFound_success() {
-        Role expected = RoleFactory.getDefaultRole();
+    void testGetRoleByName_roleFound_success() {
+        final Role expected = RoleFactory.getDefaultRole();
 
         when(roleRepository.findRoleByName(anyString())).thenReturn(Optional.of(expected));
 
-        Role role = roleService.getRoleByName(RoleConstants.NAME);
+        final Role role = roleService.getRoleByName(RoleConstants.NAME);
 
         assertEquals(expected, role);
     }
 
+    /**
+     * Verifies that get Role By Name role Not Found throw Role Not Found Exception.
+     */
     @Test
-    public void testGetRoleByName_roleNotFound_throwRoleNotFoundException() {
+    void testGetRoleByName_roleNotFound_throwRoleNotFoundException() {
         assertThrows(RoleNotFoundException.class, () -> {
 
             when(roleRepository.findRoleByName(anyString())).thenReturn(Optional.empty());
@@ -124,36 +151,45 @@ public class RoleServiceTest {
         });
     }
 
+    /**
+     * Verifies that get Role DTO By Name role DTO Found success.
+     */
     @Test
-    public void testGetRoleDtoByName_roleDtoFound_success() {
-        RoleDto expected = RoleFactory.getDefaultRoleDto();
+    void testGetRoleDtoByName_roleDtoFound_success() {
+        final RoleDto expected = RoleFactory.getDefaultRoleDto();
 
         when(roleMapper.mapRoleToRoleDto(any())).thenReturn(expected);
         when(roleRepository.findRoleByName(anyString())).thenReturn(Optional.of(RoleFactory.getDefaultRole()));
 
-        RoleDto role = roleService.getRoleDtoByName(RoleConstants.NAME);
+        final RoleDto role = roleService.getRoleDtoByName(RoleConstants.NAME);
 
         assertEquals(expected, role);
     }
 
+    /**
+     * Verifies that update Role role Updated success.
+     */
     @Test
-    public void testUpdateRole_roleUpdated_success() {
-        RoleDto expected = RoleFactory.getDefaultRoleDto();
+    void testUpdateRole_roleUpdated_success() {
+        final RoleDto expected = RoleFactory.getDefaultRoleDto();
 
         when(roleMapper.mapRoleToRoleDto(any())).thenReturn(expected);
         when(roleRepository.findById(anyInt())).thenReturn(Optional.of(new Role()));
         when(roleRepository.save(any())).thenReturn(RoleFactory.getDefaultRole());
 
-        RoleDto role = roleService.updateRole(RoleFactory.getDefaultRoleRequest(), RoleConstants.ID);
+        final RoleDto role = roleService.updateRole(RoleFactory.getDefaultRoleRequest(), RoleConstants.ID);
 
         assertEquals(expected, role);
     }
 
+    /**
+     * Verifies that add Role role Exists throws Role Already Exists Exception.
+     */
     @Test
-    public void testAddRole_roleExists_throwsRoleAlreadyExistsException() {
+    void testAddRole_roleExists_throwsRoleAlreadyExistsException() {
         assertThrows(RoleAlreadyExistsException.class, () -> {
 
-            RoleDto expected = RoleFactory.getDefaultRoleDto();
+            final RoleDto expected = RoleFactory.getDefaultRoleDto();
 
             when(roleRepository.findRoleByName(anyString())).thenReturn(Optional.of(new Role()));
 
@@ -162,14 +198,17 @@ public class RoleServiceTest {
         });
     }
 
+    /**
+     * Verifies that delete Role role Deleted success.
+     */
     @Test
-    public void testDeleteRole_roleDeleted_success() {
-        RoleDto expected = RoleFactory.getDefaultRoleDto();
+    void testDeleteRole_roleDeleted_success() {
+        final RoleDto expected = RoleFactory.getDefaultRoleDto();
 
         when(roleMapper.mapRoleToRoleDto(any())).thenReturn(expected);
         when(roleRepository.findById(anyInt())).thenReturn(Optional.of(RoleFactory.getDefaultRole()));
 
-        RoleDto role = roleService.deleteRole(RoleConstants.ID);
+        final RoleDto role = roleService.deleteRole(RoleConstants.ID);
 
         assertEquals(expected, role);
     }
