@@ -1,7 +1,7 @@
 # CineLedger
 
-API-first, stateless Spring Boot backend for cinema management. The project exposes REST endpoints for catalog,
-scheduling, ordering, reporting, reviews, and user/security workflows for external clients (frontend/Postman).
+API-first, stateless Spring Boot backend for cinema management. The project exposes REST endpoints for a catalog,
+scheduling, ordering, reporting, reviews and user/security workflows for external clients (frontend/Postman).
 
 ## Tech Stack
 
@@ -87,9 +87,9 @@ mvn spring-boot:run
 - Uses stateless security configuration.
 - `spring.jpa.open-in-view` is disabled.
 - Sensitive values are externalized via environment variables.
-- Liquibase manages the schema and Hibernate validates it on startup.
+- Liquibase manages the schema and Hibernate validates it on a startup.
 - Liquibase expects a clean `cineledger` database for first startup and applies `001-init-schema.sql`.
-- Core roles (`ADMIN`, `VENDOR`, `USER`) can be bootstrapped automatically on startup.
+- Core roles (`ADMIN`, `VENDOR`, `USER`) can be bootstrapped automatically on a startup.
 - An initial admin user can be bootstrapped when `APP_BOOTSTRAP_ADMIN_*` values are provided.
 - JWT auth uses the app-specific cookie name `CINELEDGER_AUTH`.
 - `GET /csrf` is available for clients that need to fetch the CSRF token explicitly.
