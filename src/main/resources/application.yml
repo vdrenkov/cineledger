@@ -1,0 +1,54 @@
+jwt:
+  secret: ${JWT_SECRET}
+  cookie:
+    secure: ${JWT_COOKIE_SECURE:true}
+    same-site: ${JWT_COOKIE_SAME_SITE:Lax}
+
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/cineledger}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate:
+        default_schema: public
+    hibernate:
+      ddl-auto: validate
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+
+logging:
+  file:
+    name: logs/log.log
+  pattern:
+    file: '%d{dd-MM-yyyy HH:mm:ss} [%thread] %-5level %logger{36}.%M -%msg%n'
+  level:
+    root: INFO
+    bg.vdrenkov.cineledger: INFO
+
+app:
+  bootstrap:
+    roles: ${APP_BOOTSTRAP_ROLES:true}
+    admin:
+      username: ${APP_BOOTSTRAP_ADMIN_USERNAME:}
+      password: ${APP_BOOTSTRAP_ADMIN_PASSWORD:}
+      email: ${APP_BOOTSTRAP_ADMIN_EMAIL:}
+      first-name: ${APP_BOOTSTRAP_ADMIN_FIRST_NAME:}
+      last-name: ${APP_BOOTSTRAP_ADMIN_LAST_NAME:}
+
+api:
+  key: ${MAILJET_API_KEY:}
+  secret: ${MAILJET_API_SECRET:}
+
+mail:
+  sender:
+    email: ${MAIL_SENDER_EMAIL:no-reply@cineledger.dev}
+    name: ${MAIL_SENDER_NAME:CineLedger}
+
+imdb:
+  key: ${IMDB_API_KEY:}
+  url: ${IMDB_API_URL:https://imdb-api.com/en/API/}
+
+

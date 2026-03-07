@@ -1,0 +1,21 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-init-schema
+      author: vdrenkov
+      validCheckSum:
+        - 9:5f907fa6cf7a097be0526e88302cb8ea
+      changes:
+        - sqlFile:
+            path: db/changelog/changes/001-init-schema.sql
+            relativeToChangelogFile: false
+            splitStatements: true
+            stripComments: false
+  - changeSet:
+      id: 002-fix-movie-runtime-type
+      author: vdrenkov
+      changes:
+        - sqlFile:
+            path: db/changelog/changes/002-fix-movie-runtime-type.sql
+            relativeToChangelogFile: false
+            splitStatements: true
+            stripComments: false
