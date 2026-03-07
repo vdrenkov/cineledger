@@ -12,7 +12,6 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 public class OrderDto {
-
     private int id;
     private LocalDate dateOfPurchase;
     private UserDto user;

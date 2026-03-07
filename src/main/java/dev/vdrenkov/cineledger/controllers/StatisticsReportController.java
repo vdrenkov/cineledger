@@ -19,7 +19,6 @@ import java.time.LocalDate;
  */
 @RestController
 public class StatisticsReportController {
-
     private static final Logger log = LoggerFactory.getLogger(StatisticsReportController.class);
 
     private final StatisticsReportService statisticsReportService;

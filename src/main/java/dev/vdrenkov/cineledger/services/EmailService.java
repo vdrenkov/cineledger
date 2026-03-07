@@ -23,7 +23,6 @@ import org.springframework.util.StringUtils;
  */
 @Service
 public class EmailService {
-
     private static final Logger log = LoggerFactory.getLogger(EmailService.class);
     private final String apiKey;
     private final String apiSecretKey;

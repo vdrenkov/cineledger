@@ -1,11 +1,11 @@
 package dev.vdrenkov.cineledger.controllers;
 
 import dev.vdrenkov.cineledger.services.ReviewService;
-import dev.vdrenkov.cineledger.testutils.constants.CinemaConstants;
-import dev.vdrenkov.cineledger.testutils.constants.MovieConstants;
-import dev.vdrenkov.cineledger.testutils.constants.UserConstants;
-import dev.vdrenkov.cineledger.testutils.factories.CinemaFactory;
-import dev.vdrenkov.cineledger.testutils.factories.ReviewFactory;
+import dev.vdrenkov.cineledger.testutil.constants.CinemaConstants;
+import dev.vdrenkov.cineledger.testutil.constants.MovieConstants;
+import dev.vdrenkov.cineledger.testutil.constants.UserConstants;
+import dev.vdrenkov.cineledger.testutil.factories.CinemaFactory;
+import dev.vdrenkov.cineledger.testutil.factories.ReviewFactory;
 import dev.vdrenkov.cineledger.utils.constants.URIConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,10 +19,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import tools.jackson.databind.ObjectMapper;
 
-import static dev.vdrenkov.cineledger.testutils.constants.ReviewConstants.DATE_MODIFIED;
-import static dev.vdrenkov.cineledger.testutils.constants.ReviewConstants.ID;
-import static dev.vdrenkov.cineledger.testutils.constants.ReviewConstants.RATING;
-import static dev.vdrenkov.cineledger.testutils.constants.ReviewConstants.REVIEW_TEXT;
+import static dev.vdrenkov.cineledger.testutil.constants.ReviewConstants.DATE_MODIFIED;
+import static dev.vdrenkov.cineledger.testutil.constants.ReviewConstants.ID;
+import static dev.vdrenkov.cineledger.testutil.constants.ReviewConstants.RATING;
+import static dev.vdrenkov.cineledger.testutil.constants.ReviewConstants.REVIEW_TEXT;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -41,7 +41,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc
 class ReviewControllerTest {
-
     private static final String REVIEW_ID_PATH_PLACEHOLDER = "/reviews/1";
     private static final String RETURN_OLD = "returnOld";
 

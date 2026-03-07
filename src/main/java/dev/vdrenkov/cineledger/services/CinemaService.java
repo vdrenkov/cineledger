@@ -21,7 +21,6 @@ import java.util.Objects;
  */
 @Service
 public class CinemaService {
-
     private static final Logger log = LoggerFactory.getLogger(CinemaService.class);
 
     private final CinemaRepository cinemaRepository;

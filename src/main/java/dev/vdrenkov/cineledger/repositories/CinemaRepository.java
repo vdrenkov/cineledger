@@ -12,7 +12,6 @@ import java.util.Optional;
  */
 @Repository
 public interface CinemaRepository extends JpaRepository<Cinema, Integer> {
-
     List<Cinema> findAllByCity(String city);
 
     List<Cinema> findAllByAddress(String address);

@@ -15,7 +15,6 @@ import org.springframework.web.client.RestTemplate;
  */
 @Service
 public class ImdbService {
-
     private static final Logger log = LoggerFactory.getLogger(ImdbService.class);
 
     private final RestTemplate restTemplate;

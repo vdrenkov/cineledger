@@ -24,7 +24,6 @@ import java.util.Objects;
  */
 @Service
 public class ProgramService {
-
     private static final Logger log = LoggerFactory.getLogger(ProgramService.class);
 
     private final ProgramRepository programRepository;

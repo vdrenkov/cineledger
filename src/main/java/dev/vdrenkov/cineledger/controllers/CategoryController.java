@@ -28,7 +28,6 @@ import java.util.List;
  */
 @RestController
 public class CategoryController {
-
     private static final Logger log = LoggerFactory.getLogger(CategoryController.class);
     private final CategoryService categoryService;
 

@@ -1,8 +1,8 @@
 package dev.vdrenkov.cineledger.mappers;
 
 import dev.vdrenkov.cineledger.models.dtos.ItemDto;
-import dev.vdrenkov.cineledger.testutils.constants.ItemConstants;
-import dev.vdrenkov.cineledger.testutils.factories.ItemFactory;
+import dev.vdrenkov.cineledger.testutil.constants.ItemConstants;
+import dev.vdrenkov.cineledger.testutil.factories.ItemFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

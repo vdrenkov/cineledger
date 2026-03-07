@@ -19,7 +19,6 @@ import java.time.LocalDate;
  */
 @RestController
 public class IncomeReportController {
-
     private static final Logger log = LoggerFactory.getLogger(IncomeReportController.class);
 
     private final IncomeReportService incomeReportService;

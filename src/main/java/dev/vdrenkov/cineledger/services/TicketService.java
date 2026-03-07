@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
  */
 @Service
 public class TicketService {
-
     private static final Logger log = LoggerFactory.getLogger(TicketService.class);
 
     private final ProjectionService projectionService;

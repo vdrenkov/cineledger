@@ -25,7 +25,6 @@ import java.util.List;
  */
 @RestController
 public class TicketController {
-
     private static final Logger log = LoggerFactory.getLogger(TicketController.class);
 
     private final TicketService ticketService;

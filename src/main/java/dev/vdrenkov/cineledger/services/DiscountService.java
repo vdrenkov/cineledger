@@ -20,7 +20,6 @@ import java.util.List;
  */
 @Service
 public class DiscountService {
-
     private static final Logger log = LoggerFactory.getLogger(DiscountService.class);
 
     private final DiscountRepository discountRepository;

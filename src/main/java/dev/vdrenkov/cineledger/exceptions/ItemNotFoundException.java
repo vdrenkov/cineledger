@@ -4,7 +4,6 @@ package dev.vdrenkov.cineledger.exceptions;
  * Signals that the requested item could not be found.
  */
 public class ItemNotFoundException extends RuntimeException {
-
     /**
      * Creates the exception with the supplied message.
      *

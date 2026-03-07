@@ -24,7 +24,6 @@ import java.util.List;
  */
 @Service
 public class ProjectionService {
-
     private static final Logger log = LoggerFactory.getLogger(ProjectionService.class);
 
     private final ProjectionRepository projectionRepository;

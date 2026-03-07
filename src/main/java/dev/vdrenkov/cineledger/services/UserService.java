@@ -42,7 +42,6 @@ import java.util.stream.Collectors;
  */
 @Service
 public class UserService {
-
     private static final Logger log = LoggerFactory.getLogger(UserService.class);
     private static final String RECOVERY_PASSWORD_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%&*";
     private static final int RECOVERY_PASSWORD_LENGTH = 12;

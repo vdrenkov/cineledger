@@ -1,8 +1,8 @@
 package dev.vdrenkov.cineledger.controllers;
 
 import dev.vdrenkov.cineledger.services.ProgramService;
-import dev.vdrenkov.cineledger.testutils.constants.CinemaConstants;
-import dev.vdrenkov.cineledger.testutils.factories.ProgramFactory;
+import dev.vdrenkov.cineledger.testutil.constants.CinemaConstants;
+import dev.vdrenkov.cineledger.testutil.factories.ProgramFactory;
 import dev.vdrenkov.cineledger.utils.constants.URIConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,8 +20,8 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.time.format.DateTimeFormatter;
 
-import static dev.vdrenkov.cineledger.testutils.constants.ProgramConstants.DATE;
-import static dev.vdrenkov.cineledger.testutils.constants.ProgramConstants.ID;
+import static dev.vdrenkov.cineledger.testutil.constants.ProgramConstants.DATE;
+import static dev.vdrenkov.cineledger.testutil.constants.ProgramConstants.ID;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
@@ -38,7 +38,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc
 class ProgramControllerTest {
-
     private static final String RETURN_OLD = "returnOld";
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private MockMvc mvc;

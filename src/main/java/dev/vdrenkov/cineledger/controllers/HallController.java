@@ -28,7 +28,6 @@ import java.util.List;
  */
 @RestController
 public class HallController {
-
     private static final Logger log = LoggerFactory.getLogger(HallController.class);
 
     private final HallService hallService;

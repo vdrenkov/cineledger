@@ -12,7 +12,6 @@ import java.util.List;
  */
 @Repository
 public interface TicketRepository extends JpaRepository<Ticket, Integer> {
-
     List<Ticket> findTicketByProjectionId(int projectionId);
 
     int countByProjectionId(int projectionId);

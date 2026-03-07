@@ -29,7 +29,6 @@ import java.util.Arrays;
 @EnableWebSecurity
 @Configuration
 public class WebSecurityConfiguration {
-
     private static final String[] AUTH_PATH = { "/csrf", "/login", "/registration", "/logout", "/password-recovery"
     };
 

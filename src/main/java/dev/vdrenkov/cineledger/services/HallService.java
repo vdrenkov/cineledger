@@ -20,7 +20,6 @@ import java.util.List;
  */
 @Service
 public class HallService {
-
     private static final Logger log = LoggerFactory.getLogger(HallService.class);
 
     private final HallRepository hallRepository;

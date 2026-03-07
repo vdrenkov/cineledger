@@ -22,7 +22,6 @@ import static org.mockito.Mockito.when;
  */
 @ExtendWith(MockitoExtension.class)
 class ImdbServiceTest {
-
     private static final String IMDB_KEY = "test-key";
 
     private static final String BASE_URL = "https://imdb-api.com/en/API/";

@@ -11,7 +11,6 @@ import java.util.List;
  */
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, Integer> {
-
     List<Review> findAll();
 
     List<Review> findByCinemaId(int cinemaId);

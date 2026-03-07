@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
  */
 @Component
 public class CategoryMapper {
-
     private static final Logger log = LoggerFactory.getLogger(CategoryMapper.class);
 
     /**

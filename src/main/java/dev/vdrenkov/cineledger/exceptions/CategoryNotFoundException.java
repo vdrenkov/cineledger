@@ -4,7 +4,6 @@ package dev.vdrenkov.cineledger.exceptions;
  * Signals that the requested category could not be found.
  */
 public class CategoryNotFoundException extends RuntimeException {
-
     /**
      * Creates the exception with the supplied message.
      *

@@ -10,7 +10,6 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 @SpringBootApplication
 @ConfigurationPropertiesScan
 public class CineLedgerApplication {
-
     /**
      * Boots the application with the provided startup arguments.
      *

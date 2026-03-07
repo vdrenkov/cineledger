@@ -1,13 +1,13 @@
 package dev.vdrenkov.cineledger.jwt;
 
-import dev.vdrenkov.cineledger.testutils.factories.JwtFactory;
+import dev.vdrenkov.cineledger.testutil.factories.JwtFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Date;
+import java.time.Instant;
 
-import static dev.vdrenkov.cineledger.testutils.constants.JwtConstants.JWT_USERNAME;
-import static dev.vdrenkov.cineledger.testutils.constants.JwtConstants.NOW;
+import static dev.vdrenkov.cineledger.testutil.constants.JwtConstants.JWT_USERNAME;
+import static dev.vdrenkov.cineledger.testutil.constants.JwtConstants.NOW;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -16,8 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Tests jwt token util behavior.
  */
 class JwtTokenUtilTest {
-
-    private static final String SECRET = "test-secret-for-jwt-tests-should-be-at-least-thirty-two-characters";
+    private static final String SECRET = "gD7rL2vQ9mX4pNc8sH1tWy5kZa3uEf6jRb0qMn7cTy2wKs9hPv4xLd8nFg5rQb1sU";
 
     private final JwtTokenUtil jwtTokenUtil = new JwtTokenUtil();
 
@@ -41,13 +40,13 @@ class JwtTokenUtilTest {
     }
 
     /**
-     * Verifies that get Expiration Date From Token date Valid returns True.
+     * Verifies that get Expiration Instant From Token date Valid returns True.
      */
     @Test
-    void testGetExpirationDateFromToken_dateValid_returnsTrue() {
-        final Date date = jwtTokenUtil.getExpirationDateFromToken(JwtFactory.getDefaultJwtToken());
+    void testGetExpirationInstantFromToken_dateValid_returnsTrue() {
+        final Instant expiration = jwtTokenUtil.getExpirationInstantFromToken(JwtFactory.getDefaultJwtToken());
 
-        assertTrue(date.after(NOW));
+        assertTrue(expiration.isAfter(NOW.toInstant()));
     }
 
     /**

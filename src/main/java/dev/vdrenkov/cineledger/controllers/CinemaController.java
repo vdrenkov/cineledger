@@ -28,7 +28,6 @@ import java.util.List;
  */
 @RestController
 public class CinemaController {
-
     private static final Logger log = LoggerFactory.getLogger(CinemaController.class);
 
     private final CinemaService cinemaService;

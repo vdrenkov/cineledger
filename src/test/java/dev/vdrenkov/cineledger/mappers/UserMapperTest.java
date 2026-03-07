@@ -2,9 +2,9 @@ package dev.vdrenkov.cineledger.mappers;
 
 import dev.vdrenkov.cineledger.models.dtos.UserDto;
 import dev.vdrenkov.cineledger.models.entities.User;
-import dev.vdrenkov.cineledger.testutils.constants.UserConstants;
-import dev.vdrenkov.cineledger.testutils.factories.RoleFactory;
-import dev.vdrenkov.cineledger.testutils.factories.UserFactory;
+import dev.vdrenkov.cineledger.testutil.constants.UserConstants;
+import dev.vdrenkov.cineledger.testutil.factories.RoleFactory;
+import dev.vdrenkov.cineledger.testutil.factories.UserFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -52,8 +52,9 @@ class UserMapperTest {
             Assertions.assertEquals(expectedDto.getFirstName(), actualDto.getFirstName());
             Assertions.assertEquals(expectedDto.getLastName(), actualDto.getLastName());
             Assertions.assertEquals(expectedDto.getJoinDate(), actualDto.getJoinDate());
-            Assertions.assertEquals(expectedDto.getRoles().get(0).getId(), actualDto.getRoles().get(0).getId());
-            Assertions.assertEquals(expectedDto.getRoles().get(0).getName(), actualDto.getRoles().get(0).getName());
+            Assertions.assertEquals(expectedDto.getRoles().getFirst().getId(), actualDto.getRoles().getFirst().getId());
+            Assertions.assertEquals(expectedDto.getRoles().getFirst().getName(),
+                actualDto.getRoles().getFirst().getName());
         }
     }
 
@@ -72,8 +73,8 @@ class UserMapperTest {
         Assertions.assertEquals(UserConstants.FIRST_NAME, actualDto.getFirstName());
         Assertions.assertEquals(UserConstants.LAST_NAME, actualDto.getLastName());
         Assertions.assertEquals(UserConstants.JOIN_DATE, actualDto.getJoinDate());
-        Assertions.assertEquals(RoleFactory.getDefaultRoleDtoList().get(0).getName(),
-            actualDto.getRoles().get(0).getName());
+        Assertions.assertEquals(RoleFactory.getDefaultRoleDtoList().getFirst().getName(),
+            actualDto.getRoles().getFirst().getName());
     }
 }
 

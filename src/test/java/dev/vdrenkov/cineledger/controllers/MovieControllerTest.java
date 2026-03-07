@@ -2,8 +2,8 @@ package dev.vdrenkov.cineledger.controllers;
 
 import dev.vdrenkov.cineledger.models.dtos.MovieDto;
 import dev.vdrenkov.cineledger.services.MovieService;
-import dev.vdrenkov.cineledger.testutils.factories.CategoryFactory;
-import dev.vdrenkov.cineledger.testutils.factories.MovieFactory;
+import dev.vdrenkov.cineledger.testutil.factories.CategoryFactory;
+import dev.vdrenkov.cineledger.testutil.factories.MovieFactory;
 import dev.vdrenkov.cineledger.utils.constants.URIConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,15 +21,15 @@ import tools.jackson.databind.ObjectMapper;
 import java.util.Collections;
 import java.util.List;
 
-import static dev.vdrenkov.cineledger.testutils.constants.MovieConstants.DESCRIPTION;
-import static dev.vdrenkov.cineledger.testutils.constants.MovieConstants.ID;
-import static dev.vdrenkov.cineledger.testutils.constants.MovieConstants.RATING;
-import static dev.vdrenkov.cineledger.testutils.constants.MovieConstants.RELEASE_DATE;
-import static dev.vdrenkov.cineledger.testutils.constants.MovieConstants.RUNTIME;
-import static dev.vdrenkov.cineledger.testutils.constants.MovieConstants.TITLE;
-import static dev.vdrenkov.cineledger.testutils.factories.MovieFactory.getDefaultMovieDto;
-import static dev.vdrenkov.cineledger.testutils.factories.MovieFactory.getDefaultMovieDtoList;
-import static dev.vdrenkov.cineledger.testutils.factories.MovieFactory.getDefaultMovieRequest;
+import static dev.vdrenkov.cineledger.testutil.constants.MovieConstants.DESCRIPTION;
+import static dev.vdrenkov.cineledger.testutil.constants.MovieConstants.ID;
+import static dev.vdrenkov.cineledger.testutil.constants.MovieConstants.RATING;
+import static dev.vdrenkov.cineledger.testutil.constants.MovieConstants.RELEASE_DATE;
+import static dev.vdrenkov.cineledger.testutil.constants.MovieConstants.RUNTIME;
+import static dev.vdrenkov.cineledger.testutil.constants.MovieConstants.TITLE;
+import static dev.vdrenkov.cineledger.testutil.factories.MovieFactory.getDefaultMovieDto;
+import static dev.vdrenkov.cineledger.testutil.factories.MovieFactory.getDefaultMovieDtoList;
+import static dev.vdrenkov.cineledger.testutil.factories.MovieFactory.getDefaultMovieRequest;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyDouble;
@@ -50,7 +50,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ExtendWith(MockitoExtension.class)
 class MovieControllerTest {
-
     private static final String RETURN_OLD = "returnOld";
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private MockMvc mockMvc;

@@ -12,7 +12,6 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 public class UserDto {
-
     private int id;
     private String username;
     private String email;

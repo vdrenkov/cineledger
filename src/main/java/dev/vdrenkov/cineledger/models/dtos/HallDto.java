@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class HallDto {
-
     private int id;
     private int capacity;
     private CinemaDto cinema;

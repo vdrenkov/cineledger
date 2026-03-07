@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
  */
 @Component
 public class TicketMapper {
-
     private static final Logger log = LoggerFactory.getLogger(TicketMapper.class);
 
     private final ProjectionMapper projectionMapper;

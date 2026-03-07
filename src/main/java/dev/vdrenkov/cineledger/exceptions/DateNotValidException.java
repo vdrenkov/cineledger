@@ -4,7 +4,6 @@ package dev.vdrenkov.cineledger.exceptions;
  * Signals that a submitted date violates the application validation rules.
  */
 public class DateNotValidException extends RuntimeException {
-
     /**
      * Creates the exception with the supplied message.
      *

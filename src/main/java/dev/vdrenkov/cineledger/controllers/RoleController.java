@@ -28,7 +28,6 @@ import java.util.List;
  */
 @RestController
 public class RoleController {
-
     private static final Logger log = LoggerFactory.getLogger(RoleController.class);
 
     private final RoleService roleService;

@@ -23,7 +23,6 @@ import java.util.List;
  */
 @Service
 public class ItemService {
-
     private static final Logger log = LoggerFactory.getLogger(ItemService.class);
 
     private final ItemRepository itemRepository;

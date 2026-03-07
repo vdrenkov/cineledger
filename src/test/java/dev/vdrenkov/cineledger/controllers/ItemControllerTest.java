@@ -1,7 +1,7 @@
 package dev.vdrenkov.cineledger.controllers;
 
 import dev.vdrenkov.cineledger.services.ItemService;
-import dev.vdrenkov.cineledger.testutils.factories.ItemFactory;
+import dev.vdrenkov.cineledger.testutil.factories.ItemFactory;
 import dev.vdrenkov.cineledger.utils.constants.URIConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,11 +18,11 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.util.Collections;
 
-import static dev.vdrenkov.cineledger.testutils.constants.ItemConstants.ID;
-import static dev.vdrenkov.cineledger.testutils.constants.ItemConstants.IS_BELLOW;
-import static dev.vdrenkov.cineledger.testutils.constants.ItemConstants.NAME;
-import static dev.vdrenkov.cineledger.testutils.constants.ItemConstants.PRICE;
-import static dev.vdrenkov.cineledger.testutils.constants.ItemConstants.QUANTITY;
+import static dev.vdrenkov.cineledger.testutil.constants.ItemConstants.ID;
+import static dev.vdrenkov.cineledger.testutil.constants.ItemConstants.IS_BELLOW;
+import static dev.vdrenkov.cineledger.testutil.constants.ItemConstants.NAME;
+import static dev.vdrenkov.cineledger.testutil.constants.ItemConstants.PRICE;
+import static dev.vdrenkov.cineledger.testutil.constants.ItemConstants.QUANTITY;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -41,7 +41,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc
 class ItemControllerTest {
-
     private MockMvc mockMvc;
 
     @Mock

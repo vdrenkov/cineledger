@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
  */
 @Service
 public class MovieService {
-
     private static final Logger log = LoggerFactory.getLogger(MovieService.class);
 
     private final MovieRepository movieRepository;

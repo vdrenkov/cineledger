@@ -1,11 +1,10 @@
 package dev.vdrenkov.cineledger.mappers;
 
 import dev.vdrenkov.cineledger.models.dtos.TicketDto;
-import dev.vdrenkov.cineledger.testutils.constants.ProjectionConstants;
-import dev.vdrenkov.cineledger.testutils.constants.TicketConstants;
-import dev.vdrenkov.cineledger.testutils.factories.ProjectionFactory;
-import dev.vdrenkov.cineledger.testutils.factories.TicketFactory;
-import org.junit.jupiter.api.Assertions;
+import dev.vdrenkov.cineledger.testutil.constants.ProjectionConstants;
+import dev.vdrenkov.cineledger.testutil.constants.TicketConstants;
+import dev.vdrenkov.cineledger.testutil.factories.ProjectionFactory;
+import dev.vdrenkov.cineledger.testutil.factories.TicketFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -14,7 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -40,9 +39,9 @@ class TicketMapperTest {
 
         final TicketDto ticket = ticketMapper.mapTicketToTicketDto(TicketFactory.getDefaultTicket());
 
-        Assertions.assertEquals(ticket.getId(), TicketConstants.ID);
-        Assertions.assertEquals(ticket.getDateOfPurchase(), TicketConstants.DATE_OF_PURCHASE);
-        Assertions.assertEquals(ticket.getProjection().getStartTime(), ProjectionConstants.START_TIME);
+        assertEquals(TicketConstants.ID, ticket.getId());
+        assertEquals(TicketConstants.DATE_OF_PURCHASE, ticket.getDateOfPurchase());
+        assertEquals(ProjectionConstants.START_TIME, ticket.getProjection().getStartTime());
     }
 
     /**
@@ -54,11 +53,11 @@ class TicketMapperTest {
             ProjectionFactory.getDefaultProjectionDto());
 
         final List<TicketDto> ticketDtos = ticketMapper.mapTicketToDtoList(TicketFactory.getDefaultTicketList());
-        final TicketDto ticket = ticketDtos.get(0);
+        final TicketDto ticket = ticketDtos.getFirst();
 
-        Assertions.assertEquals(ticket.getId(), TicketConstants.ID);
-        Assertions.assertEquals(ticket.getDateOfPurchase(), TicketConstants.DATE_OF_PURCHASE);
-        assertEquals(ticket.getProjection().getStartTime(), ProjectionConstants.START_TIME);
+        assertEquals(TicketConstants.ID, ticket.getId());
+        assertEquals(TicketConstants.DATE_OF_PURCHASE, ticket.getDateOfPurchase());
+        assertEquals(ProjectionConstants.START_TIME, ticket.getProjection().getStartTime());
     }
 }
 

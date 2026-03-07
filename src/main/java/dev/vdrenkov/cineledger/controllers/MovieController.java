@@ -30,7 +30,6 @@ import java.util.List;
  */
 @RestController
 public class MovieController {
-
     private static final Logger log = LoggerFactory.getLogger(MovieController.class);
 
     private final MovieService movieService;

@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
  */
 @Component
 public class CinemaMapper {
-
     private static final Logger log = LoggerFactory.getLogger(CinemaMapper.class);
 
     /**

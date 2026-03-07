@@ -2,11 +2,11 @@ package dev.vdrenkov.cineledger.services;
 
 import dev.vdrenkov.cineledger.models.dtos.ItemDto;
 import dev.vdrenkov.cineledger.models.entities.Category;
-import dev.vdrenkov.cineledger.testutils.constants.ItemConstants;
-import dev.vdrenkov.cineledger.testutils.constants.MovieConstants;
-import dev.vdrenkov.cineledger.testutils.constants.ReportConstants;
-import dev.vdrenkov.cineledger.testutils.factories.OrderFactory;
-import dev.vdrenkov.cineledger.testutils.factories.TicketFactory;
+import dev.vdrenkov.cineledger.testutil.constants.ItemConstants;
+import dev.vdrenkov.cineledger.testutil.constants.MovieConstants;
+import dev.vdrenkov.cineledger.testutil.constants.ReportConstants;
+import dev.vdrenkov.cineledger.testutil.factories.OrderFactory;
+import dev.vdrenkov.cineledger.testutil.factories.TicketFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

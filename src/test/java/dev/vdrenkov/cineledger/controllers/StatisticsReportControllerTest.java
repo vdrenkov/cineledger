@@ -1,8 +1,8 @@
 package dev.vdrenkov.cineledger.controllers;
 
 import dev.vdrenkov.cineledger.services.StatisticsReportService;
-import dev.vdrenkov.cineledger.testutils.constants.ItemConstants;
-import dev.vdrenkov.cineledger.testutils.constants.MovieConstants;
+import dev.vdrenkov.cineledger.testutil.constants.ItemConstants;
+import dev.vdrenkov.cineledger.testutil.constants.MovieConstants;
 import dev.vdrenkov.cineledger.utils.constants.URIConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,9 +14,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static dev.vdrenkov.cineledger.testutils.constants.MovieConstants.ID;
-import static dev.vdrenkov.cineledger.testutils.constants.ReportConstants.END_DATE;
-import static dev.vdrenkov.cineledger.testutils.constants.ReportConstants.START_DATE;
+import static dev.vdrenkov.cineledger.testutil.constants.MovieConstants.ID;
+import static dev.vdrenkov.cineledger.testutil.constants.ReportConstants.END_DATE;
+import static dev.vdrenkov.cineledger.testutil.constants.ReportConstants.START_DATE;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -30,7 +30,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @ExtendWith(MockitoExtension.class)
 class StatisticsReportControllerTest {
-
     private MockMvc mockMvc;
 
     @Mock

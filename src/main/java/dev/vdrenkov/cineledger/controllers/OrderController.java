@@ -29,7 +29,6 @@ import java.util.List;
  */
 @RestController
 public class OrderController {
-
     private static final Logger log = LoggerFactory.getLogger(OrderController.class);
 
     private final OrderService orderService;

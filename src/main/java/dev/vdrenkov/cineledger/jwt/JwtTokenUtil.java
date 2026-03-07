@@ -14,7 +14,6 @@ import javax.crypto.SecretKey;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -24,7 +23,6 @@ import java.util.function.Function;
  */
 @Component
 public class JwtTokenUtil implements Serializable {
-
     private final Logger log = LoggerFactory.getLogger(JwtTokenUtil.class);
 
     @Value("${jwt.secret}")
@@ -57,11 +55,11 @@ public class JwtTokenUtil implements Serializable {
      *
      * @param token
      *     JWT token value
-     * @return requested date value
+     * @return requested instant value
      */
-    public Date getExpirationDateFromToken(final String token) {
+    public Instant getExpirationInstantFromToken(final String token) {
         log.info("An attempt to extract the expiration date from the JWT token");
-        return getClaimFromToken(token, Claims::getExpiration);
+        return getClaimFromToken(token, claims -> claims.getExpiration().toInstant());
     }
 
     /**
@@ -85,9 +83,9 @@ public class JwtTokenUtil implements Serializable {
     }
 
     private boolean isTokenExpired(final String token) {
-        final Date expiration = getExpirationDateFromToken(token);
+        final Instant expiration = getExpirationInstantFromToken(token);
         log.info("An attempt to check whether the JWT has expired");
-        return expiration.before(new Date());
+        return expiration.isBefore(Instant.now());
     }
 
     /**
@@ -111,8 +109,8 @@ public class JwtTokenUtil implements Serializable {
             .builder()
             .claims(claims)
             .subject(subject)
-            .issuedAt(Date.from(now))
-            .expiration(Date.from(expiration))
+            .issuedAt(java.util.Date.from(now))
+            .expiration(java.util.Date.from(expiration))
             .signWith(getSigningKey(), Jwts.SIG.HS512)
             .compact();
     }

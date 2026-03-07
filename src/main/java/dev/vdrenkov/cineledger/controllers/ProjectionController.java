@@ -30,7 +30,6 @@ import java.util.List;
  */
 @RestController
 public class ProjectionController {
-
     private static final Logger log = LoggerFactory.getLogger(ProjectionController.class);
 
     private final ProjectionService projectionService;

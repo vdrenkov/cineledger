@@ -28,7 +28,6 @@ import java.util.List;
  */
 @RestController
 public class DiscountController {
-
     private static final Logger log = LoggerFactory.getLogger(DiscountController.class);
 
     private final DiscountService discountService;

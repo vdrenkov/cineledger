@@ -11,7 +11,6 @@ import java.util.List;
  */
 @Repository
 public interface HallRepository extends JpaRepository<Hall, Integer> {
-
     List<Hall> findAllByCinemaId(int cinemaId);
 }
 

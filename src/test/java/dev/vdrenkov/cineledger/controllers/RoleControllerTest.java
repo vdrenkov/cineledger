@@ -1,7 +1,7 @@
 package dev.vdrenkov.cineledger.controllers;
 
 import dev.vdrenkov.cineledger.services.RoleService;
-import dev.vdrenkov.cineledger.testutils.factories.RoleFactory;
+import dev.vdrenkov.cineledger.testutil.factories.RoleFactory;
 import dev.vdrenkov.cineledger.utils.constants.URIConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,8 +16,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import tools.jackson.databind.ObjectMapper;
 
-import static dev.vdrenkov.cineledger.testutils.constants.RoleConstants.ID;
-import static dev.vdrenkov.cineledger.testutils.constants.RoleConstants.NAME;
+import static dev.vdrenkov.cineledger.testutil.constants.RoleConstants.ID;
+import static dev.vdrenkov.cineledger.testutil.constants.RoleConstants.NAME;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -34,7 +34,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ExtendWith(MockitoExtension.class)
 class RoleControllerTest {
-
     private static final String RETURN_OLD = "returnOld";
     private static final ObjectMapper objectMapper = new ObjectMapper();
 

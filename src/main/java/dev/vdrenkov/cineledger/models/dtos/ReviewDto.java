@@ -12,7 +12,6 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Data
 public class ReviewDto {
-
     private int id;
     private double rating;
     private String reviewText;

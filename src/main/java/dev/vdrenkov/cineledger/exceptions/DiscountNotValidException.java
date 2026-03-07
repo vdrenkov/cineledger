@@ -4,7 +4,6 @@ package dev.vdrenkov.cineledger.exceptions;
  * Signals that the provided discount code does not satisfy the expected format.
  */
 public class DiscountNotValidException extends RuntimeException {
-
     /**
      * Creates the exception with the supplied message.
      *

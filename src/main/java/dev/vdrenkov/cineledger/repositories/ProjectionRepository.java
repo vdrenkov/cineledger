@@ -12,7 +12,6 @@ import java.util.List;
  */
 @Repository
 public interface ProjectionRepository extends JpaRepository<Projection, Integer> {
-
     List<Projection> findProjectionsByProgramId(int id);
 
     List<Projection> findProjectionsByMovieId(int id);

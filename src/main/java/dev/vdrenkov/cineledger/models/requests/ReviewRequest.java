@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class ReviewRequest {
-
     private double rating;
     private String reviewText;
 }

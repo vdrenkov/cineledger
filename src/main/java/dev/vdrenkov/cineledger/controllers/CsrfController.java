@@ -12,7 +12,6 @@ import java.util.Map;
  */
 @RestController
 public class CsrfController {
-
     /**
      * Executes the csrf operation for csrf.
      *

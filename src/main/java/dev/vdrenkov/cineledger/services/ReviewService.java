@@ -25,7 +25,6 @@ import java.util.stream.Collectors;
  */
 @Service
 public class ReviewService {
-
     private static final Logger log = LoggerFactory.getLogger(ReviewService.class);
 
     private final ReviewRepository reviewRepository;

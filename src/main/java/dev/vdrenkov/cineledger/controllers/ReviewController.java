@@ -28,7 +28,6 @@ import java.util.List;
  */
 @RestController
 public class ReviewController {
-
     private static final Logger log = LoggerFactory.getLogger(ReviewController.class);
 
     private final ReviewService reviewService;

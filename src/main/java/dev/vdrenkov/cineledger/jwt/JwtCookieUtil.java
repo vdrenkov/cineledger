@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class JwtCookieUtil {
-
     private final Logger log = LoggerFactory.getLogger(JwtCookieUtil.class);
 
     private final JwtTokenUtil tokenUtil;

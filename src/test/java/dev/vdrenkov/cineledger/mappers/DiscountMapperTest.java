@@ -1,8 +1,8 @@
 package dev.vdrenkov.cineledger.mappers;
 
 import dev.vdrenkov.cineledger.models.dtos.DiscountDto;
-import dev.vdrenkov.cineledger.testutils.constants.DiscountConstants;
-import dev.vdrenkov.cineledger.testutils.factories.DiscountFactory;
+import dev.vdrenkov.cineledger.testutil.constants.DiscountConstants;
+import dev.vdrenkov.cineledger.testutil.factories.DiscountFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -14,7 +14,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Tests discount mapper behavior.
  */
 class DiscountMapperTest {
-
     private final DiscountMapper discountMapper = new DiscountMapper();
 
     /**

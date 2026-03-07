@@ -9,7 +9,6 @@ import org.springframework.web.client.RestTemplate;
  */
 @Configuration
 public class WebConfiguration {
-
     /**
      * Creates the shared RestTemplate bean used for outbound HTTP calls.
      *

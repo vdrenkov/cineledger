@@ -1,9 +1,9 @@
 package dev.vdrenkov.cineledger.mappers;
 
 import dev.vdrenkov.cineledger.models.dtos.HallDto;
-import dev.vdrenkov.cineledger.testutils.constants.HallConstants;
-import dev.vdrenkov.cineledger.testutils.factories.CinemaFactory;
-import dev.vdrenkov.cineledger.testutils.factories.HallFactory;
+import dev.vdrenkov.cineledger.testutil.constants.HallConstants;
+import dev.vdrenkov.cineledger.testutil.factories.CinemaFactory;
+import dev.vdrenkov.cineledger.testutil.factories.HallFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -16,7 +16,6 @@ import java.util.List;
  */
 @Service
 public class StatisticsReportService {
-
     private static final Logger log = LoggerFactory.getLogger(StatisticsReportService.class);
 
     private final TicketService ticketService;

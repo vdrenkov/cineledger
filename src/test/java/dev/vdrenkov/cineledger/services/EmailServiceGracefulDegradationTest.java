@@ -1,13 +1,12 @@
 package dev.vdrenkov.cineledger.services;
 
-import dev.vdrenkov.cineledger.testutils.factories.OrderFactory;
-import dev.vdrenkov.cineledger.testutils.factories.UserFactory;
+import dev.vdrenkov.cineledger.testutil.factories.OrderFactory;
+import dev.vdrenkov.cineledger.testutil.factories.UserFactory;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 class EmailServiceGracefulDegradationTest {
-
     private final EmailService emailService = new EmailService("", "", "no-reply@cineledger.dev", "CineLedger");
 
     @Test

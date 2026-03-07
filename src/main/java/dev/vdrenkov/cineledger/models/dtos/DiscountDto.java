@@ -9,7 +9,6 @@ import lombok.Data;
 @AllArgsConstructor
 @Data
 public class DiscountDto {
-
     private int id;
     private String type;
     private String code;

@@ -1,8 +1,8 @@
 package dev.vdrenkov.cineledger.mappers;
 
 import dev.vdrenkov.cineledger.models.dtos.RoleDto;
-import dev.vdrenkov.cineledger.testutils.constants.RoleConstants;
-import dev.vdrenkov.cineledger.testutils.factories.RoleFactory;
+import dev.vdrenkov.cineledger.testutil.constants.RoleConstants;
+import dev.vdrenkov.cineledger.testutil.factories.RoleFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,8 +38,8 @@ class RoleMapperTest {
     void testMapRolesToRoleDtos_success() {
         final List<RoleDto> result = roleMapper.mapRolesToRoleDtos(RoleFactory.getDefaultRoleList());
 
-        Assertions.assertEquals(RoleConstants.ID, result.get(0).getId());
-        Assertions.assertEquals(RoleConstants.NAME, result.get(0).getName());
+        Assertions.assertEquals(RoleConstants.ID, result.getFirst().getId());
+        Assertions.assertEquals(RoleConstants.NAME, result.getFirst().getName());
     }
 }
 

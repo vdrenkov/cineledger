@@ -10,7 +10,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class CsrfControllerTest {
-
     private final CsrfController csrfController = new CsrfController();
 
     @Test

@@ -7,7 +7,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @ConfigurationProperties(prefix = "app.bootstrap")
 public class BootstrapProperties {
-
     private final Admin admin = new Admin();
     private boolean roles = true;
 

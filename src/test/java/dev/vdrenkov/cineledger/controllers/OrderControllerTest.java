@@ -2,8 +2,8 @@ package dev.vdrenkov.cineledger.controllers;
 
 import dev.vdrenkov.cineledger.models.dtos.OrderDto;
 import dev.vdrenkov.cineledger.services.OrderService;
-import dev.vdrenkov.cineledger.testutils.factories.OrderFactory;
-import dev.vdrenkov.cineledger.testutils.factories.TicketFactory;
+import dev.vdrenkov.cineledger.testutil.factories.OrderFactory;
+import dev.vdrenkov.cineledger.testutil.factories.TicketFactory;
 import dev.vdrenkov.cineledger.utils.constants.URIConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,14 +21,14 @@ import tools.jackson.databind.ObjectMapper;
 import java.util.Collections;
 import java.util.List;
 
-import static dev.vdrenkov.cineledger.testutils.constants.DiscountConstants.CODE;
-import static dev.vdrenkov.cineledger.testutils.constants.RoleConstants.NAME;
-import static dev.vdrenkov.cineledger.testutils.constants.UserConstants.EMAIL;
-import static dev.vdrenkov.cineledger.testutils.constants.UserConstants.FIRST_NAME;
-import static dev.vdrenkov.cineledger.testutils.constants.UserConstants.ID;
-import static dev.vdrenkov.cineledger.testutils.constants.UserConstants.JOIN_DATE;
-import static dev.vdrenkov.cineledger.testutils.constants.UserConstants.LAST_NAME;
-import static dev.vdrenkov.cineledger.testutils.constants.UserConstants.USERNAME;
+import static dev.vdrenkov.cineledger.testutil.constants.DiscountConstants.CODE;
+import static dev.vdrenkov.cineledger.testutil.constants.RoleConstants.NAME;
+import static dev.vdrenkov.cineledger.testutil.constants.UserConstants.EMAIL;
+import static dev.vdrenkov.cineledger.testutil.constants.UserConstants.FIRST_NAME;
+import static dev.vdrenkov.cineledger.testutil.constants.UserConstants.ID;
+import static dev.vdrenkov.cineledger.testutil.constants.UserConstants.JOIN_DATE;
+import static dev.vdrenkov.cineledger.testutil.constants.UserConstants.LAST_NAME;
+import static dev.vdrenkov.cineledger.testutil.constants.UserConstants.USERNAME;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -47,7 +47,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ExtendWith(MockitoExtension.class)
 class OrderControllerTest {
-
     private static final String RETURN_OLD = "returnOld";
     private static final ObjectMapper objectMapper = new ObjectMapper();
 

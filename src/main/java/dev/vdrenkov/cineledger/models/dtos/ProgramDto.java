@@ -11,7 +11,6 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Data
 public class ProgramDto {
-
     private int id;
     private LocalDate programDate;
     private CinemaDto cinema;

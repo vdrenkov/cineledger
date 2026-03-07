@@ -1,11 +1,11 @@
 package dev.vdrenkov.cineledger.controllers;
 
 import dev.vdrenkov.cineledger.services.ProjectionService;
-import dev.vdrenkov.cineledger.testutils.constants.MovieConstants;
-import dev.vdrenkov.cineledger.testutils.constants.ProgramConstants;
-import dev.vdrenkov.cineledger.testutils.factories.CategoryFactory;
-import dev.vdrenkov.cineledger.testutils.factories.CinemaFactory;
-import dev.vdrenkov.cineledger.testutils.factories.HallFactory;
+import dev.vdrenkov.cineledger.testutil.constants.MovieConstants;
+import dev.vdrenkov.cineledger.testutil.constants.ProgramConstants;
+import dev.vdrenkov.cineledger.testutil.factories.CategoryFactory;
+import dev.vdrenkov.cineledger.testutil.factories.CinemaFactory;
+import dev.vdrenkov.cineledger.testutil.factories.HallFactory;
 import dev.vdrenkov.cineledger.utils.constants.URIConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,13 +20,13 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import tools.jackson.databind.ObjectMapper;
 
-import static dev.vdrenkov.cineledger.testutils.constants.ProjectionConstants.ID;
-import static dev.vdrenkov.cineledger.testutils.constants.ProjectionConstants.PRICE;
-import static dev.vdrenkov.cineledger.testutils.constants.ProjectionConstants.START_TIME;
-import static dev.vdrenkov.cineledger.testutils.factories.ProjectionFactory.getDefaultProjection;
-import static dev.vdrenkov.cineledger.testutils.factories.ProjectionFactory.getDefaultProjectionDto;
-import static dev.vdrenkov.cineledger.testutils.factories.ProjectionFactory.getDefaultProjectionDtoList;
-import static dev.vdrenkov.cineledger.testutils.factories.ProjectionFactory.getDefaultProjectionRequest;
+import static dev.vdrenkov.cineledger.testutil.constants.ProjectionConstants.ID;
+import static dev.vdrenkov.cineledger.testutil.constants.ProjectionConstants.PRICE;
+import static dev.vdrenkov.cineledger.testutil.constants.ProjectionConstants.START_TIME;
+import static dev.vdrenkov.cineledger.testutil.factories.ProjectionFactory.getDefaultProjection;
+import static dev.vdrenkov.cineledger.testutil.factories.ProjectionFactory.getDefaultProjectionDto;
+import static dev.vdrenkov.cineledger.testutil.factories.ProjectionFactory.getDefaultProjectionDtoList;
+import static dev.vdrenkov.cineledger.testutil.factories.ProjectionFactory.getDefaultProjectionRequest;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -45,7 +45,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ExtendWith(MockitoExtension.class)
 class ProjectionControllerTest {
-
     private static final String START_TIME_STRING = "startTime";
     private static final String RETURN_OLD = "returnOld";
     private static final String IS_BEFORE = "isBefore";

@@ -15,11 +15,11 @@ import dev.vdrenkov.cineledger.models.entities.Role;
 import dev.vdrenkov.cineledger.models.entities.User;
 import dev.vdrenkov.cineledger.models.requests.LoginRequest;
 import dev.vdrenkov.cineledger.repositories.UserRepository;
-import dev.vdrenkov.cineledger.testutils.constants.RoleConstants;
-import dev.vdrenkov.cineledger.testutils.constants.UserConstants;
-import dev.vdrenkov.cineledger.testutils.factories.JwtFactory;
-import dev.vdrenkov.cineledger.testutils.factories.RoleFactory;
-import dev.vdrenkov.cineledger.testutils.factories.UserFactory;
+import dev.vdrenkov.cineledger.testutil.constants.RoleConstants;
+import dev.vdrenkov.cineledger.testutil.constants.UserConstants;
+import dev.vdrenkov.cineledger.testutil.factories.JwtFactory;
+import dev.vdrenkov.cineledger.testutil.factories.RoleFactory;
+import dev.vdrenkov.cineledger.testutil.factories.UserFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -61,9 +61,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 class UserServiceTest {
-
     private static final int INVALID_ID = 2;
-    private static final String SECRET = "test-secret-for-jwt-tests-should-be-at-least-thirty-two-characters";
+    private static final String SECRET = "pT6wYk3nRb9mQf2sHx8vLd4cZa1uEg7jKr5qNs0xVc6tMp2hWy9bDf3rLu8nQk4sC";
 
     @Mock
     private AuthenticationManager authenticationManager;

@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class CinemaDto {
-
     private int id;
     private String address;
     private String city;

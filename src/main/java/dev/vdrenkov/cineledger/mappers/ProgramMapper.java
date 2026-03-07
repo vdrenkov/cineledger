@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
  */
 @Component
 public class ProgramMapper {
-
     private static final Logger log = LoggerFactory.getLogger(ProgramMapper.class);
 
     private final CinemaMapper cinemaMapper;

@@ -1,9 +1,9 @@
 package dev.vdrenkov.cineledger.mappers;
 
 import dev.vdrenkov.cineledger.models.dtos.ProgramDto;
-import dev.vdrenkov.cineledger.testutils.constants.ProgramConstants;
-import dev.vdrenkov.cineledger.testutils.factories.CinemaFactory;
-import dev.vdrenkov.cineledger.testutils.factories.ProgramFactory;
+import dev.vdrenkov.cineledger.testutil.constants.ProgramConstants;
+import dev.vdrenkov.cineledger.testutil.factories.CinemaFactory;
+import dev.vdrenkov.cineledger.testutil.factories.ProgramFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

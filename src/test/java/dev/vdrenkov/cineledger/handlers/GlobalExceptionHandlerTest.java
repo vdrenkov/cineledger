@@ -39,7 +39,7 @@ import dev.vdrenkov.cineledger.services.CategoryService;
 import dev.vdrenkov.cineledger.services.MovieService;
 import dev.vdrenkov.cineledger.services.ProjectionService;
 import dev.vdrenkov.cineledger.services.UserService;
-import dev.vdrenkov.cineledger.testutils.constants.UserConstants;
+import dev.vdrenkov.cineledger.testutil.constants.UserConstants;
 import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
 import jakarta.validation.UnexpectedTypeException;
 import org.hamcrest.Matchers;
@@ -78,10 +78,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ExtendWith(MockitoExtension.class)
 class GlobalExceptionHandlerTest {
-
-    private final String URI = "/categories";
-
-    private final String ROOT_ERRORS = "$.Errors";
+    private static final String URI = "/categories";
+    private static final String ROOT_ERRORS = "$.Errors";
 
     private MockMvc mockMvc;
 
@@ -621,7 +619,7 @@ class GlobalExceptionHandlerTest {
     }
 
     /**
-     * Verifies that hande Discount Not Valid Exception on Endpoint Get All Categories not Found.
+     * Verifies that handle Discount Not Valid Exception on Endpoint Get All Categories not Found.
      */
     @Test
     void testHandeDiscountNotValidException_onEndpointGetAllCategories_notFound() throws Exception {

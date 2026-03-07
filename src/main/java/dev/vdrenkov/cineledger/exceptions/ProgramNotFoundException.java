@@ -4,7 +4,6 @@ package dev.vdrenkov.cineledger.exceptions;
  * Signals that the requested program could not be found.
  */
 public class ProgramNotFoundException extends RuntimeException {
-
     /**
      * Creates the exception with the supplied message.
      *

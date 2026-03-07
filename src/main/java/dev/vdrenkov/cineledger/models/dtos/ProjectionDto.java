@@ -11,7 +11,6 @@ import java.time.LocalTime;
 @AllArgsConstructor
 @Data
 public class ProjectionDto {
-
     private int id;
     private double price;
     private HallDto hall;

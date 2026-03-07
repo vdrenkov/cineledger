@@ -12,7 +12,6 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Data
 public class MovieDto {
-
     private int id;
     private String title;
     private double averageRating;

@@ -20,7 +20,6 @@ import java.util.List;
  */
 @Service
 public class CategoryService {
-
     private final static Logger log = LoggerFactory.getLogger(CategoryService.class);
 
     private final CategoryMapper categoryMapper;

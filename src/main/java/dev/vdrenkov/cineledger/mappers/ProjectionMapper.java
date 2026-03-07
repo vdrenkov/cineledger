@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
  */
 @Component
 public class ProjectionMapper {
-
     private static final Logger log = LoggerFactory.getLogger(ProjectionMapper.class);
 
     private final HallMapper hallMapper;

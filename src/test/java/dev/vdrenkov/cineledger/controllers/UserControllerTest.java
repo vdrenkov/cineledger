@@ -1,10 +1,10 @@
 package dev.vdrenkov.cineledger.controllers;
 
 import dev.vdrenkov.cineledger.services.UserService;
-import dev.vdrenkov.cineledger.testutils.constants.RoleConstants;
-import dev.vdrenkov.cineledger.testutils.constants.UserConstants;
-import dev.vdrenkov.cineledger.testutils.factories.HttpCookieFactory;
-import dev.vdrenkov.cineledger.testutils.factories.UserFactory;
+import dev.vdrenkov.cineledger.testutil.constants.RoleConstants;
+import dev.vdrenkov.cineledger.testutil.constants.UserConstants;
+import dev.vdrenkov.cineledger.testutil.factories.HttpCookieFactory;
+import dev.vdrenkov.cineledger.testutil.factories.UserFactory;
 import dev.vdrenkov.cineledger.utils.constants.URIConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,15 +19,15 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import tools.jackson.databind.ObjectMapper;
 
-import static dev.vdrenkov.cineledger.testutils.constants.HttpCookieConstants.COOKIE_NAME;
-import static dev.vdrenkov.cineledger.testutils.constants.HttpCookieConstants.COOKIE_VALUE;
-import static dev.vdrenkov.cineledger.testutils.constants.RoleConstants.NAME;
-import static dev.vdrenkov.cineledger.testutils.constants.UserConstants.EMAIL;
-import static dev.vdrenkov.cineledger.testutils.constants.UserConstants.FIRST_NAME;
-import static dev.vdrenkov.cineledger.testutils.constants.UserConstants.ID;
-import static dev.vdrenkov.cineledger.testutils.constants.UserConstants.JOIN_DATE;
-import static dev.vdrenkov.cineledger.testutils.constants.UserConstants.LAST_NAME;
-import static dev.vdrenkov.cineledger.testutils.constants.UserConstants.USERNAME;
+import static dev.vdrenkov.cineledger.testutil.constants.HttpCookieConstants.COOKIE_NAME;
+import static dev.vdrenkov.cineledger.testutil.constants.HttpCookieConstants.COOKIE_VALUE;
+import static dev.vdrenkov.cineledger.testutil.constants.RoleConstants.NAME;
+import static dev.vdrenkov.cineledger.testutil.constants.UserConstants.EMAIL;
+import static dev.vdrenkov.cineledger.testutil.constants.UserConstants.FIRST_NAME;
+import static dev.vdrenkov.cineledger.testutil.constants.UserConstants.ID;
+import static dev.vdrenkov.cineledger.testutil.constants.UserConstants.JOIN_DATE;
+import static dev.vdrenkov.cineledger.testutil.constants.UserConstants.LAST_NAME;
+import static dev.vdrenkov.cineledger.testutil.constants.UserConstants.USERNAME;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -46,7 +46,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ExtendWith(MockitoExtension.class)
 class UserControllerTest {
-
     /**
      * Provides the default cookie used in tests.
      */
@@ -60,7 +59,7 @@ class UserControllerTest {
     private static final String IS_BEFORE = "isBefore";
     private static final String RECOVER_PASSWORD_PATH = "/password-recovery";
 
-    private final static ObjectMapper objectMapper = new ObjectMapper();
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     private MockMvc mockMvc;
 

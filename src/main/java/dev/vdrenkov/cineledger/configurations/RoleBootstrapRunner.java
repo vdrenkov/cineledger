@@ -21,7 +21,6 @@ import java.util.List;
  */
 @Component
 public class RoleBootstrapRunner implements CommandLineRunner {
-
     private static final Logger log = LoggerFactory.getLogger(RoleBootstrapRunner.class);
 
     private final RoleRepository roleRepository;

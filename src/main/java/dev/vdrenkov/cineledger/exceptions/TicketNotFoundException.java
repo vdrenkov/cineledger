@@ -4,7 +4,6 @@ package dev.vdrenkov.cineledger.exceptions;
  * Signals that the requested ticket could not be found.
  */
 public class TicketNotFoundException extends RuntimeException {
-
     /**
      * Creates the exception with the supplied message.
      *

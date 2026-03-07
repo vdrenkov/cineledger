@@ -22,7 +22,6 @@ import java.util.List;
  */
 @Service
 public class JwtUserDetailsService implements UserDetailsService {
-
     private final Logger log = LoggerFactory.getLogger(JwtUserDetailsService.class);
 
     private final UserRepository userRepository;

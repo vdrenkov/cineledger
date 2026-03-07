@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
  */
 @Component
 public class UserMapper {
-
     private static final Logger log = LoggerFactory.getLogger(UserMapper.class);
 
     private final RoleMapper roleMapper;
