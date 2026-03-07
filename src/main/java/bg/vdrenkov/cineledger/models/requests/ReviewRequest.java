@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @Data
 public class ReviewRequest {
 
-  private double rating;
-  private String reviewText;
+    private double rating;
+    private String reviewText;
 }
 
 

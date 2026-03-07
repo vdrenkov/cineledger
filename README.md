@@ -1,6 +1,7 @@
 # CineLedger
 
-API-first, stateless Spring Boot backend for cinema management. The project exposes REST endpoints for catalog, scheduling, ordering, reporting, reviews, and user/security workflows for external clients (frontend/Postman).
+API-first, stateless Spring Boot backend for cinema management. The project exposes REST endpoints for catalog,
+scheduling, ordering, reporting, reviews, and user/security workflows for external clients (frontend/Postman).
 
 ## Tech Stack
 

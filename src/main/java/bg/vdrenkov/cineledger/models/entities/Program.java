@@ -1,9 +1,5 @@
 package bg.vdrenkov.cineledger.models.entities;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,6 +8,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDate;
 
 @Entity
@@ -21,21 +21,21 @@ import java.time.LocalDate;
 @Data
 public class Program {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private int id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
 
-  @Column(name = "program_date")
-  private LocalDate programDate;
+    @Column(name = "program_date")
+    private LocalDate programDate;
 
-  @OneToOne
-  @JoinColumn(name = "cinema_id")
-  private Cinema cinema;
+    @OneToOne
+    @JoinColumn(name = "cinema_id")
+    private Cinema cinema;
 
-  public Program(LocalDate programDate, Cinema cinema) {
-    this.programDate = programDate;
-    this.cinema = cinema;
-  }
+    public Program(LocalDate programDate, Cinema cinema) {
+        this.programDate = programDate;
+        this.cinema = cinema;
+    }
 }
 
 

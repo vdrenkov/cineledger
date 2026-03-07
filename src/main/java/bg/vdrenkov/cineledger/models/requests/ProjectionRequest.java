@@ -1,11 +1,11 @@
 package bg.vdrenkov.cineledger.models.requests;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import java.time.LocalTime;
 
 @AllArgsConstructor
@@ -13,24 +13,24 @@ import java.time.LocalTime;
 @Data
 public class ProjectionRequest {
 
-  @Positive(message = "The price must be positive")
-  @NotNull(message = "The price can't be empty")
-  private double price;
+    @Positive(message = "The price must be positive")
+    @NotNull(message = "The price can't be empty")
+    private double price;
 
-  @Positive(message = "The hall id must be positive")
-  @NotNull(message = "The hall id can't be empty")
-  private int hallId;
+    @Positive(message = "The hall id must be positive")
+    @NotNull(message = "The hall id can't be empty")
+    private int hallId;
 
-  @Positive(message = "The program id must be positive")
-  @NotNull(message = "The program id can't be empty")
-  private int programId;
+    @Positive(message = "The program id must be positive")
+    @NotNull(message = "The program id can't be empty")
+    private int programId;
 
-  @Positive(message = "The movie id must be positive")
-  @NotNull(message = "The movie id can't be empty")
-  private int movieId;
+    @Positive(message = "The movie id must be positive")
+    @NotNull(message = "The movie id can't be empty")
+    private int movieId;
 
-  @NotNull(message = "The start time can't be empty")
-  private LocalTime startTime;
+    @NotNull(message = "The start time can't be empty")
+    private LocalTime startTime;
 }
 
 

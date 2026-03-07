@@ -17,69 +17,69 @@ import java.time.LocalDate;
 @RestController
 public class IncomeReportController {
 
-  private static final Logger log = LoggerFactory.getLogger(IncomeReportController.class);
+    private static final Logger log = LoggerFactory.getLogger(IncomeReportController.class);
 
-  private final IncomeReportService incomeReportService;
+    private final IncomeReportService incomeReportService;
 
-  @Autowired
-  public IncomeReportController(IncomeReportService incomeReportService) {
-    this.incomeReportService = incomeReportService;
-  }
+    @Autowired
+    public IncomeReportController(IncomeReportService incomeReportService) {
+        this.incomeReportService = incomeReportService;
+    }
 
-  @GetMapping(URIConstants.REPORTS_CINEMAS_ID_INCOMES_PATH)
-  public ResponseEntity<Double> getAllIncomesByCinemaId(
-    @PathVariable int id, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
-    @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
+    @GetMapping(URIConstants.REPORTS_CINEMAS_ID_INCOMES_PATH)
+    public ResponseEntity<Double> getAllIncomesByCinemaId(@PathVariable int id,
+        @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+        @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
 
-    double cinemaIncome = incomeReportService.getAllIncomesByCinemaId(id, startDate, endDate);
-    log.info(String.format("All incomes by cinema id %d report requested", id));
+        double cinemaIncome = incomeReportService.getAllIncomesByCinemaId(id, startDate, endDate);
+        log.info(String.format("All incomes by cinema id %d report requested", id));
 
-    return ResponseEntity.ok(cinemaIncome);
-  }
+        return ResponseEntity.ok(cinemaIncome);
+    }
 
-  @GetMapping(URIConstants.REPORTS_HALLS_ID_INCOMES_PATH)
-  public ResponseEntity<Double> getAllIncomesByHallId(
-    @PathVariable int id, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
-    @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
+    @GetMapping(URIConstants.REPORTS_HALLS_ID_INCOMES_PATH)
+    public ResponseEntity<Double> getAllIncomesByHallId(@PathVariable int id,
+        @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+        @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
 
-    double hallIncome = incomeReportService.getAllIncomesByHallId(id, startDate, endDate);
-    log.info(String.format("All incomes by hall id %d report requested", id));
+        double hallIncome = incomeReportService.getAllIncomesByHallId(id, startDate, endDate);
+        log.info(String.format("All incomes by hall id %d report requested", id));
 
-    return ResponseEntity.ok(hallIncome);
-  }
+        return ResponseEntity.ok(hallIncome);
+    }
 
-  @GetMapping(value = URIConstants.REPORTS_ITEMS_ID_INCOMES_PATH)
-  public ResponseEntity<Double> getAllIncomesByItemId(
-    @PathVariable int id, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
-    @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
+    @GetMapping(value = URIConstants.REPORTS_ITEMS_ID_INCOMES_PATH)
+    public ResponseEntity<Double> getAllIncomesByItemId(@PathVariable int id,
+        @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+        @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
 
-    double itemIncome = incomeReportService.getAllIncomesByItemId(id, startDate, endDate);
-    log.info(String.format("All incomes by hall id %d report requested", id));
+        double itemIncome = incomeReportService.getAllIncomesByItemId(id, startDate, endDate);
+        log.info(String.format("All incomes by hall id %d report requested", id));
 
-    return ResponseEntity.ok(itemIncome);
-  }
+        return ResponseEntity.ok(itemIncome);
+    }
 
-  @GetMapping(URIConstants.REPORTS_MOVIES_ID_INCOMES_PATH)
-  public ResponseEntity<Double> getAllIncomesByMovieId(
-    @PathVariable int id, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
-    @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
+    @GetMapping(URIConstants.REPORTS_MOVIES_ID_INCOMES_PATH)
+    public ResponseEntity<Double> getAllIncomesByMovieId(@PathVariable int id,
+        @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+        @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
 
-    double movieIncome = incomeReportService.getAllIncomesByMovieId(id, startDate, endDate);
-    log.info(String.format("All incomes by hall id %d report requested", id));
+        double movieIncome = incomeReportService.getAllIncomesByMovieId(id, startDate, endDate);
+        log.info(String.format("All incomes by hall id %d report requested", id));
 
-    return ResponseEntity.ok(movieIncome);
-  }
+        return ResponseEntity.ok(movieIncome);
+    }
 
-  @GetMapping(URIConstants.REPORTS_USERS_ID_INCOMES_PATH)
-  public ResponseEntity<Double> getAllIncomesByUserId(
-    @PathVariable int id, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
-    @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
+    @GetMapping(URIConstants.REPORTS_USERS_ID_INCOMES_PATH)
+    public ResponseEntity<Double> getAllIncomesByUserId(@PathVariable int id,
+        @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+        @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
 
-    double userIncome = incomeReportService.getAllIncomesByUserId(id, startDate, endDate);
-    log.info(String.format("All incomes by hall id %d report requested", id));
+        double userIncome = incomeReportService.getAllIncomesByUserId(id, startDate, endDate);
+        log.info(String.format("All incomes by hall id %d report requested", id));
 
-    return ResponseEntity.ok(userIncome);
-  }
+        return ResponseEntity.ok(userIncome);
+    }
 }
 
 

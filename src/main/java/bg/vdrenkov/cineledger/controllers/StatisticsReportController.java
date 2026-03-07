@@ -17,51 +17,49 @@ import java.time.LocalDate;
 @RestController
 public class StatisticsReportController {
 
-  private static final Logger log = LoggerFactory.getLogger(StatisticsReportController.class);
+    private static final Logger log = LoggerFactory.getLogger(StatisticsReportController.class);
 
-  private final StatisticsReportService statisticsReportService;
+    private final StatisticsReportService statisticsReportService;
 
-  @Autowired
-  public StatisticsReportController(StatisticsReportService statisticsReportService) {
-    this.statisticsReportService = statisticsReportService;
-  }
+    @Autowired
+    public StatisticsReportController(StatisticsReportService statisticsReportService) {
+        this.statisticsReportService = statisticsReportService;
+    }
 
-  @GetMapping(URIConstants.REPORTS_MOVIES_CATEGORIES_ID_TICKETS_COUNT_PATH)
-  public ResponseEntity<Integer> getPurchasedTicketsCountByMovieCategory(
-    @PathVariable int id,
-    @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
-    @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
+    @GetMapping(URIConstants.REPORTS_MOVIES_CATEGORIES_ID_TICKETS_COUNT_PATH)
+    public ResponseEntity<Integer> getPurchasedTicketsCountByMovieCategory(@PathVariable int id,
+        @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+        @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
 
-    int movieCategoryTicketCount =
-      statisticsReportService.getPurchasedTicketsCountByMovieCategory(id, startDate, endDate);
-    log.info("Received request to get purchased tickets count by movie category");
+        int movieCategoryTicketCount = statisticsReportService.getPurchasedTicketsCountByMovieCategory(id, startDate,
+            endDate);
+        log.info("Received request to get purchased tickets count by movie category");
 
-    return ResponseEntity.ok(movieCategoryTicketCount);
-  }
+        return ResponseEntity.ok(movieCategoryTicketCount);
+    }
 
-  @GetMapping(URIConstants.REPORTS_MOVIES_TICKETS_COUNT_PATH)
-  public ResponseEntity<Integer> getPurchasedTicketsCountByMovieTitle(
-    @RequestParam String title,
-    @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
-    @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
+    @GetMapping(URIConstants.REPORTS_MOVIES_TICKETS_COUNT_PATH)
+    public ResponseEntity<Integer> getPurchasedTicketsCountByMovieTitle(@RequestParam String title,
+        @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+        @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
 
-    int movieTitleTicketCount = statisticsReportService.getPurchasedTicketsCountByMovieTitle(title, startDate, endDate);
-    log.info("Received request to get purchased tickets count by movie title");
+        int movieTitleTicketCount = statisticsReportService.getPurchasedTicketsCountByMovieTitle(title, startDate,
+            endDate);
+        log.info("Received request to get purchased tickets count by movie title");
 
-    return ResponseEntity.ok(movieTitleTicketCount);
-  }
+        return ResponseEntity.ok(movieTitleTicketCount);
+    }
 
-  @GetMapping(URIConstants.REPORTS_ITEMS_ITEMS_COUNT_PATH)
-  public ResponseEntity<Integer> getPurchasedItemsCountByItemName(
-    @RequestParam String name,
-    @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
-    @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
+    @GetMapping(URIConstants.REPORTS_ITEMS_ITEMS_COUNT_PATH)
+    public ResponseEntity<Integer> getPurchasedItemsCountByItemName(@RequestParam String name,
+        @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+        @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
 
-    int itemNameCount = statisticsReportService.getPurchasedItemsCountByItemName(name, startDate, endDate);
-    log.info("Received request to get purchased tickets count by movie title");
+        int itemNameCount = statisticsReportService.getPurchasedItemsCountByItemName(name, startDate, endDate);
+        log.info("Received request to get purchased tickets count by movie title");
 
-    return ResponseEntity.ok(itemNameCount);
-  }
+        return ResponseEntity.ok(itemNameCount);
+    }
 }
 
 

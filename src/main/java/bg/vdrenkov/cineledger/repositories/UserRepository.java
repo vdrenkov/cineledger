@@ -11,16 +11,16 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
 
-  Optional<User> findUserByUsername(String username);
+    Optional<User> findUserByUsername(String username);
 
-  boolean existsByUsername(String username);
+    boolean existsByUsername(String username);
 
-  Optional<User> findUserByEmail(String email);
+    Optional<User> findUserByEmail(String email);
 
-  List<User> findAllByRolesName(String roleName);
+    List<User> findAllByRolesName(String roleName);
 
-  List<User> findAllByJoinDateBefore(LocalDate dateBefore);
+    List<User> findAllByJoinDateBefore(LocalDate dateBefore);
 
-  List<User> findAllByJoinDateAfter(LocalDate dateAfter);
+    List<User> findAllByJoinDateAfter(LocalDate dateAfter);
 }
 

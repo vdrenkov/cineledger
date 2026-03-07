@@ -1,6 +1,5 @@
 package bg.vdrenkov.cineledger.mappers;
 
-import org.junit.jupiter.api.extension.ExtendWith;
 import bg.vdrenkov.cineledger.models.dtos.TicketDto;
 import bg.vdrenkov.cineledger.testUtils.constants.ProjectionConstants;
 import bg.vdrenkov.cineledger.testUtils.constants.TicketConstants;
@@ -8,6 +7,7 @@ import bg.vdrenkov.cineledger.testUtils.factories.ProjectionFactory;
 import bg.vdrenkov.cineledger.testUtils.factories.TicketFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -29,7 +29,8 @@ public class TicketMapperTest {
 
     @Test
     public void testMapTicketToTicketDto_success() {
-        when(projectionMapper.mapProjectionToProjectionDto(any())).thenReturn(ProjectionFactory.getDefaultProjectionDto());
+        when(projectionMapper.mapProjectionToProjectionDto(any())).thenReturn(
+            ProjectionFactory.getDefaultProjectionDto());
 
         TicketDto ticket = ticketMapper.mapTicketToTicketDto(TicketFactory.getDefaultTicket());
 
@@ -40,7 +41,8 @@ public class TicketMapperTest {
 
     @Test
     public void testMapTicketsToTicketsDto_success() {
-        when(projectionMapper.mapProjectionToProjectionDto(any())).thenReturn(ProjectionFactory.getDefaultProjectionDto());
+        when(projectionMapper.mapProjectionToProjectionDto(any())).thenReturn(
+            ProjectionFactory.getDefaultProjectionDto());
 
         List<TicketDto> ticketDtos = ticketMapper.mapTicketToDtoList(TicketFactory.getDefaultTicketList());
         TicketDto ticket = ticketDtos.get(0);

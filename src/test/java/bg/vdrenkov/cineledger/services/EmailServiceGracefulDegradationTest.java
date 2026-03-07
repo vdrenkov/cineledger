@@ -5,29 +5,26 @@ import bg.vdrenkov.cineledger.testUtils.factories.UserFactory;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import org.junit.jupiter.api.Assertions;
 
 class EmailServiceGracefulDegradationTest {
 
-  private final EmailService emailService = new EmailService("", "", "no-reply@cineledger.dev", "CineLedger");
+    private final EmailService emailService = new EmailService("", "", "no-reply@cineledger.dev", "CineLedger");
 
-  @Test
-  void sendRegistrationConfirmationEmail_withoutMailjetCredentials_doesNotFail() {
-    assertDoesNotThrow(() -> emailService.sendRegistrationConfirmationEmail(UserFactory.getDefaultUser()));
-  }
+    @Test
+    void sendRegistrationConfirmationEmail_withoutMailjetCredentials_doesNotFail() {
+        assertDoesNotThrow(() -> emailService.sendRegistrationConfirmationEmail(UserFactory.getDefaultUser()));
+    }
 
-  @Test
-  void sendPasswordConfirmationEmail_withoutMailjetCredentials_doesNotFail() {
-    assertDoesNotThrow(
-      () -> emailService.sendPasswordConfirmationEmail(UserFactory.getDefaultUser(), "new-password")
-    );
-  }
+    @Test
+    void sendPasswordConfirmationEmail_withoutMailjetCredentials_doesNotFail() {
+        assertDoesNotThrow(
+            () -> emailService.sendPasswordConfirmationEmail(UserFactory.getDefaultUser(), "new-password"));
+    }
 
-  @Test
-  void sendOrderConfirmationEmail_withoutMailjetCredentials_doesNotFail() {
-    assertDoesNotThrow(
-      () -> emailService.sendOrderConfirmationEmail(UserFactory.getDefaultUser(), OrderFactory.getDefaultOrder())
-    );
-  }
+    @Test
+    void sendOrderConfirmationEmail_withoutMailjetCredentials_doesNotFail() {
+        assertDoesNotThrow(() -> emailService.sendOrderConfirmationEmail(UserFactory.getDefaultUser(),
+            OrderFactory.getDefaultOrder()));
+    }
 }
 

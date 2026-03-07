@@ -26,8 +26,8 @@ public class DiscountMapperTest {
 
     @Test
     public void testMapDiscountListToDiscountDtoList_success() {
-        List<DiscountDto> discountDtos =
-                discountMapper.mapDiscountListToDiscountDtoList(DiscountFactory.getDefaultDiscountList());
+        List<DiscountDto> discountDtos = discountMapper.mapDiscountListToDiscountDtoList(
+            DiscountFactory.getDefaultDiscountList());
 
         assertEquals(1, discountDtos.size());
         DiscountDto discountDto = discountDtos.get(0);

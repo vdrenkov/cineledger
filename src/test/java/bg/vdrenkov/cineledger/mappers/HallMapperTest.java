@@ -1,19 +1,18 @@
 package bg.vdrenkov.cineledger.mappers;
 
-import org.junit.jupiter.api.extension.ExtendWith;
 import bg.vdrenkov.cineledger.models.dtos.HallDto;
 import bg.vdrenkov.cineledger.testUtils.constants.HallConstants;
 import bg.vdrenkov.cineledger.testUtils.factories.CinemaFactory;
 import bg.vdrenkov.cineledger.testUtils.factories.HallFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;

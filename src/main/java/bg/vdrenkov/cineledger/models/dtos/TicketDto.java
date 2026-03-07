@@ -9,9 +9,9 @@ import java.time.LocalDate;
 @Data
 public class TicketDto {
 
-  private int id;
-  private LocalDate dateOfPurchase;
-  private ProjectionDto projection;
+    private int id;
+    private LocalDate dateOfPurchase;
+    private ProjectionDto projection;
 }
 
 

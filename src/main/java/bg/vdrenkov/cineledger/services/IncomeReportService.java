@@ -14,177 +14,176 @@ import java.util.List;
 @Service
 public class IncomeReportService {
 
-  private static final Logger log = LoggerFactory.getLogger(IncomeReportService.class);
+    private static final Logger log = LoggerFactory.getLogger(IncomeReportService.class);
 
-  private final CinemaService cinemaService;
-  private final HallService hallService;
-  private final ItemService itemService;
-  private final MovieService movieService;
-  private final UserService userService;
-  private final OrderService orderService;
-  private final TicketService ticketService;
+    private final CinemaService cinemaService;
+    private final HallService hallService;
+    private final ItemService itemService;
+    private final MovieService movieService;
+    private final UserService userService;
+    private final OrderService orderService;
+    private final TicketService ticketService;
 
-  @Autowired
-  public IncomeReportService(
-    CinemaService cinemaService, HallService hallService, ItemService itemService,
-    MovieService movieService, UserService userService, OrderService orderService, TicketService ticketService) {
-    this.cinemaService = cinemaService;
-    this.hallService = hallService;
-    this.itemService = itemService;
-    this.movieService = movieService;
-    this.userService = userService;
-    this.orderService = orderService;
-    this.ticketService = ticketService;
-  }
-
-  public double getAllIncomesByCinemaId(int id, LocalDate startDate, LocalDate endDate) {
-    double incomes = 0;
-
-    cinemaService.getCinemaById(id);
-
-    List<Order> allOrders = orderService.getOrdersByDateBetween(startDate, endDate);
-
-    for (Order order : allOrders) {
-      if (isOrderWithinDateRange(order, startDate, endDate) && isOrderFromCinema(order, id)) {
-        incomes += order.getTotalPrice();
-      }
+    @Autowired
+    public IncomeReportService(CinemaService cinemaService, HallService hallService, ItemService itemService,
+        MovieService movieService, UserService userService, OrderService orderService, TicketService ticketService) {
+        this.cinemaService = cinemaService;
+        this.hallService = hallService;
+        this.itemService = itemService;
+        this.movieService = movieService;
+        this.userService = userService;
+        this.orderService = orderService;
+        this.ticketService = ticketService;
     }
 
-    log.info(String.format("All incomes by cinema id %d calculated", id));
+    public double getAllIncomesByCinemaId(int id, LocalDate startDate, LocalDate endDate) {
+        double incomes = 0;
 
-    return incomes;
-  }
+        cinemaService.getCinemaById(id);
 
-  public double getAllIncomesByHallId(int id, LocalDate startDate, LocalDate endDate) {
-    double incomes = 0;
+        List<Order> allOrders = orderService.getOrdersByDateBetween(startDate, endDate);
 
-    hallService.getHallById(id);
-
-    List<Order> allOrders = orderService.getOrdersByDateBetween(startDate, endDate);
-
-    for (Order order : allOrders) {
-      if (isOrderWithinDateRange(order, startDate, endDate) && isOrderFromHall(order, id)) {
-        incomes += order.getTotalPrice();
-      }
-    }
-
-    log.info(String.format("All incomes by hall id %d calculated", id));
-
-    return incomes;
-  }
-
-  public double getAllIncomesByItemId(int id, LocalDate startDate, LocalDate endDate) {
-    double incomes = 0;
-
-    itemService.getItemDtoById(id);
-
-    List<Order> allOrders = orderService.getOrdersByDateBetween(startDate, endDate);
-
-    for (Order order : allOrders) {
-      if (isOrderWithinDateRange(order, startDate, endDate)) {
-        for (Item item : order.getItems()) {
-          if (id == item.getId()) {
-            incomes += item.getPrice();
-          }
+        for (Order order : allOrders) {
+            if (isOrderWithinDateRange(order, startDate, endDate) && isOrderFromCinema(order, id)) {
+                incomes += order.getTotalPrice();
+            }
         }
-      }
+
+        log.info(String.format("All incomes by cinema id %d calculated", id));
+
+        return incomes;
     }
 
-    log.info(String.format("All incomes by item id %d calculated", id));
+    public double getAllIncomesByHallId(int id, LocalDate startDate, LocalDate endDate) {
+        double incomes = 0;
 
-    return incomes;
-  }
+        hallService.getHallById(id);
 
-  public double getAllIncomesByMovieId(int id, LocalDate startDate, LocalDate endDate) {
-    double incomes = 0;
+        List<Order> allOrders = orderService.getOrdersByDateBetween(startDate, endDate);
 
-    movieService.getMovieById(id);
+        for (Order order : allOrders) {
+            if (isOrderWithinDateRange(order, startDate, endDate) && isOrderFromHall(order, id)) {
+                incomes += order.getTotalPrice();
+            }
+        }
 
-    List<Ticket> allTickets = ticketService.getTicketsByDateBetween(startDate, endDate);
+        log.info(String.format("All incomes by hall id %d calculated", id));
 
-    for (Ticket ticket : allTickets) {
-      if (isTicketWithinDateRange(ticket, startDate, endDate) && isTicketForMovie(ticket, id)) {
-        incomes += ticket.getProjection().getPrice();
-      }
+        return incomes;
     }
 
-    log.info(String.format("All incomes by movie id %d calculated", id));
+    public double getAllIncomesByItemId(int id, LocalDate startDate, LocalDate endDate) {
+        double incomes = 0;
 
-    return incomes;
-  }
+        itemService.getItemDtoById(id);
 
-  public double getAllIncomesByUserId(int id, LocalDate startDate, LocalDate endDate) {
-    double incomes = 0;
+        List<Order> allOrders = orderService.getOrdersByDateBetween(startDate, endDate);
 
-    userService.getUserById(id);
+        for (Order order : allOrders) {
+            if (isOrderWithinDateRange(order, startDate, endDate)) {
+                for (Item item : order.getItems()) {
+                    if (id == item.getId()) {
+                        incomes += item.getPrice();
+                    }
+                }
+            }
+        }
 
-    List<Order> allOrders = orderService.getOrdersByDateBetween(startDate, endDate);
+        log.info(String.format("All incomes by item id %d calculated", id));
 
-    for (Order order : allOrders) {
-      if (isOrderWithinDateRange(order, startDate, endDate) && isOrderFromUser(order, id)) {
-        incomes += order.getTotalPrice();
-      }
+        return incomes;
     }
 
-    log.info(String.format("All incomes by user id %d calculated", id));
+    public double getAllIncomesByMovieId(int id, LocalDate startDate, LocalDate endDate) {
+        double incomes = 0;
 
-    return incomes;
-  }
+        movieService.getMovieById(id);
 
-  private boolean isOrderFromCinema(Order order, int cinemaId) {
-    List<Ticket> tickets = order.getTickets();
+        List<Ticket> allTickets = ticketService.getTicketsByDateBetween(startDate, endDate);
 
-    for (Ticket ticket : tickets) {
-      if (cinemaId == ticket.getProjection().getHall().getCinema().getId()) {
+        for (Ticket ticket : allTickets) {
+            if (isTicketWithinDateRange(ticket, startDate, endDate) && isTicketForMovie(ticket, id)) {
+                incomes += ticket.getProjection().getPrice();
+            }
+        }
 
-        log.info("Order is from cinema");
+        log.info(String.format("All incomes by movie id %d calculated", id));
 
-        return true;
-      }
+        return incomes;
     }
 
-    log.info("Order is not from cinema");
+    public double getAllIncomesByUserId(int id, LocalDate startDate, LocalDate endDate) {
+        double incomes = 0;
 
-    return false;
-  }
+        userService.getUserById(id);
 
-  private boolean isOrderFromHall(Order order, int hallId) {
-    List<Ticket> tickets = order.getTickets();
+        List<Order> allOrders = orderService.getOrdersByDateBetween(startDate, endDate);
 
-    for (Ticket ticket : tickets) {
-      if (hallId == ticket.getProjection().getHall().getId()) {
+        for (Order order : allOrders) {
+            if (isOrderWithinDateRange(order, startDate, endDate) && isOrderFromUser(order, id)) {
+                incomes += order.getTotalPrice();
+            }
+        }
 
-        log.info("Order is from hall");
+        log.info(String.format("All incomes by user id %d calculated", id));
 
-        return true;
-      }
+        return incomes;
     }
 
-    log.info("Order is not from hall");
+    private boolean isOrderFromCinema(Order order, int cinemaId) {
+        List<Ticket> tickets = order.getTickets();
 
-    return false;
-  }
+        for (Ticket ticket : tickets) {
+            if (cinemaId == ticket.getProjection().getHall().getCinema().getId()) {
 
-  private boolean isTicketForMovie(Ticket ticket, int movieId) {
-    return movieId == ticket.getProjection().getMovie().getId();
-  }
+                log.info("Order is from cinema");
 
-  private boolean isOrderFromUser(Order order, int userId) {
-    return userId == order.getUser().getId();
-  }
+                return true;
+            }
+        }
 
-  private boolean isTicketWithinDateRange(Ticket ticket, LocalDate startDate, LocalDate endDate) {
-    LocalDate ticketDate = ticket.getDateOfPurchase();
+        log.info("Order is not from cinema");
 
-    return ticketDate.isEqual(startDate) || ticketDate.isEqual(endDate) ||
-           (ticketDate.isAfter(startDate) && ticketDate.isBefore(endDate));
-  }
+        return false;
+    }
 
-  private boolean isOrderWithinDateRange(Order order, LocalDate startDate, LocalDate endDate) {
-    LocalDate orderDate = order.getDateOfPurchase();
+    private boolean isOrderFromHall(Order order, int hallId) {
+        List<Ticket> tickets = order.getTickets();
 
-    return orderDate.isEqual(startDate) || (orderDate.isAfter(startDate) && orderDate.isBefore(endDate));
-  }
+        for (Ticket ticket : tickets) {
+            if (hallId == ticket.getProjection().getHall().getId()) {
+
+                log.info("Order is from hall");
+
+                return true;
+            }
+        }
+
+        log.info("Order is not from hall");
+
+        return false;
+    }
+
+    private boolean isTicketForMovie(Ticket ticket, int movieId) {
+        return movieId == ticket.getProjection().getMovie().getId();
+    }
+
+    private boolean isOrderFromUser(Order order, int userId) {
+        return userId == order.getUser().getId();
+    }
+
+    private boolean isTicketWithinDateRange(Ticket ticket, LocalDate startDate, LocalDate endDate) {
+        LocalDate ticketDate = ticket.getDateOfPurchase();
+
+        return ticketDate.isEqual(startDate) || ticketDate.isEqual(endDate) || (ticketDate.isAfter(startDate)
+            && ticketDate.isBefore(endDate));
+    }
+
+    private boolean isOrderWithinDateRange(Order order, LocalDate startDate, LocalDate endDate) {
+        LocalDate orderDate = order.getDateOfPurchase();
+
+        return orderDate.isEqual(startDate) || (orderDate.isAfter(startDate) && orderDate.isBefore(endDate));
+    }
 }
 
 

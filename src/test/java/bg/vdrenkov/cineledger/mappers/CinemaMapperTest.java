@@ -1,17 +1,15 @@
 package bg.vdrenkov.cineledger.mappers;
 
-import org.junit.jupiter.api.extension.ExtendWith;
 import bg.vdrenkov.cineledger.models.dtos.CinemaDto;
 import bg.vdrenkov.cineledger.testUtils.constants.CinemaConstants;
 import bg.vdrenkov.cineledger.testUtils.factories.CinemaFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
 public class CinemaMapperTest {

@@ -12,18 +12,16 @@ import java.util.stream.Collectors;
 @Component
 public class DiscountMapper {
 
-  private static final Logger log = LoggerFactory.getLogger(DiscountMapper.class);
+    private static final Logger log = LoggerFactory.getLogger(DiscountMapper.class);
 
-  public DiscountDto mapDiscountToDiscountDto(Discount discount) {
-    log.info(String.format("The discount %s is being mapped to a discount DTO", discount.getType()));
-    return new DiscountDto(discount.getId(), discount.getType(), discount.getCode(), discount.getPercentage());
-  }
+    public DiscountDto mapDiscountToDiscountDto(Discount discount) {
+        log.info(String.format("The discount %s is being mapped to a discount DTO", discount.getType()));
+        return new DiscountDto(discount.getId(), discount.getType(), discount.getCode(), discount.getPercentage());
+    }
 
-  public List<DiscountDto> mapDiscountListToDiscountDtoList(List<Discount> discounts) {
-    return discounts.stream()
-                    .map(this::mapDiscountToDiscountDto)
-                    .collect(Collectors.toList());
-  }
+    public List<DiscountDto> mapDiscountListToDiscountDtoList(List<Discount> discounts) {
+        return discounts.stream().map(this::mapDiscountToDiscountDto).collect(Collectors.toList());
+    }
 }
 
 

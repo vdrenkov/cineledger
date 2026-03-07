@@ -10,13 +10,13 @@ import java.time.LocalDate;
 @Data
 public class MovieDto {
 
-  private int id;
-  private String title;
-  private double averageRating;
-  private String description;
-  private LocalDate releaseDate;
-  private Duration runtime;
-  private CategoryDto category;
+    private int id;
+    private String title;
+    private double averageRating;
+    private String description;
+    private LocalDate releaseDate;
+    private Duration runtime;
+    private CategoryDto category;
 }
 
 

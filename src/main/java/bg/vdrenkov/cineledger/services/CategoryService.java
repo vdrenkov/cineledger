@@ -2,12 +2,12 @@ package bg.vdrenkov.cineledger.services;
 
 import bg.vdrenkov.cineledger.exceptions.CategoryAlreadyExistsException;
 import bg.vdrenkov.cineledger.exceptions.CategoryNotFoundException;
-import bg.vdrenkov.cineledger.utils.constants.ExceptionMessages;
 import bg.vdrenkov.cineledger.mappers.CategoryMapper;
 import bg.vdrenkov.cineledger.models.dtos.CategoryDto;
 import bg.vdrenkov.cineledger.models.entities.Category;
 import bg.vdrenkov.cineledger.models.requests.CategoryRequest;
 import bg.vdrenkov.cineledger.repositories.CategoryRepository;
+import bg.vdrenkov.cineledger.utils.constants.ExceptionMessages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,84 +18,84 @@ import java.util.List;
 @Service
 public class CategoryService {
 
-  private final static Logger log = LoggerFactory.getLogger(CategoryService.class);
+    private final static Logger log = LoggerFactory.getLogger(CategoryService.class);
 
-  private final CategoryMapper categoryMapper;
-  private final CategoryRepository categoryRepository;
+    private final CategoryMapper categoryMapper;
+    private final CategoryRepository categoryRepository;
 
-  @Autowired
-  public CategoryService(CategoryMapper categoryMapper, CategoryRepository categoryRepository) {
-    this.categoryMapper = categoryMapper;
-    this.categoryRepository = categoryRepository;
-  }
+    @Autowired
+    public CategoryService(CategoryMapper categoryMapper, CategoryRepository categoryRepository) {
+        this.categoryMapper = categoryMapper;
+        this.categoryRepository = categoryRepository;
+    }
 
-  public Category addCategory(CategoryRequest categoryRequest) {
-    log.info("An attempt to save a category in the database");
+    public Category addCategory(CategoryRequest categoryRequest) {
+        log.info("An attempt to save a category in the database");
 
-    categoryValidation(categoryRequest);
+        categoryValidation(categoryRequest);
 
-    return categoryRepository.save(new Category(categoryRequest.getName()));
-  }
+        return categoryRepository.save(new Category(categoryRequest.getName()));
+    }
 
-  public List<CategoryDto> getAllCategories() {
-    log.info("An attempt to extract all categories from the database");
+    public List<CategoryDto> getAllCategories() {
+        log.info("An attempt to extract all categories from the database");
 
-    return categoryMapper.mapCategoryToCategoryDtoList(categoryRepository.findAll());
-  }
+        return categoryMapper.mapCategoryToCategoryDtoList(categoryRepository.findAll());
+    }
 
-  public CategoryDto getCategoryDtoById(int id) {
-    log.info(String.format("An attempt to extract category with id %d from the database", id));
+    public CategoryDto getCategoryDtoById(int id) {
+        log.info(String.format("An attempt to extract category with id %d from the database", id));
 
-    return categoryMapper.mapCategoryToCategoryDto(getCategoryById(id));
-  }
+        return categoryMapper.mapCategoryToCategoryDto(getCategoryById(id));
+    }
 
-  public CategoryDto getCategoryDtoByName(String name) {
-    log.info(String.format("An attempt to extract category with name %s from the database", name));
+    public CategoryDto getCategoryDtoByName(String name) {
+        log.info(String.format("An attempt to extract category with name %s from the database", name));
 
-    return categoryMapper.mapCategoryToCategoryDto(categoryRepository.findByName(name).orElseThrow(() -> {
+        return categoryMapper.mapCategoryToCategoryDto(categoryRepository.findByName(name).orElseThrow(() -> {
 
-      log.error(String.format("Exception caught: %s", ExceptionMessages.CATEGORY_NOT_FOUND_MESSAGE));
+            log.error(String.format("Exception caught: %s", ExceptionMessages.CATEGORY_NOT_FOUND_MESSAGE));
 
-      throw new CategoryNotFoundException(ExceptionMessages.CATEGORY_NOT_FOUND_MESSAGE);
-    }));
-  }
+            throw new CategoryNotFoundException(ExceptionMessages.CATEGORY_NOT_FOUND_MESSAGE);
+        }));
+    }
 
-  public Category getCategoryById(int id) {
-    log.info(String.format("An attempt to extract category with id %d from the database", id));
+    public Category getCategoryById(int id) {
+        log.info(String.format("An attempt to extract category with id %d from the database", id));
 
-    return categoryRepository.findById(id).orElseThrow(() -> {
+        return categoryRepository.findById(id).orElseThrow(() -> {
 
-      log.error(String.format("Exception caught: %s", ExceptionMessages.CATEGORY_NOT_FOUND_MESSAGE));
+            log.error(String.format("Exception caught: %s", ExceptionMessages.CATEGORY_NOT_FOUND_MESSAGE));
 
-      throw new CategoryNotFoundException(ExceptionMessages.CATEGORY_NOT_FOUND_MESSAGE);
-    });
-  }
+            throw new CategoryNotFoundException(ExceptionMessages.CATEGORY_NOT_FOUND_MESSAGE);
+        });
+    }
 
-  public CategoryDto updateCategory(CategoryRequest categoryRequest, int categoryId) {
-    CategoryDto categoryDto = getCategoryDtoById(categoryId);
+    public CategoryDto updateCategory(CategoryRequest categoryRequest, int categoryId) {
+        CategoryDto categoryDto = getCategoryDtoById(categoryId);
 
-    log.info(String.format("An attempt to update category with id %d in the database", categoryId));
+        log.info(String.format("An attempt to update category with id %d in the database", categoryId));
 
-    categoryRepository.save(new Category(categoryId, categoryRequest.getName()));
-    return categoryDto;
-  }
+        categoryRepository.save(new Category(categoryId, categoryRequest.getName()));
+        return categoryDto;
+    }
 
-  public CategoryDto deleteCategory(int categoryId) {
-    CategoryDto categoryDto = getCategoryDtoById(categoryId);
-    categoryRepository.deleteById(categoryId);
+    public CategoryDto deleteCategory(int categoryId) {
+        CategoryDto categoryDto = getCategoryDtoById(categoryId);
+        categoryRepository.deleteById(categoryId);
 
-    log.info(String.format("Category with id %d was deleted", categoryId));
+        log.info(String.format("Category with id %d was deleted", categoryId));
 
-    return categoryDto;
-  }
+        return categoryDto;
+    }
 
-  private void categoryValidation(CategoryRequest categoryRequest) {
-    categoryRepository.findByName(categoryRequest.getName()).ifPresent(category -> {
-      log.error(String.format("Exception caught: %s", ExceptionMessages.CATEGORY_ALREADY_EXISTS_MESSAGE));
+    private void categoryValidation(CategoryRequest categoryRequest) {
+        categoryRepository.findByName(categoryRequest.getName()).ifPresent(category -> {
+            log.error(String.format("Exception caught: %s", ExceptionMessages.CATEGORY_ALREADY_EXISTS_MESSAGE));
 
-      throw new CategoryAlreadyExistsException(ExceptionMessages.CATEGORY_ALREADY_EXISTS_MESSAGE);
-    });
-  }
+            throw new CategoryAlreadyExistsException(ExceptionMessages.CATEGORY_ALREADY_EXISTS_MESSAGE);
+        });
+    }
 }
 
 

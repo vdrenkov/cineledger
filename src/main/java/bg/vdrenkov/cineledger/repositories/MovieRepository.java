@@ -11,25 +11,25 @@ import java.util.Optional;
 @Repository
 public interface MovieRepository extends JpaRepository<Movie, Integer> {
 
-  Optional<Movie> findByTitle(String title);
+    Optional<Movie> findByTitle(String title);
 
-  List<Movie> findByTitleContaining(String title);
+    List<Movie> findByTitleContaining(String title);
 
-  List<Movie> findByTitleContainingAndAverageRatingGreaterThanEqual(String title, double minRating);
+    List<Movie> findByTitleContainingAndAverageRatingGreaterThanEqual(String title, double minRating);
 
-  List<Movie> findByAverageRatingGreaterThanEqual(double averageRating);
+    List<Movie> findByAverageRatingGreaterThanEqual(double averageRating);
 
-  List<Movie> findByCategoryId(int categoryId);
+    List<Movie> findByCategoryId(int categoryId);
 
-  List<Movie> findByCategoryIdAndAverageRatingGreaterThanEqual(int categoryId, double rating);
+    List<Movie> findByCategoryIdAndAverageRatingGreaterThanEqual(int categoryId, double rating);
 
-  List<Movie> findByReleaseDateAfter(LocalDate date);
+    List<Movie> findByReleaseDateAfter(LocalDate date);
 
-  List<Movie> findByReleaseDateBefore(LocalDate date);
+    List<Movie> findByReleaseDateBefore(LocalDate date);
 
-  List<Movie> findByReleaseDateAfterAndAverageRatingGreaterThanEqual(LocalDate date, double rating);
+    List<Movie> findByReleaseDateAfterAndAverageRatingGreaterThanEqual(LocalDate date, double rating);
 
-  List<Movie> findByReleaseDateBeforeAndAverageRatingGreaterThanEqual(LocalDate date, double rating);
+    List<Movie> findByReleaseDateBeforeAndAverageRatingGreaterThanEqual(LocalDate date, double rating);
 }
 
 

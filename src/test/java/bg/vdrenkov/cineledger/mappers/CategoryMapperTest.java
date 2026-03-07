@@ -1,17 +1,15 @@
 package bg.vdrenkov.cineledger.mappers;
 
-import org.junit.jupiter.api.extension.ExtendWith;
 import bg.vdrenkov.cineledger.models.dtos.CategoryDto;
 import bg.vdrenkov.cineledger.testUtils.constants.CategoryConstants;
 import bg.vdrenkov.cineledger.testUtils.factories.CategoryFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
 public class CategoryMapperTest {
@@ -22,7 +20,7 @@ public class CategoryMapperTest {
     @Test
     public void testMapCategoryToCategoryDtoList_success() {
         List<CategoryDto> categoryDtos = categoryMapper.mapCategoryToCategoryDtoList(
-          CategoryFactory.getDefaultCategoryList());
+            CategoryFactory.getDefaultCategoryList());
 
         CategoryDto categoryDto = categoryDtos.get(0);
         Assertions.assertEquals(categoryDto.getId(), CategoryConstants.ID);

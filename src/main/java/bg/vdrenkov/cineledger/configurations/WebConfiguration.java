@@ -10,15 +10,15 @@ import java.util.Random;
 @Configuration
 public class WebConfiguration {
 
-  @Bean
-  public RestTemplate restTemplate() {
-    return new RestTemplate();
-  }
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
 
-  @Bean
-  public Random random() {
-    return new SecureRandom();
-  }
+    @Bean
+    public Random random() {
+        return new SecureRandom();
+    }
 }
 
 

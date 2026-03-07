@@ -9,12 +9,12 @@ import java.time.LocalTime;
 @Data
 public class ProjectionDto {
 
-  private int id;
-  private double price;
-  private HallDto hall;
-  private ProgramDto program;
-  private MovieDto movie;
-  private LocalTime startTime;
+    private int id;
+    private double price;
+    private HallDto hall;
+    private ProgramDto program;
+    private MovieDto movie;
+    private LocalTime startTime;
 }
 
 

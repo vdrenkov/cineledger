@@ -8,14 +8,14 @@ import java.time.LocalDate;
 
 public final class ProgramConstants {
 
-  public final static int ID = 1;
-  public final static LocalDate PAST_DATE = LocalDate.of(2000, 1, 1);
-  public final static LocalDate DATE = LocalDate.now().plusDays(30);
-  public static final Cinema PROGRAM_CINEMA = CinemaFactory.getDefaultCinema();
+    public final static int ID = 1;
+    public final static LocalDate PAST_DATE = LocalDate.of(2000, 1, 1);
+    public final static LocalDate DATE = LocalDate.now().plusDays(30);
+    public static final Cinema PROGRAM_CINEMA = CinemaFactory.getDefaultCinema();
 
-  private ProgramConstants() throws IllegalAccessException {
-    throw new IllegalAccessException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
-  }
+    private ProgramConstants() throws IllegalAccessException {
+        throw new IllegalAccessException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
+    }
 }
 
 

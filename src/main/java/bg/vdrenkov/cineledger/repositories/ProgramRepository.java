@@ -11,11 +11,11 @@ import java.util.Optional;
 @Repository
 public interface ProgramRepository extends JpaRepository<Program, Integer> {
 
-  List<Program> findAllByProgramDate(LocalDate programDate);
+    List<Program> findAllByProgramDate(LocalDate programDate);
 
-  List<Program> findAllByCinemaId(int cinemaId);
+    List<Program> findAllByCinemaId(int cinemaId);
 
-  Optional<Program> findByProgramDateAndCinemaId(LocalDate programDate, int cinemaId);
+    Optional<Program> findByProgramDateAndCinemaId(LocalDate programDate, int cinemaId);
 }
 
 

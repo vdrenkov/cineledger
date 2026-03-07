@@ -22,81 +22,80 @@ import java.util.stream.Collectors;
 @Service
 public class TicketService {
 
-  private static final Logger log = LoggerFactory.getLogger(TicketService.class);
+    private static final Logger log = LoggerFactory.getLogger(TicketService.class);
 
-  private final ProjectionService projectionService;
-  private final TicketMapper ticketMapper;
-  private final TicketRepository ticketRepository;
+    private final ProjectionService projectionService;
+    private final TicketMapper ticketMapper;
+    private final TicketRepository ticketRepository;
 
-  @Autowired
-  public TicketService(
-    ProjectionService projectionService, TicketMapper ticketMapper, TicketRepository ticketRepository) {
-    this.projectionService = projectionService;
-    this.ticketMapper = ticketMapper;
-    this.ticketRepository = ticketRepository;
-  }
-
-  public Ticket addTicket(TicketRequest request) {
-    Projection projection = projectionService.getProjectionById(request.getProjectionId());
-
-    LocalDate programDate = projection.getProgram().getProgramDate();
-    LocalDate dateOfPurchase = LocalDate.now();
-
-    if (programDate.isBefore(dateOfPurchase)) {
-      log.error(String.format("Exception caught: %s", ExceptionMessages.DATE_NOT_VALID_MESSAGE));
-      throw new DateNotValidException(ExceptionMessages.DATE_NOT_VALID_MESSAGE);
+    @Autowired
+    public TicketService(ProjectionService projectionService, TicketMapper ticketMapper,
+        TicketRepository ticketRepository) {
+        this.projectionService = projectionService;
+        this.ticketMapper = ticketMapper;
+        this.ticketRepository = ticketRepository;
     }
 
+    public Ticket addTicket(TicketRequest request) {
+        Projection projection = projectionService.getProjectionById(request.getProjectionId());
 
-    calculateAvailableTickets(projection);
+        LocalDate programDate = projection.getProgram().getProgramDate();
+        LocalDate dateOfPurchase = LocalDate.now();
 
-    Ticket ticket = new Ticket(dateOfPurchase, projection);
+        if (programDate.isBefore(dateOfPurchase)) {
+            log.error(String.format("Exception caught: %s", ExceptionMessages.DATE_NOT_VALID_MESSAGE));
+            throw new DateNotValidException(ExceptionMessages.DATE_NOT_VALID_MESSAGE);
+        }
 
-    log.info("An attempt to add a new ticket in the database");
+        calculateAvailableTickets(projection);
 
-    return ticketRepository.save(ticket);
-  }
+        Ticket ticket = new Ticket(dateOfPurchase, projection);
 
-  public List<TicketDto> getTicketsByProjectionId(int id) {
-    Projection projection = this.projectionService.getProjectionById(id);
+        log.info("An attempt to add a new ticket in the database");
 
-    List<Ticket> tickets = ticketRepository.findTicketByProjectionId(projection.getId());
-
-    log.info(String.format("All tickets with projection id %d were requested from the database", id));
-
-    return tickets.stream().map(ticketMapper::mapTicketToTicketDto).collect(Collectors.toList());
-  }
-
-  public Ticket getTicketById(int id) {
-    log.info(String.format("Retrieving ticket with id %d from database", id));
-
-    return ticketRepository.findById(id).orElseThrow(() -> {
-      log.error(String.format("Exception caught: %s", ExceptionMessages.TICKET_NOT_FOUND_MESSAGE));
-
-      throw new TicketNotFoundException(ExceptionMessages.TICKET_NOT_FOUND_MESSAGE);
-    });
-  }
-
-  public List<Ticket> getTicketsByDateBetween(LocalDate startDate, LocalDate endDate) {
-    log.info(
-      String.format("All tickets with date between %s and %s were requested from the database", startDate, endDate));
-
-    return ticketRepository.findTicketsByDateOfPurchaseBetween(startDate, endDate);
-  }
-
-  public int calculateAvailableTickets(Projection projection) {
-    int capacity = projection.getHall().getCapacity();
-    int totalTickets = ticketRepository.countByProjectionId(projection.getId());
-    int availableTickets = capacity - totalTickets;
-
-    if (availableTickets <= 0) {
-      log.error(String.format("Exception caught: %s", ExceptionMessages.NO_AVAILABLE_TICKETS_EXCEPTION));
-
-      throw new NoAvailableTicketsException(ExceptionMessages.NO_AVAILABLE_TICKETS_EXCEPTION);
+        return ticketRepository.save(ticket);
     }
 
-    return capacity - totalTickets;
-  }
+    public List<TicketDto> getTicketsByProjectionId(int id) {
+        Projection projection = this.projectionService.getProjectionById(id);
+
+        List<Ticket> tickets = ticketRepository.findTicketByProjectionId(projection.getId());
+
+        log.info(String.format("All tickets with projection id %d were requested from the database", id));
+
+        return tickets.stream().map(ticketMapper::mapTicketToTicketDto).collect(Collectors.toList());
+    }
+
+    public Ticket getTicketById(int id) {
+        log.info(String.format("Retrieving ticket with id %d from database", id));
+
+        return ticketRepository.findById(id).orElseThrow(() -> {
+            log.error(String.format("Exception caught: %s", ExceptionMessages.TICKET_NOT_FOUND_MESSAGE));
+
+            throw new TicketNotFoundException(ExceptionMessages.TICKET_NOT_FOUND_MESSAGE);
+        });
+    }
+
+    public List<Ticket> getTicketsByDateBetween(LocalDate startDate, LocalDate endDate) {
+        log.info(String.format("All tickets with date between %s and %s were requested from the database", startDate,
+            endDate));
+
+        return ticketRepository.findTicketsByDateOfPurchaseBetween(startDate, endDate);
+    }
+
+    public int calculateAvailableTickets(Projection projection) {
+        int capacity = projection.getHall().getCapacity();
+        int totalTickets = ticketRepository.countByProjectionId(projection.getId());
+        int availableTickets = capacity - totalTickets;
+
+        if (availableTickets <= 0) {
+            log.error(String.format("Exception caught: %s", ExceptionMessages.NO_AVAILABLE_TICKETS_EXCEPTION));
+
+            throw new NoAvailableTicketsException(ExceptionMessages.NO_AVAILABLE_TICKETS_EXCEPTION);
+        }
+
+        return capacity - totalTickets;
+    }
 }
 
 

@@ -7,10 +7,10 @@ import lombok.Data;
 @Data
 public class DiscountDto {
 
-  private int id;
-  private String type;
-  private String code;
-  private int percentage;
+    private int id;
+    private String type;
+    private String code;
+    private int percentage;
 }
 
 

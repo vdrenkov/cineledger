@@ -1,6 +1,6 @@
 package bg.vdrenkov.cineledger.services;
 
-import org.junit.jupiter.api.extension.ExtendWith;
+import bg.vdrenkov.cineledger.models.dtos.ItemDto;
 import bg.vdrenkov.cineledger.models.entities.Cinema;
 import bg.vdrenkov.cineledger.models.entities.Hall;
 import bg.vdrenkov.cineledger.models.entities.Movie;
@@ -12,9 +12,9 @@ import bg.vdrenkov.cineledger.testUtils.constants.ProjectionConstants;
 import bg.vdrenkov.cineledger.testUtils.constants.ReportConstants;
 import bg.vdrenkov.cineledger.testUtils.factories.OrderFactory;
 import bg.vdrenkov.cineledger.testUtils.factories.TicketFactory;
-import bg.vdrenkov.cineledger.models.dtos.ItemDto;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -58,7 +58,8 @@ public class IncomeReportServiceTest {
         when(cinemaService.getCinemaById(anyInt())).thenReturn(new Cinema());
         when(orderService.getOrdersByDateBetween(any(), any())).thenReturn(OrderFactory.getDefaultOrderList());
 
-        double result = incomeReportService.getAllIncomesByCinemaId(ReportConstants.ID, ReportConstants.START_DATE, ReportConstants.END_DATE);
+        double result = incomeReportService.getAllIncomesByCinemaId(ReportConstants.ID, ReportConstants.START_DATE,
+            ReportConstants.END_DATE);
 
         Assertions.assertEquals(OrderConstants.TOTAL_PRICE, result, 0.0);
     }
@@ -71,7 +72,8 @@ public class IncomeReportServiceTest {
         when(cinemaService.getCinemaById(anyInt())).thenReturn(new Cinema());
         when(orderService.getOrdersByDateBetween(any(), any())).thenReturn(orders);
 
-        double result = incomeReportService.getAllIncomesByCinemaId(ReportConstants.ID, ReportConstants.START_DATE, ReportConstants.END_DATE);
+        double result = incomeReportService.getAllIncomesByCinemaId(ReportConstants.ID, ReportConstants.START_DATE,
+            ReportConstants.END_DATE);
 
         assertEquals(0, result, 0.0);
     }
@@ -81,7 +83,8 @@ public class IncomeReportServiceTest {
         when(hallService.getHallById(anyInt())).thenReturn(new Hall());
         when(orderService.getOrdersByDateBetween(any(), any())).thenReturn(OrderFactory.getDefaultOrderList());
 
-        double result = incomeReportService.getAllIncomesByHallId(ReportConstants.ID, ReportConstants.START_DATE, ReportConstants.END_DATE);
+        double result = incomeReportService.getAllIncomesByHallId(ReportConstants.ID, ReportConstants.START_DATE,
+            ReportConstants.END_DATE);
 
         Assertions.assertEquals(OrderConstants.TOTAL_PRICE, result, 0.0);
     }
@@ -94,7 +97,8 @@ public class IncomeReportServiceTest {
         when(hallService.getHallById(anyInt())).thenReturn(new Hall());
         when(orderService.getOrdersByDateBetween(any(), any())).thenReturn(orders);
 
-        double result = incomeReportService.getAllIncomesByHallId(ReportConstants.ID, ReportConstants.START_DATE, ReportConstants.END_DATE);
+        double result = incomeReportService.getAllIncomesByHallId(ReportConstants.ID, ReportConstants.START_DATE,
+            ReportConstants.END_DATE);
 
         assertEquals(0, result, 0.0);
     }
@@ -104,7 +108,8 @@ public class IncomeReportServiceTest {
         when(itemService.getItemDtoById(anyInt())).thenReturn(new ItemDto());
         when(orderService.getOrdersByDateBetween(any(), any())).thenReturn(OrderFactory.getDefaultOrderList());
 
-        double result = incomeReportService.getAllIncomesByItemId(ReportConstants.ID, ReportConstants.START_DATE, ReportConstants.END_DATE);
+        double result = incomeReportService.getAllIncomesByItemId(ReportConstants.ID, ReportConstants.START_DATE,
+            ReportConstants.END_DATE);
 
         Assertions.assertEquals(ItemConstants.PRICE, result, 0.0);
     }
@@ -114,7 +119,8 @@ public class IncomeReportServiceTest {
         when(movieService.getMovieById(anyInt())).thenReturn(new Movie());
         when(ticketService.getTicketsByDateBetween(any(), any())).thenReturn(TicketFactory.getDefaultTicketList());
 
-        double result = incomeReportService.getAllIncomesByMovieId(ReportConstants.ID, ReportConstants.START_DATE, ReportConstants.END_DATE);
+        double result = incomeReportService.getAllIncomesByMovieId(ReportConstants.ID, ReportConstants.START_DATE,
+            ReportConstants.END_DATE);
 
         Assertions.assertEquals(ProjectionConstants.PRICE, result, 0.0);
     }
@@ -124,7 +130,8 @@ public class IncomeReportServiceTest {
         when(userService.getUserById(anyInt())).thenReturn(new User());
         when(orderService.getOrdersByDateBetween(any(), any())).thenReturn(OrderFactory.getDefaultOrderList());
 
-        double result = incomeReportService.getAllIncomesByUserId(ReportConstants.ID, ReportConstants.START_DATE, ReportConstants.END_DATE);
+        double result = incomeReportService.getAllIncomesByUserId(ReportConstants.ID, ReportConstants.START_DATE,
+            ReportConstants.END_DATE);
 
         Assertions.assertEquals(OrderConstants.TOTAL_PRICE, result, 0.0);
     }

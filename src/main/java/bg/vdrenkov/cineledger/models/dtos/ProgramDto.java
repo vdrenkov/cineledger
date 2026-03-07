@@ -9,9 +9,9 @@ import java.time.LocalDate;
 @Data
 public class ProgramDto {
 
-  private int id;
-  private LocalDate programDate;
-  private CinemaDto cinema;
+    private int id;
+    private LocalDate programDate;
+    private CinemaDto cinema;
 }
 
 

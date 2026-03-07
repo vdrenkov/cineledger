@@ -10,12 +10,12 @@ import java.util.List;
 @Data
 public class OrderDto {
 
-  private int id;
-  private LocalDate dateOfPurchase;
-  private UserDto user;
-  private List<TicketDto> tickets;
-  private List<ItemDto> items;
-  private double totalPrice;
+    private int id;
+    private LocalDate dateOfPurchase;
+    private UserDto user;
+    private List<TicketDto> tickets;
+    private List<ItemDto> items;
+    private double totalPrice;
 }
 
 

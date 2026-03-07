@@ -1,10 +1,11 @@
 package bg.vdrenkov.cineledger.controllers;
 
+import bg.vdrenkov.cineledger.models.dtos.ItemDto;
 import bg.vdrenkov.cineledger.models.entities.Item;
 import bg.vdrenkov.cineledger.models.requests.ItemRequest;
 import bg.vdrenkov.cineledger.services.ItemService;
 import bg.vdrenkov.cineledger.utils.constants.URIConstants;
-import bg.vdrenkov.cineledger.models.dtos.ItemDto;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,84 +20,78 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
 
 @RestController
 public class ItemController {
 
-  private static final Logger log = LoggerFactory.getLogger(ItemController.class);
+    private static final Logger log = LoggerFactory.getLogger(ItemController.class);
 
-  private final ItemService itemService;
+    private final ItemService itemService;
 
-  @Autowired
-  public ItemController(ItemService itemService) {
-    this.itemService = itemService;
-  }
+    @Autowired
+    public ItemController(ItemService itemService) {
+        this.itemService = itemService;
+    }
 
-  @PostMapping(URIConstants.ITEMS_PATH)
-  public ResponseEntity<Void> addItem(@RequestBody @Valid ItemRequest itemRequest) {
-    log.info("Creation of a new item request has been submitted");
-    Item item = itemService.addItem(itemRequest);
-    log.info("Created new item");
+    @PostMapping(URIConstants.ITEMS_PATH)
+    public ResponseEntity<Void> addItem(@RequestBody @Valid ItemRequest itemRequest) {
+        log.info("Creation of a new item request has been submitted");
+        Item item = itemService.addItem(itemRequest);
+        log.info("Created new item");
 
-    URI location = UriComponentsBuilder
-      .fromUriString(URIConstants.ITEMS_ID_PATH)
-      .buildAndExpand(item.getId())
-      .toUri();
+        URI location = UriComponentsBuilder
+            .fromUriString(URIConstants.ITEMS_ID_PATH)
+            .buildAndExpand(item.getId())
+            .toUri();
 
-    return ResponseEntity.created(location).build();
-  }
+        return ResponseEntity.created(location).build();
+    }
 
-  @GetMapping(URIConstants.ITEMS_PATH)
-  public ResponseEntity<List<ItemDto>> getAllItems() {
-    List<ItemDto> items = itemService.getAllItems();
-    log.info("All items were requested from the database");
+    @GetMapping(URIConstants.ITEMS_PATH)
+    public ResponseEntity<List<ItemDto>> getAllItems() {
+        List<ItemDto> items = itemService.getAllItems();
+        log.info("All items were requested from the database");
 
-    return ResponseEntity.ok(items);
-  }
+        return ResponseEntity.ok(items);
+    }
 
-  @GetMapping(value = URIConstants.ITEMS_PATH, params = "itemName")
-  public ResponseEntity<ItemDto> getItemByName(@RequestParam String itemName) {
-    ItemDto itemdto = itemService.getItemDtoByName(itemName);
-    log.info(String.format("Item with name %s has been requested from database", itemName));
+    @GetMapping(value = URIConstants.ITEMS_PATH, params = "itemName")
+    public ResponseEntity<ItemDto> getItemByName(@RequestParam String itemName) {
+        ItemDto itemdto = itemService.getItemDtoByName(itemName);
+        log.info(String.format("Item with name %s has been requested from database", itemName));
 
-    return ResponseEntity.ok(itemdto);
-  }
+        return ResponseEntity.ok(itemdto);
+    }
 
-  @GetMapping(value = URIConstants.ITEMS_PATH, params = "quantity")
-  public ResponseEntity<List<ItemDto>> getItemsByQuantity(
-    @RequestParam int quantity,
-    @RequestParam Boolean isBelow) {
+    @GetMapping(value = URIConstants.ITEMS_PATH, params = "quantity")
+    public ResponseEntity<List<ItemDto>> getItemsByQuantity(@RequestParam int quantity, @RequestParam Boolean isBelow) {
 
-    List<ItemDto> filteredItems = itemService.getItemsByQuantity(quantity, isBelow);
-    log.info("Filtered items were requested from the database");
+        List<ItemDto> filteredItems = itemService.getItemsByQuantity(quantity, isBelow);
+        log.info("Filtered items were requested from the database");
 
-    return ResponseEntity.ok(filteredItems);
-  }
+        return ResponseEntity.ok(filteredItems);
+    }
 
-  @PutMapping(URIConstants.ITEMS_ID_PATH)
-  public ResponseEntity<ItemDto> updateItem(
-    @RequestBody @Valid ItemRequest itemRequest, @PathVariable int id,
-    @RequestParam(required = false) boolean returnOld) {
+    @PutMapping(URIConstants.ITEMS_ID_PATH)
+    public ResponseEntity<ItemDto> updateItem(@RequestBody @Valid ItemRequest itemRequest, @PathVariable int id,
+        @RequestParam(required = false) boolean returnOld) {
 
-    ItemDto itemDto = itemService.editItem(itemRequest, id);
-    log.info(String.format("Item with id %d was updated", id));
+        ItemDto itemDto = itemService.editItem(itemRequest, id);
+        log.info(String.format("Item with id %d was updated", id));
 
-    return returnOld ? ResponseEntity.ok(itemDto) : ResponseEntity.noContent().build();
-  }
+        return returnOld ? ResponseEntity.ok(itemDto) : ResponseEntity.noContent().build();
+    }
 
-  @DeleteMapping(URIConstants.ITEMS_ID_PATH)
-  public ResponseEntity<ItemDto> deleteItem(
-    @PathVariable int id,
-    @RequestParam(required = false) boolean returnOld) {
+    @DeleteMapping(URIConstants.ITEMS_ID_PATH)
+    public ResponseEntity<ItemDto> deleteItem(@PathVariable int id, @RequestParam(required = false) boolean returnOld) {
 
-    ItemDto itemDto = itemService.removeItem(id);
-    log.info(String.format("Item with id %d was deleted", id));
+        ItemDto itemDto = itemService.removeItem(id);
+        log.info(String.format("Item with id %d was deleted", id));
 
-    return returnOld ? ResponseEntity.ok(itemDto) : ResponseEntity.noContent().build();
-  }
+        return returnOld ? ResponseEntity.ok(itemDto) : ResponseEntity.noContent().build();
+    }
 }
 
 

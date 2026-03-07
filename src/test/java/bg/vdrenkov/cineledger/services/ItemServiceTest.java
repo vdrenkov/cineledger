@@ -1,16 +1,16 @@
 package bg.vdrenkov.cineledger.services;
 
-import org.junit.jupiter.api.extension.ExtendWith;
 import bg.vdrenkov.cineledger.exceptions.ItemAlreadyExistsException;
 import bg.vdrenkov.cineledger.exceptions.ItemNotFoundException;
 import bg.vdrenkov.cineledger.exceptions.NoAvailableItemsException;
 import bg.vdrenkov.cineledger.mappers.ItemMapper;
+import bg.vdrenkov.cineledger.models.dtos.ItemDto;
 import bg.vdrenkov.cineledger.models.entities.Item;
 import bg.vdrenkov.cineledger.repositories.ItemRepository;
 import bg.vdrenkov.cineledger.testUtils.constants.ItemConstants;
 import bg.vdrenkov.cineledger.testUtils.factories.ItemFactory;
-import bg.vdrenkov.cineledger.models.dtos.ItemDto;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -18,13 +18,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import org.junit.jupiter.api.Assertions;
 
 @ExtendWith(MockitoExtension.class)
 public class ItemServiceTest {
@@ -62,12 +61,12 @@ public class ItemServiceTest {
 
     @Test
     public void testGetItemDtoById_itemNotFound_throwsItemNotFoundException() {
-      assertThrows(ItemNotFoundException.class, () -> {
+        assertThrows(ItemNotFoundException.class, () -> {
 
-          when(itemRepository.findById(anyInt())).thenThrow(new ItemNotFoundException(anyString()));
-          itemService.getItemDtoById(ItemConstants.ID);
-      
-      });
+            when(itemRepository.findById(anyInt())).thenThrow(new ItemNotFoundException(anyString()));
+            itemService.getItemDtoById(ItemConstants.ID);
+
+        });
     }
 
     @Test
@@ -82,12 +81,12 @@ public class ItemServiceTest {
 
     @Test
     public void testFindItemById_itemNotFound_throwsItemNotFoundException() {
-      assertThrows(ItemNotFoundException.class, () -> {
+        assertThrows(ItemNotFoundException.class, () -> {
 
-          when(itemRepository.findById(anyInt())).thenReturn(Optional.empty());
-          itemService.getItemById(ItemConstants.ID);
-      
-      });
+            when(itemRepository.findById(anyInt())).thenReturn(Optional.empty());
+            itemService.getItemById(ItemConstants.ID);
+
+        });
     }
 
     @Test
@@ -103,13 +102,13 @@ public class ItemServiceTest {
 
     @Test
     public void testGetItemDtoByName_throwsCategoryNotFoundException() {
-      assertThrows(ItemNotFoundException.class, () -> {
+        assertThrows(ItemNotFoundException.class, () -> {
 
-          when(itemRepository.findByName(anyString())).thenReturn(Optional.empty());
+            when(itemRepository.findByName(anyString())).thenReturn(Optional.empty());
 
-          itemService.getItemDtoByName(ItemConstants.NAME);
-      
-      });
+            itemService.getItemDtoByName(ItemConstants.NAME);
+
+        });
     }
 
     @Test
@@ -124,13 +123,13 @@ public class ItemServiceTest {
 
     @Test
     public void testAddItem_itemAlreadyExists_throwsExistingItemException() {
-      assertThrows(ItemAlreadyExistsException.class, () -> {
+        assertThrows(ItemAlreadyExistsException.class, () -> {
 
-          when(itemRepository.findByName(anyString())).thenReturn(Optional.of(new Item()));
+            when(itemRepository.findByName(anyString())).thenReturn(Optional.of(new Item()));
 
-          itemService.addItem(ItemFactory.getDefaultItemRequest());
-      
-      });
+            itemService.addItem(ItemFactory.getDefaultItemRequest());
+
+        });
     }
 
     @Test
@@ -180,14 +179,14 @@ public class ItemServiceTest {
 
     @Test
     public void testDecrementItemQuantity_shouldThrowNoAvailableItemsException() {
-      assertThrows(NoAvailableItemsException.class, () -> {
+        assertThrows(NoAvailableItemsException.class, () -> {
 
-          Item item = new Item();
-          item.setQuantity(0);
+            Item item = new Item();
+            item.setQuantity(0);
 
-          itemService.decrementItemQuantity(item);
-      
-      });
+            itemService.decrementItemQuantity(item);
+
+        });
     }
 
     @Test

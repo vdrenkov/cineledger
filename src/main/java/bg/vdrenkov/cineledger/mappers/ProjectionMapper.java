@@ -13,33 +13,30 @@ import java.util.stream.Collectors;
 @Component
 public class ProjectionMapper {
 
-  private static final Logger log = LoggerFactory.getLogger(ProjectionMapper.class);
+    private static final Logger log = LoggerFactory.getLogger(ProjectionMapper.class);
 
-  private final HallMapper hallMapper;
-  private final ProgramMapper programMapper;
-  private final MovieMapper movieMapper;
+    private final HallMapper hallMapper;
+    private final ProgramMapper programMapper;
+    private final MovieMapper movieMapper;
 
-  @Autowired
-  public ProjectionMapper(HallMapper hallMapper, ProgramMapper programMapper, MovieMapper movieMapper) {
-    this.hallMapper = hallMapper;
-    this.programMapper = programMapper;
-    this.movieMapper = movieMapper;
-  }
+    @Autowired
+    public ProjectionMapper(HallMapper hallMapper, ProgramMapper programMapper, MovieMapper movieMapper) {
+        this.hallMapper = hallMapper;
+        this.programMapper = programMapper;
+        this.movieMapper = movieMapper;
+    }
 
-  public ProjectionDto mapProjectionToProjectionDto(Projection projection) {
-    log.info(String.format("The projection with an id %d is being mapped to a projection DTO", projection.getId()));
-    return new ProjectionDto(projection.getId(), projection.getPrice(),
-                             hallMapper.mapHallToHallDto(projection.getHall()),
-                             programMapper.mapProgramToProgramDto(projection.getProgram()),
-                             movieMapper.mapMovieToMovieDto(projection.getMovie()),
-                             projection.getStartTime());
-  }
+    public ProjectionDto mapProjectionToProjectionDto(Projection projection) {
+        log.info(String.format("The projection with an id %d is being mapped to a projection DTO", projection.getId()));
+        return new ProjectionDto(projection.getId(), projection.getPrice(),
+            hallMapper.mapHallToHallDto(projection.getHall()),
+            programMapper.mapProgramToProgramDto(projection.getProgram()),
+            movieMapper.mapMovieToMovieDto(projection.getMovie()), projection.getStartTime());
+    }
 
-  public List<ProjectionDto> mapProjectionListToProjectionDtoList(List<Projection> projections) {
-    return projections.stream()
-                      .map(this::mapProjectionToProjectionDto)
-                      .collect(Collectors.toList());
-  }
+    public List<ProjectionDto> mapProjectionListToProjectionDtoList(List<Projection> projections) {
+        return projections.stream().map(this::mapProjectionToProjectionDto).collect(Collectors.toList());
+    }
 }
 
 

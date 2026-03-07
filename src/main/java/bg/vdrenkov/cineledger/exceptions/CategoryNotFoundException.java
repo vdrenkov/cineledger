@@ -2,9 +2,9 @@ package bg.vdrenkov.cineledger.exceptions;
 
 public class CategoryNotFoundException extends RuntimeException {
 
-  public CategoryNotFoundException(String message) {
-    super(message);
-  }
+    public CategoryNotFoundException(String message) {
+        super(message);
+    }
 }
 
 

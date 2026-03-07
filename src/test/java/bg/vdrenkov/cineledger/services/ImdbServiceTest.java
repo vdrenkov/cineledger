@@ -5,12 +5,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.client.RestTemplate;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.Assertions;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -41,8 +40,8 @@ public class ImdbServiceTest {
     public void testGetMovies_returnTop_success() throws JSONException {
         String filter = "top";
         String mockResponseBody =
-                "{\"items\": [{\"title\": \"The Shawshank Redemption\", \"year\": \"1994\", \"image\": \"image1.jpg\"}, " +
-                        "{\"title\": \"Movie 2\", \"year\": \"2023\", \"image\": \"image2.jpg\"}]}";
+            "{\"items\": [{\"title\": \"The Shawshank Redemption\", \"year\": \"1994\", \"image\": \"image1.jpg\"}, "
+                + "{\"title\": \"Movie 2\", \"year\": \"2023\", \"image\": \"image2.jpg\"}]}";
         when(restTemplate.getForObject(anyString(), any())).thenReturn(mockResponseBody);
 
         JSONObject mockResponseJson = new JSONObject(mockResponseBody);
@@ -71,8 +70,7 @@ public class ImdbServiceTest {
     @Test
     public void testGetMovies_returnBoxOffices_success() throws JSONException {
         String filter = "box office";
-        String mockResponseBody =
-                "{\"items\": [{\"title\": \"Avatar\", \"year\": \"2009\"}, {\"title\": \"Movie 2\", \"year\": \"2023\"}]}";
+        String mockResponseBody = "{\"items\": [{\"title\": \"Avatar\", \"year\": \"2009\"}, {\"title\": \"Movie 2\", \"year\": \"2023\"}]}";
         when(restTemplate.getForObject(anyString(), any())).thenReturn(mockResponseBody);
 
         JSONObject mockResponseJson = new JSONObject(mockResponseBody);
@@ -98,8 +96,7 @@ public class ImdbServiceTest {
     @Test
     public void testGetMovies_returnComingSoon_success() throws JSONException {
         String filter = "coming soon";
-        String mockResponseBody =
-                "{\"items\": [{\"title\": \"The Flash\", \"year\": \"2023\",\"image\": \"image1.jpg\"}, {\"title\": \"Movie 2\", \"year\": \"2023\",\"image\": \"image2.jpg\"}]}";
+        String mockResponseBody = "{\"items\": [{\"title\": \"The Flash\", \"year\": \"2023\",\"image\": \"image1.jpg\"}, {\"title\": \"Movie 2\", \"year\": \"2023\",\"image\": \"image2.jpg\"}]}";
         when(restTemplate.getForObject(anyString(), any())).thenReturn(mockResponseBody);
 
         JSONObject mockResponseJson = new JSONObject(mockResponseBody);

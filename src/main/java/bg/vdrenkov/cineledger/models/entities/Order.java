@@ -1,9 +1,5 @@
 package bg.vdrenkov.cineledger.models.entities;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -15,6 +11,10 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -25,37 +25,35 @@ import java.util.List;
 @Data
 public class Order {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private int id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
 
-  @Column(name = "date_of_purchase")
-  private LocalDate dateOfPurchase;
+    @Column(name = "date_of_purchase")
+    private LocalDate dateOfPurchase;
 
-  @ManyToOne
-  @JoinColumn(name = "user_id")
-  private User user;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
-  @OneToMany
-  private List<Ticket> tickets;
+    @OneToMany
+    private List<Ticket> tickets;
 
-  @ManyToMany
-  @JoinTable(
-    name = "orders_items",
-    joinColumns = {@JoinColumn(name = "order_id")},
-    inverseJoinColumns = {@JoinColumn(name = "item_id")})
-  private List<Item> items;
+    @ManyToMany
+    @JoinTable(name = "orders_items", joinColumns = { @JoinColumn(name = "order_id") },
+        inverseJoinColumns = { @JoinColumn(name = "item_id") })
+    private List<Item> items;
 
-  @Column(name = "total_price")
-  private double totalPrice;
+    @Column(name = "total_price")
+    private double totalPrice;
 
-  public Order(LocalDate dateOfPurchase, User user, List<Ticket> tickets, List<Item> items, double totalPrice) {
-    this.dateOfPurchase = dateOfPurchase;
-    this.user = user;
-    this.tickets = tickets;
-    this.items = items;
-    this.totalPrice = totalPrice;
-  }
+    public Order(LocalDate dateOfPurchase, User user, List<Ticket> tickets, List<Item> items, double totalPrice) {
+        this.dateOfPurchase = dateOfPurchase;
+        this.user = user;
+        this.tickets = tickets;
+        this.items = items;
+        this.totalPrice = totalPrice;
+    }
 }
 
 

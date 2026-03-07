@@ -7,13 +7,13 @@ import static bg.vdrenkov.cineledger.testUtils.constants.HttpCookieConstants.COO
 
 public final class HttpCookieFactory {
 
-  private HttpCookieFactory() throws IllegalAccessException {
-    throw new IllegalAccessException();
-  }
+    private HttpCookieFactory() throws IllegalAccessException {
+        throw new IllegalAccessException();
+    }
 
-  public static HttpCookie getDefaultHttpCookie() {
-    return new HttpCookie(COOKIE_NAME, COOKIE_VALUE);
-  }
+    public static HttpCookie getDefaultHttpCookie() {
+        return new HttpCookie(COOKIE_NAME, COOKIE_VALUE);
+    }
 }
 
 

@@ -1,11 +1,12 @@
 package bg.vdrenkov.cineledger.controllers;
 
+import bg.vdrenkov.cineledger.models.dtos.OrderDto;
 import bg.vdrenkov.cineledger.models.entities.Order;
 import bg.vdrenkov.cineledger.models.requests.OrderRequest;
 import bg.vdrenkov.cineledger.models.requests.TicketRequest;
 import bg.vdrenkov.cineledger.services.OrderService;
 import bg.vdrenkov.cineledger.utils.constants.URIConstants;
-import bg.vdrenkov.cineledger.models.dtos.OrderDto;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,77 +21,76 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
 
 @RestController
 public class OrderController {
 
-  private static final Logger log = LoggerFactory.getLogger(OrderController.class);
+    private static final Logger log = LoggerFactory.getLogger(OrderController.class);
 
-  private final OrderService orderService;
+    private final OrderService orderService;
 
-  @Autowired
-  public OrderController(OrderService orderService) {
-    this.orderService = orderService;
-  }
+    @Autowired
+    public OrderController(OrderService orderService) {
+        this.orderService = orderService;
+    }
 
-  @PostMapping(URIConstants.ORDERS_PATH)
-  public ResponseEntity<Void> addOrder(@RequestBody @Valid OrderRequest request) {
+    @PostMapping(URIConstants.ORDERS_PATH)
+    public ResponseEntity<Void> addOrder(@RequestBody @Valid OrderRequest request) {
 
-    Order order = orderService.addOrder(request);
-    log.info("A request for an order to be added has been submitted");
+        Order order = orderService.addOrder(request);
+        log.info("A request for an order to be added has been submitted");
 
-    URI location = UriComponentsBuilder
-      .fromUriString(URIConstants.ORDERS_ID_PATH)
-      .buildAndExpand(order.getId())
-      .toUri();
+        URI location = UriComponentsBuilder
+            .fromUriString(URIConstants.ORDERS_ID_PATH)
+            .buildAndExpand(order.getId())
+            .toUri();
 
-    return ResponseEntity.created(location).build();
-  }
+        return ResponseEntity.created(location).build();
+    }
 
-  @PostMapping(URIConstants.USERS_ID_ORDERS_PATH)
-  public ResponseEntity<Void> makeReservationWithUserId(
-    @RequestBody @Valid List<TicketRequest> requests, @PathVariable int id,
-    @RequestParam(required = false, defaultValue = "Code") String discountCode) {
+    @PostMapping(URIConstants.USERS_ID_ORDERS_PATH)
+    public ResponseEntity<Void> makeReservationWithUserId(@RequestBody @Valid List<TicketRequest> requests,
+        @PathVariable int id, @RequestParam(required = false, defaultValue = "Code") String discountCode) {
 
-    Order order = orderService.makeReservationWithUserId(requests, id, discountCode);
-    log.info("A request for a ticket to be added has been submitted");
+        Order order = orderService.makeReservationWithUserId(requests, id, discountCode);
+        log.info("A request for a ticket to be added has been submitted");
 
-    URI location = UriComponentsBuilder
-      .fromUriString(URIConstants.ORDERS_ID_PATH)
-      .buildAndExpand(order.getId())
-      .toUri();
+        URI location = UriComponentsBuilder
+            .fromUriString(URIConstants.ORDERS_ID_PATH)
+            .buildAndExpand(order.getId())
+            .toUri();
 
-    return ResponseEntity.created(location).build();
-  }
+        return ResponseEntity.created(location).build();
+    }
 
-  @GetMapping(URIConstants.USERS_ID_ORDERS_PATH)
-  public ResponseEntity<List<OrderDto>> getOrdersByUserId(@PathVariable int id) {
-    List<OrderDto> orderDtos = orderService.getOrdersByUserId(id);
-    log.info(String.format("All orders by user id %d were requested from the database", id));
+    @GetMapping(URIConstants.USERS_ID_ORDERS_PATH)
+    public ResponseEntity<List<OrderDto>> getOrdersByUserId(@PathVariable int id) {
+        List<OrderDto> orderDtos = orderService.getOrdersByUserId(id);
+        log.info(String.format("All orders by user id %d were requested from the database", id));
 
-    return ResponseEntity.ok(orderDtos);
-  }
+        return ResponseEntity.ok(orderDtos);
+    }
 
-  @PutMapping(URIConstants.ORDERS_ID_PATH)
-  public ResponseEntity<OrderDto> updateOrder(
-    @RequestBody @Valid OrderRequest request, @PathVariable int id, @RequestParam(required = false) boolean returnOld) {
+    @PutMapping(URIConstants.ORDERS_ID_PATH)
+    public ResponseEntity<OrderDto> updateOrder(@RequestBody @Valid OrderRequest request, @PathVariable int id,
+        @RequestParam(required = false) boolean returnOld) {
 
-    OrderDto orderDto = orderService.updateOrder(request, id);
-    log.info(String.format("Order with an id %d was updated", id));
+        OrderDto orderDto = orderService.updateOrder(request, id);
+        log.info(String.format("Order with an id %d was updated", id));
 
-    return returnOld ? ResponseEntity.ok(orderDto) : ResponseEntity.noContent().build();
-  }
+        return returnOld ? ResponseEntity.ok(orderDto) : ResponseEntity.noContent().build();
+    }
 
-  @DeleteMapping(URIConstants.ORDERS_ID_PATH)
-  public ResponseEntity<OrderDto> deleteOrder(@PathVariable int id, @RequestParam(required = false) boolean returnOld) {
-    OrderDto orderDto = orderService.deleteOrder(id);
-    log.info(String.format("Order with an id %d was deleted", id));
+    @DeleteMapping(URIConstants.ORDERS_ID_PATH)
+    public ResponseEntity<OrderDto> deleteOrder(@PathVariable int id,
+        @RequestParam(required = false) boolean returnOld) {
+        OrderDto orderDto = orderService.deleteOrder(id);
+        log.info(String.format("Order with an id %d was deleted", id));
 
-    return returnOld ? ResponseEntity.ok(orderDto) : ResponseEntity.noContent().build();
-  }
+        return returnOld ? ResponseEntity.ok(orderDto) : ResponseEntity.noContent().build();
+    }
 }
 
 

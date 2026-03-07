@@ -10,15 +10,15 @@ import java.time.LocalDate;
 @Data
 public class ReviewDto {
 
-  private int id;
-  private double rating;
-  private String reviewText;
-  private LocalDate dateModified;
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  private MovieDto movie;
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  private CinemaDto cinema;
-  private UserDto user;
+    private int id;
+    private double rating;
+    private String reviewText;
+    private LocalDate dateModified;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private MovieDto movie;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private CinemaDto cinema;
+    private UserDto user;
 }
 
 

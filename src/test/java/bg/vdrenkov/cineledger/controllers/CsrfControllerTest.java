@@ -8,20 +8,19 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import org.junit.jupiter.api.Assertions;
 
 class CsrfControllerTest {
 
-  private final CsrfController csrfController = new CsrfController();
+    private final CsrfController csrfController = new CsrfController();
 
-  @Test
-  void csrf_returnsTokenPayload() {
-    CsrfToken csrfToken = mock(CsrfToken.class);
-    when(csrfToken.getToken()).thenReturn("csrf-token");
+    @Test
+    void csrf_returnsTokenPayload() {
+        CsrfToken csrfToken = mock(CsrfToken.class);
+        when(csrfToken.getToken()).thenReturn("csrf-token");
 
-    Map<String, String> body = csrfController.csrf(csrfToken).getBody();
+        Map<String, String> body = csrfController.csrf(csrfToken).getBody();
 
-    assertEquals(Map.of("token", "csrf-token"), body);
-  }
+        assertEquals(Map.of("token", "csrf-token"), body);
+    }
 }
 

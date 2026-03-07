@@ -1,18 +1,18 @@
 package bg.vdrenkov.cineledger.services;
 
-import org.junit.jupiter.api.extension.ExtendWith;
 import bg.vdrenkov.cineledger.exceptions.DateNotValidException;
 import bg.vdrenkov.cineledger.exceptions.ProgramAlreadyExistsException;
 import bg.vdrenkov.cineledger.exceptions.ProgramNotFoundException;
 import bg.vdrenkov.cineledger.mappers.ProgramMapper;
+import bg.vdrenkov.cineledger.models.dtos.ProgramDto;
 import bg.vdrenkov.cineledger.models.entities.Program;
 import bg.vdrenkov.cineledger.models.requests.ProgramRequest;
 import bg.vdrenkov.cineledger.repositories.ProgramRepository;
 import bg.vdrenkov.cineledger.testUtils.constants.ProgramConstants;
 import bg.vdrenkov.cineledger.testUtils.factories.CinemaFactory;
 import bg.vdrenkov.cineledger.testUtils.factories.ProgramFactory;
-import bg.vdrenkov.cineledger.models.dtos.ProgramDto;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -21,13 +21,12 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
-import org.junit.jupiter.api.Assertions;
 
 @ExtendWith(MockitoExtension.class)
 public class ProgramServiceTest {
@@ -58,26 +57,26 @@ public class ProgramServiceTest {
 
     @Test
     public void testAddProgram_dateNotPresent_throwsDateNotValidException() {
-      assertThrows(DateNotValidException.class, () -> {
+        assertThrows(DateNotValidException.class, () -> {
 
-          ProgramRequest request = ProgramFactory.getDefaultProgramRequest();
-          request.setProgramDate(ProgramConstants.PAST_DATE);
+            ProgramRequest request = ProgramFactory.getDefaultProgramRequest();
+            request.setProgramDate(ProgramConstants.PAST_DATE);
 
-          programService.addProgram(request);
-      
-      });
+            programService.addProgram(request);
+
+        });
     }
 
     @Test
     public void testAddProgram_programAlreadyExists_throwsProgramAlreadyExistsException() {
-      assertThrows(ProgramAlreadyExistsException.class, () -> {
+        assertThrows(ProgramAlreadyExistsException.class, () -> {
 
-          when(programRepository.findByProgramDateAndCinemaId(any(), anyInt())).thenReturn(
-            Optional.of(ProgramFactory.getDefaultProgram()));
+            when(programRepository.findByProgramDateAndCinemaId(any(), anyInt())).thenReturn(
+                Optional.of(ProgramFactory.getDefaultProgram()));
 
-          programService.addProgram(ProgramFactory.getDefaultProgramRequest());
-      
-      });
+            programService.addProgram(ProgramFactory.getDefaultProgramRequest());
+
+        });
     }
 
     @Test
@@ -130,11 +129,11 @@ public class ProgramServiceTest {
 
     @Test
     public void testGetProgramById_programNotFound_throwsProgramNotFoundException() {
-      assertThrows(ProgramNotFoundException.class, () -> {
+        assertThrows(ProgramNotFoundException.class, () -> {
 
-          programService.getProgramById(ProgramConstants.ID);
-      
-      });
+            programService.getProgramById(ProgramConstants.ID);
+
+        });
     }
 
     @Test
@@ -157,7 +156,8 @@ public class ProgramServiceTest {
         when(programRepository.findById(anyInt())).thenReturn(Optional.of(ProgramFactory.getDefaultProgram()));
         when(programRepository.save(any())).thenReturn(ProgramFactory.getDefaultProgram());
 
-        ProgramDto program = programService.updateProgram(ProgramFactory.getDefaultProgramRequest(), ProgramConstants.ID);
+        ProgramDto program = programService.updateProgram(ProgramFactory.getDefaultProgramRequest(),
+            ProgramConstants.ID);
 
         assertEquals(expected, program);
 
@@ -165,17 +165,17 @@ public class ProgramServiceTest {
 
     @Test
     public void testUpdateProgram_dateNotPresent_throwsDateNotValidException() {
-      assertThrows(DateNotValidException.class, () -> {
+        assertThrows(DateNotValidException.class, () -> {
 
-          ProgramRequest request = ProgramFactory.getDefaultProgramRequest();
-          request.setProgramDate(ProgramConstants.PAST_DATE);
+            ProgramRequest request = ProgramFactory.getDefaultProgramRequest();
+            request.setProgramDate(ProgramConstants.PAST_DATE);
 
-          when(programMapper.mapProgramToProgramDto(any())).thenReturn(ProgramFactory.getDefaultProgramDto());
-          when(programRepository.findById(anyInt())).thenReturn(Optional.of(ProgramFactory.getDefaultProgram()));
+            when(programMapper.mapProgramToProgramDto(any())).thenReturn(ProgramFactory.getDefaultProgramDto());
+            when(programRepository.findById(anyInt())).thenReturn(Optional.of(ProgramFactory.getDefaultProgram()));
 
-          programService.updateProgram(request, ProgramConstants.ID);
-      
-      });
+            programService.updateProgram(request, ProgramConstants.ID);
+
+        });
     }
 
     @Test

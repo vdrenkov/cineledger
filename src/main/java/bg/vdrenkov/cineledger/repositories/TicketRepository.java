@@ -10,11 +10,11 @@ import java.util.List;
 @Repository
 public interface TicketRepository extends JpaRepository<Ticket, Integer> {
 
-  List<Ticket> findTicketByProjectionId(int projectionId);
+    List<Ticket> findTicketByProjectionId(int projectionId);
 
-  int countByProjectionId(int projectionId);
+    int countByProjectionId(int projectionId);
 
-  List<Ticket> findTicketsByDateOfPurchaseBetween(LocalDate startDate, LocalDate endDate);
+    List<Ticket> findTicketsByDateOfPurchaseBetween(LocalDate startDate, LocalDate endDate);
 }
 
 

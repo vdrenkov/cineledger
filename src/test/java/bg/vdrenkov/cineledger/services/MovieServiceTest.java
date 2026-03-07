@@ -1,18 +1,18 @@
 package bg.vdrenkov.cineledger.services;
 
-import org.junit.jupiter.api.extension.ExtendWith;
 import bg.vdrenkov.cineledger.exceptions.DateNotValidException;
 import bg.vdrenkov.cineledger.exceptions.MovieAlreadyExistsException;
 import bg.vdrenkov.cineledger.exceptions.MovieNotFoundException;
 import bg.vdrenkov.cineledger.mappers.MovieMapper;
+import bg.vdrenkov.cineledger.models.dtos.MovieDto;
 import bg.vdrenkov.cineledger.models.entities.Movie;
 import bg.vdrenkov.cineledger.models.requests.MovieRequest;
 import bg.vdrenkov.cineledger.repositories.MovieRepository;
 import bg.vdrenkov.cineledger.testUtils.constants.MovieConstants;
 import bg.vdrenkov.cineledger.testUtils.factories.CategoryFactory;
 import bg.vdrenkov.cineledger.testUtils.factories.MovieFactory;
-import bg.vdrenkov.cineledger.models.dtos.MovieDto;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -21,15 +21,14 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.anyDouble;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import org.junit.jupiter.api.Assertions;
 
 @ExtendWith(MockitoExtension.class)
 public class MovieServiceTest {
@@ -54,8 +53,9 @@ public class MovieServiceTest {
         List<MovieDto> expected = MovieFactory.getDefaultMovieDtoList();
 
         when(movieMapper.mapMovieListToMovieDtoList(any())).thenReturn(expected);
-        when(movieRepository.findByTitleContainingAndAverageRatingGreaterThanEqual(anyString(), anyDouble())).thenReturn(
-                MovieFactory.getDefaultMovieList());
+        when(
+            movieRepository.findByTitleContainingAndAverageRatingGreaterThanEqual(anyString(), anyDouble())).thenReturn(
+            MovieFactory.getDefaultMovieList());
 
         List<MovieDto> resultList = movieService.getMoviesByTitle(MovieConstants.TITLE, MovieConstants.RATING);
 
@@ -80,7 +80,7 @@ public class MovieServiceTest {
 
         when(movieMapper.mapMovieListToMovieDtoList(any())).thenReturn(expected);
         when(movieRepository.findByCategoryIdAndAverageRatingGreaterThanEqual(anyInt(), anyDouble())).thenReturn(
-                MovieFactory.getDefaultMovieList());
+            MovieFactory.getDefaultMovieList());
 
         List<MovieDto> resultList = movieService.getMoviesByCategory(MovieConstants.ID, MovieConstants.RATING);
 
@@ -104,10 +104,11 @@ public class MovieServiceTest {
         List<MovieDto> expected = MovieFactory.getDefaultMovieDtoList();
 
         when(movieMapper.mapMovieListToMovieDtoList(any())).thenReturn(expected);
-        when(movieRepository.findByReleaseDateAfterAndAverageRatingGreaterThanEqual(any(), anyDouble()))
-                .thenReturn(MovieFactory.getDefaultMovieList());
+        when(movieRepository.findByReleaseDateAfterAndAverageRatingGreaterThanEqual(any(), anyDouble())).thenReturn(
+            MovieFactory.getDefaultMovieList());
 
-        List<MovieDto> resultList = movieService.getMoviesByReleaseDate(MovieConstants.RELEASE_DATE, MovieConstants.RATING, true);
+        List<MovieDto> resultList = movieService.getMoviesByReleaseDate(MovieConstants.RELEASE_DATE,
+            MovieConstants.RATING, true);
 
         assertEquals(expected, resultList);
     }
@@ -140,11 +141,12 @@ public class MovieServiceTest {
     public void testGetMoviesByReleaseDateAfter_isAfterFalse_minRatingNotNull_success() {
         List<MovieDto> expected = MovieFactory.getDefaultMovieDtoList();
 
-        when(movieRepository.findByReleaseDateBeforeAndAverageRatingGreaterThanEqual(any(), anyDouble()))
-                .thenReturn(MovieFactory.getDefaultMovieList());
+        when(movieRepository.findByReleaseDateBeforeAndAverageRatingGreaterThanEqual(any(), anyDouble())).thenReturn(
+            MovieFactory.getDefaultMovieList());
         when(movieMapper.mapMovieListToMovieDtoList(any())).thenReturn(expected);
 
-        List<MovieDto> resultList = movieService.getMoviesByReleaseDate(MovieConstants.RELEASE_DATE, MovieConstants.RATING, false);
+        List<MovieDto> resultList = movieService.getMoviesByReleaseDate(MovieConstants.RELEASE_DATE,
+            MovieConstants.RATING, false);
 
         assertEquals(expected, resultList);
     }
@@ -155,7 +157,7 @@ public class MovieServiceTest {
 
         when(movieMapper.mapMovieListToMovieDtoList(any())).thenReturn(expected);
         when(movieRepository.findByAverageRatingGreaterThanEqual(anyDouble())).thenReturn(
-                MovieFactory.getDefaultMovieList());
+            MovieFactory.getDefaultMovieList());
 
         List<MovieDto> resultList = movieService.getMoviesByMinRating(MovieConstants.RATING);
 
@@ -188,41 +190,41 @@ public class MovieServiceTest {
 
     @Test
     public void testAddMovie_throwsDateNotValidException() {
-      assertThrows(DateNotValidException.class, () -> {
+        assertThrows(DateNotValidException.class, () -> {
 
-          MovieRequest request = MovieFactory.getDefaultMovieRequest();
-          request.setReleaseDate(LocalDate.of(2000, 1, 1));
+            MovieRequest request = MovieFactory.getDefaultMovieRequest();
+            request.setReleaseDate(LocalDate.of(2000, 1, 1));
 
-          movieService.addMovie(request);
-      
-      });
+            movieService.addMovie(request);
+
+        });
     }
 
     @Test
     public void testGetMoviesByTitle_WithEmptyTitle_ShouldThrowIllegalArgumentException() {
-      assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(IllegalArgumentException.class, () -> {
 
-          String title = "";
-          double minRating = 0.0;
+            String title = "";
+            double minRating = 0.0;
 
-          movieService.getMoviesByTitle(title, minRating);
-      
-      });
+            movieService.getMoviesByTitle(title, minRating);
+
+        });
     }
 
     @Test
     public void testAddMovie_throwsExistingMovieException() {
-      assertThrows(MovieAlreadyExistsException.class, () -> {
+        assertThrows(MovieAlreadyExistsException.class, () -> {
 
-          MovieRequest request = MovieFactory.getDefaultMovieRequest();
-          String existingTitle = "Existing Movie Title";
-          request.setTitle(existingTitle);
+            MovieRequest request = MovieFactory.getDefaultMovieRequest();
+            String existingTitle = "Existing Movie Title";
+            request.setTitle(existingTitle);
 
-          when(movieRepository.findByTitle(existingTitle)).thenReturn(Optional.of(MovieFactory.getDefaultMovie()));
+            when(movieRepository.findByTitle(existingTitle)).thenReturn(Optional.of(MovieFactory.getDefaultMovie()));
 
-          movieService.addMovie(request);
-      
-      });
+            movieService.addMovie(request);
+
+        });
     }
 
     @Test
@@ -246,17 +248,17 @@ public class MovieServiceTest {
 
     @Test
     public void testUpdateMovie_throwsDateNotValidException() {
-      assertThrows(DateNotValidException.class, () -> {
+        assertThrows(DateNotValidException.class, () -> {
 
-          MovieRequest request = MovieFactory.getDefaultMovieRequest();
-          request.setReleaseDate(LocalDate.of(2000, 1, 1));
+            MovieRequest request = MovieFactory.getDefaultMovieRequest();
+            request.setReleaseDate(LocalDate.of(2000, 1, 1));
 
-          when(movieMapper.mapMovieToMovieDto(any())).thenReturn(MovieFactory.getDefaultMovieDto());
-          when(movieRepository.findById(anyInt())).thenReturn(Optional.of(MovieFactory.getDefaultMovie()));
+            when(movieMapper.mapMovieToMovieDto(any())).thenReturn(MovieFactory.getDefaultMovieDto());
+            when(movieRepository.findById(anyInt())).thenReturn(Optional.of(MovieFactory.getDefaultMovie()));
 
-          movieService.updateMovie(request, MovieConstants.ID);
-      
-      });
+            movieService.updateMovie(request, MovieConstants.ID);
+
+        });
     }
 
     @Test
@@ -284,13 +286,13 @@ public class MovieServiceTest {
 
     @Test
     public void testGetMovieById_movieNotFound_throwsMovieNotFoundException() {
-      assertThrows(MovieNotFoundException.class, () -> {
+        assertThrows(MovieNotFoundException.class, () -> {
 
-          when(movieRepository.findById(anyInt())).thenReturn(Optional.empty());
+            when(movieRepository.findById(anyInt())).thenReturn(Optional.empty());
 
-          movieService.getMovieById(MovieConstants.ID);
-      
-      });
+            movieService.getMovieById(MovieConstants.ID);
+
+        });
     }
 
     @Test
@@ -318,13 +320,13 @@ public class MovieServiceTest {
 
     @Test
     public void testGetMovieByTitle_movieNotFound_throwsMovieNotFoundException() {
-      assertThrows(MovieNotFoundException.class, () -> {
+        assertThrows(MovieNotFoundException.class, () -> {
 
-          when(movieRepository.findByTitle(anyString())).thenReturn(Optional.empty());
+            when(movieRepository.findByTitle(anyString())).thenReturn(Optional.empty());
 
-          movieService.getMovieByTitle(MovieConstants.TITLE);
-      
-      });
+            movieService.getMovieByTitle(MovieConstants.TITLE);
+
+        });
     }
 
     @Test

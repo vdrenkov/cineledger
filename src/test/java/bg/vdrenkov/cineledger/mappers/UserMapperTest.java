@@ -1,6 +1,5 @@
 package bg.vdrenkov.cineledger.mappers;
 
-import org.junit.jupiter.api.extension.ExtendWith;
 import bg.vdrenkov.cineledger.models.dtos.UserDto;
 import bg.vdrenkov.cineledger.models.entities.User;
 import bg.vdrenkov.cineledger.testUtils.constants.UserConstants;
@@ -8,6 +7,7 @@ import bg.vdrenkov.cineledger.testUtils.factories.RoleFactory;
 import bg.vdrenkov.cineledger.testUtils.factories.UserFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -16,7 +16,6 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
 public class UserMapperTest {
@@ -64,7 +63,8 @@ public class UserMapperTest {
         Assertions.assertEquals(UserConstants.FIRST_NAME, actualDto.getFirstName());
         Assertions.assertEquals(UserConstants.LAST_NAME, actualDto.getLastName());
         Assertions.assertEquals(UserConstants.JOIN_DATE, actualDto.getJoinDate());
-        Assertions.assertEquals(RoleFactory.getDefaultRoleDtoList().get(0).getName(), actualDto.getRoles().get(0).getName());
+        Assertions.assertEquals(RoleFactory.getDefaultRoleDtoList().get(0).getName(),
+            actualDto.getRoles().get(0).getName());
     }
 }
 

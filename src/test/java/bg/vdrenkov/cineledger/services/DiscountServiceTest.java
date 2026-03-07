@@ -1,16 +1,16 @@
 package bg.vdrenkov.cineledger.services;
 
-import org.junit.jupiter.api.extension.ExtendWith;
 import bg.vdrenkov.cineledger.exceptions.DiscountAlreadyExistsException;
 import bg.vdrenkov.cineledger.exceptions.DiscountNotFoundException;
 import bg.vdrenkov.cineledger.mappers.DiscountMapper;
+import bg.vdrenkov.cineledger.models.dtos.DiscountDto;
 import bg.vdrenkov.cineledger.models.entities.Discount;
 import bg.vdrenkov.cineledger.repositories.DiscountRepository;
 import bg.vdrenkov.cineledger.testUtils.constants.DiscountConstants;
 import bg.vdrenkov.cineledger.testUtils.constants.OrderConstants;
 import bg.vdrenkov.cineledger.testUtils.factories.DiscountFactory;
-import bg.vdrenkov.cineledger.models.dtos.DiscountDto;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -18,173 +18,173 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import org.junit.jupiter.api.Assertions;
 
 @ExtendWith(MockitoExtension.class)
 public class DiscountServiceTest {
 
-  @Mock
-  private DiscountRepository discountRepository;
+    @Mock
+    private DiscountRepository discountRepository;
 
-  @Mock
-  private DiscountMapper discountMapper;
+    @Mock
+    private DiscountMapper discountMapper;
 
-  @InjectMocks
-  private DiscountService discountService;
+    @InjectMocks
+    private DiscountService discountService;
 
-  @Test
-  public void testAddDiscount_noExceptions_success() {
-    Discount expected = DiscountFactory.getDefaultDiscount();
-    when(discountRepository.save(any())).thenReturn(expected);
+    @Test
+    public void testAddDiscount_noExceptions_success() {
+        Discount expected = DiscountFactory.getDefaultDiscount();
+        when(discountRepository.save(any())).thenReturn(expected);
 
-    Discount discount = discountService.addDiscount(DiscountFactory.getDefaultDiscountRequest());
+        Discount discount = discountService.addDiscount(DiscountFactory.getDefaultDiscountRequest());
 
-    assertEquals(expected, discount);
-  }
+        assertEquals(expected, discount);
+    }
 
-  @Test
-  public void testAddDiscount_discountAlreadyExists_throwsDiscountAlreadyExistsException() {
-    assertThrows(DiscountAlreadyExistsException.class, () -> {
+    @Test
+    public void testAddDiscount_discountAlreadyExists_throwsDiscountAlreadyExistsException() {
+        assertThrows(DiscountAlreadyExistsException.class, () -> {
 
-      when(discountRepository.existsByType(any())).thenReturn(true);
+            when(discountRepository.existsByType(any())).thenReturn(true);
 
-      discountService.addDiscount(DiscountFactory.getDefaultDiscountRequest());
-    
-    });
-  }
+            discountService.addDiscount(DiscountFactory.getDefaultDiscountRequest());
 
-  @Test
-  public void testGetAllDiscounts_discountsFound_success() {
-    List<Discount> expected = DiscountFactory.getDefaultDiscountList();
-    when(discountRepository.findAll()).thenReturn(expected);
+        });
+    }
 
-    List<Discount> result = discountService.getAllDiscounts();
+    @Test
+    public void testGetAllDiscounts_discountsFound_success() {
+        List<Discount> expected = DiscountFactory.getDefaultDiscountList();
+        when(discountRepository.findAll()).thenReturn(expected);
 
-    assertEquals(expected, result);
-  }
+        List<Discount> result = discountService.getAllDiscounts();
 
-  @Test
-  public void testGetAllDiscountsDto_discountsFound_success() {
-    List<DiscountDto> expected = DiscountFactory.getDefaultDiscountDtoList();
-    when(discountRepository.findAll()).thenReturn(DiscountFactory.getDefaultDiscountList());
-    when(discountMapper.mapDiscountListToDiscountDtoList(any())).thenReturn(expected);
+        assertEquals(expected, result);
+    }
 
-    List<DiscountDto> result = discountService.getAllDiscountDtos();
+    @Test
+    public void testGetAllDiscountsDto_discountsFound_success() {
+        List<DiscountDto> expected = DiscountFactory.getDefaultDiscountDtoList();
+        when(discountRepository.findAll()).thenReturn(DiscountFactory.getDefaultDiscountList());
+        when(discountMapper.mapDiscountListToDiscountDtoList(any())).thenReturn(expected);
 
-    assertEquals(expected, result);
-  }
+        List<DiscountDto> result = discountService.getAllDiscountDtos();
 
-  @Test
-  public void testGetDiscountById_discountFound_success() {
-    Discount expected = DiscountFactory.getDefaultDiscount();
-    when(discountRepository.findById(anyInt())).thenReturn(Optional.of(expected));
+        assertEquals(expected, result);
+    }
 
-    Discount discount = discountService.getDiscountById(DiscountConstants.ID);
+    @Test
+    public void testGetDiscountById_discountFound_success() {
+        Discount expected = DiscountFactory.getDefaultDiscount();
+        when(discountRepository.findById(anyInt())).thenReturn(Optional.of(expected));
 
-    assertEquals(expected, discount);
-  }
+        Discount discount = discountService.getDiscountById(DiscountConstants.ID);
 
-  @Test
-  public void testGetDiscountById_discountNotFound_throwsDiscountNotFoundException() {
-    assertThrows(DiscountNotFoundException.class, () -> {
+        assertEquals(expected, discount);
+    }
 
-      discountService.getDiscountById(DiscountConstants.ID);
-    
-    });
-  }
+    @Test
+    public void testGetDiscountById_discountNotFound_throwsDiscountNotFoundException() {
+        assertThrows(DiscountNotFoundException.class, () -> {
 
-  @Test
-  public void testGetDiscountByType_discountFound_success() {
-    Discount expected = DiscountFactory.getDefaultDiscount();
-    when(discountRepository.findByType(anyString())).thenReturn(Optional.of(expected));
+            discountService.getDiscountById(DiscountConstants.ID);
 
-    Discount discount = discountService.getDiscountByType(DiscountConstants.TYPE);
+        });
+    }
 
-    assertEquals(expected, discount);
-  }
+    @Test
+    public void testGetDiscountByType_discountFound_success() {
+        Discount expected = DiscountFactory.getDefaultDiscount();
+        when(discountRepository.findByType(anyString())).thenReturn(Optional.of(expected));
 
-  @Test
-  public void testGetDiscountByType_discountNotFound_throwDiscountNotFoundException() {
-    assertThrows(DiscountNotFoundException.class, () -> {
+        Discount discount = discountService.getDiscountByType(DiscountConstants.TYPE);
 
-      when(discountRepository.findByType(anyString())).thenReturn(Optional.empty());
+        assertEquals(expected, discount);
+    }
 
-      discountService.getDiscountByType(DiscountConstants.TYPE);
-    
-    });
-  }
+    @Test
+    public void testGetDiscountByType_discountNotFound_throwDiscountNotFoundException() {
+        assertThrows(DiscountNotFoundException.class, () -> {
 
-  @Test
-  public void testGetDiscountByCode_discountFound_success() {
-    Discount expected = DiscountFactory.getDefaultDiscount();
-    when(discountRepository.findByCode(anyString())).thenReturn(Optional.of(expected));
+            when(discountRepository.findByType(anyString())).thenReturn(Optional.empty());
 
-    Discount discount = discountService.getDiscountByCode(DiscountConstants.CODE);
+            discountService.getDiscountByType(DiscountConstants.TYPE);
 
-    assertEquals(expected, discount);
-  }
+        });
+    }
 
-  @Test
-  public void testGetDiscountByCode_discountNotFound_throwDiscountNotFoundException() {
-    assertThrows(DiscountNotFoundException.class, () -> {
+    @Test
+    public void testGetDiscountByCode_discountFound_success() {
+        Discount expected = DiscountFactory.getDefaultDiscount();
+        when(discountRepository.findByCode(anyString())).thenReturn(Optional.of(expected));
 
-      when(discountRepository.findByCode(anyString())).thenReturn(Optional.empty());
+        Discount discount = discountService.getDiscountByCode(DiscountConstants.CODE);
 
-      discountService.getDiscountByCode(DiscountConstants.CODE);
-    
-    });
-  }
+        assertEquals(expected, discount);
+    }
 
-  @Test
-  public void testGetDiscountDtoByType_discountFound_success() {
-    DiscountDto expected = DiscountFactory.getDefaultDiscountDto();
-    when(discountRepository.findByType(anyString())).thenReturn(Optional.of(DiscountFactory.getDefaultDiscount()));
-    when(discountMapper.mapDiscountToDiscountDto(any())).thenReturn(expected);
+    @Test
+    public void testGetDiscountByCode_discountNotFound_throwDiscountNotFoundException() {
+        assertThrows(DiscountNotFoundException.class, () -> {
 
-    DiscountDto discountDto = discountService.getDiscountDtoByType(DiscountConstants.TYPE);
+            when(discountRepository.findByCode(anyString())).thenReturn(Optional.empty());
 
-    assertEquals(expected, discountDto);
-  }
+            discountService.getDiscountByCode(DiscountConstants.CODE);
 
-  @Test
-  public void testUpdateDiscount_discountUpdated_success() {
-    DiscountDto expected = DiscountFactory.getDefaultDiscountDto();
-    when(discountMapper.mapDiscountToDiscountDto(any())).thenReturn(expected);
-    when(discountRepository.findById(anyInt())).thenReturn(Optional.of(new Discount()));
-    when(discountRepository.save(any())).thenReturn(DiscountFactory.getDefaultDiscount());
+        });
+    }
 
-    DiscountDto discountDto = discountService.updateDiscount(DiscountFactory.getDefaultDiscountRequest(), DiscountConstants.ID);
+    @Test
+    public void testGetDiscountDtoByType_discountFound_success() {
+        DiscountDto expected = DiscountFactory.getDefaultDiscountDto();
+        when(discountRepository.findByType(anyString())).thenReturn(Optional.of(DiscountFactory.getDefaultDiscount()));
+        when(discountMapper.mapDiscountToDiscountDto(any())).thenReturn(expected);
 
-    assertEquals(expected, discountDto);
-  }
+        DiscountDto discountDto = discountService.getDiscountDtoByType(DiscountConstants.TYPE);
 
-  @Test
-  public void testDeleteDiscount_discountDeleted_success() {
-    DiscountDto expected = DiscountFactory.getDefaultDiscountDto();
-    when(discountMapper.mapDiscountToDiscountDto(any())).thenReturn(expected);
-    when(discountRepository.findById(anyInt())).thenReturn(Optional.of(DiscountFactory.getDefaultDiscount()));
+        assertEquals(expected, discountDto);
+    }
 
-    DiscountDto discountDto = discountService.deleteDiscount(DiscountConstants.ID);
+    @Test
+    public void testUpdateDiscount_discountUpdated_success() {
+        DiscountDto expected = DiscountFactory.getDefaultDiscountDto();
+        when(discountMapper.mapDiscountToDiscountDto(any())).thenReturn(expected);
+        when(discountRepository.findById(anyInt())).thenReturn(Optional.of(new Discount()));
+        when(discountRepository.save(any())).thenReturn(DiscountFactory.getDefaultDiscount());
 
-    assertEquals(expected, discountDto);
-  }
+        DiscountDto discountDto = discountService.updateDiscount(DiscountFactory.getDefaultDiscountRequest(),
+            DiscountConstants.ID);
 
-  @Test
-  public void testApplyDiscount_success() {
-    double expected = 90;
-    Discount discount = DiscountFactory.getDefaultDiscount();
-    when(discountRepository.findByCode(anyString())).thenReturn(Optional.of(discount));
+        assertEquals(expected, discountDto);
+    }
 
-    double result = discountService.applyDiscount(OrderConstants.TOTAL_PRICE, DiscountConstants.CODE);
+    @Test
+    public void testDeleteDiscount_discountDeleted_success() {
+        DiscountDto expected = DiscountFactory.getDefaultDiscountDto();
+        when(discountMapper.mapDiscountToDiscountDto(any())).thenReturn(expected);
+        when(discountRepository.findById(anyInt())).thenReturn(Optional.of(DiscountFactory.getDefaultDiscount()));
 
-    assertEquals(expected, result, 0.0);
-  }
+        DiscountDto discountDto = discountService.deleteDiscount(DiscountConstants.ID);
+
+        assertEquals(expected, discountDto);
+    }
+
+    @Test
+    public void testApplyDiscount_success() {
+        double expected = 90;
+        Discount discount = DiscountFactory.getDefaultDiscount();
+        when(discountRepository.findByCode(anyString())).thenReturn(Optional.of(discount));
+
+        double result = discountService.applyDiscount(OrderConstants.TOTAL_PRICE, DiscountConstants.CODE);
+
+        assertEquals(expected, result, 0.0);
+    }
 }
 
 

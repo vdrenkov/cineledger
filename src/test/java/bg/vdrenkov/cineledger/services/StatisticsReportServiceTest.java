@@ -1,15 +1,15 @@
 package bg.vdrenkov.cineledger.services;
 
-import org.junit.jupiter.api.extension.ExtendWith;
+import bg.vdrenkov.cineledger.models.dtos.ItemDto;
 import bg.vdrenkov.cineledger.models.entities.Category;
 import bg.vdrenkov.cineledger.testUtils.constants.ItemConstants;
 import bg.vdrenkov.cineledger.testUtils.constants.MovieConstants;
 import bg.vdrenkov.cineledger.testUtils.constants.ReportConstants;
 import bg.vdrenkov.cineledger.testUtils.factories.OrderFactory;
 import bg.vdrenkov.cineledger.testUtils.factories.TicketFactory;
-import bg.vdrenkov.cineledger.models.dtos.ItemDto;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -18,8 +18,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -49,7 +49,8 @@ public class StatisticsReportServiceTest {
         when(categoryService.getCategoryById(anyInt())).thenReturn(new Category());
         when(ticketService.getTicketsByDateBetween(any(), any())).thenReturn(TicketFactory.getDefaultTicketList());
 
-        int result = statisticsReportService.getPurchasedTicketsCountByMovieCategory(MovieConstants.ID, ReportConstants.START_DATE, ReportConstants.END_DATE);
+        int result = statisticsReportService.getPurchasedTicketsCountByMovieCategory(MovieConstants.ID,
+            ReportConstants.START_DATE, ReportConstants.END_DATE);
 
         assertEquals(1, result);
     }
@@ -60,7 +61,8 @@ public class StatisticsReportServiceTest {
         when(movieService.getIdsOfMoviesByTitle(anyString())).thenReturn(movieIds);
         when(ticketService.getTicketsByDateBetween(any(), any())).thenReturn(TicketFactory.getDefaultTicketList());
 
-        int result = statisticsReportService.getPurchasedTicketsCountByMovieTitle(MovieConstants.TITLE, ReportConstants.START_DATE, ReportConstants.END_DATE);
+        int result = statisticsReportService.getPurchasedTicketsCountByMovieTitle(MovieConstants.TITLE,
+            ReportConstants.START_DATE, ReportConstants.END_DATE);
 
         assertEquals(1, result);
     }
@@ -70,7 +72,8 @@ public class StatisticsReportServiceTest {
         when(itemService.getItemDtoByName(anyString())).thenReturn(new ItemDto());
         when(orderService.getOrdersByDateBetween(any(), any())).thenReturn(OrderFactory.getDefaultOrderList());
 
-        int result = statisticsReportService.getPurchasedItemsCountByItemName(ItemConstants.NAME, ReportConstants.START_DATE, ReportConstants.END_DATE);
+        int result = statisticsReportService.getPurchasedItemsCountByItemName(ItemConstants.NAME,
+            ReportConstants.START_DATE, ReportConstants.END_DATE);
 
         Assertions.assertEquals(1, result);
     }

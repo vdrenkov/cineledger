@@ -1,6 +1,5 @@
 package bg.vdrenkov.cineledger.mappers;
 
-import org.junit.jupiter.api.extension.ExtendWith;
 import bg.vdrenkov.cineledger.models.dtos.CinemaDto;
 import bg.vdrenkov.cineledger.models.dtos.MovieDto;
 import bg.vdrenkov.cineledger.models.dtos.ReviewDto;
@@ -11,6 +10,7 @@ import bg.vdrenkov.cineledger.testUtils.factories.ReviewFactory;
 import bg.vdrenkov.cineledger.testUtils.factories.UserFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -95,7 +95,8 @@ public class ReviewMapperTest {
         when(cinemaMapper.mapCinemaToCinemaDto(any())).thenReturn(cinema);
         when(userMapper.mapUserToUserDto(any())).thenReturn(UserFactory.getDefaultUserDto());
 
-        List<ReviewDto> reviewDtos = reviewMapper.mapReviewListToReviewDtoList(ReviewFactory.getDefaultReviewListWithCinema());
+        List<ReviewDto> reviewDtos = reviewMapper.mapReviewListToReviewDtoList(
+            ReviewFactory.getDefaultReviewListWithCinema());
         ReviewDto reviewDto = reviewDtos.get(0);
 
         Assertions.assertEquals(ReviewConstants.ID, reviewDto.getId());

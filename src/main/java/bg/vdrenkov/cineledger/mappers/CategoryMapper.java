@@ -12,17 +12,15 @@ import java.util.stream.Collectors;
 @Component
 public class CategoryMapper {
 
-  private static final Logger log = LoggerFactory.getLogger(CategoryMapper.class);
+    private static final Logger log = LoggerFactory.getLogger(CategoryMapper.class);
 
-  public CategoryDto mapCategoryToCategoryDto(Category category) {
-    log.info(String.format("The category %s is being mapped to a category DTO", category.getName()));
-    return new CategoryDto(category.getId(), category.getName());
-  }
+    public CategoryDto mapCategoryToCategoryDto(Category category) {
+        log.info(String.format("The category %s is being mapped to a category DTO", category.getName()));
+        return new CategoryDto(category.getId(), category.getName());
+    }
 
-  public List<CategoryDto> mapCategoryToCategoryDtoList(List<Category> categories) {
-    return categories.stream()
-                     .map(this::mapCategoryToCategoryDto)
-                     .collect(Collectors.toList());
-  }
+    public List<CategoryDto> mapCategoryToCategoryDtoList(List<Category> categories) {
+        return categories.stream().map(this::mapCategoryToCategoryDto).collect(Collectors.toList());
+    }
 }
 

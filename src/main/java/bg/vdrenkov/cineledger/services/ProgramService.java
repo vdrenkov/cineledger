@@ -3,13 +3,13 @@ package bg.vdrenkov.cineledger.services;
 import bg.vdrenkov.cineledger.exceptions.DateNotValidException;
 import bg.vdrenkov.cineledger.exceptions.ProgramAlreadyExistsException;
 import bg.vdrenkov.cineledger.exceptions.ProgramNotFoundException;
-import bg.vdrenkov.cineledger.utils.constants.ExceptionMessages;
 import bg.vdrenkov.cineledger.mappers.ProgramMapper;
 import bg.vdrenkov.cineledger.models.dtos.ProgramDto;
 import bg.vdrenkov.cineledger.models.entities.Cinema;
 import bg.vdrenkov.cineledger.models.entities.Program;
 import bg.vdrenkov.cineledger.models.requests.ProgramRequest;
 import bg.vdrenkov.cineledger.repositories.ProgramRepository;
+import bg.vdrenkov.cineledger.utils.constants.ExceptionMessages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,106 +22,108 @@ import java.util.Objects;
 @Service
 public class ProgramService {
 
-  private static final Logger log = LoggerFactory.getLogger(ProgramService.class);
+    private static final Logger log = LoggerFactory.getLogger(ProgramService.class);
 
-  private final ProgramRepository programRepository;
-  private final ProgramMapper programMapper;
-  private final CinemaService cinemaService;
+    private final ProgramRepository programRepository;
+    private final ProgramMapper programMapper;
+    private final CinemaService cinemaService;
 
-  @Autowired
-  public ProgramService(ProgramRepository programRepository, ProgramMapper programMapper, CinemaService cinemaService) {
-    this.programRepository = programRepository;
-    this.programMapper = programMapper;
-    this.cinemaService = cinemaService;
-  }
-
-  public Program addProgram(ProgramRequest request) {
-    if (isDateNotValid(request.getProgramDate())) {
-      log.error(String.format("Exception caught: %s", ExceptionMessages.DATE_NOT_VALID_MESSAGE));
-
-      throw new DateNotValidException(ExceptionMessages.DATE_NOT_VALID_MESSAGE);
+    @Autowired
+    public ProgramService(ProgramRepository programRepository, ProgramMapper programMapper,
+        CinemaService cinemaService) {
+        this.programRepository = programRepository;
+        this.programMapper = programMapper;
+        this.cinemaService = cinemaService;
     }
 
-    programRepository.findByProgramDateAndCinemaId(request.getProgramDate(), request.getCinemaId())
-                     .ifPresent(existingProgram -> {
+    public Program addProgram(ProgramRequest request) {
+        if (isDateNotValid(request.getProgramDate())) {
+            log.error(String.format("Exception caught: %s", ExceptionMessages.DATE_NOT_VALID_MESSAGE));
 
-                       log.error(String.format("Exception caught: %s", ExceptionMessages.PROGRAM_ALREADY_EXISTS_MESSAGE));
-                       throw new ProgramAlreadyExistsException(ExceptionMessages.PROGRAM_ALREADY_EXISTS_MESSAGE);
-                     });
+            throw new DateNotValidException(ExceptionMessages.DATE_NOT_VALID_MESSAGE);
+        }
 
-    log.info("An attempt to add a new program in the database");
+        programRepository
+            .findByProgramDateAndCinemaId(request.getProgramDate(), request.getCinemaId())
+            .ifPresent(existingProgram -> {
 
-    return programRepository.save(
-      new Program(request.getProgramDate(), cinemaService.getCinemaById(request.getCinemaId())));
-  }
+                log.error(String.format("Exception caught: %s", ExceptionMessages.PROGRAM_ALREADY_EXISTS_MESSAGE));
+                throw new ProgramAlreadyExistsException(ExceptionMessages.PROGRAM_ALREADY_EXISTS_MESSAGE);
+            });
 
-  public List<ProgramDto> getAllPrograms(LocalDate date) {
-    if (Objects.nonNull(date)) {
-      log.info(String.format("All programs with date %s were requested from the database", date));
+        log.info("An attempt to add a new program in the database");
 
-      return programMapper.mapProgramListToProgramDtoList(programRepository.findAllByProgramDate(date));
-    } else {
-      log.info("All programs were requested from the database");
-
-      return programMapper.mapProgramListToProgramDtoList(programRepository.findAll());
-    }
-  }
-
-  public List<ProgramDto> getProgramsByCinemaId(int cinemaId) {
-    log.info(String.format("All programs with cinema id %d were requested from the database", cinemaId));
-
-    Cinema cinema = cinemaService.getCinemaById(cinemaId);
-
-    return programMapper.mapProgramListToProgramDtoList(programRepository.findAllByCinemaId(cinema.getId()));
-  }
-
-  public Program getProgramById(int id) {
-    log.info(String.format("An attempt to extract a program with an id %d from the database", id));
-
-    return programRepository.findById(id).orElseThrow(() -> {
-
-      log.error(String.format("Exception caught: %s", ExceptionMessages.PROGRAM_NOT_FOUND_MESSAGE));
-
-      throw new ProgramNotFoundException(ExceptionMessages.PROGRAM_NOT_FOUND_MESSAGE);
-    });
-  }
-
-  public ProgramDto getProgramDtoById(int id) {
-    log.info(String.format("An attempt to extract a program DTO with an id %d from the database", id));
-
-    return programMapper.mapProgramToProgramDto(getProgramById(id));
-  }
-
-  public ProgramDto updateProgram(ProgramRequest request, int programId) {
-    ProgramDto programDto = getProgramDtoById(programId);
-
-    if (isDateNotValid(request.getProgramDate())) {
-
-      log.error(String.format("Exception caught: %s", ExceptionMessages.DATE_NOT_VALID_MESSAGE));
-
-      throw new DateNotValidException(ExceptionMessages.DATE_NOT_VALID_MESSAGE);
+        return programRepository.save(
+            new Program(request.getProgramDate(), cinemaService.getCinemaById(request.getCinemaId())));
     }
 
-    programRepository.save(new Program(programId, request.getProgramDate(),
-                                       cinemaService.getCinemaById(request.getCinemaId())));
+    public List<ProgramDto> getAllPrograms(LocalDate date) {
+        if (Objects.nonNull(date)) {
+            log.info(String.format("All programs with date %s were requested from the database", date));
 
-    log.info(String.format("Program with an id %d has been updated", programId));
+            return programMapper.mapProgramListToProgramDtoList(programRepository.findAllByProgramDate(date));
+        } else {
+            log.info("All programs were requested from the database");
 
-    return programDto;
-  }
+            return programMapper.mapProgramListToProgramDtoList(programRepository.findAll());
+        }
+    }
 
-  public ProgramDto deleteProgram(int programId) {
-    ProgramDto programDto = getProgramDtoById(programId);
+    public List<ProgramDto> getProgramsByCinemaId(int cinemaId) {
+        log.info(String.format("All programs with cinema id %d were requested from the database", cinemaId));
 
-    programRepository.deleteById(programId);
+        Cinema cinema = cinemaService.getCinemaById(cinemaId);
 
-    log.info(String.format("Program with an id %d has been deleted", programId));
+        return programMapper.mapProgramListToProgramDtoList(programRepository.findAllByCinemaId(cinema.getId()));
+    }
 
-    return programDto;
-  }
+    public Program getProgramById(int id) {
+        log.info(String.format("An attempt to extract a program with an id %d from the database", id));
 
-  public boolean isDateNotValid(LocalDate date) {
-    return date.isBefore(LocalDate.now());
-  }
+        return programRepository.findById(id).orElseThrow(() -> {
+
+            log.error(String.format("Exception caught: %s", ExceptionMessages.PROGRAM_NOT_FOUND_MESSAGE));
+
+            throw new ProgramNotFoundException(ExceptionMessages.PROGRAM_NOT_FOUND_MESSAGE);
+        });
+    }
+
+    public ProgramDto getProgramDtoById(int id) {
+        log.info(String.format("An attempt to extract a program DTO with an id %d from the database", id));
+
+        return programMapper.mapProgramToProgramDto(getProgramById(id));
+    }
+
+    public ProgramDto updateProgram(ProgramRequest request, int programId) {
+        ProgramDto programDto = getProgramDtoById(programId);
+
+        if (isDateNotValid(request.getProgramDate())) {
+
+            log.error(String.format("Exception caught: %s", ExceptionMessages.DATE_NOT_VALID_MESSAGE));
+
+            throw new DateNotValidException(ExceptionMessages.DATE_NOT_VALID_MESSAGE);
+        }
+
+        programRepository.save(
+            new Program(programId, request.getProgramDate(), cinemaService.getCinemaById(request.getCinemaId())));
+
+        log.info(String.format("Program with an id %d has been updated", programId));
+
+        return programDto;
+    }
+
+    public ProgramDto deleteProgram(int programId) {
+        ProgramDto programDto = getProgramDtoById(programId);
+
+        programRepository.deleteById(programId);
+
+        log.info(String.format("Program with an id %d has been deleted", programId));
+
+        return programDto;
+    }
+
+    public boolean isDateNotValid(LocalDate date) {
+        return date.isBefore(LocalDate.now());
+    }
 }
 

@@ -1,6 +1,5 @@
 package bg.vdrenkov.cineledger.mappers;
 
-import org.junit.jupiter.api.extension.ExtendWith;
 import bg.vdrenkov.cineledger.models.dtos.ItemDto;
 import bg.vdrenkov.cineledger.models.dtos.OrderDto;
 import bg.vdrenkov.cineledger.models.dtos.TicketDto;
@@ -13,6 +12,7 @@ import bg.vdrenkov.cineledger.testUtils.factories.TicketFactory;
 import bg.vdrenkov.cineledger.testUtils.factories.UserFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;

@@ -12,17 +12,15 @@ import java.util.stream.Collectors;
 @Component
 public class RoleMapper {
 
-  private static final Logger log = LoggerFactory.getLogger(RoleMapper.class);
+    private static final Logger log = LoggerFactory.getLogger(RoleMapper.class);
 
-  public RoleDto mapRoleToRoleDto(Role role) {
-    log.info(String.format("The role %s is being mapped to a role DTO", role.getName()));
-    return new RoleDto(role.getId(), role.getName());
-  }
+    public RoleDto mapRoleToRoleDto(Role role) {
+        log.info(String.format("The role %s is being mapped to a role DTO", role.getName()));
+        return new RoleDto(role.getId(), role.getName());
+    }
 
-  public List<RoleDto> mapRolesToRoleDtos(List<Role> roles) {
-    return roles.stream()
-                .map(this::mapRoleToRoleDto)
-                .collect(Collectors.toList());
-  }
+    public List<RoleDto> mapRolesToRoleDtos(List<Role> roles) {
+        return roles.stream().map(this::mapRoleToRoleDto).collect(Collectors.toList());
+    }
 }
 

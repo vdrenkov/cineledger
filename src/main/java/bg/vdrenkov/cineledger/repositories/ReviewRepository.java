@@ -9,15 +9,15 @@ import java.util.List;
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, Integer> {
 
-  List<Review> findAll();
+    List<Review> findAll();
 
-  List<Review> findByCinemaId(int cinemaId);
+    List<Review> findByCinemaId(int cinemaId);
 
-  List<Review> findByMovieId(int movieId);
+    List<Review> findByMovieId(int movieId);
 
-  List<Review> findAllByUserIdAndMovieIsNotNullAndCinemaIsNull(int userId);
+    List<Review> findAllByUserIdAndMovieIsNotNullAndCinemaIsNull(int userId);
 
-  List<Review> findAllByUserIdAndMovieIsNullAndCinemaIsNotNull(int userId);
+    List<Review> findAllByUserIdAndMovieIsNullAndCinemaIsNotNull(int userId);
 }
 
 

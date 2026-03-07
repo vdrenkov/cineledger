@@ -1,10 +1,11 @@
 package bg.vdrenkov.cineledger.controllers;
 
+import bg.vdrenkov.cineledger.models.dtos.MovieDto;
 import bg.vdrenkov.cineledger.models.entities.Movie;
 import bg.vdrenkov.cineledger.models.requests.MovieRequest;
 import bg.vdrenkov.cineledger.services.MovieService;
 import bg.vdrenkov.cineledger.utils.constants.URIConstants;
-import bg.vdrenkov.cineledger.models.dtos.MovieDto;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import jakarta.validation.Valid;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
@@ -28,100 +28,94 @@ import java.util.List;
 @RestController
 public class MovieController {
 
-  private static final Logger log = LoggerFactory.getLogger(MovieController.class);
+    private static final Logger log = LoggerFactory.getLogger(MovieController.class);
 
-  private final MovieService movieService;
+    private final MovieService movieService;
 
-  @Autowired
-  public MovieController(MovieService movieService) {
-    this.movieService = movieService;
-  }
+    @Autowired
+    public MovieController(MovieService movieService) {
+        this.movieService = movieService;
+    }
 
-  @PostMapping(URIConstants.MOVIES_PATH)
-  public ResponseEntity<Void> addMovie(@RequestBody @Valid MovieRequest movieRequest) {
-    Movie movie = movieService.addMovie(movieRequest);
-    log.info("A request for a movie to be added has been submitted");
+    @PostMapping(URIConstants.MOVIES_PATH)
+    public ResponseEntity<Void> addMovie(@RequestBody @Valid MovieRequest movieRequest) {
+        Movie movie = movieService.addMovie(movieRequest);
+        log.info("A request for a movie to be added has been submitted");
 
-    URI location = UriComponentsBuilder
-      .fromUriString(URIConstants.MOVIES_ID_PATH)
-      .buildAndExpand(movie.getId())
-      .toUri();
+        URI location = UriComponentsBuilder
+            .fromUriString(URIConstants.MOVIES_ID_PATH)
+            .buildAndExpand(movie.getId())
+            .toUri();
 
-    return ResponseEntity.created(location).build();
-  }
+        return ResponseEntity.created(location).build();
+    }
 
-  @GetMapping(value = URIConstants.MOVIES_PATH, params = "title")
-  public ResponseEntity<List<MovieDto>> getMoviesByTitle(
-    @RequestParam String title,
-    @RequestParam(required = false, defaultValue = "0.0") double minimalRating) {
+    @GetMapping(value = URIConstants.MOVIES_PATH, params = "title")
+    public ResponseEntity<List<MovieDto>> getMoviesByTitle(@RequestParam String title,
+        @RequestParam(required = false, defaultValue = "0.0") double minimalRating) {
 
-    List<MovieDto> movieDtoList = movieService.getMoviesByTitle(title, minimalRating);
-    log.info("Movies by title was requested from the database");
+        List<MovieDto> movieDtoList = movieService.getMoviesByTitle(title, minimalRating);
+        log.info("Movies by title was requested from the database");
 
-    return ResponseEntity.ok(movieDtoList);
-  }
+        return ResponseEntity.ok(movieDtoList);
+    }
 
-  @GetMapping(value = URIConstants.MOVIES_PATH, params = "release")
-  public ResponseEntity<List<MovieDto>> getMoviesByReleaseDate(
-    @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate release,
-    @RequestParam(required = false) Double rating,
-    @RequestParam(required = false) boolean isAfter) {
+    @GetMapping(value = URIConstants.MOVIES_PATH, params = "release")
+    public ResponseEntity<List<MovieDto>> getMoviesByReleaseDate(
+        @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate release,
+        @RequestParam(required = false) Double rating, @RequestParam(required = false) boolean isAfter) {
 
-    List<MovieDto> movieDtoList = movieService.getMoviesByReleaseDate(release, rating, isAfter);
-    log.info("Movies by release date after requested from the database");
+        List<MovieDto> movieDtoList = movieService.getMoviesByReleaseDate(release, rating, isAfter);
+        log.info("Movies by release date after requested from the database");
 
-    return ResponseEntity.ok(movieDtoList);
-  }
+        return ResponseEntity.ok(movieDtoList);
+    }
 
-  @GetMapping(value = URIConstants.MOVIES_PATH, params = "minRating")
-  public ResponseEntity<List<MovieDto>> getMoviesByMinRating(@RequestParam double minRating) {
-    List<MovieDto> movieDtoList = movieService.getMoviesByMinRating(minRating);
-    log.info("Movies by minimum rating requested from the database");
+    @GetMapping(value = URIConstants.MOVIES_PATH, params = "minRating")
+    public ResponseEntity<List<MovieDto>> getMoviesByMinRating(@RequestParam double minRating) {
+        List<MovieDto> movieDtoList = movieService.getMoviesByMinRating(minRating);
+        log.info("Movies by minimum rating requested from the database");
 
-    return ResponseEntity.ok(movieDtoList);
-  }
+        return ResponseEntity.ok(movieDtoList);
+    }
 
-  @GetMapping(value = URIConstants.MOVIES_PATH, params = "imdb")
-  public ResponseEntity<String> getMoviesByImdb(@RequestParam String imdb) {
-    String movies = movieService.getImdbMovies(imdb);
-    log.info("IMDB movies were requested from the database");
+    @GetMapping(value = URIConstants.MOVIES_PATH, params = "imdb")
+    public ResponseEntity<String> getMoviesByImdb(@RequestParam String imdb) {
+        String movies = movieService.getImdbMovies(imdb);
+        log.info("IMDB movies were requested from the database");
 
-    return ResponseEntity.ok(movies);
-  }
+        return ResponseEntity.ok(movies);
+    }
 
-  @GetMapping(URIConstants.CATEGORIES_ID_MOVIES_PATH)
-  public ResponseEntity<List<MovieDto>> getMoviesByCategory(
-    @PathVariable("id") Integer categoryId,
-    @RequestParam(required = false, defaultValue = "0.0") double minRating) {
+    @GetMapping(URIConstants.CATEGORIES_ID_MOVIES_PATH)
+    public ResponseEntity<List<MovieDto>> getMoviesByCategory(@PathVariable("id") Integer categoryId,
+        @RequestParam(required = false, defaultValue = "0.0") double minRating) {
 
-    List<MovieDto> movieDtoList = movieService.getMoviesByCategory(categoryId, minRating);
-    log.info("Movies by category was requested from the database");
+        List<MovieDto> movieDtoList = movieService.getMoviesByCategory(categoryId, minRating);
+        log.info("Movies by category was requested from the database");
 
-    return ResponseEntity.ok(movieDtoList);
-  }
+        return ResponseEntity.ok(movieDtoList);
+    }
 
-  @PutMapping(URIConstants.MOVIES_ID_PATH)
-  public ResponseEntity<MovieDto> updateMovie(
-    @RequestBody @Valid MovieRequest movieRequest,
-    @PathVariable int id,
-    @RequestParam(required = false) boolean returnOld) {
+    @PutMapping(URIConstants.MOVIES_ID_PATH)
+    public ResponseEntity<MovieDto> updateMovie(@RequestBody @Valid MovieRequest movieRequest, @PathVariable int id,
+        @RequestParam(required = false) boolean returnOld) {
 
-    MovieDto movieDto = movieService.updateMovie(movieRequest, id);
-    log.info(String.format("Movie with id %d was updated", id));
+        MovieDto movieDto = movieService.updateMovie(movieRequest, id);
+        log.info(String.format("Movie with id %d was updated", id));
 
-    return returnOld ? ResponseEntity.ok(movieDto) : ResponseEntity.noContent().build();
-  }
+        return returnOld ? ResponseEntity.ok(movieDto) : ResponseEntity.noContent().build();
+    }
 
-  @DeleteMapping(URIConstants.MOVIES_ID_PATH)
-  public ResponseEntity<MovieDto> deleteMovie(
-    @PathVariable int id,
-    @RequestParam(required = false) boolean returnOld) {
+    @DeleteMapping(URIConstants.MOVIES_ID_PATH)
+    public ResponseEntity<MovieDto> deleteMovie(@PathVariable int id,
+        @RequestParam(required = false) boolean returnOld) {
 
-    MovieDto movieDto = movieService.deleteMovie(id);
-    log.info(String.format("Movie with id %d was deleted", id));
+        MovieDto movieDto = movieService.deleteMovie(id);
+        log.info(String.format("Movie with id %d was deleted", id));
 
-    return returnOld ? ResponseEntity.ok(movieDto) : ResponseEntity.noContent().build();
-  }
+        return returnOld ? ResponseEntity.ok(movieDto) : ResponseEntity.noContent().build();
+    }
 }
 
 

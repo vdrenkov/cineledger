@@ -1,10 +1,11 @@
 package bg.vdrenkov.cineledger.controllers;
 
+import bg.vdrenkov.cineledger.models.dtos.CinemaDto;
 import bg.vdrenkov.cineledger.models.entities.Cinema;
 import bg.vdrenkov.cineledger.models.requests.CinemaRequest;
 import bg.vdrenkov.cineledger.services.CinemaService;
 import bg.vdrenkov.cineledger.utils.constants.URIConstants;
-import bg.vdrenkov.cineledger.models.dtos.CinemaDto;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,66 +20,63 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
 
 @RestController
 public class CinemaController {
 
-  private static final Logger log = LoggerFactory.getLogger(CinemaController.class);
+    private static final Logger log = LoggerFactory.getLogger(CinemaController.class);
 
-  private final CinemaService cinemaService;
+    private final CinemaService cinemaService;
 
-  @Autowired
-  public CinemaController(CinemaService cinemaService) {
-    this.cinemaService = cinemaService;
-  }
+    @Autowired
+    public CinemaController(CinemaService cinemaService) {
+        this.cinemaService = cinemaService;
+    }
 
-  @GetMapping(URIConstants.CINEMAS_PATH)
-  public ResponseEntity<List<CinemaDto>> getCinemas(
-    @RequestParam(required = false) String city,
-    @RequestParam(required = false) String address) {
+    @GetMapping(URIConstants.CINEMAS_PATH)
+    public ResponseEntity<List<CinemaDto>> getCinemas(@RequestParam(required = false) String city,
+        @RequestParam(required = false) String address) {
 
-    List<CinemaDto> cinemaDtos = cinemaService.getAllCinemas(city, address);
-    log.info("All cinemas were requested from the database");
+        List<CinemaDto> cinemaDtos = cinemaService.getAllCinemas(city, address);
+        log.info("All cinemas were requested from the database");
 
-    return ResponseEntity.ok(cinemaDtos);
-  }
+        return ResponseEntity.ok(cinemaDtos);
+    }
 
-  @PostMapping(URIConstants.CINEMAS_PATH)
-  public ResponseEntity<Void> addCinema(@RequestBody @Valid CinemaRequest request) {
-    Cinema cinema = cinemaService.addCinema(request);
-    log.info("A request for a cinema to be added has been submitted");
+    @PostMapping(URIConstants.CINEMAS_PATH)
+    public ResponseEntity<Void> addCinema(@RequestBody @Valid CinemaRequest request) {
+        Cinema cinema = cinemaService.addCinema(request);
+        log.info("A request for a cinema to be added has been submitted");
 
-    URI location = UriComponentsBuilder
-      .fromUriString(URIConstants.CINEMAS_ID_PATH)
-      .buildAndExpand(cinema.getId())
-      .toUri();
+        URI location = UriComponentsBuilder
+            .fromUriString(URIConstants.CINEMAS_ID_PATH)
+            .buildAndExpand(cinema.getId())
+            .toUri();
 
-    return ResponseEntity.created(location).build();
-  }
+        return ResponseEntity.created(location).build();
+    }
 
-  @PutMapping(URIConstants.CINEMAS_ID_PATH)
-  public ResponseEntity<CinemaDto> updateCinema(
-    @RequestBody @Valid CinemaRequest request, @PathVariable int id,
-    @RequestParam(required = false) boolean returnOld) {
+    @PutMapping(URIConstants.CINEMAS_ID_PATH)
+    public ResponseEntity<CinemaDto> updateCinema(@RequestBody @Valid CinemaRequest request, @PathVariable int id,
+        @RequestParam(required = false) boolean returnOld) {
 
-    CinemaDto cinemaDto = cinemaService.updateCinema(request, id);
-    log.info(String.format("Cinema with id %d was updated", id));
+        CinemaDto cinemaDto = cinemaService.updateCinema(request, id);
+        log.info(String.format("Cinema with id %d was updated", id));
 
-    return returnOld ? ResponseEntity.ok(cinemaDto) : ResponseEntity.noContent().build();
-  }
+        return returnOld ? ResponseEntity.ok(cinemaDto) : ResponseEntity.noContent().build();
+    }
 
-  @DeleteMapping(URIConstants.CINEMAS_ID_PATH)
-  public ResponseEntity<CinemaDto> deleteCinema(
-    @PathVariable int id, @RequestParam(required = false) boolean returnOld) {
+    @DeleteMapping(URIConstants.CINEMAS_ID_PATH)
+    public ResponseEntity<CinemaDto> deleteCinema(@PathVariable int id,
+        @RequestParam(required = false) boolean returnOld) {
 
-    CinemaDto cinemaDto = cinemaService.deleteCinema(id);
-    log.info(String.format("Cinema with id %d was deleted", id));
+        CinemaDto cinemaDto = cinemaService.deleteCinema(id);
+        log.info(String.format("Cinema with id %d was deleted", id));
 
-    return returnOld ? ResponseEntity.ok(cinemaDto) : ResponseEntity.noContent().build();
-  }
+        return returnOld ? ResponseEntity.ok(cinemaDto) : ResponseEntity.noContent().build();
+    }
 }
 
 

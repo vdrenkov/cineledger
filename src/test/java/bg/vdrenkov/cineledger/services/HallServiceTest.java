@@ -1,16 +1,16 @@
 package bg.vdrenkov.cineledger.services;
 
-import org.junit.jupiter.api.extension.ExtendWith;
 import bg.vdrenkov.cineledger.exceptions.HallNotFoundException;
 import bg.vdrenkov.cineledger.mappers.HallMapper;
+import bg.vdrenkov.cineledger.models.dtos.HallDto;
 import bg.vdrenkov.cineledger.models.entities.Cinema;
 import bg.vdrenkov.cineledger.models.entities.Hall;
 import bg.vdrenkov.cineledger.repositories.HallRepository;
 import bg.vdrenkov.cineledger.testUtils.constants.HallConstants;
 import bg.vdrenkov.cineledger.testUtils.factories.CinemaFactory;
 import bg.vdrenkov.cineledger.testUtils.factories.HallFactory;
-import bg.vdrenkov.cineledger.models.dtos.HallDto;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -18,12 +18,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.anyInt;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
-import org.junit.jupiter.api.Assertions;
 
 @ExtendWith(MockitoExtension.class)
 public class HallServiceTest {
@@ -77,12 +76,12 @@ public class HallServiceTest {
 
     @Test
     public void testGetHallById_hallNotFound_throwsHallNotFoundException() {
-      assertThrows(HallNotFoundException.class, () -> {
+        assertThrows(HallNotFoundException.class, () -> {
 
-          when(hallRepository.findById(anyInt())).thenReturn(Optional.empty());
-          hallService.getHallById(HallConstants.ID);
-      
-      });
+            when(hallRepository.findById(anyInt())).thenReturn(Optional.empty());
+            hallService.getHallById(HallConstants.ID);
+
+        });
     }
 
     @Test

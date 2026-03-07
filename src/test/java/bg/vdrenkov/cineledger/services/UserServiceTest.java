@@ -8,6 +8,7 @@ import bg.vdrenkov.cineledger.exceptions.UserNotFoundException;
 import bg.vdrenkov.cineledger.exceptions.UsernameAlreadyExistsException;
 import bg.vdrenkov.cineledger.jwt.JwtCookieUtil;
 import bg.vdrenkov.cineledger.mappers.UserMapper;
+import bg.vdrenkov.cineledger.models.dtos.UserDto;
 import bg.vdrenkov.cineledger.models.entities.Role;
 import bg.vdrenkov.cineledger.models.entities.User;
 import bg.vdrenkov.cineledger.models.requests.LoginRequest;
@@ -19,9 +20,9 @@ import bg.vdrenkov.cineledger.testUtils.factories.RoleFactory;
 import bg.vdrenkov.cineledger.testUtils.factories.UserFactory;
 import com.mailjet.client.errors.MailjetException;
 import com.mailjet.client.errors.MailjetSocketTimeoutException;
-import bg.vdrenkov.cineledger.models.dtos.UserDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -45,8 +46,8 @@ import java.util.Optional;
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.anyInt;
@@ -54,547 +55,548 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.ArgumentMatchers.anyInt;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.Assertions;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class UserServiceTest {
 
-  private static final int INVALID_ID = 2;
-  private static final String SECRET = "test-secret-for-jwt-tests-should-be-at-least-thirty-two-characters";
+    private static final int INVALID_ID = 2;
+    private static final String SECRET = "test-secret-for-jwt-tests-should-be-at-least-thirty-two-characters";
 
-  @Mock
-  private AuthenticationManager authenticationManager;
+    @Mock
+    private AuthenticationManager authenticationManager;
 
-  @Mock
-  private BCryptPasswordEncoder passwordEncoder;
+    @Mock
+    private BCryptPasswordEncoder passwordEncoder;
 
-  @Mock
-  private EmailService emailService;
+    @Mock
+    private EmailService emailService;
 
-  @Mock
-  private JwtCookieUtil jwtCookieUtil;
+    @Mock
+    private JwtCookieUtil jwtCookieUtil;
 
-  @Mock
-  private UserRepository userRepository;
+    @Mock
+    private UserRepository userRepository;
 
-  @Mock
-  private Random random;
+    @Mock
+    private Random random;
 
-  @Mock
-  private RoleService roleService;
+    @Mock
+    private RoleService roleService;
 
-  @Mock
-  private UserMapper userMapper;
+    @Mock
+    private UserMapper userMapper;
 
-  @InjectMocks
-  private UserService userService;
+    @InjectMocks
+    private UserService userService;
 
-  @BeforeEach
-  public void setUp() {
-    JwtFactory.setSecret(SECRET);
-  }
+    @BeforeEach
+    public void setUp() {
+        JwtFactory.setSecret(SECRET);
+    }
 
-  @Test
-  public void testLogin_cookieObtained_success() {
-    UserDetails userDetails = mock(UserDetails.class);
+    @Test
+    public void testLogin_cookieObtained_success() {
+        UserDetails userDetails = mock(UserDetails.class);
 
-    Authentication authentication = mock(Authentication.class);
+        Authentication authentication = mock(Authentication.class);
 
-    HttpCookie httpCookie = mock(HttpCookie.class);
+        HttpCookie httpCookie = mock(HttpCookie.class);
 
-    when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(authentication);
-    when(authentication.getPrincipal()).thenReturn(userDetails);
-    when(jwtCookieUtil.createJWTCookie(userDetails)).thenReturn(httpCookie);
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(
+            authentication);
+        when(authentication.getPrincipal()).thenReturn(userDetails);
+        when(jwtCookieUtil.createJWTCookie(userDetails)).thenReturn(httpCookie);
 
-    HttpCookie resultCookie = userService.login(new LoginRequest(UserConstants.USERNAME, UserConstants.PASSWORD));
-    assertEquals(resultCookie, httpCookie);
-  }
+        HttpCookie resultCookie = userService.login(new LoginRequest(UserConstants.USERNAME, UserConstants.PASSWORD));
+        assertEquals(resultCookie, httpCookie);
+    }
 
-  @Test
-  public void testRegisterUser_userRegistered_cookieObtained() throws MailjetSocketTimeoutException, MailjetException {
-    HttpCookie httpCookie = JwtFactory.getDefaultHttpCookie();
+    @Test
+    public void testRegisterUser_userRegistered_cookieObtained()
+        throws MailjetSocketTimeoutException, MailjetException {
+        HttpCookie httpCookie = JwtFactory.getDefaultHttpCookie();
 
-    when(passwordEncoder.encode(anyString())).thenReturn(UserConstants.PASSWORD);
-    when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.empty());
-    when(userRepository.findUserByEmail(anyString())).thenReturn(Optional.empty());
-    when(userRepository.save(any())).thenReturn(UserFactory.getDefaultUser());
-    when(authenticationManager.authenticate(any())).thenReturn(JwtFactory.getDefaultAuthentication());
-    when(jwtCookieUtil.createJWTCookie(any())).thenReturn(httpCookie);
+        when(passwordEncoder.encode(anyString())).thenReturn(UserConstants.PASSWORD);
+        when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.empty());
+        when(userRepository.findUserByEmail(anyString())).thenReturn(Optional.empty());
+        when(userRepository.save(any())).thenReturn(UserFactory.getDefaultUser());
+        when(authenticationManager.authenticate(any())).thenReturn(JwtFactory.getDefaultAuthentication());
+        when(jwtCookieUtil.createJWTCookie(any())).thenReturn(httpCookie);
 
-    HttpCookie resultCookie = userService.registerUser(UserFactory.getDefaultUserRequest());
+        HttpCookie resultCookie = userService.registerUser(UserFactory.getDefaultUserRequest());
 
-    assertEquals(resultCookie, httpCookie);
-  }
+        assertEquals(resultCookie, httpCookie);
+    }
 
-  @Test
-  public void testRegisterUserByAdmin_userRegistered_notLoggedIn() {
-    when(passwordEncoder.encode(anyString())).thenReturn(UserConstants.PASSWORD);
-    when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.empty());
-    when(userRepository.findUserByEmail(anyString())).thenReturn(Optional.empty());
-    when(userRepository.save(any())).thenReturn(UserFactory.getDefaultUser());
+    @Test
+    public void testRegisterUserByAdmin_userRegistered_notLoggedIn() {
+        when(passwordEncoder.encode(anyString())).thenReturn(UserConstants.PASSWORD);
+        when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.empty());
+        when(userRepository.findUserByEmail(anyString())).thenReturn(Optional.empty());
+        when(userRepository.save(any())).thenReturn(UserFactory.getDefaultUser());
 
-    userService.registerUserByAdmin(UserFactory.getDefaultAdminRequest());
+        userService.registerUserByAdmin(UserFactory.getDefaultAdminRequest());
 
-    verify(authenticationManager, never()).authenticate(any());
-    verify(jwtCookieUtil, never()).createJWTCookie(any());
-  }
+        verify(authenticationManager, never()).authenticate(any());
+        verify(jwtCookieUtil, never()).createJWTCookie(any());
+    }
 
-  @Test
-  public void testAddUser_usernameExists_throwsUserEmailAlreadyExistsException() throws MailjetSocketTimeoutException,
-    MailjetException {
-    assertThrows(UsernameAlreadyExistsException.class, () -> {
+    @Test
+    public void testAddUser_usernameExists_throwsUserEmailAlreadyExistsException()
+        throws MailjetSocketTimeoutException, MailjetException {
+        assertThrows(UsernameAlreadyExistsException.class, () -> {
 
-      when(passwordEncoder.encode(anyString())).thenReturn(UserConstants.PASSWORD);
-      when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.of(new User()));
+            when(passwordEncoder.encode(anyString())).thenReturn(UserConstants.PASSWORD);
+            when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.of(new User()));
 
-      userService.addUser(UserFactory.getDefaultUserRequest());
-    
-    });
-  }
+            userService.addUser(UserFactory.getDefaultUserRequest());
 
-  @Test
-  public void testAddUser_emailExists_throwsUserEmailAlreadyExistsException() throws MailjetSocketTimeoutException,
-    MailjetException {
-    assertThrows(UserEmailAlreadyExistsException.class, () -> {
+        });
+    }
 
-      when(passwordEncoder.encode(anyString())).thenReturn(UserConstants.PASSWORD);
-      when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.empty());
-      when(userRepository.findUserByEmail(anyString())).thenReturn(Optional.of(new User()));
+    @Test
+    public void testAddUser_emailExists_throwsUserEmailAlreadyExistsException()
+        throws MailjetSocketTimeoutException, MailjetException {
+        assertThrows(UserEmailAlreadyExistsException.class, () -> {
 
-      userService.addUser(UserFactory.getDefaultUserRequest());
-    
-    });
-  }
+            when(passwordEncoder.encode(anyString())).thenReturn(UserConstants.PASSWORD);
+            when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.empty());
+            when(userRepository.findUserByEmail(anyString())).thenReturn(Optional.of(new User()));
 
-  @Test
-  public void testGetRoleByName_success() {
-    when(roleService.getRoleByName(anyString())).thenReturn(RoleFactory.getDefaultRole());
+            userService.addUser(UserFactory.getDefaultUserRequest());
 
-    Role result = userService.getRoleByName(RoleConstants.NAME);
+        });
+    }
 
-    assertEquals(RoleFactory.getDefaultRole(), result);
-  }
+    @Test
+    public void testGetRoleByName_success() {
+        when(roleService.getRoleByName(anyString())).thenReturn(RoleFactory.getDefaultRole());
 
-  @Test
-  public void testGetDefaultRoleList_success() {
-    List<Role> expected = RoleFactory.getDefaultRoleList();
+        Role result = userService.getRoleByName(RoleConstants.NAME);
 
-    when(roleService.getRoleByName(RoleConstants.NAME)).thenReturn(RoleFactory.getDefaultRole());
+        assertEquals(RoleFactory.getDefaultRole(), result);
+    }
 
-    List<Role> roles = userService.getDefaultRoleList();
+    @Test
+    public void testGetDefaultRoleList_success() {
+        List<Role> expected = RoleFactory.getDefaultRoleList();
 
-    assertEquals(expected, roles);
-  }
+        when(roleService.getRoleByName(RoleConstants.NAME)).thenReturn(RoleFactory.getDefaultRole());
 
-  @Test
-  public void testGetUserRoles_success() {
-    Role role1 = new Role(1, "ADMIN");
-    Role role2 = new Role(2, "USER");
+        List<Role> roles = userService.getDefaultRoleList();
 
-    when(roleService.getRoleByName("ADMIN")).thenReturn(role1);
-    when(roleService.getRoleByName("USER")).thenReturn(role2);
+        assertEquals(expected, roles);
+    }
 
-    List<String> roleNames = Arrays.asList("ADMIN", "USER");
+    @Test
+    public void testGetUserRoles_success() {
+        Role role1 = new Role(1, "ADMIN");
+        Role role2 = new Role(2, "USER");
 
-    List<Role> roles = userService.getUserRoles(roleNames);
+        when(roleService.getRoleByName("ADMIN")).thenReturn(role1);
+        when(roleService.getRoleByName("USER")).thenReturn(role2);
 
-    assertEquals(2, roles.size());
-    assertEquals(role1, roles.get(0));
-    assertEquals(role2, roles.get(1));
-  }
+        List<String> roleNames = Arrays.asList("ADMIN", "USER");
 
-  @Test
-  public void testGetUserRoles_rolesEmpty_throwsRoleNotChosenException() {
-    assertThrows(RoleNotChosenException.class, () -> {
+        List<Role> roles = userService.getUserRoles(roleNames);
 
-      userService.getUserRoles(Collections.emptyList());
-    
-    });
-  }
+        assertEquals(2, roles.size());
+        assertEquals(role1, roles.get(0));
+        assertEquals(role2, roles.get(1));
+    }
 
-  @Test
-  public void testGetUserById_success() {
-    User expected = UserFactory.getDefaultUser();
+    @Test
+    public void testGetUserRoles_rolesEmpty_throwsRoleNotChosenException() {
+        assertThrows(RoleNotChosenException.class, () -> {
 
-    when(userRepository.findById(anyInt())).thenReturn(Optional.of(expected));
+            userService.getUserRoles(Collections.emptyList());
 
-    User user = userService.getUserById(UserConstants.ID);
+        });
+    }
 
-    assertEquals(expected, user);
-  }
+    @Test
+    public void testGetUserById_success() {
+        User expected = UserFactory.getDefaultUser();
 
-  @Test
-  public void testGetUserById_userNotFound() {
-    when(userRepository.findById(anyInt())).thenReturn(Optional.empty());
+        when(userRepository.findById(anyInt())).thenReturn(Optional.of(expected));
 
-    assertThrows(UserNotFoundException.class, () -> userService.getUserById(UserConstants.ID));
-  }
+        User user = userService.getUserById(UserConstants.ID);
 
-  @Test
-  public void testGetUserDtoById_success() {
-    UserDto expected = UserFactory.getDefaultUserDto();
+        assertEquals(expected, user);
+    }
 
-    when(userRepository.findById(anyInt())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
-    when(userMapper.mapUserToUserDto(UserFactory.getDefaultUser())).thenReturn(expected);
+    @Test
+    public void testGetUserById_userNotFound() {
+        when(userRepository.findById(anyInt())).thenReturn(Optional.empty());
 
-    UserDto userDto = userService.getUserDtoById(UserConstants.ID);
+        assertThrows(UserNotFoundException.class, () -> userService.getUserById(UserConstants.ID));
+    }
 
-    assertEquals(expected, userDto);
-  }
+    @Test
+    public void testGetUserDtoById_success() {
+        UserDto expected = UserFactory.getDefaultUserDto();
 
-  @Test
-  public void testGetUserByUsername_success() {
-    User expected = UserFactory.getDefaultUser();
+        when(userRepository.findById(anyInt())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
+        when(userMapper.mapUserToUserDto(UserFactory.getDefaultUser())).thenReturn(expected);
 
-    when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.of(expected));
+        UserDto userDto = userService.getUserDtoById(UserConstants.ID);
 
-    User user = userService.getUserByUsername(UserConstants.USERNAME);
+        assertEquals(expected, userDto);
+    }
 
-    assertEquals(expected, user);
-  }
+    @Test
+    public void testGetUserByUsername_success() {
+        User expected = UserFactory.getDefaultUser();
 
-  @Test
-  public void testGetUserByUsername_userNotFound() {
-    when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.empty());
+        when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.of(expected));
 
-    assertThrows(UserNotFoundException.class, () -> userService.getUserByUsername(UserConstants.USERNAME));
-  }
+        User user = userService.getUserByUsername(UserConstants.USERNAME);
 
-  @Test
-  public void testGetUserDtoByUsername_success() {
-    UserDto expected = UserFactory.getDefaultUserDto();
+        assertEquals(expected, user);
+    }
 
-    when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
-    when(userMapper.mapUserToUserDto(UserFactory.getDefaultUser())).thenReturn(expected);
+    @Test
+    public void testGetUserByUsername_userNotFound() {
+        when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.empty());
 
-    UserDto user = userService.getUserDtoByUsername(UserConstants.USERNAME);
+        assertThrows(UserNotFoundException.class, () -> userService.getUserByUsername(UserConstants.USERNAME));
+    }
 
-    assertEquals(expected, user);
-  }
+    @Test
+    public void testGetUserDtoByUsername_success() {
+        UserDto expected = UserFactory.getDefaultUserDto();
 
-  @Test
-  public void testGetUserByEmail_success() {
-    User expected = UserFactory.getDefaultUser();
+        when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
+        when(userMapper.mapUserToUserDto(UserFactory.getDefaultUser())).thenReturn(expected);
 
-    when(userRepository.findUserByEmail(anyString())).thenReturn(Optional.of(expected));
+        UserDto user = userService.getUserDtoByUsername(UserConstants.USERNAME);
 
-    User user = userService.getUserByEmail(UserConstants.EMAIL);
+        assertEquals(expected, user);
+    }
 
-    assertEquals(expected, user);
-  }
+    @Test
+    public void testGetUserByEmail_success() {
+        User expected = UserFactory.getDefaultUser();
 
-  @Test
-  public void testGetUserByEmail_userNotFound() {
-    when(userRepository.findUserByEmail(anyString())).thenReturn(Optional.empty());
+        when(userRepository.findUserByEmail(anyString())).thenReturn(Optional.of(expected));
 
-    assertThrows(UserNotFoundException.class, () -> userService.getUserByEmail(UserConstants.EMAIL));
-  }
+        User user = userService.getUserByEmail(UserConstants.EMAIL);
 
-  @Test
-  public void testGetUserDtoByEmail_success() {
-    UserDto expected = UserFactory.getDefaultUserDto();
+        assertEquals(expected, user);
+    }
 
-    when(userRepository.findUserByEmail(anyString())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
-    when(userMapper.mapUserToUserDto(UserFactory.getDefaultUser())).thenReturn(expected);
+    @Test
+    public void testGetUserByEmail_userNotFound() {
+        when(userRepository.findUserByEmail(anyString())).thenReturn(Optional.empty());
 
-    UserDto result = userService.getUserDtoByEmail(UserConstants.EMAIL);
+        assertThrows(UserNotFoundException.class, () -> userService.getUserByEmail(UserConstants.EMAIL));
+    }
 
-    assertEquals(expected, result);
-  }
+    @Test
+    public void testGetUserDtoByEmail_success() {
+        UserDto expected = UserFactory.getDefaultUserDto();
 
-  @Test
-  public void testGetUsersByRoleName_success() {
-    List<User> expected = UserFactory.getDefaultUserList();
+        when(userRepository.findUserByEmail(anyString())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
+        when(userMapper.mapUserToUserDto(UserFactory.getDefaultUser())).thenReturn(expected);
 
-    when(userRepository.findAllByRolesName(RoleConstants.NAME)).thenReturn(expected);
+        UserDto result = userService.getUserDtoByEmail(UserConstants.EMAIL);
 
-    List<User> result = userService.getUsersByRoleName(RoleConstants.NAME);
+        assertEquals(expected, result);
+    }
 
-    assertEquals(expected, result);
-  }
+    @Test
+    public void testGetUsersByRoleName_success() {
+        List<User> expected = UserFactory.getDefaultUserList();
 
-  @Test
-  public void testGetUsersDtoByRoleName_success() {
-    List<UserDto> expected = UserFactory.getDefaultUserDtoList();
+        when(userRepository.findAllByRolesName(RoleConstants.NAME)).thenReturn(expected);
 
-    when(userService.getUsersByRoleName(RoleConstants.NAME)).thenReturn(UserFactory.getDefaultUserList());
-    when(userMapper.mapUsersToUserDtos(UserFactory.getDefaultUserList())).thenReturn(expected);
+        List<User> result = userService.getUsersByRoleName(RoleConstants.NAME);
 
-    List<UserDto> resultList = userService.getUsersDtoByRoleName(RoleConstants.NAME);
+        assertEquals(expected, result);
+    }
 
-    assertEquals(expected, resultList);
-  }
+    @Test
+    public void testGetUsersDtoByRoleName_success() {
+        List<UserDto> expected = UserFactory.getDefaultUserDtoList();
 
-  @Test
-  public void testGetUsersByJoinDate_before_success() {
-    User user2 = UserFactory.getDefaultUser();
-    user2.setId(2);
-    List<User> expectedUsers = Arrays.asList(UserFactory.getDefaultUser(), user2);
+        when(userService.getUsersByRoleName(RoleConstants.NAME)).thenReturn(UserFactory.getDefaultUserList());
+        when(userMapper.mapUsersToUserDtos(UserFactory.getDefaultUserList())).thenReturn(expected);
 
-    when(userRepository.findAllByJoinDateBefore(any(LocalDate.class))).thenReturn(expectedUsers);
+        List<UserDto> resultList = userService.getUsersDtoByRoleName(RoleConstants.NAME);
 
-    List<User> users = userService.getUsersByJoinDate(UserConstants.JOIN_DATE, true);
+        assertEquals(expected, resultList);
+    }
 
-    assertEquals(expectedUsers, users);
-  }
+    @Test
+    public void testGetUsersByJoinDate_before_success() {
+        User user2 = UserFactory.getDefaultUser();
+        user2.setId(2);
+        List<User> expectedUsers = Arrays.asList(UserFactory.getDefaultUser(), user2);
 
-  @Test
-  public void testGetUsersByJoinDate_after_success() {
-    User user2 = UserFactory.getDefaultUser();
-    user2.setId(2);
-    List<User> expectedUsers = Arrays.asList(UserFactory.getDefaultUser(), user2);
+        when(userRepository.findAllByJoinDateBefore(any(LocalDate.class))).thenReturn(expectedUsers);
 
-    when(userRepository.findAllByJoinDateAfter(any(LocalDate.class))).thenReturn(expectedUsers);
+        List<User> users = userService.getUsersByJoinDate(UserConstants.JOIN_DATE, true);
 
-    List<User> users = userService.getUsersByJoinDate(UserConstants.JOIN_DATE, false);
+        assertEquals(expectedUsers, users);
+    }
 
-    assertEquals(expectedUsers, users);
-  }
+    @Test
+    public void testGetUsersByJoinDate_after_success() {
+        User user2 = UserFactory.getDefaultUser();
+        user2.setId(2);
+        List<User> expectedUsers = Arrays.asList(UserFactory.getDefaultUser(), user2);
 
-  @Test
-  public void getUsersDtosByJoinDate() {
-    User user2 = UserFactory.getDefaultUser();
-    user2.setId(2);
+        when(userRepository.findAllByJoinDateAfter(any(LocalDate.class))).thenReturn(expectedUsers);
 
-    List<User> users = Arrays.asList(UserFactory.getDefaultUser(), user2);
+        List<User> users = userService.getUsersByJoinDate(UserConstants.JOIN_DATE, false);
 
-    when(userService.getUsersByJoinDate(UserConstants.JOIN_DATE, true)).thenReturn(users);
-    when(userService.getUsersByJoinDate(UserConstants.JOIN_DATE, true)).thenReturn(UserFactory.getDefaultUserList());
-    when(userMapper.mapUsersToUserDtos(UserFactory.getDefaultUserList())).thenReturn(
-      UserFactory.getDefaultUserDtoList());
+        assertEquals(expectedUsers, users);
+    }
 
-    List<UserDto> actualUserDtos = userService.getUsersDtosByJoinDate(UserConstants.JOIN_DATE, true);
-    assertEquals(UserFactory.getDefaultUserDtoList(), actualUserDtos);
-  }
+    @Test
+    public void getUsersDtosByJoinDate() {
+        User user2 = UserFactory.getDefaultUser();
+        user2.setId(2);
 
-  @Test
-  public void testUpdateUserByAdmin_userUpdated_success() {
-    UserDto expected = UserFactory.getDefaultUserDto();
+        List<User> users = Arrays.asList(UserFactory.getDefaultUser(), user2);
 
-    when(userRepository.findById(anyInt())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
-    when(userMapper.mapUserToUserDto(any())).thenReturn(expected);
-    when(roleService.getRoleByName(anyString())).thenReturn(RoleFactory.getDefaultRole());
-    when(userRepository.save(any())).thenReturn(UserFactory.getDefaultUser());
+        when(userService.getUsersByJoinDate(UserConstants.JOIN_DATE, true)).thenReturn(users);
+        when(userService.getUsersByJoinDate(UserConstants.JOIN_DATE, true)).thenReturn(
+            UserFactory.getDefaultUserList());
+        when(userMapper.mapUsersToUserDtos(UserFactory.getDefaultUserList())).thenReturn(
+            UserFactory.getDefaultUserDtoList());
 
-    UserDto result = userService.updateUserByAdmin(UserFactory.getDefaultAdminRequest(), UserConstants.ID);
+        List<UserDto> actualUserDtos = userService.getUsersDtosByJoinDate(UserConstants.JOIN_DATE, true);
+        assertEquals(UserFactory.getDefaultUserDtoList(), actualUserDtos);
+    }
 
-    assertEquals(expected, result);
-  }
+    @Test
+    public void testUpdateUserByAdmin_userUpdated_success() {
+        UserDto expected = UserFactory.getDefaultUserDto();
 
-  @Test
-  public void testUpdateUser_userUpdated_success() {
-    User expectedUser = UserFactory.getDefaultUser();
-    UserDto expectedUserDto = UserFactory.getDefaultUserDto();
-    SecurityContext securityContext = Mockito.mock(SecurityContext.class);
-    Authentication authentication = JwtFactory.getDefaultAuthentication();
-    SecurityContextHolder.setContext(securityContext);
-    when(securityContext.getAuthentication()).thenReturn(authentication);
-    when(userMapper.mapUserToUserDto(any())).thenReturn(expectedUserDto);
-    when(passwordEncoder.encode(any())).thenReturn(UserConstants.PASSWORD);
-    when(userRepository.findById(anyInt())).thenReturn(Optional.of(expectedUser));
-    when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.of(expectedUser))
-                                                        .thenReturn(Optional.empty());
-    when(userRepository.findUserByEmail(anyString())).thenReturn(Optional.empty());
-    when(roleService.getRoleByName(anyString())).thenReturn(RoleFactory.getDefaultRole());
+        when(userRepository.findById(anyInt())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
+        when(userMapper.mapUserToUserDto(any())).thenReturn(expected);
+        when(roleService.getRoleByName(anyString())).thenReturn(RoleFactory.getDefaultRole());
+        when(userRepository.save(any())).thenReturn(UserFactory.getDefaultUser());
 
-    UserDto resultUser = userService.updateUser(UserFactory.getDefaultUserRequest(), UserConstants.ID);
+        UserDto result = userService.updateUserByAdmin(UserFactory.getDefaultAdminRequest(), UserConstants.ID);
 
-    assertEquals(expectedUserDto, resultUser);
-  }
+        assertEquals(expected, result);
+    }
 
-  @Test
-  public void testUpdateUser_userNotAuthorized_throwsNotAuthorizedException() {
-    assertThrows(NotAuthorizedException.class, () -> {
+    @Test
+    public void testUpdateUser_userUpdated_success() {
+        User expectedUser = UserFactory.getDefaultUser();
+        UserDto expectedUserDto = UserFactory.getDefaultUserDto();
+        SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+        Authentication authentication = JwtFactory.getDefaultAuthentication();
+        SecurityContextHolder.setContext(securityContext);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(userMapper.mapUserToUserDto(any())).thenReturn(expectedUserDto);
+        when(passwordEncoder.encode(any())).thenReturn(UserConstants.PASSWORD);
+        when(userRepository.findById(anyInt())).thenReturn(Optional.of(expectedUser));
+        when(userRepository.findUserByUsername(anyString()))
+            .thenReturn(Optional.of(expectedUser))
+            .thenReturn(Optional.empty());
+        when(userRepository.findUserByEmail(anyString())).thenReturn(Optional.empty());
+        when(roleService.getRoleByName(anyString())).thenReturn(RoleFactory.getDefaultRole());
 
-      SecurityContext securityContext = Mockito.mock(SecurityContext.class);
-      SecurityContextHolder.setContext(securityContext);
-      Authentication authentication = JwtFactory.getDefaultAuthentication();
+        UserDto resultUser = userService.updateUser(UserFactory.getDefaultUserRequest(), UserConstants.ID);
 
-      when(securityContext.getAuthentication()).thenReturn(authentication);
-      when(userRepository.findById(anyInt())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
-      when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
-      when(roleService.getRoleByName(anyString())).thenReturn(RoleFactory.getDefaultAdminRole());
+        assertEquals(expectedUserDto, resultUser);
+    }
 
-      userService.updateUser(UserFactory.getDefaultUserRequest(), INVALID_ID);
-    
-    });
-  }
+    @Test
+    public void testUpdateUser_userNotAuthorized_throwsNotAuthorizedException() {
+        assertThrows(NotAuthorizedException.class, () -> {
 
-  @Test
-  public void testDeleteUser_userDeleted_success() {
-    UserDto userDto = UserFactory.getDefaultUserDto();
-    SecurityContext securityContext = Mockito.mock(SecurityContext.class);
-    SecurityContextHolder.setContext(securityContext);
-    Authentication authentication = JwtFactory.getDefaultAuthentication();
+            SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+            SecurityContextHolder.setContext(securityContext);
+            Authentication authentication = JwtFactory.getDefaultAuthentication();
 
-    when(securityContext.getAuthentication()).thenReturn(authentication);
-    when(userMapper.mapUserToUserDto(any())).thenReturn(userDto);
-    when(userRepository.findById(anyInt())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
-    when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
-    when(roleService.getRoleByName(anyString())).thenReturn(RoleFactory.getDefaultRole());
+            when(securityContext.getAuthentication()).thenReturn(authentication);
+            when(userRepository.findById(anyInt())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
+            when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
+            when(roleService.getRoleByName(anyString())).thenReturn(RoleFactory.getDefaultAdminRole());
 
-    UserDto result = userService.deleteUser(UserConstants.ID);
+            userService.updateUser(UserFactory.getDefaultUserRequest(), INVALID_ID);
 
-    assertEquals(userDto, result);
-  }
+        });
+    }
 
-  @Test
-  public void testDeleteUser_userNotAuthorized_throwsNotAuthorizedException() {
-    assertThrows(NotAuthorizedException.class, () -> {
+    @Test
+    public void testDeleteUser_userDeleted_success() {
+        UserDto userDto = UserFactory.getDefaultUserDto();
+        SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+        SecurityContextHolder.setContext(securityContext);
+        Authentication authentication = JwtFactory.getDefaultAuthentication();
 
-      UserDto userDto = UserFactory.getDefaultUserDto();
-      SecurityContext securityContext = Mockito.mock(SecurityContext.class);
-      SecurityContextHolder.setContext(securityContext);
-      Authentication authentication = JwtFactory.getDefaultAuthentication();
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(userMapper.mapUserToUserDto(any())).thenReturn(userDto);
+        when(userRepository.findById(anyInt())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
+        when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
+        when(roleService.getRoleByName(anyString())).thenReturn(RoleFactory.getDefaultRole());
 
-      when(securityContext.getAuthentication()).thenReturn(authentication);
-      when(userMapper.mapUserToUserDto(any())).thenReturn(userDto);
-      when(userRepository.findById(anyInt())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
-      when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
-      when(roleService.getRoleByName(anyString())).thenReturn(RoleFactory.getDefaultAdminRole());
+        UserDto result = userService.deleteUser(UserConstants.ID);
 
-      userService.deleteUser(INVALID_ID);
-    
-    });
-  }
+        assertEquals(userDto, result);
+    }
 
-  @Test
-  public void testGetCurrentUser_userLoggedIn_success() {
-    User expected = UserFactory.getDefaultUser();
-    SecurityContext securityContext = Mockito.mock(SecurityContext.class);
-    SecurityContextHolder.setContext(securityContext);
-    Authentication authentication = JwtFactory.getDefaultAuthentication();
+    @Test
+    public void testDeleteUser_userNotAuthorized_throwsNotAuthorizedException() {
+        assertThrows(NotAuthorizedException.class, () -> {
 
-    when(securityContext.getAuthentication()).thenReturn(authentication);
-    when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.of(expected));
+            UserDto userDto = UserFactory.getDefaultUserDto();
+            SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+            SecurityContextHolder.setContext(securityContext);
+            Authentication authentication = JwtFactory.getDefaultAuthentication();
 
-    User result = userService.getCurrentUser();
+            when(securityContext.getAuthentication()).thenReturn(authentication);
+            when(userMapper.mapUserToUserDto(any())).thenReturn(userDto);
+            when(userRepository.findById(anyInt())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
+            when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
+            when(roleService.getRoleByName(anyString())).thenReturn(RoleFactory.getDefaultAdminRole());
 
-    assertEquals(expected, result);
-  }
+            userService.deleteUser(INVALID_ID);
 
-  @Test
-  public void testGetUserByUsernameOnLogin_userNotFound_throwsUserNotFoundException() {
-    assertThrows(UserNotFoundException.class, () -> {
+        });
+    }
 
-      UserDto userDto = UserFactory.getDefaultUserDto();
-      SecurityContext securityContext = Mockito.mock(SecurityContext.class);
-      SecurityContextHolder.setContext(securityContext);
-      Authentication authentication = JwtFactory.getDefaultAuthentication();
+    @Test
+    public void testGetCurrentUser_userLoggedIn_success() {
+        User expected = UserFactory.getDefaultUser();
+        SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+        SecurityContextHolder.setContext(securityContext);
+        Authentication authentication = JwtFactory.getDefaultAuthentication();
 
-      when(securityContext.getAuthentication()).thenReturn(authentication);
-      when(userMapper.mapUserToUserDto(any())).thenReturn(userDto);
-      when(userRepository.findById(anyInt())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
-      when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.empty());
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.of(expected));
 
-      UserDto result = userService.deleteUser(UserConstants.ID);
+        User result = userService.getCurrentUser();
 
-      assertEquals(userDto, result);
-    
-    });
-  }
+        assertEquals(expected, result);
+    }
 
-  @Test
-  public void testIsAuthorized_userNotLogged_throwsNotLoggedInException() {
-    assertThrows(NotLoggedInException.class, () -> {
+    @Test
+    public void testGetUserByUsernameOnLogin_userNotFound_throwsUserNotFoundException() {
+        assertThrows(UserNotFoundException.class, () -> {
 
-      UserDto userDto = UserFactory.getDefaultUserDto();
-      SecurityContext securityContext = Mockito.mock(SecurityContext.class);
-      SecurityContextHolder.setContext(securityContext);
-      Authentication authentication = Mockito.mock(Authentication.class);
+            UserDto userDto = UserFactory.getDefaultUserDto();
+            SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+            SecurityContextHolder.setContext(securityContext);
+            Authentication authentication = JwtFactory.getDefaultAuthentication();
 
-      when(authentication.getName()).thenReturn(null);
-      when(securityContext.getAuthentication()).thenReturn(authentication);
-      when(userRepository.findById(anyInt())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
+            when(securityContext.getAuthentication()).thenReturn(authentication);
+            when(userMapper.mapUserToUserDto(any())).thenReturn(userDto);
+            when(userRepository.findById(anyInt())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
+            when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.empty());
 
-      UserDto result = userService.updateUser(UserFactory.getDefaultUserRequest(), UserConstants.ID);
+            UserDto result = userService.deleteUser(UserConstants.ID);
 
-      assertEquals(userDto, result);
-    
-    });
-  }
+            assertEquals(userDto, result);
 
-  @Test
-  public void testIsAuthorized_roleAdmin_returnsTrue() {
-    User user = UserFactory.getDefaultUser();
-    user.setRoles(Collections.singletonList(RoleFactory.getDefaultAdminRole()));
-    UserDto userDto = UserFactory.getDefaultUserDto();
-    SecurityContext securityContext = Mockito.mock(SecurityContext.class);
-    SecurityContextHolder.setContext(securityContext);
-    Authentication authentication = JwtFactory.getDefaultAuthentication();
+        });
+    }
 
-    when(securityContext.getAuthentication()).thenReturn(authentication);
-    when(userMapper.mapUserToUserDto(any())).thenReturn(userDto);
-    when(userRepository.findById(anyInt())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
-    when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.of(user)).thenReturn(Optional.empty());
-    when(roleService.getRoleByName(anyString())).thenReturn(RoleFactory.getDefaultAdminRole());
+    @Test
+    public void testIsAuthorized_userNotLogged_throwsNotLoggedInException() {
+        assertThrows(NotLoggedInException.class, () -> {
 
-    UserDto result = userService.updateUser(UserFactory.getDefaultUserRequest(), UserConstants.ID);
+            UserDto userDto = UserFactory.getDefaultUserDto();
+            SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+            SecurityContextHolder.setContext(securityContext);
+            Authentication authentication = Mockito.mock(Authentication.class);
 
-    assertEquals(userDto, result);
-  }
+            when(authentication.getName()).thenReturn(null);
+            when(securityContext.getAuthentication()).thenReturn(authentication);
+            when(userRepository.findById(anyInt())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
 
-  @Test
-  public void testIsCurrentUserAdmin_roleAdmin_returnsTrue() {
-    User expected = UserFactory.getDefaultAdmin();
-    SecurityContext securityContext = Mockito.mock(SecurityContext.class);
-    SecurityContextHolder.setContext(securityContext);
-    Authentication authentication = JwtFactory.getDefaultAuthentication();
+            UserDto result = userService.updateUser(UserFactory.getDefaultUserRequest(), UserConstants.ID);
 
-    when(securityContext.getAuthentication()).thenReturn(authentication);
-    when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.of(expected));
+            assertEquals(userDto, result);
 
-    boolean result = userService.isCurrentUserAdmin();
+        });
+    }
 
-    assertTrue(result);
-  }
+    @Test
+    public void testIsAuthorized_roleAdmin_returnsTrue() {
+        User user = UserFactory.getDefaultUser();
+        user.setRoles(Collections.singletonList(RoleFactory.getDefaultAdminRole()));
+        UserDto userDto = UserFactory.getDefaultUserDto();
+        SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+        SecurityContextHolder.setContext(securityContext);
+        Authentication authentication = JwtFactory.getDefaultAuthentication();
 
-  @Test
-  public void testIsCurrentUserAuthorized_userIsAdmin_returnsTrue() {
-    User expected = UserFactory.getDefaultAdmin();
-    SecurityContext securityContext = Mockito.mock(SecurityContext.class);
-    SecurityContextHolder.setContext(securityContext);
-    Authentication authentication = JwtFactory.getDefaultAuthentication();
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(userMapper.mapUserToUserDto(any())).thenReturn(userDto);
+        when(userRepository.findById(anyInt())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
+        when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.of(user)).thenReturn(Optional.empty());
+        when(roleService.getRoleByName(anyString())).thenReturn(RoleFactory.getDefaultAdminRole());
 
-    when(securityContext.getAuthentication()).thenReturn(authentication);
-    when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.of(expected));
+        UserDto result = userService.updateUser(UserFactory.getDefaultUserRequest(), UserConstants.ID);
 
-    boolean result = userService.isCurrentUserAuthorized(UserConstants.ID);
+        assertEquals(userDto, result);
+    }
 
-    assertTrue(result);
-  }
+    @Test
+    public void testIsCurrentUserAdmin_roleAdmin_returnsTrue() {
+        User expected = UserFactory.getDefaultAdmin();
+        SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+        SecurityContextHolder.setContext(securityContext);
+        Authentication authentication = JwtFactory.getDefaultAuthentication();
 
-  @Test
-  public void testIsCurrentUserAuthorized_userAuthorized_returnsTrue() {
-    User expected = UserFactory.getDefaultUser();
-    SecurityContext securityContext = Mockito.mock(SecurityContext.class);
-    SecurityContextHolder.setContext(securityContext);
-    Authentication authentication = JwtFactory.getDefaultAuthentication();
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.of(expected));
 
-    when(securityContext.getAuthentication()).thenReturn(authentication);
-    when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.of(expected));
+        boolean result = userService.isCurrentUserAdmin();
 
-    boolean result = userService.isCurrentUserAuthorized(UserConstants.ID);
+        assertTrue(result);
+    }
 
-    assertTrue(result);
-  }
+    @Test
+    public void testIsCurrentUserAuthorized_userIsAdmin_returnsTrue() {
+        User expected = UserFactory.getDefaultAdmin();
+        SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+        SecurityContextHolder.setContext(securityContext);
+        Authentication authentication = JwtFactory.getDefaultAuthentication();
 
-  @Test
-  public void testRecoverPassword() throws MailjetSocketTimeoutException, MailjetException {
-    User expectedUser = UserFactory.getDefaultUser();
-    when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.of(expectedUser));
-    when(random.nextInt(anyInt())).thenReturn(1);
-    when(passwordEncoder.encode(any())).thenReturn(UserConstants.PASSWORD);
-    when(userRepository.save(any())).thenReturn(expectedUser);
-    Mockito.doNothing().when(emailService).sendPasswordConfirmationEmail(any(), anyString());
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.of(expected));
 
-    User resultUser = userService.recoverPassword(UserConstants.USERNAME);
+        boolean result = userService.isCurrentUserAuthorized(UserConstants.ID);
 
-    assertEquals(expectedUser, resultUser);
-  }
+        assertTrue(result);
+    }
+
+    @Test
+    public void testIsCurrentUserAuthorized_userAuthorized_returnsTrue() {
+        User expected = UserFactory.getDefaultUser();
+        SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+        SecurityContextHolder.setContext(securityContext);
+        Authentication authentication = JwtFactory.getDefaultAuthentication();
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.of(expected));
+
+        boolean result = userService.isCurrentUserAuthorized(UserConstants.ID);
+
+        assertTrue(result);
+    }
+
+    @Test
+    public void testRecoverPassword() throws MailjetSocketTimeoutException, MailjetException {
+        User expectedUser = UserFactory.getDefaultUser();
+        when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.of(expectedUser));
+        when(random.nextInt(anyInt())).thenReturn(1);
+        when(passwordEncoder.encode(any())).thenReturn(UserConstants.PASSWORD);
+        when(userRepository.save(any())).thenReturn(expectedUser);
+        Mockito.doNothing().when(emailService).sendPasswordConfirmationEmail(any(), anyString());
+
+        User resultUser = userService.recoverPassword(UserConstants.USERNAME);
+
+        assertEquals(expectedUser, resultUser);
+    }
 }
 
 

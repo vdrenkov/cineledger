@@ -1,9 +1,9 @@
 package bg.vdrenkov.cineledger.services;
 
-import org.junit.jupiter.api.extension.ExtendWith;
 import bg.vdrenkov.cineledger.exceptions.NotAuthorizedException;
 import bg.vdrenkov.cineledger.exceptions.ReviewNotFoundException;
 import bg.vdrenkov.cineledger.mappers.ReviewMapper;
+import bg.vdrenkov.cineledger.models.dtos.ReviewDto;
 import bg.vdrenkov.cineledger.models.entities.Review;
 import bg.vdrenkov.cineledger.repositories.ReviewRepository;
 import bg.vdrenkov.cineledger.testUtils.constants.ReviewConstants;
@@ -11,9 +11,9 @@ import bg.vdrenkov.cineledger.testUtils.factories.CinemaFactory;
 import bg.vdrenkov.cineledger.testUtils.factories.MovieFactory;
 import bg.vdrenkov.cineledger.testUtils.factories.ReviewFactory;
 import bg.vdrenkov.cineledger.testUtils.factories.UserFactory;
-import bg.vdrenkov.cineledger.models.dtos.ReviewDto;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -21,11 +21,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyDouble;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyDouble;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -56,7 +56,8 @@ public class ReviewServiceTest {
         when(userService.getCurrentUser()).thenReturn(UserFactory.getDefaultUser());
         when(movieService.getMovieById(anyInt())).thenReturn(MovieFactory.getDefaultMovie());
         when(reviewRepository.save(any())).thenReturn(ReviewFactory.getDefaultReview());
-        when(movieService.updateMovieAverageRating(anyDouble(), anyInt())).thenReturn(MovieFactory.getDefaultMovieDto());
+        when(movieService.updateMovieAverageRating(anyDouble(), anyInt())).thenReturn(
+            MovieFactory.getDefaultMovieDto());
 
         Review review = reviewService.addMovieReview(ReviewFactory.getDefaultReviewRequest(), ReviewConstants.ID);
 
@@ -74,7 +75,8 @@ public class ReviewServiceTest {
         when(userService.getCurrentUser()).thenReturn(UserFactory.getDefaultUser());
         when(movieService.getMovieById(anyInt())).thenReturn(MovieFactory.getDefaultMovie());
         when(reviewRepository.save(any())).thenReturn(new Review());
-        when(movieService.updateMovieAverageRating(anyDouble(), anyInt())).thenReturn(MovieFactory.getDefaultMovieDto());
+        when(movieService.updateMovieAverageRating(anyDouble(), anyInt())).thenReturn(
+            MovieFactory.getDefaultMovieDto());
         when(reviewRepository.findByMovieId(anyInt())).thenReturn(ReviewFactory.getDefaultReviewList());
         when(reviewMapper.mapReviewToReviewDto(any())).thenReturn(expectedDto);
 
@@ -94,7 +96,7 @@ public class ReviewServiceTest {
         when(cinemaService.getCinemaById(anyInt())).thenReturn(CinemaFactory.getDefaultCinema());
         when(reviewRepository.save(any())).thenReturn(expected);
         when(cinemaService.updateCinemaAverageRating(anyDouble(), anyInt())).thenReturn(
-                CinemaFactory.getDefaultCinemaDto());
+            CinemaFactory.getDefaultCinemaDto());
 
         Review review = reviewService.addCinemaReview(ReviewFactory.getDefaultReviewRequest(), ReviewConstants.ID);
 
@@ -135,7 +137,7 @@ public class ReviewServiceTest {
 
         when(userService.isCurrentUserAuthorized(anyInt())).thenReturn(true);
         when(reviewRepository.findAllByUserIdAndMovieIsNotNullAndCinemaIsNull(anyInt())).thenReturn(
-                ReviewFactory.getDefaultReviewList());
+            ReviewFactory.getDefaultReviewList());
         when(reviewMapper.mapReviewListToReviewDtoList(any())).thenReturn(expectedReviews);
 
         List<ReviewDto> reviews = reviewService.getMovieReviewsByUserId(ReviewConstants.ID);
@@ -145,13 +147,13 @@ public class ReviewServiceTest {
 
     @Test
     public void testGetMovieReviewsByUserId_userNotAuthorized_throwsNotAuthorizedException() {
-      assertThrows(NotAuthorizedException.class, () -> {
+        assertThrows(NotAuthorizedException.class, () -> {
 
-          when(userService.isCurrentUserAuthorized(anyInt())).thenReturn(false);
+            when(userService.isCurrentUserAuthorized(anyInt())).thenReturn(false);
 
-          reviewService.getMovieReviewsByUserId(ReviewConstants.ID);
-      
-      });
+            reviewService.getMovieReviewsByUserId(ReviewConstants.ID);
+
+        });
     }
 
     @Test
@@ -168,13 +170,13 @@ public class ReviewServiceTest {
 
     @Test
     public void testGetCinemaReviewsByUserId_userNotAuthorized_throwsNotAuthorizedException() {
-      assertThrows(NotAuthorizedException.class, () -> {
+        assertThrows(NotAuthorizedException.class, () -> {
 
-          when(userService.isCurrentUserAuthorized(anyInt())).thenReturn(false);
+            when(userService.isCurrentUserAuthorized(anyInt())).thenReturn(false);
 
-          reviewService.getCinemaReviewsByUserId(ReviewConstants.ID);
-      
-      });
+            reviewService.getCinemaReviewsByUserId(ReviewConstants.ID);
+
+        });
     }
 
     @Test
@@ -184,7 +186,8 @@ public class ReviewServiceTest {
         when(reviewRepository.findById(anyInt())).thenReturn(Optional.of(ReviewFactory.getDefaultReview()));
         when(reviewMapper.mapReviewToReviewDto(any())).thenReturn(expected);
         when(reviewRepository.save(any())).thenReturn(ReviewFactory.getDefaultReview());
-        when(movieService.updateMovieAverageRating(anyDouble(), anyInt())).thenReturn(MovieFactory.getDefaultMovieDto());
+        when(movieService.updateMovieAverageRating(anyDouble(), anyInt())).thenReturn(
+            MovieFactory.getDefaultMovieDto());
         CinemaFactory.getDefaultCinemaDto();
         when(userService.isCurrentUserAuthorized(anyInt())).thenReturn(true);
 
@@ -195,14 +198,14 @@ public class ReviewServiceTest {
 
     @Test
     public void testUpdateReview_userIdDifferent_throwsNotAuthorizedException() {
-      assertThrows(NotAuthorizedException.class, () -> {
+        assertThrows(NotAuthorizedException.class, () -> {
 
-          when(reviewRepository.findById(anyInt())).thenReturn(Optional.of(ReviewFactory.getDefaultReview()));
-          when(userService.isCurrentUserAuthorized(anyInt())).thenReturn(false);
+            when(reviewRepository.findById(anyInt())).thenReturn(Optional.of(ReviewFactory.getDefaultReview()));
+            when(userService.isCurrentUserAuthorized(anyInt())).thenReturn(false);
 
-          reviewService.updateReview(ReviewFactory.getDefaultReviewRequest(), ReviewConstants.ID);
-      
-      });
+            reviewService.updateReview(ReviewFactory.getDefaultReviewRequest(), ReviewConstants.ID);
+
+        });
     }
 
     @Test
@@ -222,24 +225,24 @@ public class ReviewServiceTest {
 
     @Test
     public void testUpdateReview_ReviewNotFoundException_fail() {
-      assertThrows(ReviewNotFoundException.class, () -> {
+        assertThrows(ReviewNotFoundException.class, () -> {
 
-          when(reviewRepository.findById(anyInt())).thenThrow(ReviewNotFoundException.class);
+            when(reviewRepository.findById(anyInt())).thenThrow(ReviewNotFoundException.class);
 
-          reviewService.updateReview(ReviewFactory.getDefaultReviewRequest(), ReviewConstants.ID);
-      
-      });
+            reviewService.updateReview(ReviewFactory.getDefaultReviewRequest(), ReviewConstants.ID);
+
+        });
     }
 
     @Test
     public void testUpdateReview_ReviewByUserNotFoundException_fail() {
-      assertThrows(ReviewNotFoundException.class, () -> {
+        assertThrows(ReviewNotFoundException.class, () -> {
 
-          when(reviewRepository.findById(anyInt())).thenReturn(Optional.empty());
+            when(reviewRepository.findById(anyInt())).thenReturn(Optional.empty());
 
-          reviewService.updateReview(ReviewFactory.getDefaultReviewRequest(), ReviewConstants.ID);
-      
-      });
+            reviewService.updateReview(ReviewFactory.getDefaultReviewRequest(), ReviewConstants.ID);
+
+        });
     }
 
     @Test
@@ -249,7 +252,8 @@ public class ReviewServiceTest {
         when(reviewRepository.findById(anyInt())).thenReturn(Optional.of(ReviewFactory.getDefaultReview()));
         when(userService.isCurrentUserAuthorized(anyInt())).thenReturn(true);
         when(reviewMapper.mapReviewToReviewDto(any())).thenReturn(expected);
-        when(movieService.updateMovieAverageRating(anyDouble(), anyInt())).thenReturn(MovieFactory.getDefaultMovieDto());
+        when(movieService.updateMovieAverageRating(anyDouble(), anyInt())).thenReturn(
+            MovieFactory.getDefaultMovieDto());
         CinemaFactory.getDefaultCinemaDto();
 
         ReviewDto result = reviewService.deleteReview(ReviewConstants.ID);
@@ -274,25 +278,25 @@ public class ReviewServiceTest {
 
     @Test
     public void testDeleteReview_ReviewNotFoundException_fail() {
-      assertThrows(ReviewNotFoundException.class, () -> {
+        assertThrows(ReviewNotFoundException.class, () -> {
 
-          when(reviewRepository.findById(anyInt())).thenReturn(Optional.empty());
+            when(reviewRepository.findById(anyInt())).thenReturn(Optional.empty());
 
-          reviewService.deleteReview(ReviewConstants.ID);
-      
-      });
+            reviewService.deleteReview(ReviewConstants.ID);
+
+        });
     }
 
     @Test
     public void testDeleteReview_ReviewByUserNotFoundException_fail() {
-      assertThrows(NotAuthorizedException.class, () -> {
+        assertThrows(NotAuthorizedException.class, () -> {
 
-          when(reviewRepository.findById(anyInt())).thenReturn(Optional.of(ReviewFactory.getDefaultReview()));
-          when(userService.isCurrentUserAuthorized(anyInt())).thenReturn(false);
+            when(reviewRepository.findById(anyInt())).thenReturn(Optional.of(ReviewFactory.getDefaultReview()));
+            when(userService.isCurrentUserAuthorized(anyInt())).thenReturn(false);
 
-          reviewService.deleteReview(ReviewConstants.ID);
-      
-      });
+            reviewService.deleteReview(ReviewConstants.ID);
+
+        });
     }
 }
 

@@ -1,210 +1,507 @@
 CREATE TABLE IF NOT EXISTS public.categories
 (
-    id SERIAL,
-    name character varying(255) UNIQUE,
-    CONSTRAINT categories_pkey PRIMARY KEY (id)
-);
+    id
+    SERIAL,
+    name
+    character
+    varying
+(
+    255
+) UNIQUE,
+    CONSTRAINT categories_pkey PRIMARY KEY
+(
+    id
+)
+    );
 
 CREATE TABLE IF NOT EXISTS public.cinemas
 (
-    id SERIAL,
-    address character varying(255),
-    city character varying(255),
+    id
+    SERIAL,
+    address
+    character
+    varying
+(
+    255
+),
+    city character varying
+(
+    255
+),
     average_rating double precision NOT NULL DEFAULT 0.0,
-    CONSTRAINT cinemas_pkey PRIMARY KEY (id),
-    CONSTRAINT unique_address_city UNIQUE (address, city)
-);
+    CONSTRAINT cinemas_pkey PRIMARY KEY
+(
+    id
+),
+    CONSTRAINT unique_address_city UNIQUE
+(
+    address,
+    city
+)
+    );
 
 CREATE TABLE IF NOT EXISTS public.discounts
 (
-    id SERIAL,
-    type character varying(255),
-    code character varying(255),
+    id
+    SERIAL,
+    type
+    character
+    varying
+(
+    255
+),
+    code character varying
+(
+    255
+),
     percentage int,
-    CONSTRAINT discounts_pkey PRIMARY KEY (id),
-    CONSTRAINT unique_type UNIQUE (type),
-    CONSTRAINT unique_code UNIQUE (code)
-);
+    CONSTRAINT discounts_pkey PRIMARY KEY
+(
+    id
+),
+    CONSTRAINT unique_type UNIQUE
+(
+    type
+),
+    CONSTRAINT unique_code UNIQUE
+(
+    code
+)
+    );
 
 CREATE TABLE IF NOT EXISTS public.halls
 (
-    id SERIAL,
-    capacity integer NOT NULL,
-    cinema_id integer,
-    CONSTRAINT halls_pkey PRIMARY KEY (id),
-    CONSTRAINT fk_halls_cinema_id FOREIGN KEY (cinema_id)
-        REFERENCES public.cinemas (id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-);
+    id
+    SERIAL,
+    capacity
+    integer
+    NOT
+    NULL,
+    cinema_id
+    integer,
+    CONSTRAINT
+    halls_pkey
+    PRIMARY
+    KEY
+(
+    id
+),
+    CONSTRAINT fk_halls_cinema_id FOREIGN KEY
+(
+    cinema_id
+)
+    REFERENCES public.cinemas
+(
+    id
+)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+    );
 
 CREATE TABLE IF NOT EXISTS public.items
 (
-    id SERIAL,
-    name character varying(255) UNIQUE,
+    id
+    SERIAL,
+    name
+    character
+    varying
+(
+    255
+) UNIQUE,
     price double precision,
     quantity integer NOT NULL,
-    CONSTRAINT items_pkey PRIMARY KEY (id)
-);
+    CONSTRAINT items_pkey PRIMARY KEY
+(
+    id
+)
+    );
 
 CREATE TABLE IF NOT EXISTS public.movies
 (
-    id SERIAL,
-    title character varying(255) UNIQUE,
+    id
+    SERIAL,
+    title
+    character
+    varying
+(
+    255
+) UNIQUE,
     average_rating double precision NOT NULL DEFAULT 0.0,
-    description character varying(255),
+    description character varying
+(
+    255
+),
     release_date date,
-    runtime numeric(21,0),
+    runtime numeric
+(
+    21,
+    0
+),
     category_id integer,
-    CONSTRAINT movies_pkey PRIMARY KEY (id),
-    CONSTRAINT fk_movies_category_id FOREIGN KEY (category_id)
-        REFERENCES public.categories (id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-);
+    CONSTRAINT movies_pkey PRIMARY KEY
+(
+    id
+),
+    CONSTRAINT fk_movies_category_id FOREIGN KEY
+(
+    category_id
+)
+    REFERENCES public.categories
+(
+    id
+)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+    );
 
 CREATE TABLE IF NOT EXISTS public.users
 (
-    id SERIAL,
-    username character varying(255) UNIQUE,
-    password character varying(255),
-    email character varying(255) UNIQUE,
-    first_name character varying(255),
-    last_name character varying(255),
+    id
+    SERIAL,
+    username
+    character
+    varying
+(
+    255
+) UNIQUE,
+    password character varying
+(
+    255
+),
+    email character varying
+(
+    255
+) UNIQUE,
+    first_name character varying
+(
+    255
+),
+    last_name character varying
+(
+    255
+),
     join_date date,
-    CONSTRAINT users_pkey PRIMARY KEY (id)
-);
+    CONSTRAINT users_pkey PRIMARY KEY
+(
+    id
+)
+    );
 
 CREATE TABLE IF NOT EXISTS public.orders
 (
-    id SERIAL,
-    date_of_purchase date,
-    total_price double precision,
-    user_id integer,
-    CONSTRAINT orders_pkey PRIMARY KEY (id),
-    CONSTRAINT fk_orders_user_id FOREIGN KEY (user_id)
-        REFERENCES public.users (id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-);
+    id
+    SERIAL,
+    date_of_purchase
+    date,
+    total_price
+    double
+    precision,
+    user_id
+    integer,
+    CONSTRAINT
+    orders_pkey
+    PRIMARY
+    KEY
+(
+    id
+),
+    CONSTRAINT fk_orders_user_id FOREIGN KEY
+(
+    user_id
+)
+    REFERENCES public.users
+(
+    id
+)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+    );
 
 CREATE TABLE IF NOT EXISTS public.orders_items
 (
-    order_id integer NOT NULL,
-    item_id integer NOT NULL,
-    CONSTRAINT fk_orders_items_item_id FOREIGN KEY (item_id)
-        REFERENCES public.items (id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE,
-    CONSTRAINT fk_orders_items_order_id FOREIGN KEY (order_id)
-        REFERENCES public.orders (id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-);
+    order_id
+    integer
+    NOT
+    NULL,
+    item_id
+    integer
+    NOT
+    NULL,
+    CONSTRAINT
+    fk_orders_items_item_id
+    FOREIGN
+    KEY
+(
+    item_id
+)
+    REFERENCES public.items
+(
+    id
+)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE,
+    CONSTRAINT fk_orders_items_order_id FOREIGN KEY
+(
+    order_id
+)
+    REFERENCES public.orders
+(
+    id
+)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+    );
 
 CREATE TABLE IF NOT EXISTS public.programs
 (
-    id SERIAL,
-    program_date date,
-    cinema_id integer,
-    CONSTRAINT programs_pkey PRIMARY KEY (id),
-    CONSTRAINT fk_programs_cinema_id FOREIGN KEY (cinema_id)
-        REFERENCES public.cinemas (id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-);
+    id
+    SERIAL,
+    program_date
+    date,
+    cinema_id
+    integer,
+    CONSTRAINT
+    programs_pkey
+    PRIMARY
+    KEY
+(
+    id
+),
+    CONSTRAINT fk_programs_cinema_id FOREIGN KEY
+(
+    cinema_id
+)
+    REFERENCES public.cinemas
+(
+    id
+)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+    );
 
 CREATE TABLE IF NOT EXISTS public.projections
 (
-    id SERIAL,
-    price double precision,
-    hall_id integer,
-    program_id integer,
-    movie_id integer,
-    start_time time without time zone,
-    CONSTRAINT projections_pkey PRIMARY KEY (id),
-    CONSTRAINT fk_projections_program_id FOREIGN KEY (program_id)
-        REFERENCES public.programs (id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE,
-    CONSTRAINT fk_projections_hall_id FOREIGN KEY (hall_id)
-        REFERENCES public.halls (id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE,
-    CONSTRAINT fk_projections_movie_id FOREIGN KEY (movie_id)
-        REFERENCES public.movies (id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-);
+    id
+    SERIAL,
+    price
+    double
+    precision,
+    hall_id
+    integer,
+    program_id
+    integer,
+    movie_id
+    integer,
+    start_time
+    time
+    without
+    time
+    zone,
+    CONSTRAINT
+    projections_pkey
+    PRIMARY
+    KEY
+(
+    id
+),
+    CONSTRAINT fk_projections_program_id FOREIGN KEY
+(
+    program_id
+)
+    REFERENCES public.programs
+(
+    id
+)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE,
+    CONSTRAINT fk_projections_hall_id FOREIGN KEY
+(
+    hall_id
+)
+    REFERENCES public.halls
+(
+    id
+)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE,
+    CONSTRAINT fk_projections_movie_id FOREIGN KEY
+(
+    movie_id
+)
+    REFERENCES public.movies
+(
+    id
+)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+    );
 
 CREATE TABLE IF NOT EXISTS public.reviews
 (
-    id serial,
-    date_modified date,
-    rating double precision,
-    review_text character varying(255),
+    id
+    serial,
+    date_modified
+    date,
+    rating
+    double
+    precision,
+    review_text
+    character
+    varying
+(
+    255
+),
     cinema_id integer,
     movie_id integer,
     user_id integer NOT NULL,
-    CONSTRAINT reviews_pkey PRIMARY KEY (id),
-    CONSTRAINT fk_reviews_cinema_id FOREIGN KEY (cinema_id)
-        REFERENCES public.cinemas (id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE,
-    CONSTRAINT fk_reviews_movie_id FOREIGN KEY (movie_id)
-        REFERENCES public.movies (id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE,
-    CONSTRAINT fk_reviews_user_id FOREIGN KEY (user_id)
-        REFERENCES public.users (id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-);
+    CONSTRAINT reviews_pkey PRIMARY KEY
+(
+    id
+),
+    CONSTRAINT fk_reviews_cinema_id FOREIGN KEY
+(
+    cinema_id
+)
+    REFERENCES public.cinemas
+(
+    id
+)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE,
+    CONSTRAINT fk_reviews_movie_id FOREIGN KEY
+(
+    movie_id
+)
+    REFERENCES public.movies
+(
+    id
+)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE,
+    CONSTRAINT fk_reviews_user_id FOREIGN KEY
+(
+    user_id
+)
+    REFERENCES public.users
+(
+    id
+)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+    );
 
 CREATE TABLE IF NOT EXISTS public.tickets
 (
-    id SERIAL,
-    date_of_purchase date,
-    projection_id integer,
-    CONSTRAINT tickets_pkey PRIMARY KEY (id),
-    CONSTRAINT fk_tickets_projection_id FOREIGN KEY (projection_id)
-        REFERENCES public.projections (id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-);
+    id
+    SERIAL,
+    date_of_purchase
+    date,
+    projection_id
+    integer,
+    CONSTRAINT
+    tickets_pkey
+    PRIMARY
+    KEY
+(
+    id
+),
+    CONSTRAINT fk_tickets_projection_id FOREIGN KEY
+(
+    projection_id
+)
+    REFERENCES public.projections
+(
+    id
+)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+    );
 
 CREATE TABLE IF NOT EXISTS public.orders_tickets
 (
-    order_id integer NOT NULL,
-    tickets_id integer NOT NULL,
-    CONSTRAINT uk_tickets_id UNIQUE (tickets_id),
-    CONSTRAINT fk_orders_tickets_order_id FOREIGN KEY (order_id)
-        REFERENCES public.orders (id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE,
-    CONSTRAINT fk_orders_tickets_tickets_id FOREIGN KEY (tickets_id)
-        REFERENCES public.tickets (id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-);
+    order_id
+    integer
+    NOT
+    NULL,
+    tickets_id
+    integer
+    NOT
+    NULL,
+    CONSTRAINT
+    uk_tickets_id
+    UNIQUE
+(
+    tickets_id
+),
+    CONSTRAINT fk_orders_tickets_order_id FOREIGN KEY
+(
+    order_id
+)
+    REFERENCES public.orders
+(
+    id
+)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE,
+    CONSTRAINT fk_orders_tickets_tickets_id FOREIGN KEY
+(
+    tickets_id
+)
+    REFERENCES public.tickets
+(
+    id
+)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+    );
 
 CREATE TABLE IF NOT EXISTS public.roles
 (
-    id SERIAL,
-    name character varying(255) UNIQUE,
-    CONSTRAINT roles_pkey PRIMARY KEY (id)
-);
+    id
+    SERIAL,
+    name
+    character
+    varying
+(
+    255
+) UNIQUE,
+    CONSTRAINT roles_pkey PRIMARY KEY
+(
+    id
+)
+    );
 
 CREATE TABLE IF NOT EXISTS public.users_roles
 (
-    user_id integer NOT NULL,
-    role_id integer NOT NULL,
-    CONSTRAINT fk_users_roles_user_id FOREIGN KEY (user_id)
-        REFERENCES public.users (id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE,
-    CONSTRAINT fk_users_roles_role_id FOREIGN KEY (role_id)
-        REFERENCES public.roles (id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-);
+    user_id
+    integer
+    NOT
+    NULL,
+    role_id
+    integer
+    NOT
+    NULL,
+    CONSTRAINT
+    fk_users_roles_user_id
+    FOREIGN
+    KEY
+(
+    user_id
+)
+    REFERENCES public.users
+(
+    id
+)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE,
+    CONSTRAINT fk_users_roles_role_id FOREIGN KEY
+(
+    role_id
+)
+    REFERENCES public.roles
+(
+    id
+)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+    );
