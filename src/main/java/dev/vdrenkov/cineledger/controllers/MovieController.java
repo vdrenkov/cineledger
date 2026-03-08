@@ -55,7 +55,7 @@ public class MovieController {
     @PostMapping(URIConstants.MOVIES_PATH)
     public ResponseEntity<Void> addMovie(@RequestBody @Valid MovieRequest movieRequest) {
         final Movie movie = movieService.addMovie(movieRequest);
-        log.info("A request for a movie to be added has been submitted");
+        log.info("Request for a movie to be added submitted");
 
         URI location = UriComponentsBuilder
             .fromUriString(URIConstants.MOVIES_ID_PATH)
@@ -70,8 +70,6 @@ public class MovieController {
      *
      * @param title
      *     title text to search for
-     * @param false
-     *     false used by the operation
      * @param minimalRating
      *     minimum rating threshold
      * @return HTTP response describing the operation result
@@ -81,7 +79,7 @@ public class MovieController {
         @RequestParam(required = false, defaultValue = "0.0") double minimalRating) {
 
         final List<MovieDto> movieDtoList = movieService.getMoviesByTitle(title, minimalRating);
-        log.info("Movies by title was requested from the database");
+        log.info("Movies by title requested from the database");
 
         return ResponseEntity.ok(movieDtoList);
     }
@@ -100,7 +98,7 @@ public class MovieController {
     @GetMapping(value = URIConstants.MOVIES_PATH, params = "release")
     public ResponseEntity<List<MovieDto>> getMoviesByReleaseDate(
         @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate release,
-        @RequestParam(required = false) Double rating, @RequestParam(required = false) boolean isAfter) {
+        @RequestParam(required = false) Double rating, @RequestParam(required = false) Boolean isAfter) {
 
         final List<MovieDto> movieDtoList = movieService.getMoviesByReleaseDate(release, rating, isAfter);
         log.info("Movies by release date after requested from the database");
@@ -133,7 +131,7 @@ public class MovieController {
     @GetMapping(value = URIConstants.MOVIES_PATH, params = "imdb")
     public ResponseEntity<String> getMoviesByImdb(@RequestParam String imdb) {
         final String movies = movieService.getImdbMovies(imdb);
-        log.info("IMDB movies were requested from the database");
+        log.info("IMDB movies requested from the database");
 
         return ResponseEntity.ok(movies);
     }
@@ -143,8 +141,6 @@ public class MovieController {
      *
      * @param categoryId
      *     identifier of the target category
-     * @param false
-     *     false used by the operation
      * @param minRating
      *     minimum rating threshold
      * @return HTTP response describing the operation result
@@ -154,7 +150,7 @@ public class MovieController {
         @RequestParam(required = false, defaultValue = "0.0") double minRating) {
 
         final List<MovieDto> movieDtoList = movieService.getMoviesByCategory(categoryId, minRating);
-        log.info("Movies by category was requested from the database");
+        log.info("Movies by category requested from the database");
 
         return ResponseEntity.ok(movieDtoList);
     }
@@ -172,12 +168,12 @@ public class MovieController {
      */
     @PutMapping(URIConstants.MOVIES_ID_PATH)
     public ResponseEntity<MovieDto> updateMovie(@RequestBody @Valid MovieRequest movieRequest, @PathVariable int id,
-        @RequestParam(required = false) boolean returnOld) {
+        @RequestParam(required = false) Boolean returnOld) {
 
         final MovieDto movieDto = movieService.updateMovie(movieRequest, id);
-        log.info(String.format("Movie with id %d was updated", id));
+        log.info("Movie with id {} updated", id);
 
-        return returnOld ? ResponseEntity.ok(movieDto) : ResponseEntity.noContent().build();
+        return Boolean.TRUE.equals(returnOld) ? ResponseEntity.ok(movieDto) : ResponseEntity.noContent().build();
     }
 
     /**
@@ -191,12 +187,12 @@ public class MovieController {
      */
     @DeleteMapping(URIConstants.MOVIES_ID_PATH)
     public ResponseEntity<MovieDto> deleteMovie(@PathVariable int id,
-        @RequestParam(required = false) boolean returnOld) {
+        @RequestParam(required = false) Boolean returnOld) {
 
         final MovieDto movieDto = movieService.deleteMovie(id);
-        log.info(String.format("Movie with id %d was deleted", id));
+        log.info("Movie with id {} deleted", id);
 
-        return returnOld ? ResponseEntity.ok(movieDto) : ResponseEntity.noContent().build();
+        return Boolean.TRUE.equals(returnOld) ? ResponseEntity.ok(movieDto) : ResponseEntity.noContent().build();
     }
 }
 

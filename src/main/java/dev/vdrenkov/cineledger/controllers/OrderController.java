@@ -55,7 +55,7 @@ public class OrderController {
     public ResponseEntity<Void> addOrder(@RequestBody @Valid OrderRequest request) {
 
         final Order order = orderService.addOrder(request);
-        log.info("A request for an order to be added has been submitted");
+        log.info("Request for an order to be added submitted");
 
         URI location = UriComponentsBuilder
             .fromUriString(URIConstants.ORDERS_ID_PATH)
@@ -72,8 +72,6 @@ public class OrderController {
      *     request payloads to process
      * @param id
      *     identifier of the target resource
-     * @param false
-     *     false used by the operation
      * @param discountCode
      *     discount code to validate or apply
      * @return HTTP response describing the operation result
@@ -83,7 +81,7 @@ public class OrderController {
         @PathVariable int id, @RequestParam(required = false, defaultValue = "Code") String discountCode) {
 
         final Order order = orderService.makeReservationWithUserId(requests, id, discountCode);
-        log.info("A request for a ticket to be added has been submitted");
+        log.info("Request for a ticket to be added submitted");
 
         URI location = UriComponentsBuilder
             .fromUriString(URIConstants.ORDERS_ID_PATH)
@@ -103,7 +101,7 @@ public class OrderController {
     @GetMapping(URIConstants.USERS_ID_ORDERS_PATH)
     public ResponseEntity<List<OrderDto>> getOrdersByUserId(@PathVariable int id) {
         final List<OrderDto> orderDtos = orderService.getOrdersByUserId(id);
-        log.info(String.format("All orders by user id %d were requested from the database", id));
+        log.info("All orders by user id {} requested from the database", id);
 
         return ResponseEntity.ok(orderDtos);
     }
@@ -121,12 +119,12 @@ public class OrderController {
      */
     @PutMapping(URIConstants.ORDERS_ID_PATH)
     public ResponseEntity<OrderDto> updateOrder(@RequestBody @Valid OrderRequest request, @PathVariable int id,
-        @RequestParam(required = false) boolean returnOld) {
+        @RequestParam(required = false) Boolean returnOld) {
 
         final OrderDto orderDto = orderService.updateOrder(request, id);
-        log.info(String.format("Order with an id %d was updated", id));
+        log.info("Order with an id {} updated", id);
 
-        return returnOld ? ResponseEntity.ok(orderDto) : ResponseEntity.noContent().build();
+        return Boolean.TRUE.equals(returnOld) ? ResponseEntity.ok(orderDto) : ResponseEntity.noContent().build();
     }
 
     /**
@@ -140,11 +138,11 @@ public class OrderController {
      */
     @DeleteMapping(URIConstants.ORDERS_ID_PATH)
     public ResponseEntity<OrderDto> deleteOrder(@PathVariable int id,
-        @RequestParam(required = false) boolean returnOld) {
+        @RequestParam(required = false) Boolean returnOld) {
         final OrderDto orderDto = orderService.deleteOrder(id);
-        log.info(String.format("Order with an id %d was deleted", id));
+        log.info("Order with an id {} deleted", id);
 
-        return returnOld ? ResponseEntity.ok(orderDto) : ResponseEntity.noContent().build();
+        return Boolean.TRUE.equals(returnOld) ? ResponseEntity.ok(orderDto) : ResponseEntity.noContent().build();
     }
 }
 

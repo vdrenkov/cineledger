@@ -52,7 +52,7 @@ public class CategoryController {
     @PostMapping(URIConstants.CATEGORIES_PATH)
     public ResponseEntity<Void> addCategory(@RequestBody @Valid CategoryRequest categoryRequest) {
         final Category category = categoryService.addCategory(categoryRequest);
-        log.info("A request for a category to be added has been submitted");
+        log.info("Request for a category to be added submitted");
 
         URI location = UriComponentsBuilder
             .fromUriString(URIConstants.CATEGORIES_ID_PATH)
@@ -70,7 +70,7 @@ public class CategoryController {
     @GetMapping(URIConstants.CATEGORIES_PATH)
     public ResponseEntity<List<CategoryDto>> getAllCategories() {
         final List<CategoryDto> categories = categoryService.getAllCategories();
-        log.info("All categories were requested from the database");
+        log.info("All categories requested from the database");
 
         return ResponseEntity.ok(categories);
     }
@@ -85,7 +85,7 @@ public class CategoryController {
     @GetMapping(value = URIConstants.CATEGORIES_PATH, params = "categoryName")
     public ResponseEntity<CategoryDto> getCategoryByName(@RequestParam String categoryName) {
         final CategoryDto category = categoryService.getCategoryDtoByName(categoryName);
-        log.info(String.format("Category with name %s has been requested from database", categoryName));
+        log.info("Category with name {} requested from database", categoryName);
 
         return ResponseEntity.ok(category);
     }
@@ -103,12 +103,12 @@ public class CategoryController {
      */
     @PutMapping(URIConstants.CATEGORIES_ID_PATH)
     public ResponseEntity<CategoryDto> updateCategory(@RequestBody @Valid CategoryRequest categoryRequest,
-        @PathVariable int id, @RequestParam(required = false) boolean returnOld) {
+        @PathVariable int id, @RequestParam(required = false) Boolean returnOld) {
 
         final CategoryDto categoryDto = categoryService.updateCategory(categoryRequest, id);
-        log.info(String.format("Category with id %d was updated", id));
+        log.info("Category with id {} updated", id);
 
-        return returnOld ? ResponseEntity.ok(categoryDto) : ResponseEntity.noContent().build();
+        return Boolean.TRUE.equals(returnOld) ? ResponseEntity.ok(categoryDto) : ResponseEntity.noContent().build();
     }
 
     /**
@@ -122,12 +122,12 @@ public class CategoryController {
      */
     @DeleteMapping(URIConstants.CATEGORIES_ID_PATH)
     public ResponseEntity<CategoryDto> deleteCategory(@PathVariable int id,
-        @RequestParam(required = false) boolean returnOld) {
+        @RequestParam(required = false) Boolean returnOld) {
 
         final CategoryDto categoryDto = categoryService.deleteCategory(id);
-        log.info(String.format("Category with id %d was deleted", id));
+        log.info("Category with id {} deleted", id);
 
-        return returnOld ? ResponseEntity.ok(categoryDto) : ResponseEntity.noContent().build();
+        return Boolean.TRUE.equals(returnOld) ? ResponseEntity.ok(categoryDto) : ResponseEntity.noContent().build();
     }
 }
 

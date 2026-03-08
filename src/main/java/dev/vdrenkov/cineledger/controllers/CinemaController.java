@@ -57,7 +57,7 @@ public class CinemaController {
         @RequestParam(required = false) String address) {
 
         final List<CinemaDto> cinemaDtos = cinemaService.getAllCinemas(city, address);
-        log.info("All cinemas were requested from the database");
+        log.info("All cinemas requested from the database");
 
         return ResponseEntity.ok(cinemaDtos);
     }
@@ -72,7 +72,7 @@ public class CinemaController {
     @PostMapping(URIConstants.CINEMAS_PATH)
     public ResponseEntity<Void> addCinema(@RequestBody @Valid CinemaRequest request) {
         final Cinema cinema = cinemaService.addCinema(request);
-        log.info("A request for a cinema to be added has been submitted");
+        log.info("Request for a cinema to be added submitted");
 
         URI location = UriComponentsBuilder
             .fromUriString(URIConstants.CINEMAS_ID_PATH)
@@ -95,12 +95,12 @@ public class CinemaController {
      */
     @PutMapping(URIConstants.CINEMAS_ID_PATH)
     public ResponseEntity<CinemaDto> updateCinema(@RequestBody @Valid CinemaRequest request, @PathVariable int id,
-        @RequestParam(required = false) boolean returnOld) {
+        @RequestParam(required = false) Boolean returnOld) {
 
         final CinemaDto cinemaDto = cinemaService.updateCinema(request, id);
-        log.info(String.format("Cinema with id %d was updated", id));
+        log.info("Cinema with id {} updated", id);
 
-        return returnOld ? ResponseEntity.ok(cinemaDto) : ResponseEntity.noContent().build();
+        return Boolean.TRUE.equals(returnOld) ? ResponseEntity.ok(cinemaDto) : ResponseEntity.noContent().build();
     }
 
     /**
@@ -114,12 +114,12 @@ public class CinemaController {
      */
     @DeleteMapping(URIConstants.CINEMAS_ID_PATH)
     public ResponseEntity<CinemaDto> deleteCinema(@PathVariable int id,
-        @RequestParam(required = false) boolean returnOld) {
+        @RequestParam(required = false) Boolean returnOld) {
 
         final CinemaDto cinemaDto = cinemaService.deleteCinema(id);
-        log.info(String.format("Cinema with id %d was deleted", id));
+        log.info("Cinema with id {} deleted", id);
 
-        return returnOld ? ResponseEntity.ok(cinemaDto) : ResponseEntity.noContent().build();
+        return Boolean.TRUE.equals(returnOld) ? ResponseEntity.ok(cinemaDto) : ResponseEntity.noContent().build();
     }
 }
 

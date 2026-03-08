@@ -53,7 +53,7 @@ public class DiscountController {
     @PostMapping(URIConstants.DISCOUNTS_PATH)
     public ResponseEntity<Void> addDiscount(@RequestBody @Valid DiscountRequest discountRequest) {
         final Discount discount = discountService.addDiscount(discountRequest);
-        log.info("A request for a discount to be added has been submitted");
+        log.info("Request for a discount to be added submitted");
 
         URI location = UriComponentsBuilder
             .fromUriString(URIConstants.DISCOUNTS_ID_PATH)
@@ -71,7 +71,7 @@ public class DiscountController {
     @GetMapping(URIConstants.DISCOUNTS_PATH)
     public ResponseEntity<List<DiscountDto>> getAllDiscounts() {
         final List<DiscountDto> discounts = discountService.getAllDiscountDtos();
-        log.info("All discounts were requested from the database");
+        log.info("All discounts requested from the database");
 
         return ResponseEntity.ok(discounts);
     }
@@ -86,7 +86,7 @@ public class DiscountController {
     @GetMapping(value = URIConstants.DISCOUNTS_PATH, params = "type")
     public ResponseEntity<DiscountDto> getDiscountByType(@RequestParam String type) {
         final DiscountDto discount = discountService.getDiscountDtoByType(type);
-        log.info(String.format("Discount with type %s has been requested from database", type));
+        log.info("Discount with type {} requested from database", type);
 
         return ResponseEntity.ok(discount);
     }
@@ -104,12 +104,12 @@ public class DiscountController {
      */
     @PutMapping(URIConstants.DISCOUNTS_ID_PATH)
     public ResponseEntity<DiscountDto> updateDiscount(@RequestBody @Valid DiscountRequest request, @PathVariable int id,
-        @RequestParam(required = false) boolean returnOld) {
+        @RequestParam(required = false) Boolean returnOld) {
 
         final DiscountDto discountDto = discountService.updateDiscount(request, id);
-        log.info(String.format("Discount with id %d was updated", id));
+        log.info("Discount with id {} updated", id);
 
-        return returnOld ? ResponseEntity.ok(discountDto) : ResponseEntity.noContent().build();
+        return Boolean.TRUE.equals(returnOld) ? ResponseEntity.ok(discountDto) : ResponseEntity.noContent().build();
     }
 
     /**
@@ -123,12 +123,12 @@ public class DiscountController {
      */
     @DeleteMapping(URIConstants.DISCOUNTS_ID_PATH)
     public ResponseEntity<DiscountDto> deleteDiscount(@PathVariable int id,
-        @RequestParam(required = false) boolean returnOld) {
+        @RequestParam(required = false) Boolean returnOld) {
 
         final DiscountDto discountDto = discountService.deleteDiscount(id);
-        log.info(String.format("Discount with id %d was deleted", id));
+        log.info("Discount with id {} deleted", id);
 
-        return returnOld ? ResponseEntity.ok(discountDto) : ResponseEntity.noContent().build();
+        return Boolean.TRUE.equals(returnOld) ? ResponseEntity.ok(discountDto) : ResponseEntity.noContent().build();
     }
 }
 

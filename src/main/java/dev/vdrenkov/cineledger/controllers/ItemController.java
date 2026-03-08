@@ -52,7 +52,7 @@ public class ItemController {
      */
     @PostMapping(URIConstants.ITEMS_PATH)
     public ResponseEntity<Void> addItem(@RequestBody @Valid ItemRequest itemRequest) {
-        log.info("Creation of a new item request has been submitted");
+        log.info("Creation of a new item request submitted");
         final Item item = itemService.addItem(itemRequest);
         log.info("Created new item");
 
@@ -72,7 +72,7 @@ public class ItemController {
     @GetMapping(URIConstants.ITEMS_PATH)
     public ResponseEntity<List<ItemDto>> getAllItems() {
         final List<ItemDto> items = itemService.getAllItems();
-        log.info("All items were requested from the database");
+        log.info("All items requested from the database");
 
         return ResponseEntity.ok(items);
     }
@@ -87,7 +87,7 @@ public class ItemController {
     @GetMapping(value = URIConstants.ITEMS_PATH, params = "itemName")
     public ResponseEntity<ItemDto> getItemByName(@RequestParam String itemName) {
         final ItemDto itemdto = itemService.getItemDtoByName(itemName);
-        log.info(String.format("Item with name %s has been requested from database", itemName));
+        log.info("Item with name {} requested from database", itemName);
 
         return ResponseEntity.ok(itemdto);
     }
@@ -105,7 +105,7 @@ public class ItemController {
     public ResponseEntity<List<ItemDto>> getItemsByQuantity(@RequestParam int quantity, @RequestParam Boolean isBelow) {
 
         final List<ItemDto> filteredItems = itemService.getItemsByQuantity(quantity, isBelow);
-        log.info("Filtered items were requested from the database");
+        log.info("Filtered items requested from the database");
 
         return ResponseEntity.ok(filteredItems);
     }
@@ -123,12 +123,12 @@ public class ItemController {
      */
     @PutMapping(URIConstants.ITEMS_ID_PATH)
     public ResponseEntity<ItemDto> updateItem(@RequestBody @Valid ItemRequest itemRequest, @PathVariable int id,
-        @RequestParam(required = false) boolean returnOld) {
+        @RequestParam(required = false) Boolean returnOld) {
 
         final ItemDto itemDto = itemService.editItem(itemRequest, id);
-        log.info(String.format("Item with id %d was updated", id));
+        log.info("Item with id {} updated", id);
 
-        return returnOld ? ResponseEntity.ok(itemDto) : ResponseEntity.noContent().build();
+        return Boolean.TRUE.equals(returnOld) ? ResponseEntity.ok(itemDto) : ResponseEntity.noContent().build();
     }
 
     /**
@@ -141,12 +141,12 @@ public class ItemController {
      * @return HTTP response describing the operation result
      */
     @DeleteMapping(URIConstants.ITEMS_ID_PATH)
-    public ResponseEntity<ItemDto> deleteItem(@PathVariable int id, @RequestParam(required = false) boolean returnOld) {
+    public ResponseEntity<ItemDto> deleteItem(@PathVariable int id, @RequestParam(required = false) Boolean returnOld) {
 
         final ItemDto itemDto = itemService.removeItem(id);
-        log.info(String.format("Item with id %d was deleted", id));
+        log.info("Item with id {} was deleted", id);
 
-        return returnOld ? ResponseEntity.ok(itemDto) : ResponseEntity.noContent().build();
+        return Boolean.TRUE.equals(returnOld) ? ResponseEntity.ok(itemDto) : ResponseEntity.noContent().build();
     }
 }
 

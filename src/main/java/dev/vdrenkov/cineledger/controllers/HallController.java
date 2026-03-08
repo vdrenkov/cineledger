@@ -53,7 +53,7 @@ public class HallController {
     @PostMapping(URIConstants.HALLS_PATH)
     public ResponseEntity<Void> addHall(@RequestBody @Valid HallRequest request) {
         final Hall hall = hallService.addHall(request);
-        log.info("A request for a hall to be added has been submitted");
+        log.info("Request for a hall to be added submitted");
 
         URI location = UriComponentsBuilder
             .fromUriString(URIConstants.HALLS_ID_PATH)
@@ -73,7 +73,7 @@ public class HallController {
     @GetMapping(URIConstants.CINEMAS_ID_HALLS_PATH)
     public ResponseEntity<List<HallDto>> getHallsByCinemaId(@PathVariable int id) {
         final List<HallDto> hallDtos = hallService.getHallsByCinemaId(id);
-        log.info(String.format("All halls with cinema id %d were requested from the database", id));
+        log.info("All halls with cinema id {} requested from the database", id);
 
         return ResponseEntity.ok(hallDtos);
     }
@@ -91,11 +91,11 @@ public class HallController {
      */
     @PutMapping(URIConstants.HALLS_ID_PATH)
     public ResponseEntity<HallDto> updateHall(@RequestBody @Valid HallRequest request, @PathVariable int id,
-        @RequestParam(required = false) boolean returnOld) {
+        @RequestParam(required = false) Boolean returnOld) {
         final HallDto hallDto = hallService.updateHall(request, id);
-        log.info(String.format("Hall with id %d was updated", id));
+        log.info("Hall with id {} updated", id);
 
-        return returnOld ? ResponseEntity.ok(hallDto) : ResponseEntity.noContent().build();
+        return Boolean.TRUE.equals(returnOld) ? ResponseEntity.ok(hallDto) : ResponseEntity.noContent().build();
     }
 
     /**
@@ -108,11 +108,11 @@ public class HallController {
      * @return HTTP response describing the operation result
      */
     @DeleteMapping(URIConstants.HALLS_ID_PATH)
-    public ResponseEntity<HallDto> deleteHall(@PathVariable int id, @RequestParam(required = false) boolean returnOld) {
+    public ResponseEntity<HallDto> deleteHall(@PathVariable int id, @RequestParam(required = false) Boolean returnOld) {
         final HallDto hallDto = hallService.deleteHall(id);
-        log.info(String.format("Hall with id %d was deleted", id));
+        log.info("Hall with id {} deleted", id);
 
-        return returnOld ? ResponseEntity.ok(hallDto) : ResponseEntity.noContent().build();
+        return Boolean.TRUE.equals(returnOld) ? ResponseEntity.ok(hallDto) : ResponseEntity.noContent().build();
     }
 }
 

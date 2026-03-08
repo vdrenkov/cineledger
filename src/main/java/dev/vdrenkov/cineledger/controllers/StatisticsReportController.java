@@ -97,7 +97,7 @@ public class StatisticsReportController {
         @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
 
         final int itemNameCount = statisticsReportService.getPurchasedItemsCountByItemName(name, startDate, endDate);
-        log.info("Received request to get purchased tickets count by movie title");
+        log.info("Received request to get purchased tickets count by item name");
 
         return ResponseEntity.ok(itemNameCount);
     }

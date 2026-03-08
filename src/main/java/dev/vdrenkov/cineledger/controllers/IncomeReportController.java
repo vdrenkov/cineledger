@@ -51,7 +51,7 @@ public class IncomeReportController {
         @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
 
         final double cinemaIncome = incomeReportService.getAllIncomesByCinemaId(id, startDate, endDate);
-        log.info(String.format("All incomes by cinema id %d report requested", id));
+        log.info("All incomes by cinema id {} report requested", id);
 
         return ResponseEntity.ok(cinemaIncome);
     }
@@ -73,7 +73,7 @@ public class IncomeReportController {
         @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
 
         final double hallIncome = incomeReportService.getAllIncomesByHallId(id, startDate, endDate);
-        log.info(String.format("All incomes by hall id %d report requested", id));
+        log.info("All incomes by hall id {} report requested", id);
 
         return ResponseEntity.ok(hallIncome);
     }
@@ -89,13 +89,13 @@ public class IncomeReportController {
      *     end date of the requested interval
      * @return HTTP response describing the operation result
      */
-    @GetMapping(value = URIConstants.REPORTS_ITEMS_ID_INCOMES_PATH)
+    @GetMapping(URIConstants.REPORTS_ITEMS_ID_INCOMES_PATH)
     public ResponseEntity<Double> getAllIncomesByItemId(@PathVariable int id,
         @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
         @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
 
         final double itemIncome = incomeReportService.getAllIncomesByItemId(id, startDate, endDate);
-        log.info(String.format("All incomes by hall id %d report requested", id));
+        log.info("All incomes by item id {} report requested", id);
 
         return ResponseEntity.ok(itemIncome);
     }
@@ -117,7 +117,7 @@ public class IncomeReportController {
         @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
 
         final double movieIncome = incomeReportService.getAllIncomesByMovieId(id, startDate, endDate);
-        log.info(String.format("All incomes by hall id %d report requested", id));
+        log.info("All incomes by movie id {} report requested", id);
 
         return ResponseEntity.ok(movieIncome);
     }
@@ -139,7 +139,7 @@ public class IncomeReportController {
         @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
 
         final double userIncome = incomeReportService.getAllIncomesByUserId(id, startDate, endDate);
-        log.info(String.format("All incomes by hall id %d report requested", id));
+        log.info("All incomes by user id {} report requested", id);
 
         return ResponseEntity.ok(userIncome);
     }

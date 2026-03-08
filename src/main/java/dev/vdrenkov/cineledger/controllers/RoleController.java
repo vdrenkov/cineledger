@@ -53,7 +53,7 @@ public class RoleController {
     @PostMapping(URIConstants.ROLES_PATH)
     public ResponseEntity<Void> addRole(@RequestBody @Valid RoleRequest request) {
         final Role role = roleService.addRole(request);
-        log.info("A request for a user role to be added has been submitted");
+        log.info("Request for a user role to be added submitted");
 
         URI location = UriComponentsBuilder
             .fromUriString(URIConstants.ROLES_ID_PATH)
@@ -71,7 +71,7 @@ public class RoleController {
     @GetMapping(URIConstants.ROLES_PATH)
     public ResponseEntity<List<RoleDto>> getAllRoles() {
         final List<RoleDto> roleDtos = roleService.getAllRolesDto();
-        log.info("All user roles were requested from the database");
+        log.info("All user roles requested from the database");
 
         return ResponseEntity.ok(roleDtos);
     }
@@ -104,12 +104,12 @@ public class RoleController {
      */
     @PutMapping(URIConstants.ROLES_ID_PATH)
     public ResponseEntity<RoleDto> updateRole(@RequestBody @Valid RoleRequest request, @PathVariable int id,
-        @RequestParam(required = false) boolean returnOld) {
+        @RequestParam(required = false) Boolean returnOld) {
 
         final RoleDto roleDto = roleService.updateRole(request, id);
-        log.info(String.format("User role with id %d was updated", id));
+        log.info("User role with id {} updated", id);
 
-        return returnOld ? ResponseEntity.ok(roleDto) : ResponseEntity.noContent().build();
+        return Boolean.TRUE.equals(returnOld) ? ResponseEntity.ok(roleDto) : ResponseEntity.noContent().build();
     }
 
     /**
@@ -122,11 +122,11 @@ public class RoleController {
      * @return HTTP response describing the operation result
      */
     @DeleteMapping(URIConstants.ROLES_ID_PATH)
-    public ResponseEntity<RoleDto> deleteRole(@PathVariable int id, @RequestParam(required = false) boolean returnOld) {
+    public ResponseEntity<RoleDto> deleteRole(@PathVariable int id, @RequestParam(required = false) Boolean returnOld) {
         final RoleDto roleDto = roleService.deleteRole(id);
-        log.info(String.format("User role with id %d was deleted", id));
+        log.info("User role with id {} deleted", id);
 
-        return returnOld ? ResponseEntity.ok(roleDto) : ResponseEntity.noContent().build();
+        return Boolean.TRUE.equals(returnOld) ? ResponseEntity.ok(roleDto) : ResponseEntity.noContent().build();
     }
 }
 

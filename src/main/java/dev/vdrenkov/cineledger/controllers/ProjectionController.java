@@ -55,7 +55,7 @@ public class ProjectionController {
     @PostMapping(URIConstants.PROJECTIONS_PATH)
     public ResponseEntity<Void> addProjection(@RequestBody @Valid ProjectionRequest request) {
         final Projection projection = this.projectionService.addProjection(request);
-        log.info("A request for a projection to be added has been submitted");
+        log.info("Request for a projection to be added submitted");
 
         URI location = UriComponentsBuilder
             .fromUriString(URIConstants.PROJECTIONS_ID_PATH)
@@ -75,7 +75,7 @@ public class ProjectionController {
     @GetMapping(URIConstants.PROGRAMS_ID_PROJECTIONS_PATH)
     public ResponseEntity<List<ProjectionDto>> getProjectionsByProgramId(@PathVariable int id) {
         final List<ProjectionDto> projectionsDtos = this.projectionService.getProjectionsByProgramId(id);
-        log.info("All projections by program id were requested from the database");
+        log.info("All projections by program id requested from the database");
 
         return ResponseEntity.ok(projectionsDtos);
     }
@@ -90,7 +90,7 @@ public class ProjectionController {
     @GetMapping(URIConstants.MOVIES_ID_PROJECTIONS_PATH)
     public ResponseEntity<List<ProjectionDto>> getProjectionsByMovieId(@PathVariable int id) {
         final List<ProjectionDto> projectionsDtos = this.projectionService.getProjectionsByMovieId(id);
-        log.info("All projections by movie id were requested from the database");
+        log.info("All projections by movie id requested from the database");
 
         return ResponseEntity.ok(projectionsDtos);
     }
@@ -110,7 +110,7 @@ public class ProjectionController {
 
         final List<ProjectionDto> projectionDtos = this.projectionService.getProjectionsByStartTime(startTime,
             isBefore);
-        log.info("All projections by start time were requested from the database");
+        log.info("All projections by start time requested from the database");
 
         return ResponseEntity.ok(projectionDtos);
     }
@@ -128,12 +128,12 @@ public class ProjectionController {
      */
     @PutMapping(URIConstants.PROJECTIONS_ID_PATH)
     public ResponseEntity<ProjectionDto> updateProjection(@RequestBody @Valid ProjectionRequest request,
-        @PathVariable int id, @RequestParam(required = false) boolean returnOld) {
+        @PathVariable int id, @RequestParam(required = false) Boolean returnOld) {
 
         final ProjectionDto projectionDto = this.projectionService.updateProjection(request, id);
-        log.info(String.format("Projection with id %d was updated", id));
+        log.info("Projection with id {} updated", id);
 
-        return returnOld ? ResponseEntity.ok(projectionDto) : ResponseEntity.noContent().build();
+        return Boolean.TRUE.equals(returnOld) ? ResponseEntity.ok(projectionDto) : ResponseEntity.noContent().build();
     }
 
     /**
@@ -147,12 +147,12 @@ public class ProjectionController {
      */
     @DeleteMapping(URIConstants.PROJECTIONS_ID_PATH)
     public ResponseEntity<ProjectionDto> deleteProjection(@PathVariable int id,
-        @RequestParam(required = false) boolean returnOld) {
+        @RequestParam(required = false) Boolean returnOld) {
 
         final ProjectionDto projectionDto = this.projectionService.deleteProjection(id);
-        log.info(String.format("Projection with id %d was deleted", id));
+        log.info("Projection with id {} deleted", id);
 
-        return returnOld ? ResponseEntity.ok(projectionDto) : ResponseEntity.noContent().build();
+        return Boolean.TRUE.equals(returnOld) ? ResponseEntity.ok(projectionDto) : ResponseEntity.noContent().build();
     }
 }
 

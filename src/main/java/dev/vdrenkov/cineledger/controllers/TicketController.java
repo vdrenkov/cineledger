@@ -50,7 +50,7 @@ public class TicketController {
     @PostMapping(URIConstants.TICKETS_PATH)
     public ResponseEntity<Void> addTicket(@RequestBody @Valid TicketRequest request) {
         final Ticket ticket = ticketService.addTicket(request);
-        log.info("A request for a ticket to be added has been submitted");
+        log.info("Request for a ticket to be added submitted");
 
         URI location = UriComponentsBuilder
             .fromUriString(URIConstants.TICKETS_ID_PATH)
@@ -70,7 +70,7 @@ public class TicketController {
     @GetMapping(URIConstants.PROJECTIONS_ID_TICKETS_PATH)
     public ResponseEntity<List<TicketDto>> getTicketsByProjectionId(@PathVariable int id) {
         final List<TicketDto> ticketDtos = ticketService.getTicketsByProjectionId(id);
-        log.info(String.format("All tickets with projection id %d were requested from the database", id));
+        log.info("All tickets with projection id {} requested from the database", id);
 
         return ResponseEntity.ok(ticketDtos);
     }

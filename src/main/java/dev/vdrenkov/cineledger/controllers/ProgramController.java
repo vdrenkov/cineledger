@@ -51,10 +51,10 @@ public class ProgramController {
      *     request payload for the program operation
      * @return HTTP response describing the operation result
      */
-    @PostMapping(value = URIConstants.PROGRAMS_PATH)
+    @PostMapping(URIConstants.PROGRAMS_PATH)
     public ResponseEntity<Void> addProgram(@RequestBody @Valid ProgramRequest programRequest) {
         final Program program = programService.addProgram(programRequest);
-        log.info("A request for a program to be added has been submitted");
+        log.info("Request for a program to be added submitted");
 
         URI location = UriComponentsBuilder
             .fromUriString(URIConstants.PROGRAMS_ID_PATH)
@@ -67,18 +67,16 @@ public class ProgramController {
     /**
      * Returns programs matching the supplied criteria.
      *
-     * @param value
-     *     value used by the operation
      * @param date
      *     date used by the operation
      * @return HTTP response describing the operation result
      */
-    @GetMapping(value = URIConstants.PROGRAMS_PATH)
+    @GetMapping(URIConstants.PROGRAMS_PATH)
     public ResponseEntity<List<ProgramDto>> getProgramsByDate(
         @RequestParam(value = "date", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
 
         final List<ProgramDto> programs = programService.getAllPrograms(date);
-        log.info("All programs by date were requested from the database");
+        log.info("All programs by date requested from the database");
 
         return ResponseEntity.ok(programs);
     }
@@ -90,10 +88,10 @@ public class ProgramController {
      *     identifier of the target resource
      * @return HTTP response describing the operation result
      */
-    @GetMapping(value = URIConstants.CINEMAS_ID_PROGRAMS_PATH)
+    @GetMapping(URIConstants.CINEMAS_ID_PROGRAMS_PATH)
     public ResponseEntity<List<ProgramDto>> getProgramsByCinemaId(@PathVariable int id) {
         final List<ProgramDto> programs = programService.getProgramsByCinemaId(id);
-        log.info("Program by cinema id was requested from the database");
+        log.info("Program by cinema id requested from the database");
 
         return ResponseEntity.ok(programs);
     }
@@ -109,14 +107,14 @@ public class ProgramController {
      *     whether the previous persisted state should be returned
      * @return HTTP response describing the operation result
      */
-    @PutMapping(value = URIConstants.PROGRAMS_ID_PATH)
+    @PutMapping(URIConstants.PROGRAMS_ID_PATH)
     public ResponseEntity<ProgramDto> updateProgram(@RequestBody @Valid ProgramRequest programRequest,
-        @PathVariable int id, @RequestParam(required = false) boolean returnOld) {
+        @PathVariable int id, @RequestParam(required = false) Boolean returnOld) {
 
         final ProgramDto programDto = programService.updateProgram(programRequest, id);
-        log.info(String.format("Program with id %d was updated", id));
+        log.info("Program with id {} updated", id);
 
-        return returnOld ? ResponseEntity.ok(programDto) : ResponseEntity.noContent().build();
+        return Boolean.TRUE.equals(returnOld) ? ResponseEntity.ok(programDto) : ResponseEntity.noContent().build();
     }
 
     /**
@@ -128,14 +126,14 @@ public class ProgramController {
      *     whether the previous persisted state should be returned
      * @return HTTP response describing the operation result
      */
-    @DeleteMapping(value = URIConstants.PROGRAMS_ID_PATH)
+    @DeleteMapping(URIConstants.PROGRAMS_ID_PATH)
     public ResponseEntity<ProgramDto> deleteProgram(@PathVariable int id,
-        @RequestParam(required = false) boolean returnOld) {
+        @RequestParam(required = false) Boolean returnOld) {
 
         final ProgramDto programDto = programService.deleteProgram(id);
-        log.info(String.format("Program with id %d was deleted", id));
+        log.info("Program with id {} deleted", id);
 
-        return returnOld ? ResponseEntity.ok(programDto) : ResponseEntity.noContent().build();
+        return Boolean.TRUE.equals(returnOld) ? ResponseEntity.ok(programDto) : ResponseEntity.noContent().build();
     }
 }
 

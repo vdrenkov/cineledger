@@ -58,7 +58,7 @@ public class UserController {
     @PostMapping(URIConstants.LOGIN_PATH)
     public ResponseEntity<Void> login(@RequestBody @Valid LoginRequest request) {
         final HttpCookie cookie = userService.login(request);
-        log.info("A login request has been submitted");
+        log.info("Login request submitted");
 
         return ResponseEntity.status(HttpStatus.OK).header(HttpHeaders.SET_COOKIE, cookie.toString()).build();
     }
@@ -73,7 +73,7 @@ public class UserController {
     @PostMapping(URIConstants.REGISTRATION_PATH)
     public ResponseEntity<Void> registerUser(@RequestBody @Valid UserRequest request) {
         final HttpCookie cookie = userService.registerUser(request);
-        log.info("A registration request has been submitted");
+        log.info("Registration request submitted");
 
         return ResponseEntity.status(HttpStatus.CREATED).header(HttpHeaders.SET_COOKIE, cookie.toString()).build();
     }
@@ -88,7 +88,7 @@ public class UserController {
     @PostMapping(URIConstants.ADMINS_PATH)
     public ResponseEntity<Void> registerUserByAdmin(@RequestBody @Valid AdminRequest request) {
         userService.registerUserByAdmin(request);
-        log.info("A registration request by an administrator has been submitted");
+        log.info("Registration request by an administrator submitted");
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -133,7 +133,7 @@ public class UserController {
     @GetMapping(value = URIConstants.USERS_PATH, params = "roleName")
     public ResponseEntity<List<UserDto>> getUsersByRoleName(@RequestParam String roleName) {
         final List<UserDto> userDtos = userService.getUsersDtoByRoleName(roleName);
-        log.info("Users by role name were requested from the database");
+        log.info("Users by role name requested from the database");
 
         return ResponseEntity.ok(userDtos);
     }
@@ -153,7 +153,7 @@ public class UserController {
         @RequestParam boolean isBefore) {
 
         final List<UserDto> userDtos = userService.getUsersDtosByJoinDate(joinDate, isBefore);
-        log.info("All Users by join date were requested from the database");
+        log.info("All Users by join date requested from the database");
 
         return ResponseEntity.ok(userDtos);
     }
@@ -171,12 +171,12 @@ public class UserController {
      */
     @PutMapping(URIConstants.USERS_ID_PATH)
     public ResponseEntity<UserDto> updateUser(@RequestBody @Valid UserRequest request, @PathVariable int id,
-        @RequestParam(required = false) boolean returnOld) {
+        @RequestParam(required = false) Boolean returnOld) {
 
         final UserDto userDto = userService.updateUser(request, id);
-        log.info(String.format("User with id %d was updated", id));
+        log.info("User with id {} was updated", id);
 
-        return returnOld ? ResponseEntity.ok(userDto) : ResponseEntity.noContent().build();
+        return Boolean.TRUE.equals(returnOld) ? ResponseEntity.ok(userDto) : ResponseEntity.noContent().build();
     }
 
     /**
@@ -192,12 +192,12 @@ public class UserController {
      */
     @PutMapping(URIConstants.ADMINS_ID_PATH)
     public ResponseEntity<UserDto> updateUserByAdmin(@RequestBody @Valid AdminRequest request, @PathVariable int id,
-        @RequestParam(required = false) boolean returnOld) {
+        @RequestParam(required = false) Boolean returnOld) {
 
         final UserDto userDto = userService.updateUserByAdmin(request, id);
-        log.info(String.format("User with id %d was updated by an admin", id));
+        log.info("User with id {} was updated by an admin", id);
 
-        return returnOld ? ResponseEntity.ok(userDto) : ResponseEntity.noContent().build();
+        return Boolean.TRUE.equals(returnOld) ? ResponseEntity.ok(userDto) : ResponseEntity.noContent().build();
     }
 
     /**
@@ -210,11 +210,11 @@ public class UserController {
      * @return HTTP response describing the operation result
      */
     @DeleteMapping(URIConstants.USERS_ID_PATH)
-    public ResponseEntity<UserDto> deleteUser(@PathVariable int id, @RequestParam(required = false) boolean returnOld) {
+    public ResponseEntity<UserDto> deleteUser(@PathVariable int id, @RequestParam(required = false) Boolean returnOld) {
         final UserDto userDto = userService.deleteUser(id);
-        log.info(String.format("User with id %d was deleted", id));
+        log.info("User with id {} was deleted", id);
 
-        return returnOld ? ResponseEntity.ok(userDto) : ResponseEntity.noContent().build();
+        return Boolean.TRUE.equals(returnOld) ? ResponseEntity.ok(userDto) : ResponseEntity.noContent().build();
     }
 
     /**
@@ -227,7 +227,7 @@ public class UserController {
     @PatchMapping("/password-recovery")
     public ResponseEntity<Void> recoverPassword(@RequestParam String username) {
         userService.recoverPassword(username);
-        log.info(String.format("A password recovery request has been submitted for user %s ", username));
+        log.info("Password recovery request submitted for user {} ", username);
         return ResponseEntity.ok().build();
     }
 }
