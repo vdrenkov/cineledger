@@ -5,7 +5,7 @@ package dev.vdrenkov.cineledger.utils.constants;
  */
 public final class URIConstants {
 
-    /**
+    /*
      * Categories endpoints
      */
 
@@ -14,7 +14,7 @@ public final class URIConstants {
     /** Item endpoint for a single category. */
     public static final String CATEGORIES_ID_PATH = "/categories/{id}";
 
-    /**
+    /*
      * Cinemas endpoints
      */
 
@@ -23,7 +23,7 @@ public final class URIConstants {
     /** Item endpoint for a single cinema. */
     public static final String CINEMAS_ID_PATH = "/cinemas/{id}";
 
-    /**
+    /*
      * Discounts endpoints
      */
 
@@ -32,7 +32,7 @@ public final class URIConstants {
     /** Item endpoint for a single discount. */
     public static final String DISCOUNTS_ID_PATH = "/discounts/{id}";
 
-    /**
+    /*
      * Halls endpoints
      */
 
@@ -43,7 +43,7 @@ public final class URIConstants {
     /** Nested endpoint for halls that belong to a specific cinema. */
     public static final String CINEMAS_ID_HALLS_PATH = "/cinemas/{id}/halls";
 
-    /**
+    /*
      * Reports endpoints
      */
 
@@ -58,7 +58,7 @@ public final class URIConstants {
     /** Income report endpoint scoped to a user. */
     public static final String REPORTS_USERS_ID_INCOMES_PATH = "/reports/users/{id}/incomes";
 
-    /**
+    /*
      * Items endpoints
      */
 
@@ -67,7 +67,7 @@ public final class URIConstants {
     /** Item endpoint for a single concession item. */
     public static final String ITEMS_ID_PATH = "/items/{id}";
 
-    /**
+    /*
      * Movies endpoints
      */
 
@@ -78,7 +78,7 @@ public final class URIConstants {
     /** Nested endpoint for movies that belong to a specific category. */
     public static final String CATEGORIES_ID_MOVIES_PATH = "/categories/{id}/movies";
 
-    /**
+    /*
      * Orders endpoints
      */
 
@@ -89,7 +89,7 @@ public final class URIConstants {
     /** Nested endpoint for orders created by a specific user. */
     public static final String USERS_ID_ORDERS_PATH = "/users/{id}/orders";
 
-    /**
+    /*
      * Programs endpoints
      */
 
@@ -100,7 +100,7 @@ public final class URIConstants {
     /** Nested endpoint for programs that belong to a specific cinema. */
     public static final String CINEMAS_ID_PROGRAMS_PATH = "/cinemas/{id}/programs";
 
-    /**
+    /*
      * Projections endpoints
      */
 
@@ -113,7 +113,7 @@ public final class URIConstants {
     /** Nested endpoint for projections that belong to a specific movie. */
     public static final String MOVIES_ID_PROJECTIONS_PATH = "/movies/{id}/projections";
 
-    /**
+    /*
      * Reviews endpoints
      */
 
@@ -128,7 +128,7 @@ public final class URIConstants {
     /** Nested endpoint for cinema reviews created by a specific user. */
     public static final String USERS_ID_CINEMAS_REVIEWS_PATH = "/users/{id}/cinemas/reviews";
 
-    /**
+    /*
      * Roles endpoints
      */
 
@@ -137,7 +137,7 @@ public final class URIConstants {
     /** Item endpoint for a single role. */
     public static final String ROLES_ID_PATH = "/roles/{id}";
 
-    /**
+    /*
      * Reports endpoints
      */
 
@@ -148,7 +148,7 @@ public final class URIConstants {
     /** Items-count report endpoint across all concession items. */
     public static final String REPORTS_ITEMS_ITEMS_COUNT_PATH = "/reports/items/items-count";
 
-    /**
+    /*
      * Tickets endpoints
      */
 
@@ -159,7 +159,7 @@ public final class URIConstants {
     /** Nested endpoint for tickets that belong to a specific projection. */
     public static final String PROJECTIONS_ID_TICKETS_PATH = "/projections/{id}/tickets";
 
-    /**
+    /*
      * Users endpoints
      */
 

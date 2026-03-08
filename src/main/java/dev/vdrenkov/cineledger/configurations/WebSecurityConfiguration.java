@@ -29,7 +29,8 @@ import java.util.Arrays;
 @EnableWebSecurity
 @Configuration
 public class WebSecurityConfiguration {
-    private static final String[] AUTH_PATH = { "/csrf", "/login", "/registration", "/logout", "/password-recovery"
+    private static final String LOGOUT_URL = "/logout";
+    private static final String[] AUTH_PATH = { "/csrf", "/login", "/registration", LOGOUT_URL, "/password-recovery"
     };
 
     private static final String[] GUEST_GET_LIST = { "/categories.*", "/cinemas.*", "/cinemas/\\d/halls",
@@ -51,8 +52,6 @@ public class WebSecurityConfiguration {
         "/users\\?roleName=.*", "/users\\?joinDate=.*", "/admins.*", "/admins/\\d.*"
     };
 
-    private static final String LOGOUT_URL = "/logout";
-
     private final JwtRequestFilter jwtRequestFilter;
 
     /**
@@ -67,7 +66,7 @@ public class WebSecurityConfiguration {
     }
 
     @Bean
-    SecurityFilterChain securityFilterChain(final HttpSecurity httpSecurity) throws Exception {
+    SecurityFilterChain securityFilterChain(final HttpSecurity httpSecurity) {
         httpSecurity
             .csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
             .authorizeHttpRequests(auth -> auth
@@ -114,8 +113,7 @@ public class WebSecurityConfiguration {
      * @return requested authentication manager value
      */
     @Bean
-    public AuthenticationManager authenticationManager(final AuthenticationConfiguration authenticationConfiguration)
-        throws Exception {
+    public AuthenticationManager authenticationManager(final AuthenticationConfiguration authenticationConfiguration) {
         return authenticationConfiguration.getAuthenticationManager();
     }
 

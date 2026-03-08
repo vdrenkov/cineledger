@@ -5,7 +5,7 @@ package dev.vdrenkov.cineledger.utils.constants;
  */
 public final class ExceptionMessages {
 
-    /**
+    /*
      * Not found messages
      */
 
@@ -38,7 +38,7 @@ public final class ExceptionMessages {
     /** Message used when a discount lookup returns no result. */
     public static final String DISCOUNT_NOT_FOUND_MESSAGE = "No such discount was found in the database!";
 
-    /**
+    /*
      * Authorization messages
      */
 
@@ -47,7 +47,7 @@ public final class ExceptionMessages {
     /** Message returned when an operation requires an authenticated user. */
     public static final String NOT_LOGGED_IN_MESSAGE = "You are not logged in!";
 
-    /**
+    /*
      * Validation messages
      */
 
@@ -62,7 +62,7 @@ public final class ExceptionMessages {
     /** Message returned when an item is out of stock. */
     public static final String NO_AVAILABLE_ITEMS_EXCEPTION = "No more items of this kind available.";
 
-    /**
+    /*
      * Existing entity properties messages
      */
 
@@ -85,21 +85,21 @@ public final class ExceptionMessages {
     /** Message used when a role with the same unique data already exists. */
     public static final String ROLE_ALREADY_EXISTS_MESSAGE = "Role already exists!";
 
-    /**
+    /*
      * Message for constructor in non-instantiable classes
      */
 
     /** Message used by private utility constructors that must never be called. */
     public static final String NON_INSTANTIABLE_CLASS_MESSAGE = "Do not instantiate this class!";
 
-    /**
+    /*
      * Global exception messages
      */
 
     /** Fallback message used for unexpected failures. */
-    public static final String GLOBAL_EXCEPTION = "Something went wrong...";
+    public static final String GLOBAL_EXCEPTION = "Something went wrong…";
     /** Log message prefix used when exceptions are handled centrally. */
-    public final static String CAUGHT_EXCEPTION = "An exception has been caught";
+    public static final String CAUGHT_EXCEPTION = "Exception caught";
     /** Message returned when the request payload or parameters fail validation. */
     public static final String INVALID_REQUEST_MESSAGE = "The request is invalid.";
     /** Message returned when a route does not support the attempted HTTP method. */

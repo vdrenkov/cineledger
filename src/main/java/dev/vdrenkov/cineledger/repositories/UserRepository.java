@@ -14,15 +14,10 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
     Optional<User> findUserByUsername(String username);
-
     boolean existsByUsername(String username);
-
     Optional<User> findUserByEmail(String email);
-
     List<User> findAllByRolesName(String roleName);
-
     List<User> findAllByJoinDateBefore(LocalDate dateBefore);
-
     List<User> findAllByJoinDateAfter(LocalDate dateAfter);
 }
 

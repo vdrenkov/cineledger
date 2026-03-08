@@ -4,6 +4,7 @@ import dev.vdrenkov.cineledger.utils.constants.JwtConstants;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.io.Serial;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
@@ -23,20 +25,13 @@ import java.util.function.Function;
  */
 @Component
 public class JwtTokenUtil implements Serializable {
-    private final Logger log = LoggerFactory.getLogger(JwtTokenUtil.class);
+    @Serial
+    private static final long serialVersionUID = 4910407962728938714L;
+    private final transient Logger log = LoggerFactory.getLogger(JwtTokenUtil.class);
 
+    @Setter
     @Value("${jwt.secret}")
     private String secret;
-
-    /**
-     * Overrides the JWT signing secret, primarily for tests.
-     *
-     * @param secret
-     *     JWT signing secret
-     */
-    public void setSecret(final String secret) {
-        this.secret = secret;
-    }
 
     /**
      * Extracts the username stored in the supplied JWT token.
@@ -69,6 +64,8 @@ public class JwtTokenUtil implements Serializable {
      *     JWT token value
      * @param claimsResolver
      *     function used to extract a claim from the token
+     * @param <T>
+     *     The specified claim type. Cannot be null.
      * @return requested t value
      */
     public <T> T getClaimFromToken(final String token, final Function<Claims, T> claimsResolver) {

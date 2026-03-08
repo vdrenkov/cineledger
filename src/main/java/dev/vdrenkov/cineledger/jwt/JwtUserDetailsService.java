@@ -5,6 +5,7 @@ import dev.vdrenkov.cineledger.models.entities.Role;
 import dev.vdrenkov.cineledger.models.entities.User;
 import dev.vdrenkov.cineledger.repositories.UserRepository;
 import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,10 +46,10 @@ public class JwtUserDetailsService implements UserDetailsService {
      * @return requested user details value
      */
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(final @NonNull String username) throws UsernameNotFoundException {
         User user = userRepository.findUserByUsername(username).orElseThrow(() -> {
             log.error(ExceptionMessages.USER_NOT_FOUND_MESSAGE);
-            throw new UserNotFoundException(ExceptionMessages.USER_NOT_FOUND_MESSAGE);
+            return new UserNotFoundException(ExceptionMessages.USER_NOT_FOUND_MESSAGE);
         });
 
         final List<SimpleGrantedAuthority> authorities = new ArrayList<>();
@@ -56,7 +57,7 @@ public class JwtUserDetailsService implements UserDetailsService {
             authorities.add(new SimpleGrantedAuthority(role.getName()));
         }
 
-        log.info(String.format("User with username %s loaded", username));
+        log.info("User with username {} loaded", username);
         return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(),
             authorities);
     }

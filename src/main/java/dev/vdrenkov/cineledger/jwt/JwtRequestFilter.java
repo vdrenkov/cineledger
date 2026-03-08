@@ -7,6 +7,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,8 +55,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
      *     remaining servlet filter chain
      */
     @Override
-    protected void doFilterInternal(final HttpServletRequest request, final HttpServletResponse response,
-        final FilterChain chain) throws ServletException, IOException {
+    protected void doFilterInternal(final HttpServletRequest request, final @NonNull HttpServletResponse response,
+        final @NonNull FilterChain chain) throws ServletException, IOException {
         final String token = getJwtToken(request.getCookies());
         String username = null;
 

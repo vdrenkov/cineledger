@@ -5,6 +5,7 @@ import dev.vdrenkov.cineledger.models.entities.User;
 import dev.vdrenkov.cineledger.repositories.RoleRepository;
 import dev.vdrenkov.cineledger.repositories.UserRepository;
 import dev.vdrenkov.cineledger.utils.constants.RoleConstants;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -56,7 +57,7 @@ public class RoleBootstrapRunner implements CommandLineRunner {
      */
     @Override
     @Transactional
-    public void run(final String... args) {
+    public void run(final String @NonNull ... args) {
         if (!bootstrapProperties.isRoles()) {
             log.info("Role bootstrap disabled by configuration");
             return;
