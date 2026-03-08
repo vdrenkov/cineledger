@@ -9,6 +9,7 @@ scheduling, ordering, reporting, reviews and user/security workflows for externa
 - Spring Boot 4.0.3
 - Spring Security (JWT + cookie support)
 - Spring Data JPA + Hibernate ORM
+- Liquibase
 - PostgreSQL
 - Maven
 - JUnit 5 + Mockito + Spring Test (MockMvc)
@@ -51,10 +52,10 @@ Set these before running the application:
 
 ## Run Locally
 
-1. Run tests:
+1. Run the full verification suite:
 
 ```bash
-mvn clean test
+mvn clean verify
 ```
 
 2. Start the application:
@@ -96,5 +97,4 @@ mvn spring-boot:run
 - Mailjet and IMDb integrations degrade gracefully when credentials are not configured.
 - `spring.jpa.hibernate.ddl-auto` is set to `validate` so entity/schema drift fails fast.
 - `DML_Scripts.sql` is development-only and should not be executed in production.
-- Full unit test suite is passing with `mvn clean test`.
-
+- Full verification passes with `mvn clean verify`.
