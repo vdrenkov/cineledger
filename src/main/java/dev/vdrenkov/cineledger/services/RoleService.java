@@ -171,7 +171,7 @@ public class RoleService {
 
     private void roleValidation(RoleRequest roleRequest) {
         roleRepository.findRoleByName(roleRequest.getName()).ifPresent(role -> {
-            log.error("Error caught: {}", ExceptionMessages.ROLE_ALREADY_EXISTS_MESSAGE);
+            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.ROLE_ALREADY_EXISTS_MESSAGE);
 
             throw new RoleAlreadyExistsException(ExceptionMessages.ROLE_ALREADY_EXISTS_MESSAGE);
         });

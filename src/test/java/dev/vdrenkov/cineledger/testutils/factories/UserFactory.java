@@ -22,8 +22,8 @@ import static dev.vdrenkov.cineledger.testutils.constants.UserConstants.USERNAME
  */
 public final class UserFactory {
 
-    private UserFactory() throws IllegalAccessException {
-        throw new IllegalAccessException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
+    private UserFactory() {
+        throw new IllegalStateException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
     }
 
     /**

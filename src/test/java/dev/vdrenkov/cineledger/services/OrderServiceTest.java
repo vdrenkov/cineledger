@@ -11,7 +11,6 @@ import dev.vdrenkov.cineledger.models.entities.User;
 import dev.vdrenkov.cineledger.models.requests.OrderRequest;
 import dev.vdrenkov.cineledger.models.requests.TicketRequest;
 import dev.vdrenkov.cineledger.repositories.OrderRepository;
-import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
 import dev.vdrenkov.cineledger.testutils.constants.DiscountConstants;
 import dev.vdrenkov.cineledger.testutils.constants.OrderConstants;
 import dev.vdrenkov.cineledger.testutils.constants.ReportConstants;
@@ -20,6 +19,7 @@ import dev.vdrenkov.cineledger.testutils.factories.OrderFactory;
 import dev.vdrenkov.cineledger.testutils.factories.ProjectionFactory;
 import dev.vdrenkov.cineledger.testutils.factories.TicketFactory;
 import dev.vdrenkov.cineledger.testutils.factories.UserFactory;
+import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -93,10 +93,10 @@ class OrderServiceTest {
     }
 
     /**
-     * Verifies that add Order discount Code Not Valid throws Discount Not Found Exception.
+     * Verifies that add Order discount Code Not Valid throws Discount Not Valid Exception.
      */
     @Test
-    void testAddOrder_discountCodeNotValid_throwsDiscountNotFoundException() {
+    void testAddOrder_discountCodeNotValid_throwsDiscountNotValidException() {
         when(ticketService.getTicketById(anyInt())).thenReturn(TicketFactory.getDefaultTicket());
         when(itemService.getItemById(anyInt())).thenReturn(ItemFactory.getDefaultItem());
         when(userService.getUserById(anyInt())).thenReturn(UserFactory.getDefaultUser());
@@ -131,10 +131,10 @@ class OrderServiceTest {
     }
 
     /**
-     * Verifies that make Reservation With User Id discount Code Not Valid throws Discount Not Found Exception.
+     * Verifies that make Reservation With User Id discount Code Not Valid throws Discount Not Valid Exception.
      */
     @Test
-    void testMakeReservationWithUserId_discountCodeNotValid_throwsDiscountNotFoundException() {
+    void testMakeReservationWithUserId_discountCodeNotValid_throwsDiscountNotValidException() {
         final Ticket ticket = new Ticket();
         ticket.setId(OrderConstants.ID);
         ticket.setDateOfPurchase(LocalDate.now());

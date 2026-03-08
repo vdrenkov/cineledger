@@ -16,8 +16,8 @@ import static dev.vdrenkov.cineledger.testutils.constants.HallConstants.ID;
  */
 public final class HallFactory {
 
-    private HallFactory() throws IllegalAccessException {
-        throw new IllegalAccessException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
+    private HallFactory() {
+        throw new IllegalStateException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
     }
 
     /**

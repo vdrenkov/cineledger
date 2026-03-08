@@ -18,8 +18,8 @@ import static dev.vdrenkov.cineledger.testutils.constants.ItemConstants.QUANTITY
  */
 public final class ItemFactory {
 
-    private ItemFactory() throws IllegalAccessException {
-        throw new IllegalAccessException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
+    private ItemFactory() {
+        throw new IllegalStateException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
     }
 
     /**

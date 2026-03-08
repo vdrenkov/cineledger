@@ -17,8 +17,8 @@ import static dev.vdrenkov.cineledger.testutils.constants.ProjectionConstants.ST
  */
 public final class ProjectionFactory {
 
-    private ProjectionFactory() throws IllegalAccessException {
-        throw new IllegalAccessException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
+    private ProjectionFactory() {
+        throw new IllegalStateException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
     }
 
     /**

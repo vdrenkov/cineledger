@@ -109,10 +109,9 @@ public final class ExceptionMessages {
     /** Message returned when the request conflicts with the current persisted state. */
     public static final String DATA_CONFLICT_MESSAGE = "The request conflicts with existing data.";
 
-    private ExceptionMessages() throws IllegalAccessException {
-        throw new IllegalAccessException(NON_INSTANTIABLE_CLASS_MESSAGE);
+    private ExceptionMessages() {
+        throw new IllegalStateException(NON_INSTANTIABLE_CLASS_MESSAGE);
     }
 }
-
 
 

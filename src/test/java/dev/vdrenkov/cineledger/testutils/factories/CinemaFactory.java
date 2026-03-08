@@ -18,8 +18,8 @@ import static dev.vdrenkov.cineledger.testutils.constants.MovieConstants.RATING;
  */
 public final class CinemaFactory {
 
-    private CinemaFactory() throws IllegalAccessException {
-        throw new IllegalAccessException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
+    private CinemaFactory() {
+        throw new IllegalStateException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
     }
 
     /**

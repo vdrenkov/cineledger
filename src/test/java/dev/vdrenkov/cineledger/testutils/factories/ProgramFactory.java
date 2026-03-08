@@ -17,8 +17,8 @@ import static dev.vdrenkov.cineledger.testutils.constants.ProgramConstants.ID;
  */
 public final class ProgramFactory {
 
-    private ProgramFactory() throws IllegalAccessException {
-        throw new IllegalAccessException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
+    private ProgramFactory() {
+        throw new IllegalStateException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
     }
 
     /**

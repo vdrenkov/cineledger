@@ -2,6 +2,7 @@ package dev.vdrenkov.cineledger.services;
 
 import dev.vdrenkov.cineledger.exceptions.DiscountAlreadyExistsException;
 import dev.vdrenkov.cineledger.exceptions.DiscountNotFoundException;
+import dev.vdrenkov.cineledger.exceptions.DiscountNotValidException;
 import dev.vdrenkov.cineledger.mappers.DiscountMapper;
 import dev.vdrenkov.cineledger.models.dtos.DiscountDto;
 import dev.vdrenkov.cineledger.models.entities.Discount;
@@ -13,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -45,7 +47,7 @@ public class DiscountService {
      */
     public Discount addDiscount(DiscountRequest request) {
         if (discountRepository.existsByType(request.getType()) || discountRepository.existsByCode(request.getCode())) {
-            log.error("Exception thrown: {}", ExceptionMessages.DISCOUNT_ALREADY_EXISTS_MESSAGE);
+            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.DISCOUNT_ALREADY_EXISTS_MESSAGE);
 
             throw new DiscountAlreadyExistsException(ExceptionMessages.DISCOUNT_ALREADY_EXISTS_MESSAGE);
         }
@@ -186,7 +188,17 @@ public class DiscountService {
      * @return requested double value
      */
     public double applyDiscount(double totalPrice, String discountCode) {
-        return totalPrice - (totalPrice * getDiscountByCode(discountCode).getPercentage() / 100);
+        if (!StringUtils.hasText(discountCode)) {
+            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.DISCOUNT_CODE_NOT_VALID_MESSAGE);
+            throw new DiscountNotValidException(ExceptionMessages.DISCOUNT_CODE_NOT_VALID_MESSAGE);
+        }
+
+        final Discount discount = discountRepository.findByCode(discountCode).orElseThrow(() -> {
+            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.DISCOUNT_CODE_NOT_VALID_MESSAGE);
+            return new DiscountNotValidException(ExceptionMessages.DISCOUNT_CODE_NOT_VALID_MESSAGE);
+        });
+
+        return totalPrice - (totalPrice * discount.getPercentage() / 100);
     }
 }
 

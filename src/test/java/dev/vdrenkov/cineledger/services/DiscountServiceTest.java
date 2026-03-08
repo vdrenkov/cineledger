@@ -2,6 +2,7 @@ package dev.vdrenkov.cineledger.services;
 
 import dev.vdrenkov.cineledger.exceptions.DiscountAlreadyExistsException;
 import dev.vdrenkov.cineledger.exceptions.DiscountNotFoundException;
+import dev.vdrenkov.cineledger.exceptions.DiscountNotValidException;
 import dev.vdrenkov.cineledger.models.dtos.DiscountDto;
 import dev.vdrenkov.cineledger.models.entities.Discount;
 import dev.vdrenkov.cineledger.models.requests.DiscountRequest;
@@ -9,6 +10,7 @@ import dev.vdrenkov.cineledger.repositories.DiscountRepository;
 import dev.vdrenkov.cineledger.testutils.constants.DiscountConstants;
 import dev.vdrenkov.cineledger.testutils.constants.OrderConstants;
 import dev.vdrenkov.cineledger.testutils.factories.DiscountFactory;
+import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -206,6 +208,19 @@ class DiscountServiceTest {
         final double result = discountService.applyDiscount(OrderConstants.TOTAL_PRICE, DiscountConstants.CODE);
 
         assertEquals(expected, result, 0.0);
+    }
+
+    /**
+     * Verifies that apply Discount invalid code throws Discount Not Valid Exception.
+     */
+    @Test
+    void testApplyDiscount_invalidCode_throwsDiscountNotValidException() {
+        when(discountRepository.findByCode(anyString())).thenReturn(Optional.empty());
+
+        final DiscountNotValidException exception = assertThrows(DiscountNotValidException.class,
+            () -> discountService.applyDiscount(OrderConstants.TOTAL_PRICE, DiscountConstants.CODE));
+
+        assertEquals(ExceptionMessages.DISCOUNT_CODE_NOT_VALID_MESSAGE, exception.getMessage());
     }
 }
 

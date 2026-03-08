@@ -18,8 +18,8 @@ import static dev.vdrenkov.cineledger.testutils.factories.ProjectionFactory.getD
  */
 public final class TicketFactory {
 
-    private TicketFactory() throws IllegalAccessException {
-        throw new IllegalAccessException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
+    private TicketFactory() {
+        throw new IllegalStateException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
     }
 
     /**

@@ -18,8 +18,8 @@ import static dev.vdrenkov.cineledger.testutils.constants.DiscountConstants.TYPE
  */
 public final class DiscountFactory {
 
-    private DiscountFactory() throws IllegalAccessException {
-        throw new IllegalAccessException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
+    private DiscountFactory() {
+        throw new IllegalStateException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
     }
 
     /**

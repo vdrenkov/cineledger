@@ -20,8 +20,8 @@ import static dev.vdrenkov.cineledger.testutils.constants.MovieConstants.TITLE;
  */
 public final class MovieFactory {
 
-    private MovieFactory() throws IllegalAccessException {
-        throw new IllegalAccessException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
+    private MovieFactory() {
+        throw new IllegalStateException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
     }
 
     /**

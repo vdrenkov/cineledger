@@ -10,8 +10,8 @@ import static dev.vdrenkov.cineledger.testutils.constants.HttpCookieConstants.CO
  */
 public final class HttpCookieFactory {
 
-    private HttpCookieFactory() throws IllegalAccessException {
-        throw new IllegalAccessException("Utility class. Do not instantiate!");
+    private HttpCookieFactory() {
+        throw new IllegalStateException("Utility class. Do not instantiate!");
     }
 
     /**

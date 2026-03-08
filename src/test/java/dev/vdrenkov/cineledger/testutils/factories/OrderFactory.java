@@ -20,8 +20,8 @@ import static dev.vdrenkov.cineledger.testutils.factories.ItemFactory.getDefault
  */
 public final class OrderFactory {
 
-    private OrderFactory() throws IllegalAccessException {
-        throw new IllegalAccessException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
+    private OrderFactory() {
+        throw new IllegalStateException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
     }
 
     /**
