@@ -11,6 +11,13 @@ import java.util.Optional;
  */
 @Repository
 public interface ItemRepository extends JpaRepository<Item, Integer> {
+    /**
+     * Finds a concession item by its unique name.
+     *
+     * @param itemName
+     *     the item name to match
+     * @return the matching item when present
+     */
     Optional<Item> findByName(String itemName);
 }
 

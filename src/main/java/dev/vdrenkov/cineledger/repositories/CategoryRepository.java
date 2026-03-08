@@ -11,6 +11,13 @@ import java.util.Optional;
  */
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Integer> {
+    /**
+     * Finds a category by its unique name.
+     *
+     * @param name
+     *     the category name to search for
+     * @return the matching category when present
+     */
     Optional<Category> findByName(String name);
 }
 
