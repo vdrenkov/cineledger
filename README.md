@@ -21,6 +21,16 @@ scheduling, ordering, reporting, reviews and user/security workflows for externa
 - `src/main/resources/application.yml`: Runtime configuration
 - `src/main/resources/CineLedger.postman_collection.json`: API collection
 
+## Architecture
+
+- Layered Spring Boot backend with clear controller, service, repository, mapper, and entity boundaries.
+- Controllers expose the HTTP contract, validate input, and delegate orchestration to the service layer.
+- Services hold business rules for catalog management, scheduling, ordering, reporting, reviews, and security flows.
+- Repositories encapsulate database access through Spring Data JPA against PostgreSQL.
+- Manual mappers keep DTO shaping explicit instead of relying on reflection-based mapping.
+- Spring Security enforces stateless JWT-based authentication and role-based authorization across the API surface.
+- Liquibase owns schema evolution, while Hibernate runs in validation mode to detect entity/schema drift early.
+
 ## Environment Variables
 
 Set these before running the application:
