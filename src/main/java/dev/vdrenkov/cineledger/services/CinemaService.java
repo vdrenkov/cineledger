@@ -8,13 +8,13 @@ import dev.vdrenkov.cineledger.models.entities.Cinema;
 import dev.vdrenkov.cineledger.models.requests.CinemaRequest;
 import dev.vdrenkov.cineledger.repositories.CinemaRepository;
 import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
+import dev.vdrenkov.cineledger.utils.constants.LogMessages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Contains business logic for cinema operations.
@@ -61,25 +61,24 @@ public class CinemaService {
      * @return matching cinema dto values
      */
     public List<CinemaDto> getAllCinemas(String city, String address) {
-        if (Objects.isNull(city) && Objects.isNull(address)) {
+        if (city == null && address == null) {
 
-            log.error("Exception caught: You haven't provided any query parameters ");
+            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, "You haven't provided any query parameters");
 
             throw new IllegalArgumentException("You haven't provided any query parameters");
-        } else if (Objects.nonNull(city) && Objects.nonNull(address)) {
+        } else if (city != null && address != null) {
 
-            log.info(String.format("All cinemas with city %s and address %s were requested from the database", city,
-                address));
+            log.info("All cinemas with city {} and address {} requested from the database", city, address);
 
             return CinemaMapper.mapCinemaToCinemaDtoList(cinemaRepository.findAllByCityAndAddress(city, address));
-        } else if (Objects.nonNull(city)) {
+        } else if (city != null) {
 
-            log.info(String.format("All cinemas with city %s were requested from the database", city));
+            log.info("All cinemas with city {} requested from the database", city);
 
             return CinemaMapper.mapCinemaToCinemaDtoList(cinemaRepository.findAllByCity(city));
         } else {
 
-            log.info(String.format("All cinemas with address %s were requested from the database", address));
+            log.info("All cinemas with address {} requested from the database", address);
 
             return CinemaMapper.mapCinemaToCinemaDtoList(cinemaRepository.findAllByAddress(address));
         }
@@ -93,13 +92,13 @@ public class CinemaService {
      * @return requested cinema value
      */
     public Cinema getCinemaById(int id) {
-        log.info(String.format("An attempt to extract a cinema with id %d from the database", id));
+        log.info("An attempt to extract a cinema with id {} from the database", id);
 
         return cinemaRepository.findById(id).orElseThrow(() -> {
 
-            log.error(String.format("Exception caught : %s", ExceptionMessages.CINEMA_NOT_FOUND_MESSAGE));
+            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.CINEMA_NOT_FOUND_MESSAGE);
 
-            throw new CinemaNotFoundException(ExceptionMessages.CINEMA_NOT_FOUND_MESSAGE);
+            return new CinemaNotFoundException(ExceptionMessages.CINEMA_NOT_FOUND_MESSAGE);
         });
     }
 
@@ -111,7 +110,7 @@ public class CinemaService {
      * @return cinema dto result
      */
     public CinemaDto getCinemaDtoById(int id) {
-        log.info(String.format("An attempt to extract a cinemaDto with id %d from the database", id));
+        log.info("An attempt to extract a cinemaDto with id {} from the database", id);
 
         return CinemaMapper.mapCinemaToCinemaDto(getCinemaById(id));
     }
@@ -131,7 +130,7 @@ public class CinemaService {
         cinemaRepository.save(
             new Cinema(id, cinemaRequest.getAddress(), cinemaRequest.getCity(), cinemaDto.getAverageRating()));
 
-        log.info(String.format("Cinema with an id %d has been updated", id));
+        log.info("Cinema with an id {} updated", id);
 
         return cinemaDto;
     }
@@ -153,7 +152,7 @@ public class CinemaService {
 
         cinemaRepository.save(cinema);
 
-        log.info(String.format("Updated average rating for cinema with id %d", cinemaId));
+        log.info("Updated average rating for cinema with id {}", cinemaId);
 
         return cinemaDto;
     }
@@ -170,14 +169,14 @@ public class CinemaService {
 
         cinemaRepository.deleteById(id);
 
-        log.info(String.format("Cinema with an id %d has been deleted", id));
+        log.info("Cinema with an id {} deleted", id);
 
         return cinemaDto;
     }
 
     private void cinemaValidation(CinemaRequest cinemaRequest) {
         cinemaRepository.findByCityAndAddress(cinemaRequest.getCity(), cinemaRequest.getAddress()).ifPresent(cinema -> {
-            log.error(String.format("Exception caught: %s", ExceptionMessages.CINEMA_ALREADY_EXISTS_MESSAGE));
+            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.CINEMA_ALREADY_EXISTS_MESSAGE);
             throw new CinemaAlreadyExistsException(ExceptionMessages.CINEMA_ALREADY_EXISTS_MESSAGE);
         });
     }

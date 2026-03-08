@@ -8,6 +8,7 @@ import dev.vdrenkov.cineledger.models.entities.Role;
 import dev.vdrenkov.cineledger.models.requests.RoleRequest;
 import dev.vdrenkov.cineledger.repositories.RoleRepository;
 import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
+import dev.vdrenkov.cineledger.utils.constants.LogMessages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,12 +81,12 @@ public class RoleService {
      * @return requested role value
      */
     public Role getRoleById(int id) {
-        log.info(String.format("Trying to retrieve role with id %d", id));
+        log.info("Trying to retrieve role with id {}", id);
 
         return roleRepository.findById(id).orElseThrow(() -> {
-            log.error(String.format("Exception caught: %s", ExceptionMessages.ROLE_NOT_FOUND_MESSAGE));
+            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.ROLE_NOT_FOUND_MESSAGE);
 
-            throw new RoleNotFoundException(ExceptionMessages.ROLE_NOT_FOUND_MESSAGE);
+            return new RoleNotFoundException(ExceptionMessages.ROLE_NOT_FOUND_MESSAGE);
         });
     }
 
@@ -97,7 +98,7 @@ public class RoleService {
      * @return role dto result
      */
     public RoleDto getRoleDtoById(int id) {
-        log.info(String.format("Trying to retrieve role DTO with id %d", id));
+        log.info("Trying to retrieve role DTO with id {}", id);
 
         return RoleMapper.mapRoleToRoleDto(getRoleById(id));
     }
@@ -110,12 +111,12 @@ public class RoleService {
      * @return requested role value
      */
     public Role getRoleByName(String name) {
-        log.info(String.format("Trying to retrieve role with name %s", name));
+        log.info("Trying to retrieve role with name {}", name);
 
         return roleRepository.findRoleByName(name.toUpperCase()).orElseThrow(() -> {
-            log.error(String.format("Exception caught: %s", ExceptionMessages.ROLE_NOT_FOUND_MESSAGE));
+            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.ROLE_NOT_FOUND_MESSAGE);
 
-            throw new RoleNotFoundException(ExceptionMessages.ROLE_NOT_FOUND_MESSAGE);
+            return new RoleNotFoundException(ExceptionMessages.ROLE_NOT_FOUND_MESSAGE);
         });
     }
 
@@ -127,7 +128,7 @@ public class RoleService {
      * @return role dto result
      */
     public RoleDto getRoleDtoByName(String name) {
-        log.info(String.format("Trying to retrieve role DTO with name %s", name));
+        log.info("Trying to retrieve role DTO with name {}", name);
 
         return RoleMapper.mapRoleToRoleDto(getRoleByName(name));
     }
@@ -146,7 +147,7 @@ public class RoleService {
 
         roleRepository.save(new Role(id, roleRequest.getName()));
 
-        log.info(String.format("Role with id %d was updated", id));
+        log.info("Role with id {} was updated", id);
 
         return roleDto;
     }
@@ -163,14 +164,14 @@ public class RoleService {
 
         roleRepository.deleteById(id);
 
-        log.info(String.format("Role with id %d was deleted", id));
+        log.info("Role with id {} was deleted", id);
 
         return roleDto;
     }
 
     private void roleValidation(RoleRequest roleRequest) {
         roleRepository.findRoleByName(roleRequest.getName()).ifPresent(role -> {
-            log.error(String.format("Error caught: %s", ExceptionMessages.ROLE_ALREADY_EXISTS_MESSAGE));
+            log.error("Error caught: {}", ExceptionMessages.ROLE_ALREADY_EXISTS_MESSAGE);
 
             throw new RoleAlreadyExistsException(ExceptionMessages.ROLE_ALREADY_EXISTS_MESSAGE);
         });

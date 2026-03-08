@@ -9,6 +9,7 @@ import dev.vdrenkov.cineledger.models.entities.Movie;
 import dev.vdrenkov.cineledger.models.requests.MovieRequest;
 import dev.vdrenkov.cineledger.repositories.MovieRepository;
 import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
+import dev.vdrenkov.cineledger.utils.constants.LogMessages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Contains business logic for movie operations.
@@ -60,13 +60,13 @@ public class MovieService {
 
         if (isDateNotValid(request.getReleaseDate())) {
 
-            log.error(String.format("Exception caught: %s", ExceptionMessages.DATE_NOT_VALID_MESSAGE));
+            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.DATE_NOT_VALID_MESSAGE);
 
             throw new DateNotValidException(ExceptionMessages.DATE_NOT_VALID_MESSAGE);
         }
 
         this.movieRepository.findByTitle(request.getTitle()).ifPresent(movie -> {
-            log.error(String.format("Exception caught: %s", ExceptionMessages.MOVIE_ALREADY_EXISTS_MESSAGE));
+            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.MOVIE_ALREADY_EXISTS_MESSAGE);
 
             throw new MovieAlreadyExistsException(ExceptionMessages.MOVIE_ALREADY_EXISTS_MESSAGE);
         });
@@ -88,21 +88,19 @@ public class MovieService {
     public List<MovieDto> getMoviesByTitle(String title, double minRating) {
         if (title == null || title.isEmpty()) {
 
-            log.error(
-                "Exception caught: Required request parameter 'title' for method parameter type String is present but "
-                    + "converted to null");
+            log.error(LogMessages.EXCEPTION_CAUGHT_LOG,
+                "Required request parameter 'title' for method parameter type String is present but converted to null");
 
             throw new IllegalArgumentException(
                 "Required request parameter 'title' for method parameter type String is present but converted to null");
         }
 
         if (minRating == 0.0) {
-            log.info(String.format("All movies with title %s were requested from the database", title));
+            log.info("All movies with title {} requested from the database", title);
 
             return MovieMapper.mapMovieListToMovieDtoList(movieRepository.findByTitleContaining(title));
         } else {
-            log.info(String.format("All movies with title %s and rating %.2f were requested from the database", title,
-                minRating));
+            log.info("All movies with title {} and rating {} requested from the database", title, minRating);
 
             return MovieMapper.mapMovieListToMovieDtoList(
                 movieRepository.findByTitleContainingAndAverageRatingGreaterThanEqual(title, minRating));
@@ -118,16 +116,15 @@ public class MovieService {
      *     minimum rating threshold
      * @return matching movie dto values
      */
-    public List<MovieDto> getMoviesByCategory(Integer categoryId, double minRating) {
+    public List<MovieDto> getMoviesByCategory(int categoryId, double minRating) {
         List<MovieDto> movies;
 
         if (minRating == 0.0) {
-            log.info(String.format("All movies with category id %d were requested from the database", categoryId));
+            log.info("All movies with category id {} requested from the database", categoryId);
 
             movies = MovieMapper.mapMovieListToMovieDtoList(movieRepository.findByCategoryId(categoryId));
         } else {
-            log.info(String.format("All movies with category id %d and rating %.2f were requested from the database",
-                categoryId, minRating));
+            log.info("All movies with category id {} and rating {} requested from the database", categoryId, minRating);
 
             movies = MovieMapper.mapMovieListToMovieDtoList(
                 movieRepository.findByCategoryIdAndAverageRatingGreaterThanEqual(categoryId, minRating));
@@ -152,7 +149,7 @@ public class MovieService {
     public List<MovieDto> getMoviesByReleaseDate(LocalDate releaseDate, Double minRating, boolean isAfter) {
         List<Movie> movies;
 
-        log.info(String.format("All movies with releaseDate %s were requested from the database", releaseDate));
+        log.info("All movies with releaseDate {} requested from the database", releaseDate);
 
         if (isAfter) {
             movies = minRating != null ?
@@ -175,7 +172,7 @@ public class MovieService {
      * @return matching movie dto values
      */
     public List<MovieDto> getMoviesByMinRating(double rating) {
-        log.info(String.format("All movies with rating of %.2f were requested from the database", rating));
+        log.info("All movies with rating of {} requested from the database", rating);
 
         return MovieMapper.mapMovieListToMovieDtoList(movieRepository.findByAverageRatingGreaterThanEqual(rating));
     }
@@ -190,9 +187,9 @@ public class MovieService {
     public Movie getMovieByTitle(String title) {
         return movieRepository.findByTitle(title).orElseThrow(() -> {
 
-            log.error(String.format("Exception caught: %s", ExceptionMessages.MOVIE_NOT_FOUND_MESSAGE));
+            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.MOVIE_NOT_FOUND_MESSAGE);
 
-            throw new MovieNotFoundException(ExceptionMessages.MOVIE_NOT_FOUND_MESSAGE);
+            return new MovieNotFoundException(ExceptionMessages.MOVIE_NOT_FOUND_MESSAGE);
         });
     }
 
@@ -204,7 +201,7 @@ public class MovieService {
      * @return movie dto result
      */
     public MovieDto getMovieDtoById(int id) {
-        log.info(String.format("An attempt to extract a movie DTO with an id %d from the database", id));
+        log.info("An attempt to extract a movie DTO with an id {} from the database", id);
 
         return MovieMapper.mapMovieToMovieDto(getMovieById(id));
     }
@@ -217,13 +214,13 @@ public class MovieService {
      * @return requested movie value
      */
     public Movie getMovieById(int id) {
-        log.info(String.format("An attempt to extract a movie with an id %d from the database", id));
+        log.info("An attempt to extract a movie with an id {} from the database", id);
 
         return movieRepository.findById(id).orElseThrow(() -> {
 
-            log.error(String.format("Exception caught: %s", ExceptionMessages.MOVIE_NOT_FOUND_MESSAGE));
+            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.MOVIE_NOT_FOUND_MESSAGE);
 
-            throw new MovieNotFoundException(ExceptionMessages.MOVIE_NOT_FOUND_MESSAGE);
+            return new MovieNotFoundException(ExceptionMessages.MOVIE_NOT_FOUND_MESSAGE);
         });
     }
 
@@ -235,11 +232,11 @@ public class MovieService {
      * @return matching integer values
      */
     public List<Integer> getIdsOfMoviesByTitle(String title) {
-        log.info(String.format("All movies IDs with title %s were requested from the database", title));
+        log.info("All movies IDs with title {} requested from the database", title);
 
         final List<Movie> movies = movieRepository.findByTitleContaining(title);
 
-        return movies.stream().map(Movie::getId).collect(Collectors.toList());
+        return movies.stream().map(Movie::getId).toList();
     }
 
     /**
@@ -266,7 +263,7 @@ public class MovieService {
         final MovieDto movieDto = getMovieDtoById(id);
 
         if (isDateNotValid(request.getReleaseDate())) {
-            log.error(String.format("Exception caught: %s", ExceptionMessages.DATE_NOT_VALID_MESSAGE));
+            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.DATE_NOT_VALID_MESSAGE);
 
             throw new DateNotValidException(ExceptionMessages.DATE_NOT_VALID_MESSAGE);
         }
@@ -275,7 +272,7 @@ public class MovieService {
             new Movie(id, request.getTitle(), request.getDescription(), request.getReleaseDate(), request.getRuntime(),
                 categoryService.getCategoryById(request.getCategoryId())));
 
-        log.info(String.format("Movie with an id %d has been updated", id));
+        log.info("Movie with an id {} updated", id);
 
         return movieDto;
     }
@@ -299,7 +296,7 @@ public class MovieService {
 
         movieRepository.save(movie);
 
-        log.info(String.format("Updated average rating for movie with id %d", movieId));
+        log.info("Updated average rating for movie with id {}", movieId);
 
         return movieDto;
     }
@@ -316,7 +313,7 @@ public class MovieService {
 
         movieRepository.deleteById(id);
 
-        log.info(String.format("Movie with an id %d has been deleted", id));
+        log.info("Movie with an id {} deleted", id);
 
         return movieDto;
     }
@@ -328,9 +325,10 @@ public class MovieService {
      *     release date to validate or persist
      * @return true when the requested condition holds; otherwise false
      */
-    public boolean isDateNotValid(LocalDate releaseDate) {
+    public static boolean isDateNotValid(LocalDate releaseDate) {
         return releaseDate.isBefore(LocalDate.now());
     }
 }
+
 
 

@@ -16,6 +16,7 @@ import dev.vdrenkov.cineledger.models.requests.LoginRequest;
 import dev.vdrenkov.cineledger.models.requests.UserRequest;
 import dev.vdrenkov.cineledger.repositories.UserRepository;
 import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
+import dev.vdrenkov.cineledger.utils.constants.LogMessages;
 import dev.vdrenkov.cineledger.utils.constants.RoleConstants;
 import dev.vdrenkov.cineledger.utils.constants.UserConstants;
 import org.slf4j.Logger;
@@ -35,7 +36,6 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * Contains business logic for user operations.
@@ -129,9 +129,8 @@ public class UserService {
      *
      * @param userRequest
      *     request payload for the user operation
-     * @return requested user value
      */
-    public User addUser(final UserRequest userRequest) {
+    public void addUser(final UserRequest userRequest) {
         final String password = passwordEncoder.encode(userRequest.getPassword());
 
         userValidation(userRequest.getUsername(), userRequest.getEmail());
@@ -143,7 +142,7 @@ public class UserService {
 
         log.info("Trying to add a new user");
 
-        return userRepository.save(user);
+        userRepository.save(user);
     }
 
     /**
@@ -151,9 +150,8 @@ public class UserService {
      *
      * @param request
      *     request payload containing the submitted data
-     * @return requested user value
      */
-    public User addUserByAdmin(final AdminRequest request) {
+    public void addUserByAdmin(final AdminRequest request) {
         final String password = passwordEncoder.encode(request.getPassword());
         userValidation(request.getUsername(), request.getEmail());
 
@@ -162,7 +160,7 @@ public class UserService {
 
         log.info("An attempt a new user to be added by an admin");
 
-        return userRepository.save(user);
+        userRepository.save(user);
     }
 
     /**
@@ -173,7 +171,7 @@ public class UserService {
      * @return requested role value
      */
     public Role getRoleByName(final String roleName) {
-        log.info(String.format("Trying to retrieve the user role %s", roleName));
+        log.info("Trying to retrieve the user role {}", roleName);
 
         return roleService.getRoleByName(roleName);
     }
@@ -197,11 +195,11 @@ public class UserService {
      * @return matching role values
      */
     public List<Role> getUserRoles(final List<String> roleNames) {
-        if (Objects.nonNull(roleNames) && roleNames.size() > 0) {
+        if (roleNames != null && !roleNames.isEmpty()) {
 
             log.info("Trying to map all ids to user roles");
 
-            return roleNames.stream().map(this::getRoleByName).collect(Collectors.toList());
+            return roleNames.stream().map(this::getRoleByName).toList();
         } else {
             throw new RoleNotChosenException(ExceptionMessages.ROLE_NOT_CHOSEN_MESSAGE);
         }
@@ -215,12 +213,12 @@ public class UserService {
      * @return requested user value
      */
     public User getUserById(final int id) {
-        log.info(String.format("Trying to retrieve user with id %d", id));
+        log.info("Trying to retrieve user with id {}", id);
 
         return userRepository.findById(id).orElseThrow(() -> {
-            log.error(String.format("Exception caught: %s", ExceptionMessages.USER_NOT_FOUND_MESSAGE));
+            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.USER_NOT_FOUND_MESSAGE);
 
-            throw new UserNotFoundException(ExceptionMessages.USER_NOT_FOUND_MESSAGE);
+            return new UserNotFoundException(ExceptionMessages.USER_NOT_FOUND_MESSAGE);
         });
     }
 
@@ -232,7 +230,7 @@ public class UserService {
      * @return user dto result
      */
     public UserDto getUserDtoById(final int id) {
-        log.info(String.format("Trying to retrieve user DTO with id %d", id));
+        log.info("Trying to retrieve user DTO with id {}", id);
 
         return UserMapper.mapUserToUserDto(getUserById(id));
     }
@@ -245,12 +243,12 @@ public class UserService {
      * @return requested user value
      */
     public User getUserByUsername(final String username) {
-        log.info(String.format("Trying to retrieve user with username %s", username));
+        log.info("Trying to retrieve user with username {}", username);
 
         return userRepository.findUserByUsername(username).orElseThrow(() -> {
-            log.error(String.format("Exception caught: %s", ExceptionMessages.USER_NOT_FOUND_MESSAGE));
+            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.USER_NOT_FOUND_MESSAGE);
 
-            throw new UserNotFoundException(ExceptionMessages.USER_NOT_FOUND_MESSAGE);
+            return new UserNotFoundException(ExceptionMessages.USER_NOT_FOUND_MESSAGE);
         });
     }
 
@@ -262,7 +260,7 @@ public class UserService {
      * @return user dto result
      */
     public UserDto getUserDtoByUsername(final String username) {
-        log.info(String.format("Trying to retrieve user DTO with username %s", username));
+        log.info("Trying to retrieve user DTO with username {}", username);
 
         return UserMapper.mapUserToUserDto(getUserByUsername(username));
     }
@@ -275,12 +273,12 @@ public class UserService {
      * @return requested user value
      */
     public User getUserByEmail(final String email) {
-        log.info(String.format("Trying to retrieve user with email %s", email));
+        log.info("Trying to retrieve user with email {}", email);
 
         return userRepository.findUserByEmail(email).orElseThrow(() -> {
-            log.error(String.format("Exception caught: %s", ExceptionMessages.USER_NOT_FOUND_MESSAGE));
+            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.USER_NOT_FOUND_MESSAGE);
 
-            throw new UserNotFoundException(ExceptionMessages.USER_NOT_FOUND_MESSAGE);
+            return new UserNotFoundException(ExceptionMessages.USER_NOT_FOUND_MESSAGE);
         });
     }
 
@@ -292,7 +290,7 @@ public class UserService {
      * @return user dto result
      */
     public UserDto getUserDtoByEmail(final String email) {
-        log.info(String.format("Trying to retrieve user DTO with email %s", email));
+        log.info("Trying to retrieve user DTO with email {}", email);
 
         return UserMapper.mapUserToUserDto(getUserByEmail(email));
     }
@@ -305,7 +303,7 @@ public class UserService {
      * @return matching user values
      */
     public List<User> getUsersByRoleName(final String roleName) {
-        log.info(String.format("Trying to retrieve users with role %s", roleName));
+        log.info("Trying to retrieve users with role {}", roleName);
 
         return userRepository.findAllByRolesName(roleName.toUpperCase());
     }
@@ -318,7 +316,7 @@ public class UserService {
      * @return matching user dto values
      */
     public List<UserDto> getUsersDtoByRoleName(final String roleName) {
-        log.info(String.format("Trying to retrieve user DTOS with role %s", roleName));
+        log.info("Trying to retrieve user DTOS with role {}", roleName);
 
         return UserMapper.mapUsersToUserDtos(getUsersByRoleName(roleName));
     }
@@ -353,9 +351,9 @@ public class UserService {
 
     private User getUserByUsernameOnLogin(final String username) {
         return userRepository.findUserByUsername(username).orElseThrow(() -> {
-            log.error(String.format("Exception caught: %s", ExceptionMessages.USER_NOT_FOUND_MESSAGE));
+            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.USER_NOT_FOUND_MESSAGE);
 
-            throw new UserNotFoundException(ExceptionMessages.USER_NOT_FOUND_MESSAGE);
+            return new UserNotFoundException(ExceptionMessages.USER_NOT_FOUND_MESSAGE);
         });
     }
 
@@ -366,8 +364,7 @@ public class UserService {
      */
     public User getCurrentUser() {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        final String currentUsername = authentication.getName();
-
+        final String currentUsername = Objects.isNull(authentication) ? "" : authentication.getName();
         return getUserByUsername(currentUsername);
     }
 
@@ -388,7 +385,7 @@ public class UserService {
         userRepository.save(new User(id, request.getUsername(), password, request.getEmail(), request.getFirstName(),
             request.getLastName(), userDto.getJoinDate(), roles));
 
-        log.info(String.format("User with id %d was updated by an admin", id));
+        log.info("User with id {} was updated by an admin", id);
         return userDto;
     }
 
@@ -407,7 +404,7 @@ public class UserService {
         final String password = passwordEncoder.encode(userRequest.getPassword());
 
         if (!isAuthorized(id)) {
-            log.error(String.format("Exception caught: %s", ExceptionMessages.NOT_AUTHORIZED_MESSAGE));
+            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.NOT_AUTHORIZED_MESSAGE);
 
             throw new NotAuthorizedException(ExceptionMessages.NOT_AUTHORIZED_MESSAGE);
         }
@@ -416,7 +413,7 @@ public class UserService {
             new User(id, userRequest.getUsername(), password, userRequest.getEmail(), userRequest.getFirstName(),
                 userRequest.getLastName(), user.getJoinDate(), user.getRoles()));
 
-        log.info(String.format("User with id %d was updated", id));
+        log.info("User with id {} was updated", id);
 
         return oldUser;
     }
@@ -432,18 +429,18 @@ public class UserService {
         final UserDto userDto = getUserDtoById(id);
 
         if (!isAuthorized(id)) {
-            log.error(String.format("Exception caught: %s", ExceptionMessages.NOT_AUTHORIZED_MESSAGE));
+            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.NOT_AUTHORIZED_MESSAGE);
 
             throw new NotAuthorizedException(ExceptionMessages.NOT_AUTHORIZED_MESSAGE);
         }
 
         userRepository.deleteById(id);
-
-        if (Objects.equals(SecurityContextHolder.getContext().getAuthentication().getName(), userDto.getUsername())) {
+        final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (Objects.nonNull(auth) && Objects.equals(auth.getName(), userDto.getUsername())) {
             SecurityContextHolder.clearContext();
         }
 
-        log.info(String.format("User with id %d was deleted", id));
+        log.info("User with id {} was deleted", id);
 
         return userDto;
     }
@@ -494,20 +491,23 @@ public class UserService {
         userRepository.save(user);
         emailService.sendPasswordConfirmationEmail(user, newPassword);
 
-        log.info(String.format("The user %s password has been changed", username));
+        log.info("The user's {} password changed", username);
         return user;
     }
 
     private boolean isAuthorized(final int userId) {
         String currentUsername = null;
 
-        if (Objects.nonNull(SecurityContextHolder.getContext()) && Objects.nonNull(
-            SecurityContextHolder.getContext().getAuthentication())) {
-            currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        SecurityContextHolder.getContext();
+        if (SecurityContextHolder.getContext().getAuthentication() != null) {
+            final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (Objects.nonNull(auth)) {
+                currentUsername = auth.getName();
+            }
         }
 
-        if (Objects.isNull(currentUsername) || Objects.equals(UserConstants.DEFAULT_GUEST_USERNAME, currentUsername)) {
-            log.error(String.format("Exception caught: %s", ExceptionMessages.NOT_LOGGED_IN_MESSAGE));
+        if (currentUsername == null || Objects.equals(UserConstants.DEFAULT_GUEST_USERNAME, currentUsername)) {
+            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.NOT_LOGGED_IN_MESSAGE);
 
             throw new NotLoggedInException(ExceptionMessages.NOT_LOGGED_IN_MESSAGE);
         }
@@ -526,13 +526,13 @@ public class UserService {
 
     private void userValidation(final String username, final String email) {
         userRepository.findUserByUsername(username).ifPresent(user -> {
-            log.error(String.format("Exception caught: %s", ExceptionMessages.USERNAME_ALREADY_EXISTS_MESSAGE));
+            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.USERNAME_ALREADY_EXISTS_MESSAGE);
 
             throw new UsernameAlreadyExistsException(ExceptionMessages.USERNAME_ALREADY_EXISTS_MESSAGE);
         });
 
         userRepository.findUserByEmail(email).ifPresent(user -> {
-            log.error(String.format("Exception caught: %s", ExceptionMessages.USER_EMAIL_ALREADY_EXISTS_MESSAGE));
+            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.USER_EMAIL_ALREADY_EXISTS_MESSAGE);
 
             throw new UserEmailAlreadyExistsException(ExceptionMessages.USER_EMAIL_ALREADY_EXISTS_MESSAGE);
         });

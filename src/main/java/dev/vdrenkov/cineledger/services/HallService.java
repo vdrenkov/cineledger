@@ -8,6 +8,7 @@ import dev.vdrenkov.cineledger.models.entities.Hall;
 import dev.vdrenkov.cineledger.models.requests.HallRequest;
 import dev.vdrenkov.cineledger.repositories.HallRepository;
 import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
+import dev.vdrenkov.cineledger.utils.constants.LogMessages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +63,7 @@ public class HallService {
     public List<HallDto> getHallsByCinemaId(int cinemaId) {
         final Cinema cinema = cinemaService.getCinemaById(cinemaId);
 
-        log.info(String.format("All halls with cinema id %d were requested from the database", cinemaId));
+        log.info("All halls with cinema id {} requested from the database", cinemaId);
 
         return HallMapper.mapHallListToHallDtoList(hallRepository.findAllByCinemaId(cinema.getId()));
     }
@@ -75,13 +76,13 @@ public class HallService {
      * @return requested hall value
      */
     public Hall getHallById(int id) {
-        log.info(String.format("An attempt to extract a hall with an id %d from the database", id));
+        log.info("An attempt to extract a hall with an id {} from the database", id);
 
         return hallRepository.findById(id).orElseThrow(() -> {
 
-            log.error(String.format("Exception caught:  %s", ExceptionMessages.HALL_NOT_FOUND_MESSAGE));
+            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.HALL_NOT_FOUND_MESSAGE);
 
-            throw new HallNotFoundException(ExceptionMessages.HALL_NOT_FOUND_MESSAGE);
+            return new HallNotFoundException(ExceptionMessages.HALL_NOT_FOUND_MESSAGE);
         });
     }
 
@@ -93,7 +94,7 @@ public class HallService {
      * @return hall dto result
      */
     public HallDto getHallDtoById(int id) {
-        log.info(String.format("An attempt to extract a hall DTO with an id %d from the database", id));
+        log.info("An attempt to extract a hall DTO with an id {} from the database", id);
 
         return HallMapper.mapHallToHallDto(getHallById(id));
     }
@@ -112,7 +113,7 @@ public class HallService {
 
         hallRepository.save(new Hall(id, request.getCapacity(), cinemaService.getCinemaById(request.getCinemaId())));
 
-        log.info(String.format("Hall with an id %d has been updated", id));
+        log.info("Hall with an id {} updated", id);
 
         return hallDto;
     }
@@ -129,7 +130,7 @@ public class HallService {
 
         hallRepository.deleteById(id);
 
-        log.info(String.format("Hall with an id %d has been deleted", id));
+        log.info("Hall with an id {} deleted", id);
 
         return hallDto;
     }

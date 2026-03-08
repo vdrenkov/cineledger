@@ -80,7 +80,7 @@ public class IncomeReportService {
             }
         }
 
-        log.info(String.format("All incomes by cinema id %d calculated", id));
+        log.info("All incomes by cinema id {} calculated", id);
 
         return incomes;
     }
@@ -109,7 +109,7 @@ public class IncomeReportService {
             }
         }
 
-        log.info(String.format("All incomes by hall id %d calculated", id));
+        log.info("All incomes by hall id {} calculated", id);
 
         return incomes;
     }
@@ -142,7 +142,7 @@ public class IncomeReportService {
             }
         }
 
-        log.info(String.format("All incomes by item id %d calculated", id));
+        log.info("All incomes by item id {} calculated", id);
 
         return incomes;
     }
@@ -171,7 +171,7 @@ public class IncomeReportService {
             }
         }
 
-        log.info(String.format("All incomes by movie id %d calculated", id));
+        log.info("All incomes by movie id {} calculated", id);
 
         return incomes;
     }
@@ -200,12 +200,12 @@ public class IncomeReportService {
             }
         }
 
-        log.info(String.format("All incomes by user id %d calculated", id));
+        log.info("All incomes by user id {} calculated", id);
 
         return incomes;
     }
 
-    private boolean isOrderFromCinema(Order order, int cinemaId) {
+    private static boolean isOrderFromCinema(Order order, int cinemaId) {
         final List<Ticket> tickets = order.getTickets();
 
         for (Ticket ticket : tickets) {
@@ -222,7 +222,7 @@ public class IncomeReportService {
         return false;
     }
 
-    private boolean isOrderFromHall(Order order, int hallId) {
+    private static boolean isOrderFromHall(Order order, int hallId) {
         final List<Ticket> tickets = order.getTickets();
 
         for (Ticket ticket : tickets) {
@@ -239,22 +239,22 @@ public class IncomeReportService {
         return false;
     }
 
-    private boolean isTicketForMovie(Ticket ticket, int movieId) {
+    private static boolean isTicketForMovie(Ticket ticket, int movieId) {
         return movieId == ticket.getProjection().getMovie().getId();
     }
 
-    private boolean isOrderFromUser(Order order, int userId) {
+    private static boolean isOrderFromUser(Order order, int userId) {
         return userId == order.getUser().getId();
     }
 
-    private boolean isTicketWithinDateRange(Ticket ticket, LocalDate startDate, LocalDate endDate) {
+    private static boolean isTicketWithinDateRange(Ticket ticket, LocalDate startDate, LocalDate endDate) {
         final LocalDate ticketDate = ticket.getDateOfPurchase();
 
         return ticketDate.isEqual(startDate) || ticketDate.isEqual(endDate) || (ticketDate.isAfter(startDate)
             && ticketDate.isBefore(endDate));
     }
 
-    private boolean isOrderWithinDateRange(Order order, LocalDate startDate, LocalDate endDate) {
+    private static boolean isOrderWithinDateRange(Order order, LocalDate startDate, LocalDate endDate) {
         final LocalDate orderDate = order.getDateOfPurchase();
 
         return orderDate.isEqual(startDate) || (orderDate.isAfter(startDate) && orderDate.isBefore(endDate));

@@ -29,6 +29,18 @@ public class EmailService {
     private final String senderEmail;
     private final String senderName;
 
+    /**
+     * Creates a new email service with the configured Mailjet credentials and sender identity.
+     *
+     * @param apiKey
+     *     Mailjet API key used for authenticated requests.
+     * @param apiSecretKey
+     *     Mailjet API secret paired with the API key.
+     * @param senderEmail
+     *     Email address used in the message sender header.
+     * @param senderName
+     *     Human-readable sender name shown to recipients.
+     */
     @Autowired
     public EmailService(@Value("${api.key}") String apiKey, @Value("${api.secret}") String apiSecretKey,
         @Value("${mail.sender.email}") String senderEmail, @Value("${mail.sender.name}") String senderName) {
@@ -123,7 +135,7 @@ public class EmailService {
         try {
             new MailjetClient(apiKey, apiSecretKey, new ClientOptions("v3.1")).post(request);
         } catch (MailjetSocketTimeoutException | MailjetException exception) {
-            log.warn("Failed to send {} email", emailType, exception);
+            log.warn("Could not send {} email", emailType, exception);
         }
     }
 }

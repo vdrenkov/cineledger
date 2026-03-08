@@ -10,6 +10,7 @@ import dev.vdrenkov.cineledger.models.entities.Ticket;
 import dev.vdrenkov.cineledger.models.requests.TicketRequest;
 import dev.vdrenkov.cineledger.repositories.TicketRepository;
 import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
+import dev.vdrenkov.cineledger.utils.constants.LogMessages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Contains business logic for ticket operations.
@@ -57,7 +57,7 @@ public class TicketService {
         final LocalDate dateOfPurchase = LocalDate.now();
 
         if (programDate.isBefore(dateOfPurchase)) {
-            log.error(String.format("Exception caught: %s", ExceptionMessages.DATE_NOT_VALID_MESSAGE));
+            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.DATE_NOT_VALID_MESSAGE);
             throw new DateNotValidException(ExceptionMessages.DATE_NOT_VALID_MESSAGE);
         }
 
@@ -82,9 +82,9 @@ public class TicketService {
 
         final List<Ticket> tickets = ticketRepository.findTicketByProjectionId(projection.getId());
 
-        log.info(String.format("All tickets with projection id %d were requested from the database", id));
+        log.info("All tickets with projection id {} requested from the database", id);
 
-        return tickets.stream().map(TicketMapper::mapTicketToTicketDto).collect(Collectors.toList());
+        return tickets.stream().map(TicketMapper::mapTicketToTicketDto).toList();
     }
 
     /**
@@ -95,12 +95,12 @@ public class TicketService {
      * @return requested ticket value
      */
     public Ticket getTicketById(int id) {
-        log.info(String.format("Retrieving ticket with id %d from database", id));
+        log.info("Retrieving ticket with id {} from database", id);
 
         return ticketRepository.findById(id).orElseThrow(() -> {
-            log.error(String.format("Exception caught: %s", ExceptionMessages.TICKET_NOT_FOUND_MESSAGE));
+            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.TICKET_NOT_FOUND_MESSAGE);
 
-            throw new TicketNotFoundException(ExceptionMessages.TICKET_NOT_FOUND_MESSAGE);
+            return new TicketNotFoundException(ExceptionMessages.TICKET_NOT_FOUND_MESSAGE);
         });
     }
 
@@ -114,8 +114,7 @@ public class TicketService {
      * @return matching ticket values
      */
     public List<Ticket> getTicketsByDateBetween(LocalDate startDate, LocalDate endDate) {
-        log.info(String.format("All tickets with date between %s and %s were requested from the database", startDate,
-            endDate));
+        log.info("All tickets with date between {} and {} requested from the database", startDate, endDate);
 
         return ticketRepository.findTicketsByDateOfPurchaseBetween(startDate, endDate);
     }
@@ -133,7 +132,7 @@ public class TicketService {
         final int availableTickets = capacity - totalTickets;
 
         if (availableTickets <= 0) {
-            log.error(String.format("Exception caught: %s", ExceptionMessages.NO_AVAILABLE_TICKETS_EXCEPTION));
+            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.NO_AVAILABLE_TICKETS_EXCEPTION);
 
             throw new NoAvailableTicketsException(ExceptionMessages.NO_AVAILABLE_TICKETS_EXCEPTION);
         }

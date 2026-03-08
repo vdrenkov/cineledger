@@ -1,5 +1,6 @@
 package dev.vdrenkov.cineledger.services;
 
+import lombok.Setter;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -19,8 +20,16 @@ public class ImdbService {
 
     private final RestTemplate restTemplate;
 
+    /**
+     * -- SETTER -- Executes the set imdb key operation for imdb.
+     */
+    @Setter
     private String imdbKey;
 
+    /**
+     * -- SETTER -- Executes the set base url operation for imdb.
+     */
+    @Setter
     private String baseUrl;
 
     /**
@@ -41,26 +50,6 @@ public class ImdbService {
     }
 
     /**
-     * Executes the set imdb key operation for imdb.
-     *
-     * @param imdbKey
-     *     imdb key used by the operation
-     */
-    public void setImdbKey(String imdbKey) {
-        this.imdbKey = imdbKey;
-    }
-
-    /**
-     * Executes the set base url operation for imdb.
-     *
-     * @param baseUrl
-     *     base url used by the operation
-     */
-    public void setBaseUrl(String baseUrl) {
-        this.baseUrl = baseUrl;
-    }
-
-    /**
      * Returns movies matching the supplied criteria.
      *
      * @param filter
@@ -68,17 +57,12 @@ public class ImdbService {
      * @return resulting string value
      */
     public String getMovies(String filter) {
-        String searchUrl;
-
-        if ("top".equals(filter)) {
-            searchUrl = baseUrl + "Top250Movies/" + imdbKey;
-        } else if ("coming soon".equals(filter)) {
-            searchUrl = baseUrl + "ComingSoon/" + imdbKey;
-        } else if ("box office".equals(filter)) {
-            searchUrl = baseUrl + "BoxOfficeAllTime/" + imdbKey;
-        } else {
-            throw new IllegalArgumentException("Invalid filter type");
-        }
+        String searchUrl = switch (filter) {
+            case "top" -> baseUrl + "Top250Movies/" + imdbKey;
+            case "coming soon" -> baseUrl + "ComingSoon/" + imdbKey;
+            case "box office" -> baseUrl + "BoxOfficeAllTime/" + imdbKey;
+            case null, default -> throw new IllegalArgumentException("Invalid filter type");
+        };
 
         if (!StringUtils.hasText(imdbKey)) {
             log.info("Skipping IMDb lookup because no API key is configured");
@@ -94,7 +78,7 @@ public class ImdbService {
         }
     }
 
-    private String filterMoviesTopMovies(String responseBody) {
+    private static String filterMoviesTopMovies(String responseBody) {
         final JSONObject responseJson = new JSONObject(responseBody);
         final JSONArray movies = responseJson.getJSONArray("items");
         final JSONArray filteredMovies = new JSONArray();
@@ -106,8 +90,9 @@ public class ImdbService {
             filteredMovie.put("title", movie.getString("title"));
             filteredMovie.put("year", movie.getString("year"));
 
-            if (movie.has("image")) {
-                filteredMovie.put("image", movie.getString("image"));
+            final String IMAGE_STRING = "image";
+            if (movie.has(IMAGE_STRING)) {
+                filteredMovie.put(IMAGE_STRING, movie.getString(IMAGE_STRING));
             }
 
             filteredMovies.put(filteredMovie);
@@ -119,7 +104,7 @@ public class ImdbService {
         return resultJson.toString(2);
     }
 
-    private String emptyMoviesResponse() {
+    private static String emptyMoviesResponse() {
         return new JSONObject().put("movies", new JSONArray()).toString(2);
     }
 }

@@ -11,6 +11,7 @@ import dev.vdrenkov.cineledger.models.entities.User;
 import dev.vdrenkov.cineledger.models.requests.OrderRequest;
 import dev.vdrenkov.cineledger.models.requests.TicketRequest;
 import dev.vdrenkov.cineledger.repositories.OrderRepository;
+import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
 import dev.vdrenkov.cineledger.testutils.constants.DiscountConstants;
 import dev.vdrenkov.cineledger.testutils.constants.OrderConstants;
 import dev.vdrenkov.cineledger.testutils.constants.ReportConstants;
@@ -99,6 +100,8 @@ class OrderServiceTest {
         when(ticketService.getTicketById(anyInt())).thenReturn(TicketFactory.getDefaultTicket());
         when(itemService.getItemById(anyInt())).thenReturn(ItemFactory.getDefaultItem());
         when(userService.getUserById(anyInt())).thenReturn(UserFactory.getDefaultUser());
+        when(discountService.applyDiscount(anyDouble(), anyString())).thenThrow(
+            new DiscountNotValidException(ExceptionMessages.DISCOUNT_CODE_NOT_VALID_MESSAGE));
 
         orderRequest.setDiscountCode("Code");
         assertThrows(DiscountNotValidException.class, () -> orderService.addOrder(orderRequest));
@@ -142,6 +145,8 @@ class OrderServiceTest {
         when(ticketService.addTicket(any())).thenReturn(ticket);
         when(userService.getUserById(anyInt())).thenReturn(UserFactory.getDefaultUser());
         when(userService.isCurrentUserAuthorized(anyInt())).thenReturn(true);
+        when(discountService.applyDiscount(anyDouble(), anyString())).thenThrow(
+            new DiscountNotValidException(ExceptionMessages.DISCOUNT_CODE_NOT_VALID_MESSAGE));
 
         assertThrows(DiscountNotValidException.class,
             () -> orderService.makeReservationWithUserId(ticketRequests, OrderConstants.ID, invalidDiscount));

@@ -93,8 +93,8 @@ public class StatisticsReportService {
         final List<Integer> movieIds = movieService.getIdsOfMoviesByTitle(title);
         final List<Ticket> tickets = ticketService.getTicketsByDateBetween(startDate, endDate);
 
-        log.info(String.format("Retrieving purchased tickets count for movie with title '%s' between %s and %s", title,
-            startDate, endDate));
+        log.info("Retrieving purchased tickets count for movie with title '{}' between {} and {}", title, startDate,
+            endDate);
 
         int totalTickets = 0;
         for (Ticket ticket : tickets) {
@@ -133,32 +133,31 @@ public class StatisticsReportService {
             }
         }
 
-        log.info(
-            String.format("Retrieving purchased items count for item with name '%s' between %s and %s", name, startDate,
-                endDate));
+        log.info("Retrieving purchased items count for item with name '{}' between {} and {}", name, startDate,
+            endDate);
 
         return totalTickets;
     }
 
-    private boolean isOrderWithinDateRange(Order order, LocalDate startDate, LocalDate endDate) {
+    private static boolean isOrderWithinDateRange(Order order, LocalDate startDate, LocalDate endDate) {
         final LocalDate orderDate = order.getDateOfPurchase();
         return orderDate.isEqual(startDate) || (orderDate.isAfter(startDate) && orderDate.isBefore(endDate));
     }
 
-    private boolean isTicketWithinDateRange(Ticket ticket, LocalDate startDate, LocalDate endDate) {
+    private static boolean isTicketWithinDateRange(Ticket ticket, LocalDate startDate, LocalDate endDate) {
         final LocalDate ticketDate = ticket.getDateOfPurchase();
 
         return ticketDate.isEqual(startDate) || ticketDate.isEqual(endDate) || (ticketDate.isAfter(startDate)
             && ticketDate.isBefore(endDate));
     }
 
-    private boolean isTicketForMovieWithTitle(Ticket ticket, List<Integer> movieIds) {
+    private static boolean isTicketForMovieWithTitle(Ticket ticket, List<Integer> movieIds) {
         final int movieId = ticket.getProjection().getMovie().getId();
 
         return movieIds.contains(movieId);
     }
 
-    private boolean isTicketForMovieCategory(Ticket ticket, int id) {
+    private static boolean isTicketForMovieCategory(Ticket ticket, int id) {
         return id == ticket.getProjection().getMovie().getCategory().getId();
     }
 }

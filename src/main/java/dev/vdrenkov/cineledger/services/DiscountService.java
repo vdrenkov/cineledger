@@ -8,6 +8,7 @@ import dev.vdrenkov.cineledger.models.entities.Discount;
 import dev.vdrenkov.cineledger.models.requests.DiscountRequest;
 import dev.vdrenkov.cineledger.repositories.DiscountRepository;
 import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
+import dev.vdrenkov.cineledger.utils.constants.LogMessages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,13 +45,12 @@ public class DiscountService {
      */
     public Discount addDiscount(DiscountRequest request) {
         if (discountRepository.existsByType(request.getType()) || discountRepository.existsByCode(request.getCode())) {
-
-            log.error(String.format("Exception thrown: %s", ExceptionMessages.DISCOUNT_ALREADY_EXISTS_MESSAGE));
+            log.error("Exception thrown: {}", ExceptionMessages.DISCOUNT_ALREADY_EXISTS_MESSAGE);
 
             throw new DiscountAlreadyExistsException(ExceptionMessages.DISCOUNT_ALREADY_EXISTS_MESSAGE);
         }
 
-        log.info(String.format("An attempt to add a discount with type %s", request.getType()));
+        log.info("An attempt to add a discount with type {}", request.getType());
 
         return discountRepository.save(new Discount(request.getType(), request.getCode(), request.getPercentage()));
     }
@@ -61,7 +61,7 @@ public class DiscountService {
      * @return matching discount values
      */
     public List<Discount> getAllDiscounts() {
-        log.info("All discounts were requested from the database");
+        log.info("All discounts requested from the database");
 
         return discountRepository.findAll();
     }
@@ -85,13 +85,12 @@ public class DiscountService {
      * @return requested discount value
      */
     public Discount getDiscountById(int id) {
-        log.info(String.format("An attempt to get a discount with an id %d", id));
+        log.info("An attempt to get a discount with an id {}", id);
 
         return discountRepository.findById(id).orElseThrow(() -> {
+            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.DISCOUNT_NOT_FOUND_MESSAGE);
 
-            log.error(String.format("Exception caught: %s", ExceptionMessages.DISCOUNT_NOT_FOUND_MESSAGE));
-
-            throw new DiscountNotFoundException(ExceptionMessages.DISCOUNT_NOT_FOUND_MESSAGE);
+            return new DiscountNotFoundException(ExceptionMessages.DISCOUNT_NOT_FOUND_MESSAGE);
         });
     }
 
@@ -103,13 +102,12 @@ public class DiscountService {
      * @return requested discount value
      */
     public Discount getDiscountByCode(String code) {
-        log.info(String.format("An attempt to get a discount with a code %s", code));
+        log.info("An attempt to get a discount with a code {}", code);
 
         return discountRepository.findByCode(code).orElseThrow(() -> {
+            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.DISCOUNT_NOT_FOUND_MESSAGE);
 
-            log.error(String.format("Exception caught: %s", ExceptionMessages.DISCOUNT_NOT_FOUND_MESSAGE));
-
-            throw new DiscountNotFoundException(ExceptionMessages.DISCOUNT_NOT_FOUND_MESSAGE);
+            return new DiscountNotFoundException(ExceptionMessages.DISCOUNT_NOT_FOUND_MESSAGE);
         });
     }
 
@@ -121,13 +119,12 @@ public class DiscountService {
      * @return requested discount value
      */
     public Discount getDiscountByType(String type) {
-        log.info(String.format("An attempt to get a discount with a type %s", type));
+        log.info("An attempt to get a discount with a type {}", type);
 
         return discountRepository.findByType(type).orElseThrow(() -> {
+            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.DISCOUNT_NOT_FOUND_MESSAGE);
 
-            log.error(String.format("Exception caught: %s", ExceptionMessages.DISCOUNT_NOT_FOUND_MESSAGE));
-
-            throw new DiscountNotFoundException(ExceptionMessages.DISCOUNT_NOT_FOUND_MESSAGE);
+            return new DiscountNotFoundException(ExceptionMessages.DISCOUNT_NOT_FOUND_MESSAGE);
         });
     }
 
@@ -157,8 +154,7 @@ public class DiscountService {
         final DiscountDto discount = DiscountMapper.mapDiscountToDiscountDto(getDiscountById(id));
 
         discountRepository.save(new Discount(id, request.getType(), request.getCode(), request.getPercentage()));
-
-        log.info(String.format("Discount with id %d was updated", id));
+        log.info("Discount with id {} was updated", id);
 
         return discount;
     }
@@ -175,7 +171,7 @@ public class DiscountService {
 
         discountRepository.deleteById(id);
 
-        log.info(String.format("Discount with id %d was deleted", id));
+        log.info("Discount with id {} was deleted", id);
 
         return DiscountMapper.mapDiscountToDiscountDto(discount);
     }

@@ -1,6 +1,5 @@
 package dev.vdrenkov.cineledger.services;
 
-import dev.vdrenkov.cineledger.exceptions.DiscountNotValidException;
 import dev.vdrenkov.cineledger.exceptions.NotAuthorizedException;
 import dev.vdrenkov.cineledger.exceptions.OrderNotFoundException;
 import dev.vdrenkov.cineledger.mappers.OrderMapper;
@@ -13,6 +12,7 @@ import dev.vdrenkov.cineledger.models.requests.OrderRequest;
 import dev.vdrenkov.cineledger.models.requests.TicketRequest;
 import dev.vdrenkov.cineledger.repositories.OrderRepository;
 import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
+import dev.vdrenkov.cineledger.utils.constants.LogMessages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,14 +24,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * Contains business logic for order operations.
  */
 @Service
 public class OrderService {
-    private final Logger log = LoggerFactory.getLogger(OrderService.class);
+    private static final Logger log = LoggerFactory.getLogger(OrderService.class);
     private final DiscountService discountService;
     private final OrderRepository orderRepository;
     private final UserService userService;
@@ -75,19 +74,15 @@ public class OrderService {
      */
     @Transactional(rollbackFor = Exception.class)
     public Order addOrder(final OrderRequest request) {
-        List<Ticket> tickets = request
-            .getTicketsIds()
-            .stream()
-            .map(ticketService::getTicketById)
-            .collect(Collectors.toList());
+        final List<Ticket> tickets = request.getTicketsIds().stream().map(ticketService::getTicketById).toList();
 
         List<Item> items = new ArrayList<>();
 
-        if (Objects.nonNull(request.getItemsIds()) && !request.getItemsIds().isEmpty()) {
-            items = request.getItemsIds().stream().map(itemService::getItemById).collect(Collectors.toList());
+        if (request.getItemsIds() != null && !request.getItemsIds().isEmpty()) {
+            items = request.getItemsIds().stream().map(itemService::getItemById).toList();
 
             for (Item item : items) {
-                itemService.decrementItemQuantity(item);
+                ItemService.decrementItemQuantity(item);
             }
         }
 
@@ -96,7 +91,7 @@ public class OrderService {
         double price = calculateOrderPrice(items, tickets);
 
         final String discountCode = request.getDiscountCode();
-        if (Objects.nonNull(discountCode) && isDiscountCodeValid(discountCode)) {
+        if (discountCode != null) {
             price = discountService.applyDiscount(price, discountCode);
         }
 
@@ -131,7 +126,7 @@ public class OrderService {
         final User user = userService.getUserById(userId);
 
         if (!userService.isCurrentUserAuthorized(userId)) {
-            log.error(String.format("Exception caught: %s", ExceptionMessages.NOT_AUTHORIZED_MESSAGE));
+            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.NOT_AUTHORIZED_MESSAGE);
             throw new NotAuthorizedException(ExceptionMessages.NOT_AUTHORIZED_MESSAGE);
         }
 
@@ -141,7 +136,7 @@ public class OrderService {
 
         double price = calculateOrderPrice(items, tickets);
 
-        if (Objects.nonNull(discountCode) && isDiscountCodeValid(discountCode)) {
+        if (discountCode != null) {
             price = discountService.applyDiscount(price, discountCode);
         }
 
@@ -167,15 +162,15 @@ public class OrderService {
         boolean isAdminOrVendor = currentUser
             .getRoles()
             .stream()
-            .anyMatch(role -> role.getName().equals("ADMIN") || role.getName().equals("VENDOR"));
+            .anyMatch(role -> "ADMIN".equals(role.getName()) || "VENDOR".equals(role.getName()));
 
         if (!(isAdminOrVendor || currentUser.getId() == userId)) {
-            log.error(String.format("Exception caught: %s", ExceptionMessages.NOT_AUTHORIZED_MESSAGE));
+            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.NOT_AUTHORIZED_MESSAGE);
 
             throw new NotAuthorizedException(ExceptionMessages.NOT_AUTHORIZED_MESSAGE);
         }
 
-        log.info(String.format("All orders with user id %d were requested from the database", userId));
+        log.info("All orders with user id {} requested from the database", userId);
 
         return OrderMapper.mapOrderToOrderDtoList(orderRepository.findOrderByUserId(userId));
     }
@@ -190,8 +185,7 @@ public class OrderService {
      * @return matching order values
      */
     public List<Order> getOrdersByDateBetween(final LocalDate startDate, final LocalDate endDate) {
-        log.info(String.format("All orders with date between %s and %s were requested from the database", startDate,
-            endDate));
+        log.info("All orders with date between {} and {} requested from the database", startDate, endDate);
         return orderRepository.findOrdersByDateOfPurchaseBetween(startDate, endDate);
     }
 
@@ -207,22 +201,18 @@ public class OrderService {
     @Transactional(rollbackFor = Exception.class)
     public OrderDto updateOrder(final OrderRequest request, final int id) {
         final Order order = orderRepository.findById(id).orElseThrow(() -> {
-            log.error(String.format("Exception caught: %s", ExceptionMessages.ORDER_NOT_FOUND_MESSAGE));
+            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.ORDER_NOT_FOUND_MESSAGE);
 
-            throw new OrderNotFoundException(ExceptionMessages.ORDER_NOT_FOUND_MESSAGE);
+            return new OrderNotFoundException(ExceptionMessages.ORDER_NOT_FOUND_MESSAGE);
         });
 
         final OrderDto orderDto = OrderMapper.mapOrderToOrderDto(order);
 
-        final List<Ticket> tickets = request
-            .getTicketsIds()
-            .stream()
-            .map(ticketService::getTicketById)
-            .collect(Collectors.toList());
+        final List<Ticket> tickets = request.getTicketsIds().stream().map(ticketService::getTicketById).toList();
 
         List<Item> items = new ArrayList<>();
         if (Objects.nonNull(request.getItemsIds()) && !request.getItemsIds().isEmpty()) {
-            items = request.getItemsIds().stream().map(itemService::getItemById).collect(Collectors.toList());
+            items = request.getItemsIds().stream().map(itemService::getItemById).toList();
         }
 
         final User user = userService.getUserById(request.getUserId());
@@ -234,16 +224,16 @@ public class OrderService {
 
             for (Item item : items) {
                 if (!existingItems.remove(item)) {
-                    itemService.decrementItemQuantity(item);
+                    ItemService.decrementItemQuantity(item);
                 }
             }
 
             for (Item removedItem : existingItems) {
-                itemService.incrementItemQuantity(removedItem);
+                ItemService.incrementItemQuantity(removedItem);
             }
         } else {
             for (Item previousItem : order.getItems()) {
-                itemService.incrementItemQuantity(previousItem);
+                ItemService.incrementItemQuantity(previousItem);
             }
         }
 
@@ -254,7 +244,7 @@ public class OrderService {
 
         orderRepository.save(order);
 
-        log.info(String.format("Order with id %d was updated", id));
+        log.info("Order with id {} was updated", id);
 
         emailService.sendOrderConfirmationEmail(user, order);
 
@@ -271,37 +261,27 @@ public class OrderService {
     @Transactional
     public OrderDto deleteOrder(final int id) {
         final Order order = orderRepository.findById(id).orElseThrow(() -> {
-            log.error(String.format("Exception caught: %s", ExceptionMessages.ORDER_NOT_FOUND_MESSAGE));
-            throw new OrderNotFoundException(ExceptionMessages.ORDER_NOT_FOUND_MESSAGE);
+            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.ORDER_NOT_FOUND_MESSAGE);
+            return new OrderNotFoundException(ExceptionMessages.ORDER_NOT_FOUND_MESSAGE);
         });
 
         final OrderDto orderDto = OrderMapper.mapOrderToOrderDto(order);
 
         orderRepository.delete(order);
-        log.info(String.format("Order with id %d was deleted from the database", id));
+        log.info("Order with id {} was deleted from the database", id);
         return orderDto;
     }
 
-    private boolean isDiscountCodeValid(final String discountCode) {
-        final String regex = "\\d{4}";
-
-        if (discountCode.matches(regex)) {
-            return true;
-        } else {
-            throw new DiscountNotValidException(ExceptionMessages.DISCOUNT_CODE_NOT_VALID_MESSAGE);
-        }
-    }
-
-    private double calculateOrderPrice(final List<Item> items, final List<Ticket> tickets) {
+    private static double calculateOrderPrice(final List<Item> items, final List<Ticket> tickets) {
         double sum = 0;
 
-        if (Objects.nonNull(items) && items.size() > 0) {
+        if (Objects.nonNull(items) && !items.isEmpty()) {
             for (Item item : items) {
                 sum += item.getPrice();
             }
         }
 
-        if (Objects.nonNull(tickets) && tickets.size() > 0) {
+        if (Objects.nonNull(tickets) && !tickets.isEmpty()) {
             for (Ticket ticket : tickets) {
                 sum += ticket.getProjection().getPrice();
             }

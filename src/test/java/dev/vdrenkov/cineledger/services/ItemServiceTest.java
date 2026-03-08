@@ -177,7 +177,7 @@ class ItemServiceTest {
         final Item item = new Item();
         item.setQuantity(5);
 
-        final int incrementedQuantity = itemService.incrementItemQuantity(item);
+        final int incrementedQuantity = ItemService.incrementItemQuantity(item);
 
         assertEquals(6, incrementedQuantity);
         assertEquals(6, item.getQuantity());
@@ -191,7 +191,7 @@ class ItemServiceTest {
         final Item item = new Item();
         item.setQuantity(5);
 
-        final int decrementedQuantity = itemService.decrementItemQuantity(item);
+        final int decrementedQuantity = ItemService.decrementItemQuantity(item);
 
         assertEquals(4, decrementedQuantity);
         assertEquals(4, item.getQuantity());
@@ -205,7 +205,7 @@ class ItemServiceTest {
         final Item item = new Item();
         item.setQuantity(0);
 
-        assertThrows(NoAvailableItemsException.class, () -> itemService.decrementItemQuantity(item));
+        assertThrows(NoAvailableItemsException.class, () -> ItemService.decrementItemQuantity(item));
     }
 
     /**

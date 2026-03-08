@@ -8,6 +8,7 @@ import dev.vdrenkov.cineledger.models.entities.Category;
 import dev.vdrenkov.cineledger.models.requests.CategoryRequest;
 import dev.vdrenkov.cineledger.repositories.CategoryRepository;
 import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
+import dev.vdrenkov.cineledger.utils.constants.LogMessages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,7 @@ import java.util.List;
  */
 @Service
 public class CategoryService {
-    private final static Logger log = LoggerFactory.getLogger(CategoryService.class);
+    private static final Logger log = LoggerFactory.getLogger(CategoryService.class);
 
     private final CategoryRepository categoryRepository;
 
@@ -69,7 +70,7 @@ public class CategoryService {
      * @return category dto result
      */
     public CategoryDto getCategoryDtoById(int id) {
-        log.info(String.format("An attempt to extract category with id %d from the database", id));
+        log.info("An attempt to extract category DTO with id {} from the database", id);
 
         return CategoryMapper.mapCategoryToCategoryDto(getCategoryById(id));
     }
@@ -82,13 +83,12 @@ public class CategoryService {
      * @return category dto result
      */
     public CategoryDto getCategoryDtoByName(String name) {
-        log.info(String.format("An attempt to extract category with name %s from the database", name));
+        log.info("An attempt to extract category with name {} from the database", name);
 
         return CategoryMapper.mapCategoryToCategoryDto(categoryRepository.findByName(name).orElseThrow(() -> {
+            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.CATEGORY_NOT_FOUND_MESSAGE);
 
-            log.error(String.format("Exception caught: %s", ExceptionMessages.CATEGORY_NOT_FOUND_MESSAGE));
-
-            throw new CategoryNotFoundException(ExceptionMessages.CATEGORY_NOT_FOUND_MESSAGE);
+            return new CategoryNotFoundException(ExceptionMessages.CATEGORY_NOT_FOUND_MESSAGE);
         }));
     }
 
@@ -100,13 +100,12 @@ public class CategoryService {
      * @return requested category value
      */
     public Category getCategoryById(int id) {
-        log.info(String.format("An attempt to extract category with id %d from the database", id));
+        log.info("An attempt to extract category with id {} from the database", id);
 
         return categoryRepository.findById(id).orElseThrow(() -> {
+            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.CATEGORY_NOT_FOUND_MESSAGE);
 
-            log.error(String.format("Exception caught: %s", ExceptionMessages.CATEGORY_NOT_FOUND_MESSAGE));
-
-            throw new CategoryNotFoundException(ExceptionMessages.CATEGORY_NOT_FOUND_MESSAGE);
+            return new CategoryNotFoundException(ExceptionMessages.CATEGORY_NOT_FOUND_MESSAGE);
         });
     }
 
@@ -122,8 +121,7 @@ public class CategoryService {
     public CategoryDto updateCategory(CategoryRequest categoryRequest, int categoryId) {
         final CategoryDto categoryDto = getCategoryDtoById(categoryId);
 
-        log.info(String.format("An attempt to update category with id %d in the database", categoryId));
-
+        log.info("An attempt to update category with id {} in the database", categoryId);
         categoryRepository.save(new Category(categoryId, categoryRequest.getName()));
         return categoryDto;
     }
@@ -139,14 +137,14 @@ public class CategoryService {
         final CategoryDto categoryDto = getCategoryDtoById(categoryId);
         categoryRepository.deleteById(categoryId);
 
-        log.info(String.format("Category with id %d was deleted", categoryId));
+        log.info("Category with id {} was deleted", categoryId);
 
         return categoryDto;
     }
 
     private void categoryValidation(CategoryRequest categoryRequest) {
         categoryRepository.findByName(categoryRequest.getName()).ifPresent(category -> {
-            log.error(String.format("Exception caught: %s", ExceptionMessages.CATEGORY_ALREADY_EXISTS_MESSAGE));
+            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.CATEGORY_ALREADY_EXISTS_MESSAGE);
 
             throw new CategoryAlreadyExistsException(ExceptionMessages.CATEGORY_ALREADY_EXISTS_MESSAGE);
         });

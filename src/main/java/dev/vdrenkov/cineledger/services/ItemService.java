@@ -9,6 +9,7 @@ import dev.vdrenkov.cineledger.models.entities.Item;
 import dev.vdrenkov.cineledger.models.requests.ItemRequest;
 import dev.vdrenkov.cineledger.repositories.ItemRepository;
 import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
+import dev.vdrenkov.cineledger.utils.constants.LogMessages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,10 +47,10 @@ public class ItemService {
      * @return requested item value
      */
     public Item addItem(ItemRequest itemRequest) {
-        log.info(String.format("An attempt to add item with name '%s' in thee database", itemRequest.getName()));
+        log.info("An attempt to add item with name '{}' in thee database", itemRequest.getName());
 
         this.itemRepository.findByName(itemRequest.getName()).ifPresent(item -> {
-            log.error(String.format("Exception caught: %s", ExceptionMessages.ITEM_ALREADY_EXISTS_MESSAGE));
+            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.ITEM_ALREADY_EXISTS_MESSAGE);
 
             throw new ItemAlreadyExistsException(ExceptionMessages.ITEM_ALREADY_EXISTS_MESSAGE);
         });
@@ -67,7 +68,7 @@ public class ItemService {
      * @return item dto result
      */
     public ItemDto getItemDtoById(int id) {
-        log.info(String.format("An attempt to extract item DTO with id %d from the database", id));
+        log.info("An attempt to extract item DTO with id {} from the database", id);
 
         return ItemMapper.mapItemToItemDto(getItemById(id));
     }
@@ -80,13 +81,13 @@ public class ItemService {
      * @return requested item value
      */
     public Item getItemById(int id) {
-        log.info(String.format("An attempt to extract item with id %d from the database", id));
+        log.info("An attempt to extract item with id {} from the database", id);
 
         return itemRepository.findById(id).orElseThrow(() -> {
 
-            log.error(String.format("Exception caught: %s", ExceptionMessages.ITEM_NOT_FOUND_MESSAGE));
+            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.ITEM_NOT_FOUND_MESSAGE);
 
-            throw new ItemNotFoundException(ExceptionMessages.ITEM_NOT_FOUND_MESSAGE);
+            return new ItemNotFoundException(ExceptionMessages.ITEM_NOT_FOUND_MESSAGE);
         });
     }
 
@@ -98,12 +99,12 @@ public class ItemService {
      * @return item dto result
      */
     public ItemDto getItemDtoByName(String itemName) {
-        log.info(String.format("An attempt to extract item with name %s from the database", itemName));
+        log.info("An attempt to extract item with name {} from the database", itemName);
 
         return ItemMapper.mapItemToItemDto(itemRepository.findByName(itemName).orElseThrow(() -> {
-            log.error(String.format("Exception caught: %s", ExceptionMessages.ITEM_NOT_FOUND_MESSAGE));
+            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.ITEM_NOT_FOUND_MESSAGE);
 
-            throw new ItemNotFoundException(ExceptionMessages.ITEM_NOT_FOUND_MESSAGE);
+            return new ItemNotFoundException(ExceptionMessages.ITEM_NOT_FOUND_MESSAGE);
         }));
     }
 
@@ -116,7 +117,7 @@ public class ItemService {
      *     whether below should be applied
      * @return matching item dto values
      */
-    public List<ItemDto> getItemsByQuantity(int quantity, Boolean isBelow) {
+    public List<ItemDto> getItemsByQuantity(int quantity, boolean isBelow) {
         final List<ItemDto> filteredItems = new ArrayList<>();
         final List<ItemDto> itemList = getAllItems();
 
@@ -165,7 +166,7 @@ public class ItemService {
     public ItemDto editItem(ItemRequest itemRequest, int id) {
         final ItemDto itemDto = getItemDtoById(id);
 
-        log.info(String.format("An attempt to update item with id %d in the database", id));
+        log.info("An attempt to update item with id {} in the database", id);
 
         itemRepository.save(new Item(id, itemRequest.getName(), itemRequest.getPrice(), itemRequest.getQuantity()));
 
@@ -184,7 +185,7 @@ public class ItemService {
 
         itemRepository.deleteById(id);
 
-        log.info(String.format("Item with id %d was deleted", id));
+        log.info("Item with id {} was deleted", id);
 
         return itemDto;
     }
@@ -196,7 +197,7 @@ public class ItemService {
      *     item entity to transform
      * @return requested int value
      */
-    public int incrementItemQuantity(Item item) {
+    public static int incrementItemQuantity(Item item) {
         final int currentQuantity = item.getQuantity();
         final int incrementedQuantity = currentQuantity + 1;
 
@@ -212,14 +213,14 @@ public class ItemService {
      *     item entity to transform
      * @return requested int value
      */
-    public int decrementItemQuantity(Item item) {
+    public static int decrementItemQuantity(Item item) {
         final int currentQuantity = item.getQuantity();
         final int decrementedQuantity = currentQuantity - 1;
 
         item.setQuantity(decrementedQuantity);
 
         if (currentQuantity <= 0) {
-            log.error(String.format("Exception caught: %s", ExceptionMessages.NO_AVAILABLE_ITEMS_EXCEPTION));
+            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.NO_AVAILABLE_ITEMS_EXCEPTION);
 
             throw new NoAvailableItemsException(ExceptionMessages.NO_AVAILABLE_ITEMS_EXCEPTION);
         }

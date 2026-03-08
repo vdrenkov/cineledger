@@ -10,6 +10,7 @@ import dev.vdrenkov.cineledger.models.entities.Program;
 import dev.vdrenkov.cineledger.models.requests.ProgramRequest;
 import dev.vdrenkov.cineledger.repositories.ProgramRepository;
 import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
+import dev.vdrenkov.cineledger.utils.constants.LogMessages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Contains business logic for program operations.
@@ -52,7 +52,7 @@ public class ProgramService {
      */
     public Program addProgram(ProgramRequest request) {
         if (isDateNotValid(request.getProgramDate())) {
-            log.error(String.format("Exception caught: %s", ExceptionMessages.DATE_NOT_VALID_MESSAGE));
+            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.DATE_NOT_VALID_MESSAGE);
 
             throw new DateNotValidException(ExceptionMessages.DATE_NOT_VALID_MESSAGE);
         }
@@ -61,7 +61,7 @@ public class ProgramService {
             .findByProgramDateAndCinemaId(request.getProgramDate(), request.getCinemaId())
             .ifPresent(existingProgram -> {
 
-                log.error(String.format("Exception caught: %s", ExceptionMessages.PROGRAM_ALREADY_EXISTS_MESSAGE));
+                log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.PROGRAM_ALREADY_EXISTS_MESSAGE);
                 throw new ProgramAlreadyExistsException(ExceptionMessages.PROGRAM_ALREADY_EXISTS_MESSAGE);
             });
 
@@ -79,12 +79,12 @@ public class ProgramService {
      * @return matching program dto values
      */
     public List<ProgramDto> getAllPrograms(LocalDate date) {
-        if (Objects.nonNull(date)) {
-            log.info(String.format("All programs with date %s were requested from the database", date));
+        if (date != null) {
+            log.info("All programs with date {} requested from the database", date);
 
             return ProgramMapper.mapProgramListToProgramDtoList(programRepository.findAllByProgramDate(date));
         } else {
-            log.info("All programs were requested from the database");
+            log.info("All programs requested from the database");
 
             return ProgramMapper.mapProgramListToProgramDtoList(programRepository.findAll());
         }
@@ -98,7 +98,7 @@ public class ProgramService {
      * @return matching program dto values
      */
     public List<ProgramDto> getProgramsByCinemaId(int cinemaId) {
-        log.info(String.format("All programs with cinema id %d were requested from the database", cinemaId));
+        log.info("All programs with cinema id {} requested from the database", cinemaId);
 
         final Cinema cinema = cinemaService.getCinemaById(cinemaId);
 
@@ -113,13 +113,12 @@ public class ProgramService {
      * @return requested program value
      */
     public Program getProgramById(int id) {
-        log.info(String.format("An attempt to extract a program with an id %d from the database", id));
+        log.info("An attempt to extract a program with an id {} from the database", id);
 
         return programRepository.findById(id).orElseThrow(() -> {
+            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.PROGRAM_NOT_FOUND_MESSAGE);
 
-            log.error(String.format("Exception caught: %s", ExceptionMessages.PROGRAM_NOT_FOUND_MESSAGE));
-
-            throw new ProgramNotFoundException(ExceptionMessages.PROGRAM_NOT_FOUND_MESSAGE);
+            return new ProgramNotFoundException(ExceptionMessages.PROGRAM_NOT_FOUND_MESSAGE);
         });
     }
 
@@ -131,7 +130,7 @@ public class ProgramService {
      * @return program dto result
      */
     public ProgramDto getProgramDtoById(int id) {
-        log.info(String.format("An attempt to extract a program DTO with an id %d from the database", id));
+        log.info("An attempt to extract a program DTO with an id {} from the database", id);
 
         return ProgramMapper.mapProgramToProgramDto(getProgramById(id));
     }
@@ -149,8 +148,7 @@ public class ProgramService {
         final ProgramDto programDto = getProgramDtoById(programId);
 
         if (isDateNotValid(request.getProgramDate())) {
-
-            log.error(String.format("Exception caught: %s", ExceptionMessages.DATE_NOT_VALID_MESSAGE));
+            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.DATE_NOT_VALID_MESSAGE);
 
             throw new DateNotValidException(ExceptionMessages.DATE_NOT_VALID_MESSAGE);
         }
@@ -158,7 +156,7 @@ public class ProgramService {
         programRepository.save(
             new Program(programId, request.getProgramDate(), cinemaService.getCinemaById(request.getCinemaId())));
 
-        log.info(String.format("Program with an id %d has been updated", programId));
+        log.info("Program with an id {} updated", programId);
 
         return programDto;
     }
@@ -175,7 +173,7 @@ public class ProgramService {
 
         programRepository.deleteById(programId);
 
-        log.info(String.format("Program with an id %d has been deleted", programId));
+        log.info("Program with an id {} deleted", programId);
 
         return programDto;
     }
@@ -187,7 +185,7 @@ public class ProgramService {
      *     date used by the operation
      * @return true when the requested condition holds; otherwise false
      */
-    public boolean isDateNotValid(LocalDate date) {
+    public static boolean isDateNotValid(LocalDate date) {
         return date.isBefore(LocalDate.now());
     }
 }

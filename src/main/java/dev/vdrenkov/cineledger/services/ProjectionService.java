@@ -11,6 +11,7 @@ import dev.vdrenkov.cineledger.models.entities.Projection;
 import dev.vdrenkov.cineledger.models.requests.ProjectionRequest;
 import dev.vdrenkov.cineledger.repositories.ProjectionRepository;
 import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
+import dev.vdrenkov.cineledger.utils.constants.LogMessages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,7 +68,7 @@ public class ProjectionService {
 
         final boolean isHallAvailable = isHallAvailable(hall.getId(), program.getId(), startTime);
         if (!isHallAvailable) {
-            log.error(String.format("Exception caught: %s", ExceptionMessages.HALL_NOT_AVAILABLE_EXCEPTION));
+            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.HALL_NOT_AVAILABLE_EXCEPTION);
 
             throw new HallNotAvailableException(ExceptionMessages.HALL_NOT_AVAILABLE_EXCEPTION);
         }
@@ -89,7 +90,7 @@ public class ProjectionService {
     public List<ProjectionDto> getProjectionsByProgramId(int programId) {
         final Program program = programService.getProgramById(programId);
 
-        log.info(String.format("All projections with program id %d were requested from the database", programId));
+        log.info("All projections with program id {} requested from the database", programId);
 
         return ProjectionMapper.mapProjectionListToProjectionDtoList(
             projectionRepository.findProjectionsByProgramId(program.getId()));
@@ -105,7 +106,7 @@ public class ProjectionService {
     public List<ProjectionDto> getProjectionsByMovieId(int movieId) {
         final Movie movie = movieService.getMovieById(movieId);
 
-        log.info(String.format("All projections with movie id %d were requested from the database", movieId));
+        log.info("All projections with movie id {} requested from the database", movieId);
 
         return ProjectionMapper.mapProjectionListToProjectionDtoList(
             projectionRepository.findProjectionsByMovieId(movie.getId()));
@@ -120,17 +121,15 @@ public class ProjectionService {
      *     whether to match data before the provided boundary
      * @return matching projection dto values
      */
-    public List<ProjectionDto> getProjectionsByStartTime(LocalTime startTime, Boolean isBefore) {
+    public List<ProjectionDto> getProjectionsByStartTime(LocalTime startTime, boolean isBefore) {
         List<Projection> projections;
 
         if (isBefore) {
-            log.info(
-                String.format("All projections by start time before %s were requested from the database", startTime));
+            log.info("All projections by start time before {} requested from the database", startTime);
 
             projections = projectionRepository.findProjectionsByStartTimeBefore(startTime);
         } else {
-            log.info(
-                String.format("All projections by start time after %s were requested from the database", startTime));
+            log.info("All projections by start time after {} requested from the database", startTime);
 
             projections = projectionRepository.findProjectionsByStartTimeAfter(startTime);
         }
@@ -146,12 +145,12 @@ public class ProjectionService {
      * @return requested projection value
      */
     public Projection getProjectionById(int id) {
-        log.info(String.format("An attempt to extract a projection with an id %d from the database", id));
+        log.info("An attempt to extract a projection with an id {} from the database", id);
 
         return projectionRepository.findById(id).orElseThrow(() -> {
-            log.error(String.format("Exception caught: %s", ExceptionMessages.PROJECTION_NOT_FOUND_MESSAGE));
+            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.PROJECTION_NOT_FOUND_MESSAGE);
 
-            throw new ProgramNotFoundException(ExceptionMessages.PROJECTION_NOT_FOUND_MESSAGE);
+            return new ProgramNotFoundException(ExceptionMessages.PROJECTION_NOT_FOUND_MESSAGE);
         });
     }
 
@@ -163,7 +162,7 @@ public class ProjectionService {
      * @return projection dto result
      */
     public ProjectionDto getProjectionDtoById(int id) {
-        log.info(String.format("An attempt to extract a projection DTO with an id %d from the database", id));
+        log.info("An attempt to extract a projection DTO with an id {} from the database", id);
 
         return ProjectionMapper.mapProjectionToProjectionDto(getProjectionById(id));
     }
@@ -186,7 +185,7 @@ public class ProjectionService {
 
         final boolean isHallAvailable = isHallAvailable(hall.getId(), program.getId(), startTime);
         if (!isHallAvailable) {
-            log.error(String.format("Exception caught: %s", ExceptionMessages.HALL_NOT_AVAILABLE_EXCEPTION));
+            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.HALL_NOT_AVAILABLE_EXCEPTION);
 
             throw new HallNotAvailableException(ExceptionMessages.HALL_NOT_AVAILABLE_EXCEPTION);
         }
@@ -194,7 +193,7 @@ public class ProjectionService {
         final Projection projection = new Projection(id, request.getPrice(), hall, program, movie, startTime);
         projectionRepository.save(projection);
 
-        log.info(String.format("Projection with an id %d has been updated", id));
+        log.info("Projection with an id {} updated", id);
 
         return projectionDto;
     }
@@ -211,7 +210,7 @@ public class ProjectionService {
 
         projectionRepository.deleteById(id);
 
-        log.info(String.format("Projection with an id %d has been deleted", id));
+        log.info("Projection with an id {} deleted", id);
 
         return projectionDto;
     }
