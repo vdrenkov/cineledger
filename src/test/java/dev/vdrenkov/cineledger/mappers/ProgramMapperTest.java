@@ -52,7 +52,7 @@ class ProgramMapperTest {
         List<ProgramDto> resultList = programMapper.mapProgramListToProgramDtoList(
             ProgramFactory.getDefaultProgramList());
 
-        final ProgramDto resultDto = resultList.get(0);
+        final ProgramDto resultDto = resultList.getFirst();
 
         Assertions.assertEquals(ProgramConstants.ID, resultDto.getId());
         Assertions.assertEquals(ProgramConstants.DATE, resultDto.getProgramDate());

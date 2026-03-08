@@ -16,8 +16,9 @@ public final class HttpCookieConstants {
      */
     public static final String COOKIE_VALUE = "Value";
 
-    private HttpCookieConstants() throws IllegalAccessException {
-        throw new IllegalAccessException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
+    private HttpCookieConstants() {
+        throw new IllegalStateException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
     }
 }
+
 

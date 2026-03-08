@@ -11,7 +11,7 @@ import static dev.vdrenkov.cineledger.testutil.constants.HttpCookieConstants.COO
 public final class HttpCookieFactory {
 
     private HttpCookieFactory() throws IllegalAccessException {
-        throw new IllegalAccessException();
+        throw new IllegalAccessException("Utility class. Do not instantiate!");
     }
 
     /**

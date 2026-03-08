@@ -51,7 +51,7 @@ class HallMapperTest {
         when(cinemaMapper.mapCinemaToCinemaDto(any())).thenReturn(CinemaFactory.getDefaultCinemaDto());
 
         final List<HallDto> hallDtoList = hallMapper.mapHallListToHallDtoList(HallFactory.getDefaultHallList());
-        final HallDto hallDto = hallDtoList.get(0);
+        final HallDto hallDto = hallDtoList.getFirst();
 
         Assertions.assertEquals(HallConstants.ID, hallDto.getId());
         Assertions.assertEquals(HallConstants.CAPACITY, hallDto.getCapacity());

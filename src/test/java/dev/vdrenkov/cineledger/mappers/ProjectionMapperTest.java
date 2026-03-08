@@ -70,7 +70,7 @@ class ProjectionMapperTest {
         List<ProjectionDto> resultList = projectionMapper.mapProjectionListToProjectionDtoList(
             ProjectionFactory.getDefaultProjectionList());
 
-        final ProjectionDto resultDto = resultList.get(0);
+        final ProjectionDto resultDto = resultList.getFirst();
 
         Assertions.assertEquals(ProjectionConstants.ID, resultDto.getId());
         Assertions.assertEquals(ProjectionConstants.PROJECTION_HALL_DTO.getId(), resultDto.getHall().getId());

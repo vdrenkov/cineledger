@@ -1,7 +1,5 @@
 package dev.vdrenkov.cineledger.services;
 
-import com.mailjet.client.errors.MailjetException;
-import com.mailjet.client.errors.MailjetSocketTimeoutException;
 import dev.vdrenkov.cineledger.exceptions.DiscountNotValidException;
 import dev.vdrenkov.cineledger.exceptions.NotAuthorizedException;
 import dev.vdrenkov.cineledger.exceptions.OrderNotFoundException;
@@ -12,6 +10,7 @@ import dev.vdrenkov.cineledger.models.entities.Order;
 import dev.vdrenkov.cineledger.models.entities.Ticket;
 import dev.vdrenkov.cineledger.models.entities.User;
 import dev.vdrenkov.cineledger.models.requests.OrderRequest;
+import dev.vdrenkov.cineledger.models.requests.TicketRequest;
 import dev.vdrenkov.cineledger.repositories.OrderRepository;
 import dev.vdrenkov.cineledger.testutil.constants.DiscountConstants;
 import dev.vdrenkov.cineledger.testutil.constants.OrderConstants;
@@ -50,6 +49,8 @@ import static org.mockito.Mockito.when;
  */
 @ExtendWith(MockitoExtension.class)
 class OrderServiceTest {
+    final List<TicketRequest> ticketRequests = Collections.singletonList(TicketFactory.getDefaultTicketRequest());
+    final OrderRequest orderRequest = OrderFactory.getDefaultOrderRequest();
 
     @Mock
     private OrderMapper orderMapper;
@@ -79,7 +80,7 @@ class OrderServiceTest {
      * Verifies that add Order no Exceptions success.
      */
     @Test
-    void testAddOrder_noExceptions_success() throws MailjetSocketTimeoutException, MailjetException {
+    void testAddOrder_noExceptions_success() {
         final Order expected = OrderFactory.getDefaultOrder();
 
         when(ticketService.getTicketById(anyInt())).thenReturn(TicketFactory.getDefaultTicket());
@@ -88,7 +89,7 @@ class OrderServiceTest {
         when(orderRepository.save(any())).thenReturn(OrderFactory.getDefaultOrder());
         when(discountService.applyDiscount(anyDouble(), anyString())).thenReturn(OrderConstants.TOTAL_PRICE);
 
-        final Order order = orderService.addOrder(OrderFactory.getDefaultOrderRequest());
+        final Order order = orderService.addOrder(orderRequest);
 
         assertEquals(expected, order);
         verify(emailService).sendOrderConfirmationEmail(any(), any());
@@ -98,26 +99,20 @@ class OrderServiceTest {
      * Verifies that add Order discount Code Not Valid throws Discount Not Found Exception.
      */
     @Test
-    void testAddOrder_discountCodeNotValid_throwsDiscountNotFoundException()
-        throws MailjetSocketTimeoutException, MailjetException {
-        assertThrows(DiscountNotValidException.class, () -> {
+    void testAddOrder_discountCodeNotValid_throwsDiscountNotFoundException() {
+        when(ticketService.getTicketById(anyInt())).thenReturn(TicketFactory.getDefaultTicket());
+        when(itemService.getItemById(anyInt())).thenReturn(ItemFactory.getDefaultItem());
+        when(userService.getUserById(anyInt())).thenReturn(UserFactory.getDefaultUser());
 
-            when(ticketService.getTicketById(anyInt())).thenReturn(TicketFactory.getDefaultTicket());
-            when(itemService.getItemById(anyInt())).thenReturn(ItemFactory.getDefaultItem());
-            when(userService.getUserById(anyInt())).thenReturn(UserFactory.getDefaultUser());
-
-            final OrderRequest orderRequest = OrderFactory.getDefaultOrderRequest();
-            orderRequest.setDiscountCode("Code");
-            orderService.addOrder(orderRequest);
-
-        });
+        orderRequest.setDiscountCode("Code");
+        assertThrows(DiscountNotValidException.class, () -> orderService.addOrder(orderRequest));
     }
 
     /**
      * Verifies that make Reservation With User Id no Exceptions success.
      */
     @Test
-    void testMakeReservationWithUserId_noExceptions_success() throws MailjetSocketTimeoutException, MailjetException {
+    void testMakeReservationWithUserId_noExceptions_success() {
         final Order expected = OrderFactory.getDefaultOrder();
         final Ticket ticket = new Ticket();
         ticket.setId(OrderConstants.ID);
@@ -130,9 +125,7 @@ class OrderServiceTest {
         when(orderRepository.save(any())).thenReturn(expected);
         when(discountService.applyDiscount(anyDouble(), anyString())).thenReturn(OrderConstants.TOTAL_PRICE);
 
-        Order order = orderService.makeReservationWithUserId(
-            Collections.singletonList(TicketFactory.getDefaultTicketRequest()), OrderConstants.ID,
-            DiscountConstants.CODE);
+        Order order = orderService.makeReservationWithUserId(ticketRequests, OrderConstants.ID, DiscountConstants.CODE);
 
         assertEquals(expected, order);
     }
@@ -141,41 +134,31 @@ class OrderServiceTest {
      * Verifies that make Reservation With User Id discount Code Not Valid throws Discount Not Found Exception.
      */
     @Test
-    void testMakeReservationWithUserId_discountCodeNotValid_throwsDiscountNotFoundException()
-        throws MailjetSocketTimeoutException, MailjetException {
-        assertThrows(DiscountNotValidException.class, () -> {
+    void testMakeReservationWithUserId_discountCodeNotValid_throwsDiscountNotFoundException() {
+        final Ticket ticket = new Ticket();
+        ticket.setId(OrderConstants.ID);
+        ticket.setDateOfPurchase(LocalDate.now());
+        ticket.setProjection(ProjectionFactory.getDefaultProjection());
 
-            final Ticket ticket = new Ticket();
-            ticket.setId(OrderConstants.ID);
-            ticket.setDateOfPurchase(LocalDate.now());
-            ticket.setProjection(ProjectionFactory.getDefaultProjection());
+        final String invalidDiscount = "ABC";
 
-            final String invalidDiscount = "ABC";
+        when(ticketService.addTicket(any())).thenReturn(ticket);
+        when(userService.getUserById(anyInt())).thenReturn(UserFactory.getDefaultUser());
+        when(userService.isCurrentUserAuthorized(anyInt())).thenReturn(true);
 
-            when(ticketService.addTicket(any())).thenReturn(ticket);
-            when(userService.getUserById(anyInt())).thenReturn(UserFactory.getDefaultUser());
-            when(userService.isCurrentUserAuthorized(anyInt())).thenReturn(true);
-
-            orderService.makeReservationWithUserId(Collections.singletonList(TicketFactory.getDefaultTicketRequest()),
-                OrderConstants.ID, invalidDiscount);
-
-        });
+        assertThrows(DiscountNotValidException.class,
+            () -> orderService.makeReservationWithUserId(ticketRequests, OrderConstants.ID, invalidDiscount));
     }
 
     /**
      * Verifies that make Reservation With User Id invalid User Id throws Not Authorized Exception.
      */
     @Test
-    void testMakeReservationWithUserId_invalidUserId_throwsNotAuthorizedException()
-        throws MailjetSocketTimeoutException, MailjetException {
-        assertThrows(NotAuthorizedException.class, () -> {
+    void testMakeReservationWithUserId_invalidUserId_throwsNotAuthorizedException() {
+        when(userService.isCurrentUserAuthorized(anyInt())).thenReturn(false);
 
-            when(userService.isCurrentUserAuthorized(anyInt())).thenReturn(false);
-
-            orderService.makeReservationWithUserId(Collections.singletonList(TicketFactory.getDefaultTicketRequest()),
-                OrderConstants.ID, null);
-
-        });
+        assertThrows(NotAuthorizedException.class,
+            () -> orderService.makeReservationWithUserId(ticketRequests, OrderConstants.ID, null));
     }
 
     /**
@@ -202,24 +185,18 @@ class OrderServiceTest {
      */
     @Test
     void testGetOrdersByUserId_invalidUserId_throwsNotAuthorizedException() {
-        assertThrows(NotAuthorizedException.class, () -> {
+        final User user = UserFactory.getDefaultUser();
+        when(userService.getCurrentUser()).thenReturn(user);
 
-            final User user = UserFactory.getDefaultUser();
-
-            when(userService.getCurrentUser()).thenReturn(user);
-
-            final int invalidUserId = 999;
-
-            orderService.getOrdersByUserId(invalidUserId);
-
-        });
+        final int invalidUserId = 999;
+        assertThrows(NotAuthorizedException.class, () -> orderService.getOrdersByUserId(invalidUserId));
     }
 
     /**
      * Verifies that update Order no Exceptions success.
      */
     @Test
-    void testUpdateOrder_noExceptions_success() throws MailjetSocketTimeoutException, MailjetException {
+    void testUpdateOrder_noExceptions_success() {
         final OrderDto expected = OrderFactory.getDefaultOrderDto();
 
         when(orderRepository.findById(anyInt())).thenReturn(Optional.of(OrderFactory.getDefaultOrder()));
@@ -232,12 +209,11 @@ class OrderServiceTest {
         newItem.setId(999);
         when(itemService.getItemById(newItem.getId())).thenReturn(newItem);
 
-        final OrderRequest request = OrderFactory.getDefaultOrderRequest();
-        request.setItemsIds(Collections.singletonList(newItem.getId()));
-        final OrderDto result = orderService.updateOrder(request, OrderConstants.ID);
+        orderRequest.setItemsIds(Collections.singletonList(newItem.getId()));
+        final OrderDto result = orderService.updateOrder(orderRequest, OrderConstants.ID);
 
-        request.setItemsIds(new ArrayList<>());
-        orderService.updateOrder(request, OrderConstants.ID);
+        orderRequest.setItemsIds(new ArrayList<>());
+        orderService.updateOrder(orderRequest, OrderConstants.ID);
 
         assertEquals(expected, result);
     }
@@ -246,14 +222,10 @@ class OrderServiceTest {
      * Verifies that update Order Order Not Found Exception fail.
      */
     @Test
-    void testUpdateOrder_OrderNotFoundException_fail() throws MailjetSocketTimeoutException, MailjetException {
-        assertThrows(OrderNotFoundException.class, () -> {
+    void testUpdateOrder_OrderNotFoundException_fail() {
+        when(orderRepository.findById(anyInt())).thenReturn(Optional.empty());
 
-            when(orderRepository.findById(anyInt())).thenReturn(Optional.empty());
-
-            orderService.updateOrder(OrderFactory.getDefaultOrderRequest(), OrderConstants.ID);
-
-        });
+        assertThrows(OrderNotFoundException.class, () -> orderService.updateOrder(orderRequest, OrderConstants.ID));
     }
 
     /**
@@ -276,13 +248,9 @@ class OrderServiceTest {
      */
     @Test
     void testDeleteOrder_OrderNotFoundException_fail() {
-        assertThrows(OrderNotFoundException.class, () -> {
+        when(orderRepository.findById(anyInt())).thenReturn(Optional.empty());
 
-            when(orderRepository.findById(anyInt())).thenReturn(Optional.empty());
-
-            orderService.deleteOrder(OrderConstants.ID);
-
-        });
+        assertThrows(OrderNotFoundException.class, () -> orderService.deleteOrder(OrderConstants.ID));
     }
 
     /**

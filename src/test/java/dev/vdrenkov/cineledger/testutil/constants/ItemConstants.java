@@ -28,9 +28,10 @@ public final class ItemConstants {
      */
     public static final boolean IS_BELLOW = false;
 
-    private ItemConstants() throws IllegalAccessException {
-        throw new IllegalAccessException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
+    private ItemConstants() {
+        throw new IllegalStateException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
     }
 }
+
 
 

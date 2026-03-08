@@ -91,12 +91,9 @@ class HallServiceTest {
      */
     @Test
     void testGetHallById_hallNotFound_throwsHallNotFoundException() {
-        assertThrows(HallNotFoundException.class, () -> {
+        when(hallRepository.findById(anyInt())).thenReturn(Optional.empty());
 
-            when(hallRepository.findById(anyInt())).thenReturn(Optional.empty());
-            hallService.getHallById(HallConstants.ID);
-
-        });
+        assertThrows(HallNotFoundException.class, () -> hallService.getHallById(HallConstants.ID));
     }
 
     /**

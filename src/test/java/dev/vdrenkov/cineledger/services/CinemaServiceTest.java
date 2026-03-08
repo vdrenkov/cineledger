@@ -5,6 +5,7 @@ import dev.vdrenkov.cineledger.exceptions.CinemaNotFoundException;
 import dev.vdrenkov.cineledger.mappers.CinemaMapper;
 import dev.vdrenkov.cineledger.models.dtos.CinemaDto;
 import dev.vdrenkov.cineledger.models.entities.Cinema;
+import dev.vdrenkov.cineledger.models.requests.CinemaRequest;
 import dev.vdrenkov.cineledger.repositories.CinemaRepository;
 import dev.vdrenkov.cineledger.testutil.constants.CinemaConstants;
 import dev.vdrenkov.cineledger.testutil.factories.CinemaFactory;
@@ -29,6 +30,7 @@ import static org.mockito.Mockito.when;
  */
 @ExtendWith(MockitoExtension.class)
 class CinemaServiceTest {
+    final CinemaRequest cinemaRequest = CinemaFactory.getDefaultCinemaRequest();
 
     @Mock
     private CinemaRepository cinemaRepository;
@@ -47,7 +49,7 @@ class CinemaServiceTest {
         final Cinema expected = CinemaFactory.getDefaultCinema();
         when(cinemaRepository.save(any())).thenReturn(expected);
 
-        final Cinema cinema = cinemaService.addCinema(CinemaFactory.getDefaultCinemaRequest());
+        final Cinema cinema = cinemaService.addCinema(cinemaRequest);
 
         assertEquals(expected, cinema);
     }
@@ -57,13 +59,9 @@ class CinemaServiceTest {
      */
     @Test
     void testAddCinema_cinemaExists_success() {
-        assertThrows(CinemaAlreadyExistsException.class, () -> {
+        when(cinemaRepository.findByCityAndAddress(anyString(), anyString())).thenReturn(Optional.of(new Cinema()));
 
-            when(cinemaRepository.findByCityAndAddress(anyString(), anyString())).thenReturn(Optional.of(new Cinema()));
-
-            cinemaService.addCinema(CinemaFactory.getDefaultCinemaRequest());
-
-        });
+        assertThrows(CinemaAlreadyExistsException.class, () -> cinemaService.addCinema(cinemaRequest));
     }
 
     /**
@@ -71,11 +69,7 @@ class CinemaServiceTest {
      */
     @Test
     void testGetAllCinemas_cityAndAddressNull_throwsIllegalArgumentException() {
-        assertThrows(IllegalArgumentException.class, () -> {
-
-            cinemaService.getAllCinemas(null, null);
-
-        });
+        assertThrows(IllegalArgumentException.class, () -> cinemaService.getAllCinemas(null, null));
     }
 
     /**
@@ -139,11 +133,7 @@ class CinemaServiceTest {
      */
     @Test
     void testGetCinemaById_cinemaNotFound_throwsCinemaNotFoundException() {
-        assertThrows(CinemaNotFoundException.class, () -> {
-
-            cinemaService.getCinemaById(CinemaConstants.ID);
-
-        });
+        assertThrows(CinemaNotFoundException.class, () -> cinemaService.getCinemaById(CinemaConstants.ID));
     }
 
     /**
@@ -170,8 +160,7 @@ class CinemaServiceTest {
         when(cinemaRepository.findById(anyInt())).thenReturn(Optional.of(CinemaFactory.getDefaultCinema()));
         when(cinemaRepository.save(any())).thenReturn(CinemaFactory.getDefaultCinema());
 
-        final CinemaDto cinemaDto = cinemaService.updateCinema(CinemaFactory.getDefaultCinemaRequest(),
-            CinemaConstants.ID);
+        final CinemaDto cinemaDto = cinemaService.updateCinema(cinemaRequest, CinemaConstants.ID);
 
         assertEquals(expected, cinemaDto);
     }

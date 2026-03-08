@@ -16,9 +16,10 @@ public final class HallConstants {
      */
     public static final int ID = 1;
 
-    private HallConstants() throws IllegalAccessException {
-        throw new IllegalAccessException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
+    private HallConstants() {
+        throw new IllegalStateException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
     }
 }
+
 
 

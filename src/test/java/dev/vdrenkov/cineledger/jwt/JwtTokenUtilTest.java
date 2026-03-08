@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import java.time.Instant;
 
 import static dev.vdrenkov.cineledger.testutil.constants.JwtConstants.JWT_USERNAME;
-import static dev.vdrenkov.cineledger.testutil.constants.JwtConstants.NOW;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -46,7 +45,7 @@ class JwtTokenUtilTest {
     void testGetExpirationInstantFromToken_dateValid_returnsTrue() {
         final Instant expiration = jwtTokenUtil.getExpirationInstantFromToken(JwtFactory.getDefaultJwtToken());
 
-        assertTrue(expiration.isAfter(NOW.toInstant()));
+        assertTrue(expiration.isAfter(Instant.now().minusSeconds(1)));
     }
 
     /**
@@ -64,7 +63,7 @@ class JwtTokenUtilTest {
      */
     @Test
     void testValidateToken_tokenValidated_success() {
-        boolean result = jwtTokenUtil.validateToken(JwtFactory.getDefaultJwtToken(),
+        final boolean result = jwtTokenUtil.validateToken(JwtFactory.getDefaultJwtToken(),
             JwtFactory.getDefaultUserDetails());
 
         assertTrue(result);

@@ -24,9 +24,10 @@ public final class CinemaConstants {
      */
     public static final int AVERAGE_RATING = 5;
 
-    private CinemaConstants() throws IllegalAccessException {
-        throw new IllegalAccessException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
+    private CinemaConstants() {
+        throw new IllegalStateException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
     }
 }
+
 
 

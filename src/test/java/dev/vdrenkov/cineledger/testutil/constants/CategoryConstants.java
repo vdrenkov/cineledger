@@ -16,8 +16,9 @@ public final class CategoryConstants {
      */
     public static final String NAME = "Name";
 
-    private CategoryConstants() throws IllegalAccessException {
-        throw new IllegalAccessException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
+    private CategoryConstants() {
+        throw new IllegalStateException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
     }
 }
+
 

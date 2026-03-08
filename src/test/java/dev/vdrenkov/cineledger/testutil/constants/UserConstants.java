@@ -50,9 +50,10 @@ public final class UserConstants {
      */
     public static final LocalDate JOIN_DATE = LocalDate.of(YEAR, MONTH, DAY);
 
-    private UserConstants() throws IllegalAccessException {
-        throw new IllegalAccessException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
+    private UserConstants() {
+        throw new IllegalStateException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
     }
 }
+
 
 

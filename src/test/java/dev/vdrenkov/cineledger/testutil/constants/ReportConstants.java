@@ -26,9 +26,10 @@ public final class ReportConstants {
      */
     public static final LocalDate END_DATE = LocalDate.of(2100, 1, 1);
 
-    private ReportConstants() throws IllegalAccessException {
-        throw new IllegalAccessException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
+    private ReportConstants() {
+        throw new IllegalStateException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
     }
 }
+
 
 

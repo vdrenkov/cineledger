@@ -76,7 +76,7 @@ class OrderMapperTest {
         when(itemMapper.mapItemToItemDtoList(any())).thenReturn(itemDtoList);
 
         final List<OrderDto> orderDtos = orderMapper.mapOrderToOrderDtoList(OrderFactory.getDefaultOrderList());
-        final OrderDto orderDto = orderDtos.get(0);
+        final OrderDto orderDto = orderDtos.getFirst();
 
         Assertions.assertEquals(OrderConstants.ID, orderDto.getId());
         assertEquals(userDto, orderDto.getUser());

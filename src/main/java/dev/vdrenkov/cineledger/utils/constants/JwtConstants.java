@@ -12,8 +12,9 @@ public final class JwtConstants {
     /** Name of the authentication cookie carrying the JWT token. */
     public static final String JWT_COOKIE_NAME = "CINELEDGER_AUTH";
 
-    private JwtConstants() throws IllegalAccessException {
-        throw new IllegalAccessException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
+    private JwtConstants() {
+        throw new IllegalStateException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
     }
 }
+
 

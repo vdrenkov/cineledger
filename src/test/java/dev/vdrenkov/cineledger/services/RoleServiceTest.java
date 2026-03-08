@@ -5,6 +5,7 @@ import dev.vdrenkov.cineledger.exceptions.RoleNotFoundException;
 import dev.vdrenkov.cineledger.mappers.RoleMapper;
 import dev.vdrenkov.cineledger.models.dtos.RoleDto;
 import dev.vdrenkov.cineledger.models.entities.Role;
+import dev.vdrenkov.cineledger.models.requests.RoleRequest;
 import dev.vdrenkov.cineledger.repositories.RoleRepository;
 import dev.vdrenkov.cineledger.testutil.constants.RoleConstants;
 import dev.vdrenkov.cineledger.testutil.factories.RoleFactory;
@@ -101,11 +102,7 @@ class RoleServiceTest {
      */
     @Test
     void testGetRoleById_roleNotFound_throwsRoleNotFoundException() {
-        assertThrows(RoleNotFoundException.class, () -> {
-
-            roleService.getRoleById(RoleConstants.ID);
-
-        });
+        assertThrows(RoleNotFoundException.class, () -> roleService.getRoleById(RoleConstants.ID));
     }
 
     /**
@@ -142,13 +139,9 @@ class RoleServiceTest {
      */
     @Test
     void testGetRoleByName_roleNotFound_throwRoleNotFoundException() {
-        assertThrows(RoleNotFoundException.class, () -> {
+        when(roleRepository.findRoleByName(anyString())).thenReturn(Optional.empty());
 
-            when(roleRepository.findRoleByName(anyString())).thenReturn(Optional.empty());
-
-            roleService.getRoleByName(RoleConstants.NAME);
-
-        });
+        assertThrows(RoleNotFoundException.class, () -> roleService.getRoleByName(RoleConstants.NAME));
     }
 
     /**
@@ -187,15 +180,10 @@ class RoleServiceTest {
      */
     @Test
     void testAddRole_roleExists_throwsRoleAlreadyExistsException() {
-        assertThrows(RoleAlreadyExistsException.class, () -> {
+        when(roleRepository.findRoleByName(anyString())).thenReturn(Optional.of(new Role()));
 
-            final RoleDto expected = RoleFactory.getDefaultRoleDto();
-
-            when(roleRepository.findRoleByName(anyString())).thenReturn(Optional.of(new Role()));
-
-            roleService.addRole(RoleFactory.getDefaultRoleRequest());
-
-        });
+        final RoleRequest roleRequest = RoleFactory.getDefaultRoleRequest();
+        assertThrows(RoleAlreadyExistsException.class, () -> roleService.addRole(roleRequest));
     }
 
     /**

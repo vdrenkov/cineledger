@@ -5,32 +5,36 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
 import org.springframework.http.HttpCookie;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
+import java.util.Objects;
 
-import static dev.vdrenkov.cineledger.testutil.constants.JwtConstants.EXPIRATION;
-import static dev.vdrenkov.cineledger.testutil.constants.JwtConstants.JWT_COOKIE_NAME;
 import static dev.vdrenkov.cineledger.testutil.constants.JwtConstants.JWT_PASSWORD;
 import static dev.vdrenkov.cineledger.testutil.constants.JwtConstants.JWT_USERNAME;
-import static dev.vdrenkov.cineledger.testutil.constants.JwtConstants.NOW;
 import static dev.vdrenkov.cineledger.testutil.constants.JwtConstants.USER_ROLE;
+import static dev.vdrenkov.cineledger.utils.constants.JwtConstants.JWT_COOKIE_NAME;
 
 /**
  * Provides reusable jwt fixtures for tests.
  */
 public final class JwtFactory {
 
-    private static String secret;
+    private static String secret = "";
 
-    private JwtFactory() throws IllegalAccessException {
-        throw new IllegalAccessException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
+    private JwtFactory() {
+        throw new IllegalStateException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
     }
 
     /**
@@ -39,8 +43,8 @@ public final class JwtFactory {
      * @param secret
      *     secret used by the test helper
      */
-    public static void setSecret(String secret) {
-        JwtFactory.secret = secret;
+    public static void setSecret(final String secret) {
+        JwtFactory.secret = Objects.requireNonNull(secret, "secret must not be null");
     }
 
     /**
@@ -50,12 +54,14 @@ public final class JwtFactory {
      */
     public static String getDefaultJwtToken() {
         final SecretKey key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+        final Instant issuedAt = Instant.now();
+        final Instant expiration = issuedAt.plus(Duration.ofMinutes(60));
 
         return Jwts
             .builder()
             .subject(JWT_USERNAME)
-            .issuedAt(NOW)
-            .expiration(EXPIRATION)
+            .issuedAt(Date.from(issuedAt))
+            .expiration(Date.from(expiration))
             .signWith(key, Jwts.SIG.HS512)
             .compact();
     }
@@ -93,70 +99,7 @@ public final class JwtFactory {
      * @return test user details value
      */
     public static UserDetails getDefaultUserDetails() {
-        return new UserDetails() {
-            /**
-             * Builds reusable jwt test data.
-             * @return test collection<? extends granted authority> value
-             */
-            @Override
-            public Collection<? extends GrantedAuthority> getAuthorities() {
-                return Collections.singletonList(new SimpleGrantedAuthority(USER_ROLE));
-            }
-
-            /**
-             * Builds reusable jwt test data.
-             * @return test string value
-             */
-            @Override
-            public String getPassword() {
-                return JWT_PASSWORD;
-            }
-
-            /**
-             * Builds reusable jwt test data.
-             * @return test string value
-             */
-            @Override
-            public String getUsername() {
-                return JWT_USERNAME;
-            }
-
-            /**
-             * Builds reusable jwt test data.
-             * @return true when the asserted condition holds; otherwise false
-             */
-            @Override
-            public boolean isAccountNonExpired() {
-                return false;
-            }
-
-            /**
-             * Builds reusable jwt test data.
-             * @return true when the asserted condition holds; otherwise false
-             */
-            @Override
-            public boolean isAccountNonLocked() {
-                return false;
-            }
-
-            /**
-             * Builds reusable jwt test data.
-             * @return true when the asserted condition holds; otherwise false
-             */
-            @Override
-            public boolean isCredentialsNonExpired() {
-                return false;
-            }
-
-            /**
-             * Builds reusable jwt test data.
-             * @return true when the asserted condition holds; otherwise false
-             */
-            @Override
-            public boolean isEnabled() {
-                return true;
-            }
-        };
+        return User.withUsername(JWT_USERNAME).password(JWT_PASSWORD).authorities(getDefaultAuthorities()).build();
     }
 
     /**
@@ -165,71 +108,11 @@ public final class JwtFactory {
      * @return test authentication value
      */
     public static Authentication getDefaultAuthentication() {
-        return new Authentication() {
-            /**
-             * Builds reusable jwt test data.
-             * @return test collection<? extends granted authority> value
-             */
-            @Override
-            public Collection<? extends GrantedAuthority> getAuthorities() {
-                return null;
-            }
+        return new UsernamePasswordAuthenticationToken(getDefaultUserDetails(), JWT_PASSWORD, getDefaultAuthorities());
+    }
 
-            /**
-             * Builds reusable jwt test data.
-             * @return test object value
-             */
-            @Override
-            public Object getCredentials() {
-                return null;
-            }
-
-            /**
-             * Builds reusable jwt test data.
-             * @return test object value
-             */
-            @Override
-            public Object getDetails() {
-                return null;
-            }
-
-            /**
-             * Builds reusable jwt test data.
-             * @return test object value
-             */
-            @Override
-            public Object getPrincipal() {
-                return null;
-            }
-
-            /**
-             * Builds reusable jwt test data.
-             * @return true when the asserted condition holds; otherwise false
-             */
-            @Override
-            public boolean isAuthenticated() {
-                return false;
-            }
-
-            /**
-             * Builds reusable jwt test data.
-             *
-             * @param isAuthenticated is authenticated used by the test helper
-             */
-            @Override
-            public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {
-
-            }
-
-            /**
-             * Builds reusable jwt test data.
-             * @return test string value
-             */
-            @Override
-            public String getName() {
-                return JWT_USERNAME;
-            }
-        };
+    private static Collection<? extends GrantedAuthority> getDefaultAuthorities() {
+        return Collections.singletonList(new SimpleGrantedAuthority(USER_ROLE));
     }
 }
 

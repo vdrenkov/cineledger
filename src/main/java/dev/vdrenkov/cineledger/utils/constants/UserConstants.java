@@ -8,9 +8,10 @@ public final class UserConstants {
     /** Username assigned by Spring Security to anonymous requests. */
     public static final String DEFAULT_GUEST_USERNAME = "anonymousUser";
 
-    private UserConstants() throws IllegalAccessException {
-        throw new IllegalAccessException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
+    private UserConstants() {
+        throw new IllegalStateException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
     }
 }
+
 
 

@@ -1,8 +1,6 @@
 package dev.vdrenkov.cineledger.services;
 
 import com.mailjet.client.MailjetResponse;
-import com.mailjet.client.errors.MailjetException;
-import com.mailjet.client.errors.MailjetSocketTimeoutException;
 import dev.vdrenkov.cineledger.models.entities.Order;
 import dev.vdrenkov.cineledger.models.entities.User;
 import dev.vdrenkov.cineledger.testutil.constants.UserConstants;
@@ -36,7 +34,7 @@ class EmailServiceTest {
      * Verifies that send Order Confirmation Email.
      */
     @Test
-    void testSendOrderConfirmationEmail() throws JSONException, MailjetSocketTimeoutException, MailjetException {
+    void testSendOrderConfirmationEmail() throws JSONException {
         final User user = UserFactory.getDefaultUser();
         final Order order = OrderFactory.getDefaultOrder();
         final JSONObject data = new JSONObject();
@@ -54,7 +52,7 @@ class EmailServiceTest {
      * Verifies that send Password Confirmation Email.
      */
     @Test
-    void testSendPasswordConfirmationEmail() throws JSONException, MailjetSocketTimeoutException, MailjetException {
+    void testSendPasswordConfirmationEmail() throws JSONException {
         final User user = UserFactory.getDefaultUser();
         final JSONObject data = new JSONObject();
         when(mailjetResponse.getStatus()).thenReturn(200);
@@ -71,7 +69,7 @@ class EmailServiceTest {
      * Verifies that send Registration Confirmation Email.
      */
     @Test
-    void testSendRegistrationConfirmationEmail() throws JSONException, MailjetSocketTimeoutException, MailjetException {
+    void testSendRegistrationConfirmationEmail() throws JSONException {
 
         final User user = UserFactory.getDefaultUser();
 

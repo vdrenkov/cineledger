@@ -1,7 +1,5 @@
 package dev.vdrenkov.cineledger.services;
 
-import com.mailjet.client.errors.MailjetException;
-import com.mailjet.client.errors.MailjetSocketTimeoutException;
 import dev.vdrenkov.cineledger.exceptions.NotAuthorizedException;
 import dev.vdrenkov.cineledger.exceptions.NotLoggedInException;
 import dev.vdrenkov.cineledger.exceptions.RoleNotChosenException;
@@ -14,6 +12,7 @@ import dev.vdrenkov.cineledger.models.dtos.UserDto;
 import dev.vdrenkov.cineledger.models.entities.Role;
 import dev.vdrenkov.cineledger.models.entities.User;
 import dev.vdrenkov.cineledger.models.requests.LoginRequest;
+import dev.vdrenkov.cineledger.models.requests.UserRequest;
 import dev.vdrenkov.cineledger.repositories.UserRepository;
 import dev.vdrenkov.cineledger.testutil.constants.RoleConstants;
 import dev.vdrenkov.cineledger.testutil.constants.UserConstants;
@@ -63,6 +62,7 @@ import static org.mockito.Mockito.when;
 class UserServiceTest {
     private static final int INVALID_ID = 2;
     private static final String SECRET = "pT6wYk3nRb9mQf2sHx8vLd4cZa1uEg7jKr5qNs0xVc6tMp2hWy9bDf3rLu8nQk4sC";
+    final UserRequest userRequest = UserFactory.getDefaultUserRequest();
 
     @Mock
     private AuthenticationManager authenticationManager;
@@ -121,7 +121,7 @@ class UserServiceTest {
      * Verifies that register User user Registered cookie Obtained.
      */
     @Test
-    void testRegisterUser_userRegistered_cookieObtained() throws MailjetSocketTimeoutException, MailjetException {
+    void testRegisterUser_userRegistered_cookieObtained() {
         final HttpCookie httpCookie = JwtFactory.getDefaultHttpCookie();
 
         when(passwordEncoder.encode(anyString())).thenReturn(UserConstants.PASSWORD);
@@ -131,7 +131,7 @@ class UserServiceTest {
         when(authenticationManager.authenticate(any())).thenReturn(JwtFactory.getDefaultAuthentication());
         when(jwtCookieUtil.createJWTCookie(any())).thenReturn(httpCookie);
 
-        final HttpCookie resultCookie = userService.registerUser(UserFactory.getDefaultUserRequest());
+        final HttpCookie resultCookie = userService.registerUser(userRequest);
 
         assertEquals(resultCookie, httpCookie);
     }
@@ -156,33 +156,23 @@ class UserServiceTest {
      * Verifies that add User username Exists throws User Email Already Exists Exception.
      */
     @Test
-    void testAddUser_usernameExists_throwsUserEmailAlreadyExistsException()
-        throws MailjetSocketTimeoutException, MailjetException {
-        assertThrows(UsernameAlreadyExistsException.class, () -> {
+    void testAddUser_usernameExists_throwsUserEmailAlreadyExistsException() {
+        when(passwordEncoder.encode(anyString())).thenReturn(UserConstants.PASSWORD);
+        when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.of(new User()));
 
-            when(passwordEncoder.encode(anyString())).thenReturn(UserConstants.PASSWORD);
-            when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.of(new User()));
-
-            userService.addUser(UserFactory.getDefaultUserRequest());
-
-        });
+        assertThrows(UsernameAlreadyExistsException.class, () -> userService.addUser(userRequest));
     }
 
     /**
      * Verifies that add User email Exists throws User Email Already Exists Exception.
      */
     @Test
-    void testAddUser_emailExists_throwsUserEmailAlreadyExistsException()
-        throws MailjetSocketTimeoutException, MailjetException {
-        assertThrows(UserEmailAlreadyExistsException.class, () -> {
+    void testAddUser_emailExists_throwsUserEmailAlreadyExistsException() {
+        when(passwordEncoder.encode(anyString())).thenReturn(UserConstants.PASSWORD);
+        when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.empty());
+        when(userRepository.findUserByEmail(anyString())).thenReturn(Optional.of(new User()));
 
-            when(passwordEncoder.encode(anyString())).thenReturn(UserConstants.PASSWORD);
-            when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.empty());
-            when(userRepository.findUserByEmail(anyString())).thenReturn(Optional.of(new User()));
-
-            userService.addUser(UserFactory.getDefaultUserRequest());
-
-        });
+        assertThrows(UserEmailAlreadyExistsException.class, () -> userService.addUser(userRequest));
     }
 
     /**
@@ -236,11 +226,8 @@ class UserServiceTest {
      */
     @Test
     void testGetUserRoles_rolesEmpty_throwsRoleNotChosenException() {
-        assertThrows(RoleNotChosenException.class, () -> {
-
-            userService.getUserRoles(Collections.emptyList());
-
-        });
+        final List<String> emptyList = Collections.emptyList();
+        assertThrows(RoleNotChosenException.class, () -> userService.getUserRoles(emptyList));
     }
 
     /**
@@ -478,7 +465,7 @@ class UserServiceTest {
         when(userRepository.findUserByEmail(anyString())).thenReturn(Optional.empty());
         when(roleService.getRoleByName(anyString())).thenReturn(RoleFactory.getDefaultRole());
 
-        final UserDto resultUser = userService.updateUser(UserFactory.getDefaultUserRequest(), UserConstants.ID);
+        final UserDto resultUser = userService.updateUser(userRequest, UserConstants.ID);
 
         assertEquals(expectedUserDto, resultUser);
     }
@@ -488,20 +475,16 @@ class UserServiceTest {
      */
     @Test
     void testUpdateUser_userNotAuthorized_throwsNotAuthorizedException() {
-        assertThrows(NotAuthorizedException.class, () -> {
+        final SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+        SecurityContextHolder.setContext(securityContext);
+        final Authentication authentication = JwtFactory.getDefaultAuthentication();
 
-            final SecurityContext securityContext = Mockito.mock(SecurityContext.class);
-            SecurityContextHolder.setContext(securityContext);
-            final Authentication authentication = JwtFactory.getDefaultAuthentication();
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(userRepository.findById(anyInt())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
+        when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
+        when(roleService.getRoleByName(anyString())).thenReturn(RoleFactory.getDefaultAdminRole());
 
-            when(securityContext.getAuthentication()).thenReturn(authentication);
-            when(userRepository.findById(anyInt())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
-            when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
-            when(roleService.getRoleByName(anyString())).thenReturn(RoleFactory.getDefaultAdminRole());
-
-            userService.updateUser(UserFactory.getDefaultUserRequest(), INVALID_ID);
-
-        });
+        assertThrows(NotAuthorizedException.class, () -> userService.updateUser(userRequest, INVALID_ID));
     }
 
     /**
@@ -530,22 +513,18 @@ class UserServiceTest {
      */
     @Test
     void testDeleteUser_userNotAuthorized_throwsNotAuthorizedException() {
-        assertThrows(NotAuthorizedException.class, () -> {
+        final UserDto userDto = UserFactory.getDefaultUserDto();
+        final SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+        SecurityContextHolder.setContext(securityContext);
+        final Authentication authentication = JwtFactory.getDefaultAuthentication();
 
-            final UserDto userDto = UserFactory.getDefaultUserDto();
-            final SecurityContext securityContext = Mockito.mock(SecurityContext.class);
-            SecurityContextHolder.setContext(securityContext);
-            final Authentication authentication = JwtFactory.getDefaultAuthentication();
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(userMapper.mapUserToUserDto(any())).thenReturn(userDto);
+        when(userRepository.findById(anyInt())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
+        when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
+        when(roleService.getRoleByName(anyString())).thenReturn(RoleFactory.getDefaultAdminRole());
 
-            when(securityContext.getAuthentication()).thenReturn(authentication);
-            when(userMapper.mapUserToUserDto(any())).thenReturn(userDto);
-            when(userRepository.findById(anyInt())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
-            when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
-            when(roleService.getRoleByName(anyString())).thenReturn(RoleFactory.getDefaultAdminRole());
-
-            userService.deleteUser(INVALID_ID);
-
-        });
+        assertThrows(NotAuthorizedException.class, () -> userService.deleteUser(INVALID_ID));
     }
 
     /**
@@ -571,23 +550,7 @@ class UserServiceTest {
      */
     @Test
     void testGetUserByUsernameOnLogin_userNotFound_throwsUserNotFoundException() {
-        assertThrows(UserNotFoundException.class, () -> {
-
-            final UserDto userDto = UserFactory.getDefaultUserDto();
-            final SecurityContext securityContext = Mockito.mock(SecurityContext.class);
-            SecurityContextHolder.setContext(securityContext);
-            final Authentication authentication = JwtFactory.getDefaultAuthentication();
-
-            when(securityContext.getAuthentication()).thenReturn(authentication);
-            when(userMapper.mapUserToUserDto(any())).thenReturn(userDto);
-            when(userRepository.findById(anyInt())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
-            when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.empty());
-
-            final UserDto result = userService.deleteUser(UserConstants.ID);
-
-            assertEquals(userDto, result);
-
-        });
+        assertThrows(UserNotFoundException.class, () -> userService.deleteUser(UserConstants.ID));
     }
 
     /**
@@ -595,22 +558,15 @@ class UserServiceTest {
      */
     @Test
     void testIsAuthorized_userNotLogged_throwsNotLoggedInException() {
-        assertThrows(NotLoggedInException.class, () -> {
+        final SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+        SecurityContextHolder.setContext(securityContext);
+        final Authentication authentication = Mockito.mock(Authentication.class);
 
-            final UserDto userDto = UserFactory.getDefaultUserDto();
-            final SecurityContext securityContext = Mockito.mock(SecurityContext.class);
-            SecurityContextHolder.setContext(securityContext);
-            final Authentication authentication = Mockito.mock(Authentication.class);
+        when(authentication.getName()).thenReturn(null);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(userRepository.findById(anyInt())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
 
-            when(authentication.getName()).thenReturn(null);
-            when(securityContext.getAuthentication()).thenReturn(authentication);
-            when(userRepository.findById(anyInt())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
-
-            final UserDto result = userService.updateUser(UserFactory.getDefaultUserRequest(), UserConstants.ID);
-
-            assertEquals(userDto, result);
-
-        });
+        assertThrows(NotLoggedInException.class, () -> userService.updateUser(userRequest, UserConstants.ID));
     }
 
     /**
@@ -631,7 +587,7 @@ class UserServiceTest {
         when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.of(user)).thenReturn(Optional.empty());
         when(roleService.getRoleByName(anyString())).thenReturn(RoleFactory.getDefaultAdminRole());
 
-        final UserDto result = userService.updateUser(UserFactory.getDefaultUserRequest(), UserConstants.ID);
+        final UserDto result = userService.updateUser(userRequest, UserConstants.ID);
 
         assertEquals(userDto, result);
     }
@@ -694,7 +650,7 @@ class UserServiceTest {
      * Verifies that recover Password.
      */
     @Test
-    void testRecoverPassword() throws MailjetSocketTimeoutException, MailjetException {
+    void testRecoverPassword() {
         final User expectedUser = UserFactory.getDefaultUser();
         when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.of(expectedUser));
         when(passwordEncoder.encode(any())).thenReturn(UserConstants.PASSWORD);

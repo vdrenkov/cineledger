@@ -20,9 +20,10 @@ public final class RoleConstants {
      */
     public static final String ADMIN = "ADMIN";
 
-    private RoleConstants() throws IllegalAccessException {
-        throw new IllegalAccessException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
+    private RoleConstants() {
+        throw new IllegalStateException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
     }
 }
+
 
 

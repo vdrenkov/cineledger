@@ -24,9 +24,10 @@ public final class DiscountConstants {
      */
     public static final int PERCENTAGE = 10;
 
-    private DiscountConstants() throws IllegalAccessException {
-        throw new IllegalAccessException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
+    private DiscountConstants() {
+        throw new IllegalStateException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
     }
 }
+
 
 

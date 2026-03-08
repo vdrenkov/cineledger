@@ -56,7 +56,7 @@ class MovieMapperTest {
         when(categoryMapper.mapCategoryToCategoryDto(any())).thenReturn(CategoryFactory.getDefaultCategoryDto());
 
         final List<MovieDto> movieDtos = movieMapper.mapMovieListToMovieDtoList(MovieFactory.getDefaultMovieList());
-        final MovieDto movieDto = movieDtos.get(0);
+        final MovieDto movieDto = movieDtos.getFirst();
 
         Assertions.assertEquals(MovieConstants.ID, movieDto.getId());
         Assertions.assertEquals(MovieConstants.TITLE, movieDto.getTitle());

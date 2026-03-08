@@ -34,9 +34,10 @@ public final class OrderConstants {
      */
     public static final double TOTAL_PRICE = 100;
 
-    private OrderConstants() throws IllegalAccessException {
-        throw new IllegalAccessException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
+    private OrderConstants() {
+        throw new IllegalStateException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
     }
 }
+
 
 

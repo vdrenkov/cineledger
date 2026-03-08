@@ -229,14 +229,10 @@ class MovieServiceTest {
      */
     @Test
     void testAddMovie_throwsDateNotValidException() {
-        assertThrows(DateNotValidException.class, () -> {
+        final MovieRequest request = MovieFactory.getDefaultMovieRequest();
+        request.setReleaseDate(LocalDate.of(2000, 1, 1));
 
-            final MovieRequest request = MovieFactory.getDefaultMovieRequest();
-            request.setReleaseDate(LocalDate.of(2000, 1, 1));
-
-            movieService.addMovie(request);
-
-        });
+        assertThrows(DateNotValidException.class, () -> movieService.addMovie(request));
     }
 
     /**
@@ -259,17 +255,12 @@ class MovieServiceTest {
      */
     @Test
     void testAddMovie_throwsExistingMovieException() {
-        assertThrows(MovieAlreadyExistsException.class, () -> {
+        final MovieRequest request = MovieFactory.getDefaultMovieRequest();
+        final String existingTitle = "Existing Movie Title";
+        request.setTitle(existingTitle);
+        when(movieRepository.findByTitle(existingTitle)).thenReturn(Optional.of(MovieFactory.getDefaultMovie()));
 
-            final MovieRequest request = MovieFactory.getDefaultMovieRequest();
-            final String existingTitle = "Existing Movie Title";
-            request.setTitle(existingTitle);
-
-            when(movieRepository.findByTitle(existingTitle)).thenReturn(Optional.of(MovieFactory.getDefaultMovie()));
-
-            movieService.addMovie(request);
-
-        });
+        assertThrows(MovieAlreadyExistsException.class, () -> movieService.addMovie(request));
     }
 
     /**
@@ -302,17 +293,13 @@ class MovieServiceTest {
      */
     @Test
     void testUpdateMovie_throwsDateNotValidException() {
-        assertThrows(DateNotValidException.class, () -> {
+        final MovieRequest request = MovieFactory.getDefaultMovieRequest();
+        request.setReleaseDate(LocalDate.of(2000, 1, 1));
 
-            final MovieRequest request = MovieFactory.getDefaultMovieRequest();
-            request.setReleaseDate(LocalDate.of(2000, 1, 1));
+        when(movieMapper.mapMovieToMovieDto(any())).thenReturn(MovieFactory.getDefaultMovieDto());
+        when(movieRepository.findById(anyInt())).thenReturn(Optional.of(MovieFactory.getDefaultMovie()));
 
-            when(movieMapper.mapMovieToMovieDto(any())).thenReturn(MovieFactory.getDefaultMovieDto());
-            when(movieRepository.findById(anyInt())).thenReturn(Optional.of(MovieFactory.getDefaultMovie()));
-
-            movieService.updateMovie(request, MovieConstants.ID);
-
-        });
+        assertThrows(DateNotValidException.class, () -> movieService.updateMovie(request, MovieConstants.ID));
     }
 
     /**
@@ -349,13 +336,9 @@ class MovieServiceTest {
      */
     @Test
     void testGetMovieById_movieNotFound_throwsMovieNotFoundException() {
-        assertThrows(MovieNotFoundException.class, () -> {
+        when(movieRepository.findById(anyInt())).thenReturn(Optional.empty());
 
-            when(movieRepository.findById(anyInt())).thenReturn(Optional.empty());
-
-            movieService.getMovieById(MovieConstants.ID);
-
-        });
+        assertThrows(MovieNotFoundException.class, () -> movieService.getMovieById(MovieConstants.ID));
     }
 
     /**
@@ -392,13 +375,9 @@ class MovieServiceTest {
      */
     @Test
     void testGetMovieByTitle_movieNotFound_throwsMovieNotFoundException() {
-        assertThrows(MovieNotFoundException.class, () -> {
+        when(movieRepository.findByTitle(anyString())).thenReturn(Optional.empty());
 
-            when(movieRepository.findByTitle(anyString())).thenReturn(Optional.empty());
-
-            movieService.getMovieByTitle(MovieConstants.TITLE);
-
-        });
+        assertThrows(MovieNotFoundException.class, () -> movieService.getMovieByTitle(MovieConstants.TITLE));
     }
 
     /**

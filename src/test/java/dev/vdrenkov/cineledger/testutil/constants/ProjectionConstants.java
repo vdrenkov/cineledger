@@ -40,9 +40,10 @@ public final class ProjectionConstants {
      */
     public static final ProgramDto PROJECTION_PROGRAM_DTO = ProgramFactory.getDefaultProgramDto();
 
-    private ProjectionConstants() throws IllegalAccessException {
-        throw new IllegalAccessException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
+    private ProjectionConstants() {
+        throw new IllegalStateException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
     }
 }
+
 
 

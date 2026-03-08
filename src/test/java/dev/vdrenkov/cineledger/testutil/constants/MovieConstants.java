@@ -21,7 +21,7 @@ public final class MovieConstants {
     /**
      * Provides the default release date used in tests.
      */
-    public static final LocalDate RELEASE_DATE = LocalDate.now().plusDays(30);
+    public static final LocalDate RELEASE_DATE = LocalDate.of(2100, 1, 1);
     /**
      * Provides the default runtime used in tests.
      */
@@ -35,9 +35,10 @@ public final class MovieConstants {
      */
     public static final double RATING = 5;
 
-    private MovieConstants() throws IllegalAccessException {
-        throw new IllegalAccessException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
+    private MovieConstants() {
+        throw new IllegalStateException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
     }
 }
+
 
 

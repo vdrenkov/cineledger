@@ -5,6 +5,7 @@ import dev.vdrenkov.cineledger.exceptions.DiscountNotFoundException;
 import dev.vdrenkov.cineledger.mappers.DiscountMapper;
 import dev.vdrenkov.cineledger.models.dtos.DiscountDto;
 import dev.vdrenkov.cineledger.models.entities.Discount;
+import dev.vdrenkov.cineledger.models.requests.DiscountRequest;
 import dev.vdrenkov.cineledger.repositories.DiscountRepository;
 import dev.vdrenkov.cineledger.testutil.constants.DiscountConstants;
 import dev.vdrenkov.cineledger.testutil.constants.OrderConstants;
@@ -30,6 +31,7 @@ import static org.mockito.Mockito.when;
  */
 @ExtendWith(MockitoExtension.class)
 class DiscountServiceTest {
+    final DiscountRequest discountRequest = DiscountFactory.getDefaultDiscountRequest();
 
     @Mock
     private DiscountRepository discountRepository;
@@ -48,7 +50,7 @@ class DiscountServiceTest {
         final Discount expected = DiscountFactory.getDefaultDiscount();
         when(discountRepository.save(any())).thenReturn(expected);
 
-        final Discount discount = discountService.addDiscount(DiscountFactory.getDefaultDiscountRequest());
+        final Discount discount = discountService.addDiscount(discountRequest);
 
         assertEquals(expected, discount);
     }
@@ -58,13 +60,9 @@ class DiscountServiceTest {
      */
     @Test
     void testAddDiscount_discountAlreadyExists_throwsDiscountAlreadyExistsException() {
-        assertThrows(DiscountAlreadyExistsException.class, () -> {
+        when(discountRepository.existsByType(any())).thenReturn(true);
 
-            when(discountRepository.existsByType(any())).thenReturn(true);
-
-            discountService.addDiscount(DiscountFactory.getDefaultDiscountRequest());
-
-        });
+        assertThrows(DiscountAlreadyExistsException.class, () -> discountService.addDiscount(discountRequest));
     }
 
     /**
@@ -112,11 +110,7 @@ class DiscountServiceTest {
      */
     @Test
     void testGetDiscountById_discountNotFound_throwsDiscountNotFoundException() {
-        assertThrows(DiscountNotFoundException.class, () -> {
-
-            discountService.getDiscountById(DiscountConstants.ID);
-
-        });
+        assertThrows(DiscountNotFoundException.class, () -> discountService.getDiscountById(DiscountConstants.ID));
     }
 
     /**
@@ -137,13 +131,9 @@ class DiscountServiceTest {
      */
     @Test
     void testGetDiscountByType_discountNotFound_throwDiscountNotFoundException() {
-        assertThrows(DiscountNotFoundException.class, () -> {
+        when(discountRepository.findByType(anyString())).thenReturn(Optional.empty());
 
-            when(discountRepository.findByType(anyString())).thenReturn(Optional.empty());
-
-            discountService.getDiscountByType(DiscountConstants.TYPE);
-
-        });
+        assertThrows(DiscountNotFoundException.class, () -> discountService.getDiscountByType(DiscountConstants.TYPE));
     }
 
     /**
@@ -164,13 +154,9 @@ class DiscountServiceTest {
      */
     @Test
     void testGetDiscountByCode_discountNotFound_throwDiscountNotFoundException() {
-        assertThrows(DiscountNotFoundException.class, () -> {
+        when(discountRepository.findByCode(anyString())).thenReturn(Optional.empty());
 
-            when(discountRepository.findByCode(anyString())).thenReturn(Optional.empty());
-
-            discountService.getDiscountByCode(DiscountConstants.CODE);
-
-        });
+        assertThrows(DiscountNotFoundException.class, () -> discountService.getDiscountByCode(DiscountConstants.CODE));
     }
 
     /**
@@ -197,8 +183,7 @@ class DiscountServiceTest {
         when(discountRepository.findById(anyInt())).thenReturn(Optional.of(new Discount()));
         when(discountRepository.save(any())).thenReturn(DiscountFactory.getDefaultDiscount());
 
-        DiscountDto discountDto = discountService.updateDiscount(DiscountFactory.getDefaultDiscountRequest(),
-            DiscountConstants.ID);
+        DiscountDto discountDto = discountService.updateDiscount(discountRequest, DiscountConstants.ID);
 
         assertEquals(expected, discountDto);
     }

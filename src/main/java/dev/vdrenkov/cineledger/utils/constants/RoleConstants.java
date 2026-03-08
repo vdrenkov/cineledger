@@ -12,9 +12,10 @@ public final class RoleConstants {
     /** Default end-user role name. */
     public static final String DEFAULT_USER_ROLE = "USER";
 
-    private RoleConstants() throws IllegalAccessException {
-        throw new IllegalAccessException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
+    private RoleConstants() {
+        throw new IllegalStateException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
     }
 }
+
 
 

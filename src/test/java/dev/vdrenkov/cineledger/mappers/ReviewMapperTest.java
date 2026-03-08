@@ -90,7 +90,7 @@ class ReviewMapperTest {
 
         final List<ReviewDto> reviewDtos = reviewMapper.mapReviewListToReviewDtoList(
             ReviewFactory.getDefaultReviewList());
-        final ReviewDto reviewDto = reviewDtos.get(0);
+        final ReviewDto reviewDto = reviewDtos.getFirst();
 
         Assertions.assertEquals(ReviewConstants.ID, reviewDto.getId());
         Assertions.assertEquals(ReviewConstants.RATING, reviewDto.getRating(), 0.0);
@@ -113,7 +113,7 @@ class ReviewMapperTest {
 
         List<ReviewDto> reviewDtos = reviewMapper.mapReviewListToReviewDtoList(
             ReviewFactory.getDefaultReviewListWithCinema());
-        final ReviewDto reviewDto = reviewDtos.get(0);
+        final ReviewDto reviewDto = reviewDtos.getFirst();
 
         Assertions.assertEquals(ReviewConstants.ID, reviewDto.getId());
         Assertions.assertEquals(ReviewConstants.RATING, reviewDto.getRating(), 0.0);

@@ -5,6 +5,7 @@ import dev.vdrenkov.cineledger.exceptions.CategoryNotFoundException;
 import dev.vdrenkov.cineledger.mappers.CategoryMapper;
 import dev.vdrenkov.cineledger.models.dtos.CategoryDto;
 import dev.vdrenkov.cineledger.models.entities.Category;
+import dev.vdrenkov.cineledger.models.requests.CategoryRequest;
 import dev.vdrenkov.cineledger.repositories.CategoryRepository;
 import dev.vdrenkov.cineledger.testutil.constants.CategoryConstants;
 import dev.vdrenkov.cineledger.testutil.factories.CategoryFactory;
@@ -29,6 +30,7 @@ import static org.mockito.Mockito.when;
  */
 @ExtendWith(MockitoExtension.class)
 class CategoryServiceTest {
+    final CategoryRequest categoryRequest = CategoryFactory.getDefaultCategoryRequest();
 
     @Mock
     private CategoryMapper categoryMapper;
@@ -47,7 +49,7 @@ class CategoryServiceTest {
         final Category expected = CategoryFactory.getDefaultCategory();
         when(categoryRepository.save(any())).thenReturn(expected);
 
-        final Category category = categoryService.addCategory(CategoryFactory.getDefaultCategoryRequest());
+        final Category category = categoryService.addCategory(categoryRequest);
 
         assertEquals(expected, category);
     }
@@ -86,13 +88,9 @@ class CategoryServiceTest {
      */
     @Test
     void testGetCategoryDtoById_throwsCategoryNotFoundException() {
-        assertThrows(CategoryNotFoundException.class, () -> {
+        when(categoryRepository.findById(anyInt())).thenReturn(Optional.empty());
 
-            when(categoryRepository.findById(anyInt())).thenReturn(Optional.empty());
-
-            categoryService.getCategoryDtoById(CategoryConstants.ID);
-
-        });
+        assertThrows(CategoryNotFoundException.class, () -> categoryService.getCategoryDtoById(CategoryConstants.ID));
     }
 
     /**
@@ -114,13 +112,10 @@ class CategoryServiceTest {
      */
     @Test
     void testGetCategoryDtoByName_throwsCategoryNotFoundException() {
-        assertThrows(CategoryNotFoundException.class, () -> {
+        when(categoryRepository.findByName(anyString())).thenReturn(Optional.empty());
 
-            when(categoryRepository.findByName(anyString())).thenReturn(Optional.empty());
-
-            categoryService.getCategoryDtoByName(CategoryConstants.NAME);
-
-        });
+        assertThrows(CategoryNotFoundException.class,
+            () -> categoryService.getCategoryDtoByName(CategoryConstants.NAME));
     }
 
     /**
@@ -133,8 +128,7 @@ class CategoryServiceTest {
         when(categoryRepository.findById(anyInt())).thenReturn(Optional.of(CategoryFactory.getDefaultCategory()));
         when(categoryRepository.save(any())).thenReturn(CategoryFactory.getDefaultCategory());
 
-        CategoryDto categoryDto = categoryService.updateCategory(CategoryFactory.getDefaultCategoryRequest(),
-            CategoryConstants.ID);
+        CategoryDto categoryDto = categoryService.updateCategory(categoryRequest, CategoryConstants.ID);
 
         assertEquals(expected, categoryDto);
     }
@@ -144,13 +138,9 @@ class CategoryServiceTest {
      */
     @Test
     void testUpdateCategory_categoryExists_throws() {
-        assertThrows(CategoryAlreadyExistsException.class, () -> {
+        when(categoryRepository.findByName(anyString())).thenReturn(Optional.of(new Category()));
 
-            when(categoryRepository.findByName(anyString())).thenReturn(Optional.of(new Category()));
-
-            categoryService.addCategory(CategoryFactory.getDefaultCategoryRequest());
-
-        });
+        assertThrows(CategoryAlreadyExistsException.class, () -> categoryService.addCategory(categoryRequest));
     }
 
     /**
@@ -172,11 +162,7 @@ class CategoryServiceTest {
      */
     @Test
     void testGetCategoryById_categoryNotFound_throwsCategoryNotFoundException() {
-        assertThrows(CategoryNotFoundException.class, () -> {
-
-            categoryService.getCategoryById(CategoryConstants.ID);
-
-        });
+        assertThrows(CategoryNotFoundException.class, () -> categoryService.getCategoryById(CategoryConstants.ID));
     }
 }
 

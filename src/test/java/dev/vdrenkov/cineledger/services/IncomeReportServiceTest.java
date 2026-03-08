@@ -76,7 +76,7 @@ class IncomeReportServiceTest {
     @Test
     void testGetAllIncomesByCinemaId_cinemaIdDifferent_returnsZero() {
         final List<Order> orders = OrderFactory.getDefaultOrderList();
-        orders.get(0).getTickets().get(0).getProjection().getHall().getCinema().setId(0);
+        orders.getFirst().getTickets().getFirst().getProjection().getHall().getCinema().setId(0);
 
         when(cinemaService.getCinemaById(anyInt())).thenReturn(new Cinema());
         when(orderService.getOrdersByDateBetween(any(), any())).thenReturn(orders);
@@ -107,7 +107,7 @@ class IncomeReportServiceTest {
     @Test
     void testGetAllIncomesByHallId_hallIdDifferent_returnsZero() {
         final List<Order> orders = OrderFactory.getDefaultOrderList();
-        orders.get(0).getTickets().get(0).getProjection().getHall().setId(0);
+        orders.getFirst().getTickets().getFirst().getProjection().getHall().setId(0);
 
         when(hallService.getHallById(anyInt())).thenReturn(new Hall());
         when(orderService.getOrdersByDateBetween(any(), any())).thenReturn(orders);

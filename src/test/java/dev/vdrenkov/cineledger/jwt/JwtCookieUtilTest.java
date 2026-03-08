@@ -8,8 +8,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpCookie;
 import org.springframework.http.ResponseCookie;
 
-import static dev.vdrenkov.cineledger.testutil.constants.JwtConstants.JWT_COOKIE_NAME;
 import static dev.vdrenkov.cineledger.testutil.constants.JwtConstants.JWT_TOKEN;
+import static dev.vdrenkov.cineledger.utils.constants.JwtConstants.JWT_COOKIE_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;

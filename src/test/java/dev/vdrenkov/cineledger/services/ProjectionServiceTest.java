@@ -7,6 +7,7 @@ import dev.vdrenkov.cineledger.models.dtos.ProjectionDto;
 import dev.vdrenkov.cineledger.models.entities.Movie;
 import dev.vdrenkov.cineledger.models.entities.Program;
 import dev.vdrenkov.cineledger.models.entities.Projection;
+import dev.vdrenkov.cineledger.models.requests.ProjectionRequest;
 import dev.vdrenkov.cineledger.repositories.ProjectionRepository;
 import dev.vdrenkov.cineledger.testutil.constants.ProjectionConstants;
 import dev.vdrenkov.cineledger.testutil.factories.HallFactory;
@@ -39,6 +40,7 @@ import static org.mockito.Mockito.when;
  */
 @ExtendWith(MockitoExtension.class)
 class ProjectionServiceTest {
+    final ProjectionRequest projectionRequest = ProjectionFactory.getDefaultProjectionRequest();
 
     @Mock
     private ProjectionRepository projectionRepository;
@@ -140,7 +142,7 @@ class ProjectionServiceTest {
         when(programService.getProgramById(anyInt())).thenReturn(ProgramFactory.getDefaultProgram());
         when(movieService.getMovieById(anyInt())).thenReturn(MovieFactory.getDefaultMovie());
 
-        final Projection projection = projectionService.addProjection(ProjectionFactory.getDefaultProjectionRequest());
+        final Projection projection = projectionService.addProjection(projectionRequest);
 
         assertEquals(expected, projection);
     }
@@ -150,17 +152,13 @@ class ProjectionServiceTest {
      */
     @Test
     void testAddProjection_hallNotAvailable_throwsHallNotAvailableException() {
-        assertThrows(HallNotAvailableException.class, () -> {
+        when(hallService.getHallById(anyInt())).thenReturn(HallFactory.getDefaultHall());
+        when(programService.getProgramById(anyInt())).thenReturn(ProgramFactory.getDefaultProgram());
 
-            when(hallService.getHallById(anyInt())).thenReturn(HallFactory.getDefaultHall());
-            when(programService.getProgramById(anyInt())).thenReturn(ProgramFactory.getDefaultProgram());
+        final ProjectionService spyProjectionService = Mockito.spy(projectionService);
+        doReturn(false).when(spyProjectionService).isHallAvailable(anyInt(), anyInt(), any(LocalTime.class));
 
-            final ProjectionService spyProjectionService = Mockito.spy(projectionService);
-            doReturn(false).when(spyProjectionService).isHallAvailable(anyInt(), anyInt(), any(LocalTime.class));
-
-            spyProjectionService.addProjection(ProjectionFactory.getDefaultProjectionRequest());
-
-        });
+        assertThrows(HallNotAvailableException.class, () -> spyProjectionService.addProjection(projectionRequest));
     }
 
     /**
@@ -176,8 +174,7 @@ class ProjectionServiceTest {
         when(projectionRepository.findById(anyInt())).thenReturn(Optional.of(ProjectionFactory.getDefaultProjection()));
         when(projectionRepository.save(any())).thenReturn(ProjectionFactory.getDefaultProjection());
 
-        ProjectionDto projectionDto = projectionService.updateProjection(
-            ProjectionFactory.getDefaultProjectionRequest(), ProjectionConstants.ID);
+        ProjectionDto projectionDto = projectionService.updateProjection(projectionRequest, ProjectionConstants.ID);
 
         assertEquals(expected, projectionDto);
     }
@@ -187,22 +184,17 @@ class ProjectionServiceTest {
      */
     @Test
     void testUpdateProjection_hallNotAvailable_throwsHallNotAvailableException() {
-        assertThrows(HallNotAvailableException.class, () -> {
+        final ProjectionDto expected = ProjectionFactory.getDefaultProjectionDto();
+        when(projectionMapper.mapProjectionToProjectionDto(any(Projection.class))).thenReturn(expected);
+        when(hallService.getHallById(anyInt())).thenReturn(HallFactory.getDefaultHall());
+        when(programService.getProgramById(anyInt())).thenReturn(ProgramFactory.getDefaultProgram());
+        when(projectionRepository.findById(anyInt())).thenReturn(Optional.of(ProjectionFactory.getDefaultProjection()));
 
-            final ProjectionDto expected = ProjectionFactory.getDefaultProjectionDto();
-            when(projectionMapper.mapProjectionToProjectionDto(any(Projection.class))).thenReturn(expected);
-            when(hallService.getHallById(anyInt())).thenReturn(HallFactory.getDefaultHall());
-            when(programService.getProgramById(anyInt())).thenReturn(ProgramFactory.getDefaultProgram());
-            when(projectionRepository.findById(anyInt())).thenReturn(
-                Optional.of(ProjectionFactory.getDefaultProjection()));
+        final ProjectionService spyProjectionService = Mockito.spy(projectionService);
+        doReturn(false).when(spyProjectionService).isHallAvailable(anyInt(), anyInt(), any(LocalTime.class));
 
-            final ProjectionService spyProjectionService = Mockito.spy(projectionService);
-            doReturn(false).when(spyProjectionService).isHallAvailable(anyInt(), anyInt(), any(LocalTime.class));
-
-            spyProjectionService.updateProjection(ProjectionFactory.getDefaultProjectionRequest(),
-                ProjectionConstants.ID);
-
-        });
+        assertThrows(HallNotAvailableException.class,
+            () -> spyProjectionService.updateProjection(projectionRequest, ProjectionConstants.ID));
     }
 
     /**
@@ -225,13 +217,9 @@ class ProjectionServiceTest {
      */
     @Test
     void testDeleteProjection_projectionNotFound_throwsProgramNotFoundException() {
-        assertThrows(ProgramNotFoundException.class, () -> {
+        when(projectionRepository.findById(anyInt())).thenReturn(Optional.empty());
 
-            when(projectionRepository.findById(anyInt())).thenReturn(Optional.empty());
-
-            projectionService.deleteProjection(ProjectionConstants.ID);
-
-        });
+        assertThrows(ProgramNotFoundException.class, () -> projectionService.deleteProjection(ProjectionConstants.ID));
     }
 
     /**

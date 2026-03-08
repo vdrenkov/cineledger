@@ -110,13 +110,9 @@ class TicketServiceTest {
      */
     @Test
     void testGetTicketById_TicketNotFoundException_fail() {
-        assertThrows(TicketNotFoundException.class, () -> {
+        when(ticketRepository.findById(anyInt())).thenReturn(Optional.empty());
 
-            when(ticketRepository.findById(anyInt())).thenReturn(Optional.empty());
-
-            ticketService.getTicketById(TicketConstants.ID);
-
-        });
+        assertThrows(TicketNotFoundException.class, () -> ticketService.getTicketById(TicketConstants.ID));
     }
 
     /**
@@ -141,16 +137,12 @@ class TicketServiceTest {
      */
     @Test
     void testCalculateAvailableTickets_shouldThrowNoAvailableTicketsException() {
-        assertThrows(NoAvailableTicketsException.class, () -> {
+        final Projection projection = ProjectionFactory.getDefaultProjection();
+        final int totalTickets = 100;
 
-            final Projection projection = ProjectionFactory.getDefaultProjection();
-            final int totalTickets = 100;
+        when(ticketRepository.countByProjectionId(anyInt())).thenReturn(totalTickets);
 
-            when(ticketRepository.countByProjectionId(anyInt())).thenReturn(totalTickets);
-
-            ticketService.calculateAvailableTickets(projection);
-
-        });
+        assertThrows(NoAvailableTicketsException.class, () -> ticketService.calculateAvailableTickets(projection));
     }
 
     /**
@@ -158,23 +150,19 @@ class TicketServiceTest {
      */
     @Test
     void testAddTicket_dateNotValid_throwsDateNotValidException() {
-        assertThrows(DateNotValidException.class, () -> {
+        final LocalDate programDate = LocalDate.now().minusDays(1);
+        final LocalTime projectionStartTime = LocalTime.now().minusHours(1);
 
-            final LocalDate programDate = LocalDate.now().minusDays(1);
-            final LocalTime projectionStartTime = LocalTime.now().minusHours(1);
+        final Projection projection = ProjectionFactory.getDefaultProjection();
+        projection.getProgram().setProgramDate(programDate);
+        projection.setStartTime(projectionStartTime);
 
-            final Projection projection = ProjectionFactory.getDefaultProjection();
-            projection.getProgram().setProgramDate(programDate);
-            projection.setStartTime(projectionStartTime);
+        final TicketRequest request = TicketFactory.getDefaultTicketRequest();
+        request.setProjectionId(projection.getId());
 
-            final TicketRequest request = TicketFactory.getDefaultTicketRequest();
-            request.setProjectionId(projection.getId());
+        when(projectionService.getProjectionById(anyInt())).thenReturn(projection);
 
-            when(projectionService.getProjectionById(anyInt())).thenReturn(projection);
-
-            ticketService.addTicket(request);
-
-        });
+        assertThrows(DateNotValidException.class, () -> ticketService.addTicket(request));
     }
 
     /**

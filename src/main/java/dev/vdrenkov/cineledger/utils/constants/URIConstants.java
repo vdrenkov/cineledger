@@ -176,9 +176,10 @@ public final class URIConstants {
     /** Endpoint used to register a new user. */
     public static final String REGISTRATION_PATH = "/registration";
 
-    private URIConstants() throws IllegalAccessException {
-        throw new IllegalAccessException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
+    private URIConstants() {
+        throw new IllegalStateException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
     }
 }
+
 
 

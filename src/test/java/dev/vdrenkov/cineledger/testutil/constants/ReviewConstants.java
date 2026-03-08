@@ -35,10 +35,6 @@ public final class ReviewConstants {
      */
     public static final LocalDate DATE_MODIFIED = LocalDate.of(2024, 1, 1);
     /**
-     * Provides the current date value used in time-sensitive tests.
-     */
-    public static final LocalDate NOW = LocalDate.now();
-    /**
      * Provides the default review movie used in tests.
      */
     public static final Movie REVIEW_MOVIE = MovieFactory.getDefaultMovie();
@@ -63,9 +59,10 @@ public final class ReviewConstants {
      */
     public static final UserDto REVIEW_USER_DTO = UserFactory.getDefaultUserDto();
 
-    private ReviewConstants() throws IllegalAccessException {
-        throw new IllegalAccessException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
+    private ReviewConstants() {
+        throw new IllegalStateException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
     }
 }
+
 
 
