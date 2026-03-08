@@ -1,6 +1,6 @@
 package dev.vdrenkov.cineledger.jwt;
 
-import dev.vdrenkov.cineledger.testutil.factories.JwtFactory;
+import dev.vdrenkov.cineledger.testutils.factories.JwtFactory;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -18,7 +18,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.io.IOException;
 
-import static dev.vdrenkov.cineledger.testutil.constants.JwtConstants.JWT_USERNAME;
+import static dev.vdrenkov.cineledger.testutils.constants.JwtConstants.JWT_USERNAME;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;

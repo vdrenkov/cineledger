@@ -1,8 +1,8 @@
 package dev.vdrenkov.cineledger.mappers;
 
 import dev.vdrenkov.cineledger.models.dtos.CinemaDto;
-import dev.vdrenkov.cineledger.testutil.constants.CinemaConstants;
-import dev.vdrenkov.cineledger.testutil.factories.CinemaFactory;
+import dev.vdrenkov.cineledger.testutils.constants.CinemaConstants;
+import dev.vdrenkov.cineledger.testutils.factories.CinemaFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

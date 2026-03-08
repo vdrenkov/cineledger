@@ -2,9 +2,9 @@ package dev.vdrenkov.cineledger.mappers;
 
 import dev.vdrenkov.cineledger.models.dtos.UserDto;
 import dev.vdrenkov.cineledger.models.entities.User;
-import dev.vdrenkov.cineledger.testutil.constants.UserConstants;
-import dev.vdrenkov.cineledger.testutil.factories.RoleFactory;
-import dev.vdrenkov.cineledger.testutil.factories.UserFactory;
+import dev.vdrenkov.cineledger.testutils.constants.UserConstants;
+import dev.vdrenkov.cineledger.testutils.factories.RoleFactory;
+import dev.vdrenkov.cineledger.testutils.factories.UserFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

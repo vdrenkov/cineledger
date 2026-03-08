@@ -1,7 +1,7 @@
 package dev.vdrenkov.cineledger.controllers;
 
 import dev.vdrenkov.cineledger.services.CinemaService;
-import dev.vdrenkov.cineledger.testutil.factories.CinemaFactory;
+import dev.vdrenkov.cineledger.testutils.factories.CinemaFactory;
 import dev.vdrenkov.cineledger.utils.constants.URIConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,9 +16,9 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import tools.jackson.databind.ObjectMapper;
 
-import static dev.vdrenkov.cineledger.testutil.constants.CinemaConstants.ADDRESS;
-import static dev.vdrenkov.cineledger.testutil.constants.CinemaConstants.CITY;
-import static dev.vdrenkov.cineledger.testutil.constants.CinemaConstants.ID;
+import static dev.vdrenkov.cineledger.testutils.constants.CinemaConstants.ADDRESS;
+import static dev.vdrenkov.cineledger.testutils.constants.CinemaConstants.CITY;
+import static dev.vdrenkov.cineledger.testutils.constants.CinemaConstants.ID;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;

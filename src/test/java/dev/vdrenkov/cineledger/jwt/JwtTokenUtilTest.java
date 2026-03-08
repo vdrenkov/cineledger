@@ -1,12 +1,12 @@
 package dev.vdrenkov.cineledger.jwt;
 
-import dev.vdrenkov.cineledger.testutil.factories.JwtFactory;
+import dev.vdrenkov.cineledger.testutils.factories.JwtFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 
-import static dev.vdrenkov.cineledger.testutil.constants.JwtConstants.JWT_USERNAME;
+import static dev.vdrenkov.cineledger.testutils.constants.JwtConstants.JWT_USERNAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;

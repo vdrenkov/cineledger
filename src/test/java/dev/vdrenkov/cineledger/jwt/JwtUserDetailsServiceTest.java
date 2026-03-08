@@ -2,7 +2,7 @@ package dev.vdrenkov.cineledger.jwt;
 
 import dev.vdrenkov.cineledger.exceptions.UserNotFoundException;
 import dev.vdrenkov.cineledger.repositories.UserRepository;
-import dev.vdrenkov.cineledger.testutil.factories.UserFactory;
+import dev.vdrenkov.cineledger.testutils.factories.UserFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -12,8 +12,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Optional;
 
-import static dev.vdrenkov.cineledger.testutil.constants.UserConstants.PASSWORD;
-import static dev.vdrenkov.cineledger.testutil.constants.UserConstants.USERNAME;
+import static dev.vdrenkov.cineledger.testutils.constants.UserConstants.PASSWORD;
+import static dev.vdrenkov.cineledger.testutils.constants.UserConstants.USERNAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;

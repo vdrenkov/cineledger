@@ -16,7 +16,7 @@ public class CineLedgerApplication {
      * @param args
      *     application startup arguments
      */
-    public static void main(String[] args) {
+    static void main(String[] args) {
         SpringApplication.run(CineLedgerApplication.class, args);
     }
 }

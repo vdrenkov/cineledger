@@ -39,7 +39,7 @@ import dev.vdrenkov.cineledger.services.CategoryService;
 import dev.vdrenkov.cineledger.services.MovieService;
 import dev.vdrenkov.cineledger.services.ProjectionService;
 import dev.vdrenkov.cineledger.services.UserService;
-import dev.vdrenkov.cineledger.testutil.constants.UserConstants;
+import dev.vdrenkov.cineledger.testutils.constants.UserConstants;
 import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
 import jakarta.validation.UnexpectedTypeException;
 import org.hamcrest.Matchers;

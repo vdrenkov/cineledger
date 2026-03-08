@@ -1,7 +1,7 @@
 package dev.vdrenkov.cineledger.controllers;
 
 import dev.vdrenkov.cineledger.services.CategoryService;
-import dev.vdrenkov.cineledger.testutil.factories.CategoryFactory;
+import dev.vdrenkov.cineledger.testutils.factories.CategoryFactory;
 import dev.vdrenkov.cineledger.utils.constants.URIConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,8 +18,8 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.util.Collections;
 
-import static dev.vdrenkov.cineledger.testutil.constants.CategoryConstants.ID;
-import static dev.vdrenkov.cineledger.testutil.constants.CategoryConstants.NAME;
+import static dev.vdrenkov.cineledger.testutils.constants.CategoryConstants.ID;
+import static dev.vdrenkov.cineledger.testutils.constants.CategoryConstants.NAME;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;

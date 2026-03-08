@@ -12,10 +12,10 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static dev.vdrenkov.cineledger.testutil.constants.ReportConstants.END_DATE;
-import static dev.vdrenkov.cineledger.testutil.constants.ReportConstants.ID;
-import static dev.vdrenkov.cineledger.testutil.constants.ReportConstants.INCOMES;
-import static dev.vdrenkov.cineledger.testutil.constants.ReportConstants.START_DATE;
+import static dev.vdrenkov.cineledger.testutils.constants.ReportConstants.END_DATE;
+import static dev.vdrenkov.cineledger.testutils.constants.ReportConstants.ID;
+import static dev.vdrenkov.cineledger.testutils.constants.ReportConstants.INCOMES;
+import static dev.vdrenkov.cineledger.testutils.constants.ReportConstants.START_DATE;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;

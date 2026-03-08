@@ -1,8 +1,8 @@
 package dev.vdrenkov.cineledger.mappers;
 
 import dev.vdrenkov.cineledger.models.dtos.DiscountDto;
-import dev.vdrenkov.cineledger.testutil.constants.DiscountConstants;
-import dev.vdrenkov.cineledger.testutil.factories.DiscountFactory;
+import dev.vdrenkov.cineledger.testutils.constants.DiscountConstants;
+import dev.vdrenkov.cineledger.testutils.factories.DiscountFactory;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

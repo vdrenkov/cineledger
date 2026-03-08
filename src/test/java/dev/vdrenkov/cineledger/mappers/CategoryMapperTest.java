@@ -1,8 +1,8 @@
 package dev.vdrenkov.cineledger.mappers;
 
 import dev.vdrenkov.cineledger.models.dtos.CategoryDto;
-import dev.vdrenkov.cineledger.testutil.constants.CategoryConstants;
-import dev.vdrenkov.cineledger.testutil.factories.CategoryFactory;
+import dev.vdrenkov.cineledger.testutils.constants.CategoryConstants;
+import dev.vdrenkov.cineledger.testutils.factories.CategoryFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

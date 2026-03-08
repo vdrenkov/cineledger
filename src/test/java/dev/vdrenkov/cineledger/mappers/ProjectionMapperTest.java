@@ -1,8 +1,8 @@
 package dev.vdrenkov.cineledger.mappers;
 
 import dev.vdrenkov.cineledger.models.dtos.ProjectionDto;
-import dev.vdrenkov.cineledger.testutil.constants.ProjectionConstants;
-import dev.vdrenkov.cineledger.testutil.factories.ProjectionFactory;
+import dev.vdrenkov.cineledger.testutils.constants.ProjectionConstants;
+import dev.vdrenkov.cineledger.testutils.factories.ProjectionFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

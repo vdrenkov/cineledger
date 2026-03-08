@@ -1,8 +1,8 @@
 package dev.vdrenkov.cineledger.mappers;
 
 import dev.vdrenkov.cineledger.models.dtos.RoleDto;
-import dev.vdrenkov.cineledger.testutil.constants.RoleConstants;
-import dev.vdrenkov.cineledger.testutil.factories.RoleFactory;
+import dev.vdrenkov.cineledger.testutils.constants.RoleConstants;
+import dev.vdrenkov.cineledger.testutils.factories.RoleFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

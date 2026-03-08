@@ -1,9 +1,9 @@
 package dev.vdrenkov.cineledger.mappers;
 
 import dev.vdrenkov.cineledger.models.dtos.MovieDto;
-import dev.vdrenkov.cineledger.testutil.constants.MovieConstants;
-import dev.vdrenkov.cineledger.testutil.factories.CategoryFactory;
-import dev.vdrenkov.cineledger.testutil.factories.MovieFactory;
+import dev.vdrenkov.cineledger.testutils.constants.MovieConstants;
+import dev.vdrenkov.cineledger.testutils.factories.CategoryFactory;
+import dev.vdrenkov.cineledger.testutils.factories.MovieFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

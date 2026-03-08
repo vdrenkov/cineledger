@@ -1,10 +1,10 @@
 package dev.vdrenkov.cineledger.mappers;
 
 import dev.vdrenkov.cineledger.models.dtos.TicketDto;
-import dev.vdrenkov.cineledger.testutil.constants.ProjectionConstants;
-import dev.vdrenkov.cineledger.testutil.constants.TicketConstants;
-import dev.vdrenkov.cineledger.testutil.factories.ProjectionFactory;
-import dev.vdrenkov.cineledger.testutil.factories.TicketFactory;
+import dev.vdrenkov.cineledger.testutils.constants.ProjectionConstants;
+import dev.vdrenkov.cineledger.testutils.constants.TicketConstants;
+import dev.vdrenkov.cineledger.testutils.factories.ProjectionFactory;
+import dev.vdrenkov.cineledger.testutils.factories.TicketFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

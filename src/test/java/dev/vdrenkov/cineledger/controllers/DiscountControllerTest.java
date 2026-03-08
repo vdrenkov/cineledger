@@ -1,7 +1,7 @@
 package dev.vdrenkov.cineledger.controllers;
 
 import dev.vdrenkov.cineledger.services.DiscountService;
-import dev.vdrenkov.cineledger.testutil.factories.DiscountFactory;
+import dev.vdrenkov.cineledger.testutils.factories.DiscountFactory;
 import dev.vdrenkov.cineledger.utils.constants.URIConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,10 +16,10 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import tools.jackson.databind.ObjectMapper;
 
-import static dev.vdrenkov.cineledger.testutil.constants.DiscountConstants.CODE;
-import static dev.vdrenkov.cineledger.testutil.constants.DiscountConstants.ID;
-import static dev.vdrenkov.cineledger.testutil.constants.DiscountConstants.PERCENTAGE;
-import static dev.vdrenkov.cineledger.testutil.constants.DiscountConstants.TYPE;
+import static dev.vdrenkov.cineledger.testutils.constants.DiscountConstants.CODE;
+import static dev.vdrenkov.cineledger.testutils.constants.DiscountConstants.ID;
+import static dev.vdrenkov.cineledger.testutils.constants.DiscountConstants.PERCENTAGE;
+import static dev.vdrenkov.cineledger.testutils.constants.DiscountConstants.TYPE;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;

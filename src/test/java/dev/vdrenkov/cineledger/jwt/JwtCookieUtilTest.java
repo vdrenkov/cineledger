@@ -1,6 +1,6 @@
 package dev.vdrenkov.cineledger.jwt;
 
-import dev.vdrenkov.cineledger.testutil.factories.JwtFactory;
+import dev.vdrenkov.cineledger.testutils.factories.JwtFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -8,7 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpCookie;
 import org.springframework.http.ResponseCookie;
 
-import static dev.vdrenkov.cineledger.testutil.constants.JwtConstants.JWT_TOKEN;
+import static dev.vdrenkov.cineledger.testutils.constants.JwtConstants.JWT_TOKEN;
 import static dev.vdrenkov.cineledger.utils.constants.JwtConstants.JWT_COOKIE_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
