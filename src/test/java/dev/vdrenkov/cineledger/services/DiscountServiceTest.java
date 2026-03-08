@@ -2,7 +2,6 @@ package dev.vdrenkov.cineledger.services;
 
 import dev.vdrenkov.cineledger.exceptions.DiscountAlreadyExistsException;
 import dev.vdrenkov.cineledger.exceptions.DiscountNotFoundException;
-import dev.vdrenkov.cineledger.mappers.DiscountMapper;
 import dev.vdrenkov.cineledger.models.dtos.DiscountDto;
 import dev.vdrenkov.cineledger.models.entities.Discount;
 import dev.vdrenkov.cineledger.models.requests.DiscountRequest;
@@ -35,9 +34,6 @@ class DiscountServiceTest {
 
     @Mock
     private DiscountRepository discountRepository;
-
-    @Mock
-    private DiscountMapper discountMapper;
 
     @InjectMocks
     private DiscountService discountService;
@@ -85,7 +81,6 @@ class DiscountServiceTest {
     void testGetAllDiscountsDto_discountsFound_success() {
         final List<DiscountDto> expected = DiscountFactory.getDefaultDiscountDtoList();
         when(discountRepository.findAll()).thenReturn(DiscountFactory.getDefaultDiscountList());
-        when(discountMapper.mapDiscountListToDiscountDtoList(any())).thenReturn(expected);
 
         final List<DiscountDto> result = discountService.getAllDiscountDtos();
 
@@ -166,7 +161,6 @@ class DiscountServiceTest {
     void testGetDiscountDtoByType_discountFound_success() {
         final DiscountDto expected = DiscountFactory.getDefaultDiscountDto();
         when(discountRepository.findByType(anyString())).thenReturn(Optional.of(DiscountFactory.getDefaultDiscount()));
-        when(discountMapper.mapDiscountToDiscountDto(any())).thenReturn(expected);
 
         final DiscountDto discountDto = discountService.getDiscountDtoByType(DiscountConstants.TYPE);
 
@@ -179,11 +173,10 @@ class DiscountServiceTest {
     @Test
     void testUpdateDiscount_discountUpdated_success() {
         final DiscountDto expected = DiscountFactory.getDefaultDiscountDto();
-        when(discountMapper.mapDiscountToDiscountDto(any())).thenReturn(expected);
-        when(discountRepository.findById(anyInt())).thenReturn(Optional.of(new Discount()));
+        when(discountRepository.findById(anyInt())).thenReturn(Optional.of(DiscountFactory.getDefaultDiscount()));
         when(discountRepository.save(any())).thenReturn(DiscountFactory.getDefaultDiscount());
 
-        DiscountDto discountDto = discountService.updateDiscount(discountRequest, DiscountConstants.ID);
+        final DiscountDto discountDto = discountService.updateDiscount(discountRequest, DiscountConstants.ID);
 
         assertEquals(expected, discountDto);
     }
@@ -194,7 +187,6 @@ class DiscountServiceTest {
     @Test
     void testDeleteDiscount_discountDeleted_success() {
         final DiscountDto expected = DiscountFactory.getDefaultDiscountDto();
-        when(discountMapper.mapDiscountToDiscountDto(any())).thenReturn(expected);
         when(discountRepository.findById(anyInt())).thenReturn(Optional.of(DiscountFactory.getDefaultDiscount()));
 
         final DiscountDto discountDto = discountService.deleteDiscount(DiscountConstants.ID);

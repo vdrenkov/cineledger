@@ -26,20 +26,16 @@ public class ItemService {
     private static final Logger log = LoggerFactory.getLogger(ItemService.class);
 
     private final ItemRepository itemRepository;
-    private final ItemMapper itemMapper;
 
     /**
      * Creates a new item service with its required collaborators.
      *
      * @param itemRepository
      *     item repository used by the operation
-     * @param itemMapper
-     *     item mapper used by the operation
      */
     @Autowired
-    public ItemService(ItemRepository itemRepository, ItemMapper itemMapper) {
+    public ItemService(ItemRepository itemRepository) {
         this.itemRepository = itemRepository;
-        this.itemMapper = itemMapper;
     }
 
     /**
@@ -73,7 +69,7 @@ public class ItemService {
     public ItemDto getItemDtoById(int id) {
         log.info(String.format("An attempt to extract item DTO with id %d from the database", id));
 
-        return itemMapper.mapItemToItemDto(getItemById(id));
+        return ItemMapper.mapItemToItemDto(getItemById(id));
     }
 
     /**
@@ -104,7 +100,7 @@ public class ItemService {
     public ItemDto getItemDtoByName(String itemName) {
         log.info(String.format("An attempt to extract item with name %s from the database", itemName));
 
-        return itemMapper.mapItemToItemDto(itemRepository.findByName(itemName).orElseThrow(() -> {
+        return ItemMapper.mapItemToItemDto(itemRepository.findByName(itemName).orElseThrow(() -> {
             log.error(String.format("Exception caught: %s", ExceptionMessages.ITEM_NOT_FOUND_MESSAGE));
 
             throw new ItemNotFoundException(ExceptionMessages.ITEM_NOT_FOUND_MESSAGE);
@@ -151,7 +147,7 @@ public class ItemService {
     public List<ItemDto> getAllItems() {
         log.info("An attempt to extract all items from the database");
 
-        final List<ItemDto> itemDtos = itemMapper.mapItemToItemDtoList(itemRepository.findAll());
+        final List<ItemDto> itemDtos = new ArrayList<>(ItemMapper.mapItemToItemDtoList(itemRepository.findAll()));
         itemDtos.sort(Comparator.comparing(ItemDto::getId));
 
         return itemDtos;

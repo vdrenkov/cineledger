@@ -5,7 +5,6 @@ import dev.vdrenkov.cineledger.testutils.constants.ItemConstants;
 import dev.vdrenkov.cineledger.testutils.factories.ItemFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
@@ -17,16 +16,12 @@ import static org.junit.Assert.assertEquals;
  */
 @ExtendWith(MockitoExtension.class)
 class ItemMapperTest {
-
-    @InjectMocks
-    private ItemMapper itemMapper;
-
     /**
      * Verifies that map Item To Item DTO success.
      */
     @Test
     void testMapItemToItemDto_success() {
-        final ItemDto itemDto = itemMapper.mapItemToItemDto(ItemFactory.getDefaultItem());
+        final ItemDto itemDto = ItemMapper.mapItemToItemDto(ItemFactory.getDefaultItem());
 
         assertEquals(ItemConstants.ID, itemDto.getId());
         assertEquals(ItemConstants.NAME, itemDto.getName());
@@ -39,7 +34,7 @@ class ItemMapperTest {
      */
     @Test
     void testMapItemToItemDtoList_success() {
-        final List<ItemDto> itemDtos = itemMapper.mapItemToItemDtoList(ItemFactory.getDefaultItemList());
+        final List<ItemDto> itemDtos = ItemMapper.mapItemToItemDtoList(ItemFactory.getDefaultItemList());
 
         final ItemDto itemDto = itemDtos.getFirst();
         assertEquals(ItemConstants.ID, itemDto.getId());

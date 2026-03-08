@@ -4,7 +4,6 @@ import dev.vdrenkov.cineledger.services.ReviewService;
 import dev.vdrenkov.cineledger.testutils.constants.CinemaConstants;
 import dev.vdrenkov.cineledger.testutils.constants.MovieConstants;
 import dev.vdrenkov.cineledger.testutils.constants.UserConstants;
-import dev.vdrenkov.cineledger.testutils.factories.CinemaFactory;
 import dev.vdrenkov.cineledger.testutils.factories.ReviewFactory;
 import dev.vdrenkov.cineledger.utils.constants.URIConstants;
 import org.junit.jupiter.api.BeforeEach;
@@ -98,7 +97,8 @@ class ReviewControllerTest {
      */
     @Test
     void testGetReviewsByCinemaId_noExceptions_success() throws Exception {
-        when(reviewService.getReviewsByCinemaId(anyInt())).thenReturn(ReviewFactory.getDefaultReviewDtoList());
+        when(reviewService.getReviewsByCinemaId(anyInt())).thenReturn(
+            ReviewFactory.getDefaultReviewDtoListWithCinema());
 
         mockMvc
             .perform(get(URIConstants.CINEMAS_ID_REVIEWS_PATH, CinemaConstants.ID))
@@ -107,11 +107,10 @@ class ReviewControllerTest {
             .andExpect(jsonPath("$[0].rating").value(RATING))
             .andExpect(jsonPath("$[0].reviewText").value(REVIEW_TEXT))
             .andExpect(jsonPath("$[0].dateModified", is(DATE_MODIFIED.toString())))
-            .andExpect(jsonPath("$[0].movie.id").value(MovieConstants.ID))
-            .andExpect(jsonPath("$[0].movie.title").value(MovieConstants.TITLE))
-            .andExpect(jsonPath("$[0].movie.description").value(MovieConstants.DESCRIPTION))
-            .andExpect(jsonPath("$[0].movie.releaseDate", is(MovieConstants.RELEASE_DATE.toString())))
-            .andExpect(jsonPath("$[0].cinema").value(CinemaFactory.getDefaultCinemaDto()))
+            .andExpect(jsonPath("$[0].movie").doesNotExist())
+            .andExpect(jsonPath("$[0].cinema.id").value(CinemaConstants.ID))
+            .andExpect(jsonPath("$[0].cinema.address").value(CinemaConstants.ADDRESS))
+            .andExpect(jsonPath("$[0].cinema.city").value(CinemaConstants.CITY))
             .andExpect(jsonPath("$[0].user.id").value(UserConstants.ID))
             .andExpect(jsonPath("$[0].user.username").value(UserConstants.USERNAME))
             .andExpect(jsonPath("$[0].user.email").value(UserConstants.EMAIL))
@@ -138,7 +137,7 @@ class ReviewControllerTest {
             .andExpect(jsonPath("$[0].movie.title").value(MovieConstants.TITLE))
             .andExpect(jsonPath("$[0].movie.description").value(MovieConstants.DESCRIPTION))
             .andExpect(jsonPath("$[0].movie.releaseDate", is(MovieConstants.RELEASE_DATE.toString())))
-            .andExpect(jsonPath("$[0].cinema").value(CinemaFactory.getDefaultCinemaDto()))
+            .andExpect(jsonPath("$[0].cinema").doesNotExist())
             .andExpect(jsonPath("$[0].user.id").value(UserConstants.ID))
             .andExpect(jsonPath("$[0].user.username").value(UserConstants.USERNAME))
             .andExpect(jsonPath("$[0].user.email").value(UserConstants.EMAIL))
@@ -165,7 +164,7 @@ class ReviewControllerTest {
             .andExpect(jsonPath("$[0].movie.title").value(MovieConstants.TITLE))
             .andExpect(jsonPath("$[0].movie.description").value(MovieConstants.DESCRIPTION))
             .andExpect(jsonPath("$[0].movie.releaseDate", is(MovieConstants.RELEASE_DATE.toString())))
-            .andExpect(jsonPath("$[0].cinema").value(CinemaFactory.getDefaultCinemaDto()))
+            .andExpect(jsonPath("$[0].cinema").doesNotExist())
             .andExpect(jsonPath("$[0].user.id").value(UserConstants.ID))
             .andExpect(jsonPath("$[0].user.username").value(UserConstants.USERNAME))
             .andExpect(jsonPath("$[0].user.email").value(UserConstants.EMAIL))
@@ -179,7 +178,8 @@ class ReviewControllerTest {
      */
     @Test
     void testGetCinemaReviewsByUserId_noExceptions_success() throws Exception {
-        when(reviewService.getCinemaReviewsByUserId(anyInt())).thenReturn(ReviewFactory.getDefaultReviewDtoList());
+        when(reviewService.getCinemaReviewsByUserId(anyInt())).thenReturn(
+            ReviewFactory.getDefaultReviewDtoListWithCinema());
 
         mockMvc
             .perform(get(URIConstants.USERS_ID_CINEMAS_REVIEWS_PATH, UserConstants.ID))
@@ -188,11 +188,10 @@ class ReviewControllerTest {
             .andExpect(jsonPath("$[0].rating").value(RATING))
             .andExpect(jsonPath("$[0].reviewText").value(REVIEW_TEXT))
             .andExpect(jsonPath("$[0].dateModified", is(DATE_MODIFIED.toString())))
-            .andExpect(jsonPath("$[0].movie.id").value(MovieConstants.ID))
-            .andExpect(jsonPath("$[0].movie.title").value(MovieConstants.TITLE))
-            .andExpect(jsonPath("$[0].movie.description").value(MovieConstants.DESCRIPTION))
-            .andExpect(jsonPath("$[0].movie.releaseDate", is(MovieConstants.RELEASE_DATE.toString())))
-            .andExpect(jsonPath("$[0].cinema").value(CinemaFactory.getDefaultCinemaDto()))
+            .andExpect(jsonPath("$[0].movie").doesNotExist())
+            .andExpect(jsonPath("$[0].cinema.id").value(CinemaConstants.ID))
+            .andExpect(jsonPath("$[0].cinema.address").value(CinemaConstants.ADDRESS))
+            .andExpect(jsonPath("$[0].cinema.city").value(CinemaConstants.CITY))
             .andExpect(jsonPath("$[0].user.id").value(UserConstants.ID))
             .andExpect(jsonPath("$[0].user.username").value(UserConstants.USERNAME))
             .andExpect(jsonPath("$[0].user.email").value(UserConstants.EMAIL))
@@ -223,7 +222,7 @@ class ReviewControllerTest {
             .andExpect(jsonPath("$.movie.title").value(MovieConstants.TITLE))
             .andExpect(jsonPath("$.movie.description").value(MovieConstants.DESCRIPTION))
             .andExpect(jsonPath("$.movie.releaseDate", is(MovieConstants.RELEASE_DATE.toString())))
-            .andExpect(jsonPath("$.cinema").value(CinemaFactory.getDefaultCinemaDto()))
+            .andExpect(jsonPath("$.cinema").doesNotExist())
             .andExpect(jsonPath("$.user.id").value(UserConstants.ID))
             .andExpect(jsonPath("$.user.username").value(UserConstants.USERNAME))
             .andExpect(jsonPath("$.user.email").value(UserConstants.EMAIL))
@@ -266,7 +265,7 @@ class ReviewControllerTest {
             .andExpect(jsonPath("$.movie.title").value(MovieConstants.TITLE))
             .andExpect(jsonPath("$.movie.description").value(MovieConstants.DESCRIPTION))
             .andExpect(jsonPath("$.movie.releaseDate", is(MovieConstants.RELEASE_DATE.toString())))
-            .andExpect(jsonPath("$.cinema").value(CinemaFactory.getDefaultCinemaDto()))
+            .andExpect(jsonPath("$.cinema").doesNotExist())
             .andExpect(jsonPath("$.user.id").value(UserConstants.ID))
             .andExpect(jsonPath("$.user.username").value(UserConstants.USERNAME))
             .andExpect(jsonPath("$.user.email").value(UserConstants.EMAIL))

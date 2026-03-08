@@ -28,7 +28,6 @@ public class ReviewService {
     private static final Logger log = LoggerFactory.getLogger(ReviewService.class);
 
     private final ReviewRepository reviewRepository;
-    private final ReviewMapper reviewMapper;
     private final UserService userService;
     private final MovieService movieService;
     private final CinemaService cinemaService;
@@ -38,8 +37,6 @@ public class ReviewService {
      *
      * @param reviewRepository
      *     review repository used by the operation
-     * @param reviewMapper
-     *     review mapper used by the operation
      * @param userService
      *     user service used by the operation
      * @param movieService
@@ -48,10 +45,9 @@ public class ReviewService {
      *     cinema service used by the operation
      */
     @Autowired
-    public ReviewService(ReviewRepository reviewRepository, ReviewMapper reviewMapper, UserService userService,
-        MovieService movieService, CinemaService cinemaService) {
+    public ReviewService(ReviewRepository reviewRepository, UserService userService, MovieService movieService,
+        CinemaService cinemaService) {
         this.reviewRepository = reviewRepository;
-        this.reviewMapper = reviewMapper;
         this.userService = userService;
         this.movieService = movieService;
         this.cinemaService = cinemaService;
@@ -122,7 +118,7 @@ public class ReviewService {
         return reviewRepository
             .findByMovieId(movieId)
             .stream()
-            .map(reviewMapper::mapReviewToReviewDto)
+            .map(ReviewMapper::mapReviewToReviewDto)
             .collect(Collectors.toList());
     }
 
@@ -141,7 +137,7 @@ public class ReviewService {
         return reviewRepository
             .findByCinemaId(cinemaId)
             .stream()
-            .map(reviewMapper::mapReviewToReviewDto)
+            .map(ReviewMapper::mapReviewToReviewDto)
             .collect(Collectors.toList());
     }
 
@@ -154,7 +150,7 @@ public class ReviewService {
      */
     public List<ReviewDto> getMovieReviewsByUserId(int userId) {
         if (userService.isCurrentUserAuthorized(userId)) {
-            return reviewMapper.mapReviewListToReviewDtoList(
+            return ReviewMapper.mapReviewListToReviewDtoList(
                 reviewRepository.findAllByUserIdAndMovieIsNotNullAndCinemaIsNull(userId));
         } else {
             throw new NotAuthorizedException(ExceptionMessages.NOT_AUTHORIZED_MESSAGE);
@@ -170,7 +166,7 @@ public class ReviewService {
      */
     public List<ReviewDto> getCinemaReviewsByUserId(int userId) {
         if (userService.isCurrentUserAuthorized(userId)) {
-            return reviewMapper.mapReviewListToReviewDtoList(
+            return ReviewMapper.mapReviewListToReviewDtoList(
                 reviewRepository.findAllByUserIdAndMovieIsNullAndCinemaIsNotNull(userId));
         } else {
             throw new NotAuthorizedException(ExceptionMessages.NOT_AUTHORIZED_MESSAGE);
@@ -199,7 +195,7 @@ public class ReviewService {
             throw new NotAuthorizedException(ExceptionMessages.NOT_AUTHORIZED_MESSAGE);
         }
 
-        final ReviewDto reviewDto = reviewMapper.mapReviewToReviewDto(review);
+        final ReviewDto reviewDto = ReviewMapper.mapReviewToReviewDto(review);
 
         review.setReviewText(request.getReviewText());
         review.setRating(request.getRating());
@@ -242,7 +238,7 @@ public class ReviewService {
             throw new NotAuthorizedException(ExceptionMessages.NOT_AUTHORIZED_MESSAGE);
         }
 
-        final ReviewDto reviewDto = reviewMapper.mapReviewToReviewDto(review);
+        final ReviewDto reviewDto = ReviewMapper.mapReviewToReviewDto(review);
 
         reviewRepository.delete(review);
 

@@ -55,7 +55,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Converts application and framework exceptions into consistent HTTP error responses.
@@ -232,7 +231,7 @@ public class GlobalExceptionHandler {
             .getFieldErrors()
             .stream()
             .map(FieldError::getDefaultMessage)
-            .collect(Collectors.toList());
+            .toList();
         return new ResponseEntity<>(formatErrorsResponse(errors), HttpStatus.BAD_REQUEST);
     }
 
@@ -809,12 +808,12 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorsMap, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    private Map<String, List<String>> formatErrorsResponse(String... errors) {
-        return formatErrorsResponse(Arrays.stream(errors).collect(Collectors.toList()));
+    private static Map<String, List<String>> formatErrorsResponse(String... errors) {
+        return formatErrorsResponse(Arrays.stream(errors).toList());
     }
 
-    private Map<String, List<String>> formatErrorsResponse(List<String> errors) {
-        final Map<String, List<String>> errorResponse = new HashMap<>(4);
+    private static Map<String, List<String>> formatErrorsResponse(List<String> errors) {
+        final Map<String, List<String>> errorResponse = HashMap.newHashMap(4);
         errorResponse.put("Errors", errors);
         return errorResponse;
     }

@@ -2,7 +2,6 @@ package dev.vdrenkov.cineledger.services;
 
 import dev.vdrenkov.cineledger.exceptions.CategoryAlreadyExistsException;
 import dev.vdrenkov.cineledger.exceptions.CategoryNotFoundException;
-import dev.vdrenkov.cineledger.mappers.CategoryMapper;
 import dev.vdrenkov.cineledger.models.dtos.CategoryDto;
 import dev.vdrenkov.cineledger.models.entities.Category;
 import dev.vdrenkov.cineledger.models.requests.CategoryRequest;
@@ -33,9 +32,6 @@ class CategoryServiceTest {
     final CategoryRequest categoryRequest = CategoryFactory.getDefaultCategoryRequest();
 
     @Mock
-    private CategoryMapper categoryMapper;
-
-    @Mock
     private CategoryRepository categoryRepository;
 
     @InjectMocks
@@ -61,7 +57,6 @@ class CategoryServiceTest {
     void testGetAllCategories_noExceptions_success() {
         final List<CategoryDto> expected = CategoryFactory.getDefaultCategoryDtoList();
 
-        when(categoryMapper.mapCategoryToCategoryDtoList(any())).thenReturn(expected);
         when(categoryRepository.findAll()).thenReturn(CategoryFactory.getDefaultCategoryList());
 
         final List<CategoryDto> result = categoryService.getAllCategories();
@@ -75,7 +70,6 @@ class CategoryServiceTest {
     @Test
     void testGetCategoryDtoById_noExceptions_success() {
         final CategoryDto expected = CategoryFactory.getDefaultCategoryDto();
-        when(categoryMapper.mapCategoryToCategoryDto(any())).thenReturn(expected);
         when(categoryRepository.findById(anyInt())).thenReturn(Optional.of(CategoryFactory.getDefaultCategory()));
 
         final CategoryDto categoryDto = categoryService.getCategoryDtoById(CategoryConstants.ID);
@@ -99,8 +93,7 @@ class CategoryServiceTest {
     @Test
     void testGetCategoryDtoByName_noExceptions_success() {
         final CategoryDto expected = CategoryFactory.getDefaultCategoryDto();
-        when(categoryMapper.mapCategoryToCategoryDto(any())).thenReturn(expected);
-        when(categoryRepository.findByName(anyString())).thenReturn(Optional.of(new Category()));
+        when(categoryRepository.findByName(anyString())).thenReturn(Optional.of(CategoryFactory.getDefaultCategory()));
 
         final CategoryDto categoryDto = categoryService.getCategoryDtoByName(CategoryConstants.NAME);
 
@@ -124,11 +117,10 @@ class CategoryServiceTest {
     @Test
     void testUpdateCategory_success() {
         final CategoryDto expected = CategoryFactory.getDefaultCategoryDto();
-        when(categoryMapper.mapCategoryToCategoryDto(any())).thenReturn(expected);
         when(categoryRepository.findById(anyInt())).thenReturn(Optional.of(CategoryFactory.getDefaultCategory()));
         when(categoryRepository.save(any())).thenReturn(CategoryFactory.getDefaultCategory());
 
-        CategoryDto categoryDto = categoryService.updateCategory(categoryRequest, CategoryConstants.ID);
+        final CategoryDto categoryDto = categoryService.updateCategory(categoryRequest, CategoryConstants.ID);
 
         assertEquals(expected, categoryDto);
     }
@@ -149,7 +141,6 @@ class CategoryServiceTest {
     @Test
     void testDeleteCategory_success() {
         final CategoryDto expected = CategoryFactory.getDefaultCategoryDto();
-        when(categoryMapper.mapCategoryToCategoryDto(any())).thenReturn(expected);
         when(categoryRepository.findById(anyInt())).thenReturn(Optional.of(CategoryFactory.getDefaultCategory()));
 
         final CategoryDto categoryDto = categoryService.deleteCategory(CategoryConstants.ID);

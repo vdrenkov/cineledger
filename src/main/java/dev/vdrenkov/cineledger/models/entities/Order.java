@@ -43,8 +43,8 @@ public class Order {
     private List<Ticket> tickets;
 
     @ManyToMany
-    @JoinTable(name = "orders_items", joinColumns = { @JoinColumn(name = "order_id") },
-        inverseJoinColumns = { @JoinColumn(name = "item_id") })
+    @JoinTable(name = "orders_items", joinColumns = @JoinColumn(name = "order_id"),
+        inverseJoinColumns = @JoinColumn(name = "item_id"))
     private List<Item> items;
 
     @Column(name = "total_price")

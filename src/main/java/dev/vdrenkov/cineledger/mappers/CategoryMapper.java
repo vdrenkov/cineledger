@@ -4,17 +4,18 @@ import dev.vdrenkov.cineledger.models.dtos.CategoryDto;
 import dev.vdrenkov.cineledger.models.entities.Category;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Maps category domain models to DTO representations used by the API.
  */
-@Component
-public class CategoryMapper {
+public final class CategoryMapper {
     private static final Logger log = LoggerFactory.getLogger(CategoryMapper.class);
+
+    private CategoryMapper() {
+        /* This utility class should not be instantiated */
+    }
 
     /**
      * Maps category values to category dto values.
@@ -23,8 +24,8 @@ public class CategoryMapper {
      *     category entity to transform
      * @return category dto result
      */
-    public CategoryDto mapCategoryToCategoryDto(Category category) {
-        log.info(String.format("The category %s is being mapped to a category DTO", category.getName()));
+    public static CategoryDto mapCategoryToCategoryDto(Category category) {
+        log.info("Mapping the category {} to a category DTO", category.getName());
         return new CategoryDto(category.getId(), category.getName());
     }
 
@@ -35,8 +36,8 @@ public class CategoryMapper {
      *     category entities to transform
      * @return matching category dto values
      */
-    public List<CategoryDto> mapCategoryToCategoryDtoList(List<Category> categories) {
-        return categories.stream().map(this::mapCategoryToCategoryDto).collect(Collectors.toList());
+    public static List<CategoryDto> mapCategoryToCategoryDtoList(List<Category> categories) {
+        return categories.stream().map(CategoryMapper::mapCategoryToCategoryDto).toList();
     }
 }
 

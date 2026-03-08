@@ -24,8 +24,8 @@ import static dev.vdrenkov.cineledger.testutils.constants.ReviewConstants.REVIEW
  */
 public final class ReviewFactory {
 
-    private ReviewFactory() throws IllegalAccessException {
-        throw new IllegalAccessException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
+    private ReviewFactory() {
+        throw new IllegalStateException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
     }
 
     /**
@@ -52,8 +52,16 @@ public final class ReviewFactory {
      * @return test review dto value
      */
     public static ReviewDto getDefaultReviewDto() {
-        return new ReviewDto(ID, RATING, REVIEW_TEXT, DATE_MODIFIED, REVIEW_MOVIE_DTO, REVIEW_CINEMA_DTO,
-            REVIEW_USER_DTO);
+        return new ReviewDto(ID, RATING, REVIEW_TEXT, DATE_MODIFIED, REVIEW_MOVIE_DTO, null, REVIEW_USER_DTO);
+    }
+
+    /**
+     * Returns the default cinema review dto fixture used in tests.
+     *
+     * @return test review dto value
+     */
+    public static ReviewDto getDefaultReviewDtoWithCinema() {
+        return new ReviewDto(ID, RATING, REVIEW_TEXT, DATE_MODIFIED, null, REVIEW_CINEMA_DTO, REVIEW_USER_DTO);
     }
 
     /**
@@ -81,6 +89,15 @@ public final class ReviewFactory {
      */
     public static List<ReviewDto> getDefaultReviewDtoList() {
         return Collections.singletonList(getDefaultReviewDto());
+    }
+
+    /**
+     * Returns the default cinema review dto list fixture used in tests.
+     *
+     * @return test review dto values
+     */
+    public static List<ReviewDto> getDefaultReviewDtoListWithCinema() {
+        return Collections.singletonList(getDefaultReviewDtoWithCinema());
     }
 
     /**

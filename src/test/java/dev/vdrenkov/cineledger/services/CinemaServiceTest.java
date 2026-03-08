@@ -2,7 +2,6 @@ package dev.vdrenkov.cineledger.services;
 
 import dev.vdrenkov.cineledger.exceptions.CinemaAlreadyExistsException;
 import dev.vdrenkov.cineledger.exceptions.CinemaNotFoundException;
-import dev.vdrenkov.cineledger.mappers.CinemaMapper;
 import dev.vdrenkov.cineledger.models.dtos.CinemaDto;
 import dev.vdrenkov.cineledger.models.entities.Cinema;
 import dev.vdrenkov.cineledger.models.requests.CinemaRequest;
@@ -34,9 +33,6 @@ class CinemaServiceTest {
 
     @Mock
     private CinemaRepository cinemaRepository;
-
-    @Mock
-    private CinemaMapper cinemaMapper;
 
     @InjectMocks
     private CinemaService cinemaService;
@@ -78,7 +74,6 @@ class CinemaServiceTest {
     @Test
     void testGetAllCinemas_cityAndAddressNotNull_success() {
         final List<CinemaDto> expected = CinemaFactory.getDefaultCinemaDtoList();
-        when(cinemaMapper.mapCinemaToCinemaDtoList(any())).thenReturn(expected);
         when(cinemaRepository.findAllByCityAndAddress(anyString(), anyString())).thenReturn(
             CinemaFactory.getDefaultCinemaList());
 
@@ -93,7 +88,6 @@ class CinemaServiceTest {
     @Test
     void testGetAllCinemas_cityNotNull_success() {
         final List<CinemaDto> expected = CinemaFactory.getDefaultCinemaDtoList();
-        when(cinemaMapper.mapCinemaToCinemaDtoList(any())).thenReturn(expected);
         when(cinemaRepository.findAllByCity(anyString())).thenReturn(CinemaFactory.getDefaultCinemaList());
 
         final List<CinemaDto> result = cinemaService.getAllCinemas(CinemaConstants.CITY, null);
@@ -107,7 +101,6 @@ class CinemaServiceTest {
     @Test
     void testGetAllCinemas_addressNotNull_success() {
         final List<CinemaDto> expected = CinemaFactory.getDefaultCinemaDtoList();
-        when(cinemaMapper.mapCinemaToCinemaDtoList(any())).thenReturn(expected);
         when(cinemaRepository.findAllByAddress(anyString())).thenReturn(CinemaFactory.getDefaultCinemaList());
 
         final List<CinemaDto> result = cinemaService.getAllCinemas(null, CinemaConstants.ADDRESS);
@@ -142,8 +135,7 @@ class CinemaServiceTest {
     @Test
     void testGetCinemaDtoById_cinemaDtoFound_success() {
         final CinemaDto expected = CinemaFactory.getDefaultCinemaDto();
-        when(cinemaMapper.mapCinemaToCinemaDto(any())).thenReturn(expected);
-        when(cinemaRepository.findById(anyInt())).thenReturn(Optional.of(new Cinema()));
+        when(cinemaRepository.findById(anyInt())).thenReturn(Optional.of(CinemaFactory.getDefaultCinema()));
 
         final CinemaDto cinemaDto = cinemaService.getCinemaDtoById(CinemaConstants.ID);
 
@@ -156,7 +148,6 @@ class CinemaServiceTest {
     @Test
     void testUpdateCinema_cinemaUpdated_success() {
         final CinemaDto expected = CinemaFactory.getDefaultCinemaDto();
-        when(cinemaMapper.mapCinemaToCinemaDto(any())).thenReturn(expected);
         when(cinemaRepository.findById(anyInt())).thenReturn(Optional.of(CinemaFactory.getDefaultCinema()));
         when(cinemaRepository.save(any())).thenReturn(CinemaFactory.getDefaultCinema());
 
@@ -171,7 +162,6 @@ class CinemaServiceTest {
     @Test
     void testDeleteCinema_cinemaDeleted_success() {
         final CinemaDto expected = CinemaFactory.getDefaultCinemaDto();
-        when(cinemaMapper.mapCinemaToCinemaDto(any())).thenReturn(expected);
         when(cinemaRepository.findById(anyInt())).thenReturn(Optional.of(CinemaFactory.getDefaultCinema()));
 
         final CinemaDto cinemaDto = cinemaService.deleteCinema(CinemaConstants.ID);
@@ -186,7 +176,6 @@ class CinemaServiceTest {
     void testUpdateCinemaAverageRating_success() {
         final double newRating = 4.5;
 
-        when(cinemaMapper.mapCinemaToCinemaDto(any())).thenReturn(CinemaFactory.getDefaultCinemaDto());
         when(cinemaRepository.findById(anyInt())).thenReturn(Optional.of(CinemaFactory.getDefaultCinema()));
 
         final CinemaDto result = cinemaService.updateCinemaAverageRating(newRating, CinemaConstants.ID);

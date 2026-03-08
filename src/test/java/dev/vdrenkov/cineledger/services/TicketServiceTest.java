@@ -3,7 +3,6 @@ package dev.vdrenkov.cineledger.services;
 import dev.vdrenkov.cineledger.exceptions.DateNotValidException;
 import dev.vdrenkov.cineledger.exceptions.NoAvailableTicketsException;
 import dev.vdrenkov.cineledger.exceptions.TicketNotFoundException;
-import dev.vdrenkov.cineledger.mappers.TicketMapper;
 import dev.vdrenkov.cineledger.models.dtos.TicketDto;
 import dev.vdrenkov.cineledger.models.entities.Projection;
 import dev.vdrenkov.cineledger.models.entities.Ticket;
@@ -37,9 +36,6 @@ import static org.mockito.Mockito.when;
 class TicketServiceTest {
 
     @Mock
-    private TicketMapper ticketMapper;
-
-    @Mock
     private TicketRepository ticketRepository;
 
     @Mock
@@ -68,7 +64,8 @@ class TicketServiceTest {
 
         when(projectionService.getProjectionById(anyInt())).thenReturn(projection);
         when(ticketRepository.save(any())).thenReturn(expected);
-        when(ticketService.calculateAvailableTickets(projection)).thenReturn(availableTickets);
+        when(ticketRepository.countByProjectionId(anyInt())).thenReturn(
+            projection.getHall().getCapacity() - availableTickets);
 
         final Ticket ticket = ticketService.addTicket(request);
 
@@ -84,7 +81,6 @@ class TicketServiceTest {
 
         when(ticketRepository.findTicketByProjectionId(anyInt())).thenReturn(TicketFactory.getDefaultTicketList());
         when(projectionService.getProjectionById(anyInt())).thenReturn(ProjectionFactory.getDefaultProjection());
-        when(ticketMapper.mapTicketToTicketDto(any())).thenReturn(TicketFactory.getDefaultTicketDto());
 
         final List<TicketDto> result = ticketService.getTicketsByProjectionId(TicketConstants.ID);
 

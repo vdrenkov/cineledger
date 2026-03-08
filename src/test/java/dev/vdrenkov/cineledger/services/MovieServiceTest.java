@@ -3,7 +3,6 @@ package dev.vdrenkov.cineledger.services;
 import dev.vdrenkov.cineledger.exceptions.DateNotValidException;
 import dev.vdrenkov.cineledger.exceptions.MovieAlreadyExistsException;
 import dev.vdrenkov.cineledger.exceptions.MovieNotFoundException;
-import dev.vdrenkov.cineledger.mappers.MovieMapper;
 import dev.vdrenkov.cineledger.models.dtos.MovieDto;
 import dev.vdrenkov.cineledger.models.entities.Movie;
 import dev.vdrenkov.cineledger.models.requests.MovieRequest;
@@ -40,9 +39,6 @@ class MovieServiceTest {
     private MovieRepository movieRepository;
 
     @Mock
-    private MovieMapper movieMapper;
-
-    @Mock
     private CategoryService categoryService;
 
     @Mock
@@ -58,7 +54,6 @@ class MovieServiceTest {
     void testGetMoviesByTitle_minRatingNotNull_success() {
         final List<MovieDto> expected = MovieFactory.getDefaultMovieDtoList();
 
-        when(movieMapper.mapMovieListToMovieDtoList(any())).thenReturn(expected);
         when(
             movieRepository.findByTitleContainingAndAverageRatingGreaterThanEqual(anyString(), anyDouble())).thenReturn(
             MovieFactory.getDefaultMovieList());
@@ -75,7 +70,6 @@ class MovieServiceTest {
     void testGetMoviesByTitle_minRatingNull_success() {
         final List<MovieDto> expected = MovieFactory.getDefaultMovieDtoList();
 
-        when(movieMapper.mapMovieListToMovieDtoList(any())).thenReturn(expected);
         when(movieRepository.findByTitleContaining(anyString())).thenReturn(MovieFactory.getDefaultMovieList());
 
         final List<MovieDto> resultList = movieService.getMoviesByTitle(MovieConstants.TITLE, 0);
@@ -90,7 +84,6 @@ class MovieServiceTest {
     void testGetMoviesByCategory_minRatingNotNull_success() {
         final List<MovieDto> expected = MovieFactory.getDefaultMovieDtoList();
 
-        when(movieMapper.mapMovieListToMovieDtoList(any())).thenReturn(expected);
         when(movieRepository.findByCategoryIdAndAverageRatingGreaterThanEqual(anyInt(), anyDouble())).thenReturn(
             MovieFactory.getDefaultMovieList());
 
@@ -106,7 +99,6 @@ class MovieServiceTest {
     void testGetMoviesByCategory_minRatingNull_success() {
         final List<MovieDto> expected = MovieFactory.getDefaultMovieDtoList();
 
-        when(movieMapper.mapMovieListToMovieDtoList(any())).thenReturn(expected);
         when(movieRepository.findByCategoryId(anyInt())).thenReturn(MovieFactory.getDefaultMovieList());
 
         final List<MovieDto> resultList = movieService.getMoviesByCategory(MovieConstants.ID, 0);
@@ -121,7 +113,6 @@ class MovieServiceTest {
     void testGetMoviesByReleaseDateAfter_isAfterTrue_minRatingNotNull_success() {
         final List<MovieDto> expected = MovieFactory.getDefaultMovieDtoList();
 
-        when(movieMapper.mapMovieListToMovieDtoList(any())).thenReturn(expected);
         when(movieRepository.findByReleaseDateAfterAndAverageRatingGreaterThanEqual(any(), anyDouble())).thenReturn(
             MovieFactory.getDefaultMovieList());
 
@@ -139,7 +130,6 @@ class MovieServiceTest {
         final List<MovieDto> expected = MovieFactory.getDefaultMovieDtoList();
 
         when(movieRepository.findByReleaseDateAfter(any())).thenReturn(MovieFactory.getDefaultMovieList());
-        when(movieMapper.mapMovieListToMovieDtoList(any())).thenReturn(expected);
 
         final List<MovieDto> resultList = movieService.getMoviesByReleaseDate(MovieConstants.RELEASE_DATE, null, true);
 
@@ -154,7 +144,6 @@ class MovieServiceTest {
         final List<MovieDto> expected = MovieFactory.getDefaultMovieDtoList();
 
         when(movieRepository.findByReleaseDateBefore(any())).thenReturn(MovieFactory.getDefaultMovieList());
-        when(movieMapper.mapMovieListToMovieDtoList(any())).thenReturn(expected);
 
         final List<MovieDto> resultList = movieService.getMoviesByReleaseDate(MovieConstants.RELEASE_DATE, null, false);
 
@@ -170,7 +159,6 @@ class MovieServiceTest {
 
         when(movieRepository.findByReleaseDateBeforeAndAverageRatingGreaterThanEqual(any(), anyDouble())).thenReturn(
             MovieFactory.getDefaultMovieList());
-        when(movieMapper.mapMovieListToMovieDtoList(any())).thenReturn(expected);
 
         List<MovieDto> resultList = movieService.getMoviesByReleaseDate(MovieConstants.RELEASE_DATE,
             MovieConstants.RATING, false);
@@ -185,7 +173,6 @@ class MovieServiceTest {
     void testGetMoviesByMinRating_success() {
         final List<MovieDto> expected = MovieFactory.getDefaultMovieDtoList();
 
-        when(movieMapper.mapMovieListToMovieDtoList(any())).thenReturn(expected);
         when(movieRepository.findByAverageRatingGreaterThanEqual(anyDouble())).thenReturn(
             MovieFactory.getDefaultMovieList());
 
@@ -270,8 +257,8 @@ class MovieServiceTest {
     void testUpdateMovie_success() {
         final MovieDto expected = MovieFactory.getDefaultMovieDto();
 
-        when(movieMapper.mapMovieToMovieDto(any())).thenReturn(expected);
-        when(movieRepository.findById(anyInt())).thenReturn(Optional.of(new Movie()));
+        when(movieRepository.findById(anyInt())).thenReturn(Optional.of(MovieFactory.getDefaultMovie()));
+        when(categoryService.getCategoryById(anyInt())).thenReturn(CategoryFactory.getDefaultCategory());
         when(movieRepository.save(any())).thenReturn(MovieFactory.getDefaultMovie());
 
         final MovieDto movie = movieService.updateMovie(MovieFactory.getDefaultMovieRequest(), MovieConstants.ID);
@@ -296,7 +283,6 @@ class MovieServiceTest {
         final MovieRequest request = MovieFactory.getDefaultMovieRequest();
         request.setReleaseDate(LocalDate.of(2000, 1, 1));
 
-        when(movieMapper.mapMovieToMovieDto(any())).thenReturn(MovieFactory.getDefaultMovieDto());
         when(movieRepository.findById(anyInt())).thenReturn(Optional.of(MovieFactory.getDefaultMovie()));
 
         assertThrows(DateNotValidException.class, () -> movieService.updateMovie(request, MovieConstants.ID));
@@ -309,7 +295,6 @@ class MovieServiceTest {
     void testDeleteMovie_success() {
         final MovieDto expected = MovieFactory.getDefaultMovieDto();
 
-        when(movieMapper.mapMovieToMovieDto(any())).thenReturn(expected);
         when(movieRepository.findById(anyInt())).thenReturn(Optional.of(MovieFactory.getDefaultMovie()));
 
         final MovieDto movie = movieService.deleteMovie(MovieConstants.ID);
@@ -348,7 +333,6 @@ class MovieServiceTest {
     void testGetMovieDtoById_success() {
         final MovieDto expected = MovieFactory.getDefaultMovieDto();
 
-        when(movieMapper.mapMovieToMovieDto(any())).thenReturn(expected);
         when(movieRepository.findById(anyInt())).thenReturn(Optional.of(MovieFactory.getDefaultMovie()));
 
         final MovieDto movieDto = movieService.getMovieDtoById(MovieConstants.ID);
@@ -399,7 +383,6 @@ class MovieServiceTest {
     void testUpdateMovieAverageRating_success() {
         final double newRating = 4.5;
 
-        when(movieMapper.mapMovieToMovieDto(any())).thenReturn(MovieFactory.getDefaultMovieDto());
         when(movieRepository.findById(anyInt())).thenReturn(Optional.of(MovieFactory.getDefaultMovie()));
 
         final MovieDto result = movieService.updateMovieAverageRating(newRating, MovieConstants.ID);

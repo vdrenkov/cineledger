@@ -3,7 +3,6 @@ package dev.vdrenkov.cineledger.services;
 import dev.vdrenkov.cineledger.exceptions.DiscountNotValidException;
 import dev.vdrenkov.cineledger.exceptions.NotAuthorizedException;
 import dev.vdrenkov.cineledger.exceptions.OrderNotFoundException;
-import dev.vdrenkov.cineledger.mappers.OrderMapper;
 import dev.vdrenkov.cineledger.models.dtos.OrderDto;
 import dev.vdrenkov.cineledger.models.entities.Item;
 import dev.vdrenkov.cineledger.models.entities.Order;
@@ -51,9 +50,6 @@ import static org.mockito.Mockito.when;
 class OrderServiceTest {
     final List<TicketRequest> ticketRequests = Collections.singletonList(TicketFactory.getDefaultTicketRequest());
     final OrderRequest orderRequest = OrderFactory.getDefaultOrderRequest();
-
-    @Mock
-    private OrderMapper orderMapper;
 
     @Mock
     private OrderRepository orderRepository;
@@ -125,7 +121,8 @@ class OrderServiceTest {
         when(orderRepository.save(any())).thenReturn(expected);
         when(discountService.applyDiscount(anyDouble(), anyString())).thenReturn(OrderConstants.TOTAL_PRICE);
 
-        Order order = orderService.makeReservationWithUserId(ticketRequests, OrderConstants.ID, DiscountConstants.CODE);
+        final Order order = orderService.makeReservationWithUserId(ticketRequests, OrderConstants.ID,
+            DiscountConstants.CODE);
 
         assertEquals(expected, order);
     }
@@ -171,13 +168,9 @@ class OrderServiceTest {
         when(userService.getCurrentUser()).thenReturn(user);
         when(orderRepository.findOrderByUserId(anyInt())).thenReturn(OrderFactory.getDefaultOrderList());
 
-        final List<OrderDto> orderDtos = OrderFactory.getDefaultOrderDtoList();
-        when(orderMapper.mapOrderToOrderDtoList(OrderFactory.getDefaultOrderList())).thenReturn(orderDtos);
-        when(orderRepository.findOrderByUserId(anyInt())).thenReturn(OrderFactory.getDefaultOrderList());
-
         final List<OrderDto> result = orderService.getOrdersByUserId(OrderConstants.ID);
 
-        assertEquals(orderDtos, result);
+        assertEquals(OrderFactory.getDefaultOrderDtoList(), result);
     }
 
     /**
@@ -200,7 +193,6 @@ class OrderServiceTest {
         final OrderDto expected = OrderFactory.getDefaultOrderDto();
 
         when(orderRepository.findById(anyInt())).thenReturn(Optional.of(OrderFactory.getDefaultOrder()));
-        when(orderMapper.mapOrderToOrderDto(any())).thenReturn(OrderFactory.getDefaultOrderDto());
         when(ticketService.getTicketById(anyInt())).thenReturn(TicketFactory.getDefaultTicket());
         when(userService.getUserById(anyInt())).thenReturn(UserFactory.getDefaultUser());
         when(orderRepository.save(any())).thenReturn(OrderFactory.getDefaultOrder());
@@ -235,8 +227,7 @@ class OrderServiceTest {
     void testDeleteOrder_noExceptions_fail() {
         final OrderDto expected = OrderFactory.getDefaultOrderDto();
 
-        when(orderRepository.findById(anyInt())).thenReturn(Optional.of(new Order()));
-        when(orderMapper.mapOrderToOrderDto(any())).thenReturn(expected);
+        when(orderRepository.findById(anyInt())).thenReturn(Optional.of(OrderFactory.getDefaultOrder()));
 
         final OrderDto result = orderService.deleteOrder(OrderConstants.ID);
 
@@ -275,7 +266,7 @@ class OrderServiceTest {
     void testOrderMutations_areTransactional() throws NoSuchMethodException {
         final Method addOrder = OrderService.class.getMethod("addOrder", OrderRequest.class);
         final Method updateOrder = OrderService.class.getMethod("updateOrder", OrderRequest.class, int.class);
-        Method reserveOrder = OrderService.class.getMethod("makeReservationWithUserId", List.class, int.class,
+        final Method reserveOrder = OrderService.class.getMethod("makeReservationWithUserId", List.class, int.class,
             String.class);
         final Method deleteOrder = OrderService.class.getMethod("deleteOrder", int.class);
 

@@ -5,7 +5,6 @@ import dev.vdrenkov.cineledger.testutils.constants.CinemaConstants;
 import dev.vdrenkov.cineledger.testutils.factories.CinemaFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
@@ -17,16 +16,12 @@ import static org.junit.Assert.assertEquals;
  */
 @ExtendWith(MockitoExtension.class)
 class CinemaMapperTest {
-
-    @InjectMocks
-    private CinemaMapper cinemaMapper;
-
     /**
      * Verifies that map Cinema To Cinema DTO success.
      */
     @Test
     void testMapCinemaToCinemaDto_success() {
-        final CinemaDto cinemaDto = cinemaMapper.mapCinemaToCinemaDto(CinemaFactory.getDefaultCinema());
+        final CinemaDto cinemaDto = CinemaMapper.mapCinemaToCinemaDto(CinemaFactory.getDefaultCinema());
 
         assertEquals(CinemaConstants.ID, cinemaDto.getId());
         assertEquals(CinemaConstants.ADDRESS, cinemaDto.getAddress());
@@ -39,7 +34,7 @@ class CinemaMapperTest {
      */
     @Test
     void testMapCinemaToCinemaDtoList() {
-        final List<CinemaDto> cinemaDtos = cinemaMapper.mapCinemaToCinemaDtoList(CinemaFactory.getDefaultCinemaList());
+        final List<CinemaDto> cinemaDtos = CinemaMapper.mapCinemaToCinemaDtoList(CinemaFactory.getDefaultCinemaList());
 
         final CinemaDto cinemaDto = cinemaDtos.getFirst();
         assertEquals(CinemaConstants.ID, cinemaDto.getId());

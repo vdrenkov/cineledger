@@ -7,7 +7,6 @@ import dev.vdrenkov.cineledger.exceptions.UserEmailAlreadyExistsException;
 import dev.vdrenkov.cineledger.exceptions.UserNotFoundException;
 import dev.vdrenkov.cineledger.exceptions.UsernameAlreadyExistsException;
 import dev.vdrenkov.cineledger.jwt.JwtCookieUtil;
-import dev.vdrenkov.cineledger.mappers.UserMapper;
 import dev.vdrenkov.cineledger.models.dtos.UserDto;
 import dev.vdrenkov.cineledger.models.entities.Role;
 import dev.vdrenkov.cineledger.models.entities.User;
@@ -81,9 +80,6 @@ class UserServiceTest {
 
     @Mock
     private RoleService roleService;
-
-    @Mock
-    private UserMapper userMapper;
 
     @InjectMocks
     private UserService userService;
@@ -262,7 +258,6 @@ class UserServiceTest {
         final UserDto expected = UserFactory.getDefaultUserDto();
 
         when(userRepository.findById(anyInt())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
-        when(userMapper.mapUserToUserDto(UserFactory.getDefaultUser())).thenReturn(expected);
 
         final UserDto userDto = userService.getUserDtoById(UserConstants.ID);
 
@@ -301,7 +296,6 @@ class UserServiceTest {
         final UserDto expected = UserFactory.getDefaultUserDto();
 
         when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
-        when(userMapper.mapUserToUserDto(UserFactory.getDefaultUser())).thenReturn(expected);
 
         final UserDto user = userService.getUserDtoByUsername(UserConstants.USERNAME);
 
@@ -340,7 +334,6 @@ class UserServiceTest {
         final UserDto expected = UserFactory.getDefaultUserDto();
 
         when(userRepository.findUserByEmail(anyString())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
-        when(userMapper.mapUserToUserDto(UserFactory.getDefaultUser())).thenReturn(expected);
 
         final UserDto result = userService.getUserDtoByEmail(UserConstants.EMAIL);
 
@@ -368,8 +361,7 @@ class UserServiceTest {
     void testGetUsersDtoByRoleName_success() {
         final List<UserDto> expected = UserFactory.getDefaultUserDtoList();
 
-        when(userService.getUsersByRoleName(RoleConstants.NAME)).thenReturn(UserFactory.getDefaultUserList());
-        when(userMapper.mapUsersToUserDtos(UserFactory.getDefaultUserList())).thenReturn(expected);
+        when(userRepository.findAllByRolesName(RoleConstants.NAME)).thenReturn(UserFactory.getDefaultUserList());
 
         final List<UserDto> resultList = userService.getUsersDtoByRoleName(RoleConstants.NAME);
 
@@ -413,16 +405,8 @@ class UserServiceTest {
      */
     @Test
     void getUsersDtosByJoinDate() {
-        final User user2 = UserFactory.getDefaultUser();
-        user2.setId(2);
-
-        final List<User> users = Arrays.asList(UserFactory.getDefaultUser(), user2);
-
-        when(userService.getUsersByJoinDate(UserConstants.JOIN_DATE, true)).thenReturn(users);
-        when(userService.getUsersByJoinDate(UserConstants.JOIN_DATE, true)).thenReturn(
+        when(userRepository.findAllByJoinDateBefore(UserConstants.JOIN_DATE)).thenReturn(
             UserFactory.getDefaultUserList());
-        when(userMapper.mapUsersToUserDtos(UserFactory.getDefaultUserList())).thenReturn(
-            UserFactory.getDefaultUserDtoList());
 
         final List<UserDto> actualUserDtos = userService.getUsersDtosByJoinDate(UserConstants.JOIN_DATE, true);
         assertEquals(UserFactory.getDefaultUserDtoList(), actualUserDtos);
@@ -436,7 +420,6 @@ class UserServiceTest {
         final UserDto expected = UserFactory.getDefaultUserDto();
 
         when(userRepository.findById(anyInt())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
-        when(userMapper.mapUserToUserDto(any())).thenReturn(expected);
         when(roleService.getRoleByName(anyString())).thenReturn(RoleFactory.getDefaultRole());
         when(userRepository.save(any())).thenReturn(UserFactory.getDefaultUser());
 
@@ -456,7 +439,6 @@ class UserServiceTest {
         final Authentication authentication = JwtFactory.getDefaultAuthentication();
         SecurityContextHolder.setContext(securityContext);
         when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(userMapper.mapUserToUserDto(any())).thenReturn(expectedUserDto);
         when(passwordEncoder.encode(any())).thenReturn(UserConstants.PASSWORD);
         when(userRepository.findById(anyInt())).thenReturn(Optional.of(expectedUser));
         when(userRepository.findUserByUsername(anyString()))
@@ -498,7 +480,6 @@ class UserServiceTest {
         final Authentication authentication = JwtFactory.getDefaultAuthentication();
 
         when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(userMapper.mapUserToUserDto(any())).thenReturn(userDto);
         when(userRepository.findById(anyInt())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
         when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
         when(roleService.getRoleByName(anyString())).thenReturn(RoleFactory.getDefaultRole());
@@ -513,13 +494,11 @@ class UserServiceTest {
      */
     @Test
     void testDeleteUser_userNotAuthorized_throwsNotAuthorizedException() {
-        final UserDto userDto = UserFactory.getDefaultUserDto();
         final SecurityContext securityContext = Mockito.mock(SecurityContext.class);
         SecurityContextHolder.setContext(securityContext);
         final Authentication authentication = JwtFactory.getDefaultAuthentication();
 
         when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(userMapper.mapUserToUserDto(any())).thenReturn(userDto);
         when(userRepository.findById(anyInt())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
         when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
         when(roleService.getRoleByName(anyString())).thenReturn(RoleFactory.getDefaultAdminRole());
@@ -582,7 +561,6 @@ class UserServiceTest {
         final Authentication authentication = JwtFactory.getDefaultAuthentication();
 
         when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(userMapper.mapUserToUserDto(any())).thenReturn(userDto);
         when(userRepository.findById(anyInt())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
         when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.of(user)).thenReturn(Optional.empty());
         when(roleService.getRoleByName(anyString())).thenReturn(RoleFactory.getDefaultAdminRole());

@@ -2,7 +2,6 @@ package dev.vdrenkov.cineledger.services;
 
 import dev.vdrenkov.cineledger.exceptions.RoleAlreadyExistsException;
 import dev.vdrenkov.cineledger.exceptions.RoleNotFoundException;
-import dev.vdrenkov.cineledger.mappers.RoleMapper;
 import dev.vdrenkov.cineledger.models.dtos.RoleDto;
 import dev.vdrenkov.cineledger.models.entities.Role;
 import dev.vdrenkov.cineledger.models.requests.RoleRequest;
@@ -33,9 +32,6 @@ class RoleServiceTest {
 
     @Mock
     private RoleRepository roleRepository;
-
-    @Mock
-    private RoleMapper roleMapper;
 
     @InjectMocks
     private RoleService roleService;
@@ -76,7 +72,6 @@ class RoleServiceTest {
         final List<RoleDto> expected = RoleFactory.getDefaultRoleDtoList();
 
         when(roleRepository.findAll()).thenReturn(RoleFactory.getDefaultRoleList());
-        when(roleMapper.mapRolesToRoleDtos(any())).thenReturn(expected);
 
         final List<RoleDto> roles = roleService.getAllRolesDto();
 
@@ -112,7 +107,6 @@ class RoleServiceTest {
     void testGetRoleDtoById_roleDtoFound_success() {
         final RoleDto expected = RoleFactory.getDefaultRoleDto();
 
-        when(roleMapper.mapRoleToRoleDto(any())).thenReturn(expected);
         when(roleRepository.findById(anyInt())).thenReturn(Optional.of(RoleFactory.getDefaultRole()));
 
         final RoleDto role = roleService.getRoleDtoById(RoleConstants.ID);
@@ -151,7 +145,6 @@ class RoleServiceTest {
     void testGetRoleDtoByName_roleDtoFound_success() {
         final RoleDto expected = RoleFactory.getDefaultRoleDto();
 
-        when(roleMapper.mapRoleToRoleDto(any())).thenReturn(expected);
         when(roleRepository.findRoleByName(anyString())).thenReturn(Optional.of(RoleFactory.getDefaultRole()));
 
         final RoleDto role = roleService.getRoleDtoByName(RoleConstants.NAME);
@@ -166,8 +159,7 @@ class RoleServiceTest {
     void testUpdateRole_roleUpdated_success() {
         final RoleDto expected = RoleFactory.getDefaultRoleDto();
 
-        when(roleMapper.mapRoleToRoleDto(any())).thenReturn(expected);
-        when(roleRepository.findById(anyInt())).thenReturn(Optional.of(new Role()));
+        when(roleRepository.findById(anyInt())).thenReturn(Optional.of(RoleFactory.getDefaultRole()));
         when(roleRepository.save(any())).thenReturn(RoleFactory.getDefaultRole());
 
         final RoleDto role = roleService.updateRole(RoleFactory.getDefaultRoleRequest(), RoleConstants.ID);
@@ -193,7 +185,6 @@ class RoleServiceTest {
     void testDeleteRole_roleDeleted_success() {
         final RoleDto expected = RoleFactory.getDefaultRoleDto();
 
-        when(roleMapper.mapRoleToRoleDto(any())).thenReturn(expected);
         when(roleRepository.findById(anyInt())).thenReturn(Optional.of(RoleFactory.getDefaultRole()));
 
         final RoleDto role = roleService.deleteRole(RoleConstants.ID);

@@ -52,7 +52,6 @@ public class UserService {
     private final JwtCookieUtil jwtCookieUtil;
     private final UserRepository userRepository;
     private final RoleService roleService;
-    private final UserMapper userMapper;
     private final SecureRandom passwordRandom = new SecureRandom();
 
     /**
@@ -70,20 +69,17 @@ public class UserService {
      *     user repository used by the operation
      * @param roleService
      *     role service used by the operation
-     * @param userMapper
-     *     user mapper used by the operation
      */
     @Autowired
     public UserService(final AuthenticationManager authenticationManager, final BCryptPasswordEncoder passwordEncoder,
         final EmailService emailService, final JwtCookieUtil jwtCookieUtil, final UserRepository userRepository,
-        final RoleService roleService, final UserMapper userMapper) {
+        final RoleService roleService) {
         this.authenticationManager = authenticationManager;
         this.passwordEncoder = passwordEncoder;
         this.emailService = emailService;
         this.jwtCookieUtil = jwtCookieUtil;
         this.userRepository = userRepository;
         this.roleService = roleService;
-        this.userMapper = userMapper;
     }
 
     /**
@@ -238,7 +234,7 @@ public class UserService {
     public UserDto getUserDtoById(final int id) {
         log.info(String.format("Trying to retrieve user DTO with id %d", id));
 
-        return userMapper.mapUserToUserDto(getUserById(id));
+        return UserMapper.mapUserToUserDto(getUserById(id));
     }
 
     /**
@@ -268,7 +264,7 @@ public class UserService {
     public UserDto getUserDtoByUsername(final String username) {
         log.info(String.format("Trying to retrieve user DTO with username %s", username));
 
-        return userMapper.mapUserToUserDto(getUserByUsername(username));
+        return UserMapper.mapUserToUserDto(getUserByUsername(username));
     }
 
     /**
@@ -298,7 +294,7 @@ public class UserService {
     public UserDto getUserDtoByEmail(final String email) {
         log.info(String.format("Trying to retrieve user DTO with email %s", email));
 
-        return userMapper.mapUserToUserDto(getUserByEmail(email));
+        return UserMapper.mapUserToUserDto(getUserByEmail(email));
     }
 
     /**
@@ -324,7 +320,7 @@ public class UserService {
     public List<UserDto> getUsersDtoByRoleName(final String roleName) {
         log.info(String.format("Trying to retrieve user DTOS with role %s", roleName));
 
-        return userMapper.mapUsersToUserDtos(getUsersByRoleName(roleName));
+        return UserMapper.mapUsersToUserDtos(getUsersByRoleName(roleName));
     }
 
     /**
@@ -352,7 +348,7 @@ public class UserService {
      * @return matching user dto values
      */
     public List<UserDto> getUsersDtosByJoinDate(final LocalDate joinDate, final boolean isBefore) {
-        return userMapper.mapUsersToUserDtos(getUsersByJoinDate(joinDate, isBefore));
+        return UserMapper.mapUsersToUserDtos(getUsersByJoinDate(joinDate, isBefore));
     }
 
     private User getUserByUsernameOnLogin(final String username) {
@@ -407,7 +403,7 @@ public class UserService {
      */
     public UserDto updateUser(final UserRequest userRequest, final int id) {
         final User user = getUserById(id);
-        final UserDto oldUser = userMapper.mapUserToUserDto(user);
+        final UserDto oldUser = UserMapper.mapUserToUserDto(user);
         final String password = passwordEncoder.encode(userRequest.getPassword());
 
         if (!isAuthorized(id)) {

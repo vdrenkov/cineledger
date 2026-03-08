@@ -27,7 +27,6 @@ public class ProjectionService {
     private static final Logger log = LoggerFactory.getLogger(ProjectionService.class);
 
     private final ProjectionRepository projectionRepository;
-    private final ProjectionMapper projectionMapper;
     private final ProgramService programService;
     private final HallService hallService;
     private final MovieService movieService;
@@ -37,8 +36,6 @@ public class ProjectionService {
      *
      * @param projectionRepository
      *     projection repository used by the operation
-     * @param projectionMapper
-     *     projection mapper used by the operation
      * @param programService
      *     program service used by the operation
      * @param hallService
@@ -47,10 +44,9 @@ public class ProjectionService {
      *     movie service used by the operation
      */
     @Autowired
-    public ProjectionService(ProjectionRepository projectionRepository, ProjectionMapper projectionMapper,
-        ProgramService programService, HallService hallService, MovieService movieService) {
+    public ProjectionService(ProjectionRepository projectionRepository, ProgramService programService,
+        HallService hallService, MovieService movieService) {
         this.projectionRepository = projectionRepository;
-        this.projectionMapper = projectionMapper;
         this.programService = programService;
         this.hallService = hallService;
         this.movieService = movieService;
@@ -95,7 +91,7 @@ public class ProjectionService {
 
         log.info(String.format("All projections with program id %d were requested from the database", programId));
 
-        return projectionMapper.mapProjectionListToProjectionDtoList(
+        return ProjectionMapper.mapProjectionListToProjectionDtoList(
             projectionRepository.findProjectionsByProgramId(program.getId()));
     }
 
@@ -111,7 +107,7 @@ public class ProjectionService {
 
         log.info(String.format("All projections with movie id %d were requested from the database", movieId));
 
-        return projectionMapper.mapProjectionListToProjectionDtoList(
+        return ProjectionMapper.mapProjectionListToProjectionDtoList(
             projectionRepository.findProjectionsByMovieId(movie.getId()));
     }
 
@@ -139,7 +135,7 @@ public class ProjectionService {
             projections = projectionRepository.findProjectionsByStartTimeAfter(startTime);
         }
 
-        return projectionMapper.mapProjectionListToProjectionDtoList(projections);
+        return ProjectionMapper.mapProjectionListToProjectionDtoList(projections);
     }
 
     /**
@@ -169,7 +165,7 @@ public class ProjectionService {
     public ProjectionDto getProjectionDtoById(int id) {
         log.info(String.format("An attempt to extract a projection DTO with an id %d from the database", id));
 
-        return projectionMapper.mapProjectionToProjectionDto(getProjectionById(id));
+        return ProjectionMapper.mapProjectionToProjectionDto(getProjectionById(id));
     }
 
     /**

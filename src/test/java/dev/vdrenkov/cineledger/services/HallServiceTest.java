@@ -1,7 +1,6 @@
 package dev.vdrenkov.cineledger.services;
 
 import dev.vdrenkov.cineledger.exceptions.HallNotFoundException;
-import dev.vdrenkov.cineledger.mappers.HallMapper;
 import dev.vdrenkov.cineledger.models.dtos.HallDto;
 import dev.vdrenkov.cineledger.models.entities.Cinema;
 import dev.vdrenkov.cineledger.models.entities.Hall;
@@ -34,9 +33,6 @@ class HallServiceTest {
     private HallRepository hallRepository;
 
     @Mock
-    private HallMapper hallMapper;
-
-    @Mock
     private CinemaService cinemaService;
 
     @InjectMocks
@@ -65,7 +61,6 @@ class HallServiceTest {
         final List<HallDto> expected = HallFactory.getDefaultHallDtoList();
 
         when(cinemaService.getCinemaById(anyInt())).thenReturn(cinema);
-        when(hallMapper.mapHallListToHallDtoList(any())).thenReturn(expected);
         when(hallRepository.findAllByCinemaId(anyInt())).thenReturn(HallFactory.getDefaultHallList());
 
         final List<HallDto> result = hallService.getHallsByCinemaId(cinema.getId());
@@ -102,8 +97,7 @@ class HallServiceTest {
     @Test
     void testGetHallDtoById_hallDtoFound_success() {
         final HallDto expected = HallFactory.getDefaultHallDto();
-        when(hallMapper.mapHallToHallDto(any())).thenReturn(expected);
-        when(hallRepository.findById(anyInt())).thenReturn(Optional.of(new Hall()));
+        when(hallRepository.findById(anyInt())).thenReturn(Optional.of(HallFactory.getDefaultHall()));
 
         final HallDto hall = hallService.getHallDtoById(HallConstants.ID);
 
@@ -116,8 +110,8 @@ class HallServiceTest {
     @Test
     void testUpdateHall_hallUpdated_success() {
         final HallDto expected = HallFactory.getDefaultHallDto();
-        when(hallMapper.mapHallToHallDto(any())).thenReturn(expected);
         when(hallRepository.findById(anyInt())).thenReturn(Optional.of(HallFactory.getDefaultHall()));
+        when(cinemaService.getCinemaById(anyInt())).thenReturn(CinemaFactory.getDefaultCinema());
         when(hallRepository.save(any())).thenReturn(HallFactory.getDefaultHall());
 
         final HallDto hall = hallService.updateHall(HallFactory.getDefaultHallRequest(), HallConstants.ID);
@@ -131,7 +125,6 @@ class HallServiceTest {
     @Test
     void testDeleteHall_hallDeleted_success() {
         final HallDto expected = HallFactory.getDefaultHallDto();
-        when(hallMapper.mapHallToHallDto(any())).thenReturn(expected);
         when(hallRepository.findById(anyInt())).thenReturn(Optional.of(HallFactory.getDefaultHall()));
 
         final HallDto hall = hallService.deleteHall(HallConstants.ID);

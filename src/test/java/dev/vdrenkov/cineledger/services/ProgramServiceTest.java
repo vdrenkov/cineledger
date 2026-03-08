@@ -3,7 +3,6 @@ package dev.vdrenkov.cineledger.services;
 import dev.vdrenkov.cineledger.exceptions.DateNotValidException;
 import dev.vdrenkov.cineledger.exceptions.ProgramAlreadyExistsException;
 import dev.vdrenkov.cineledger.exceptions.ProgramNotFoundException;
-import dev.vdrenkov.cineledger.mappers.ProgramMapper;
 import dev.vdrenkov.cineledger.models.dtos.ProgramDto;
 import dev.vdrenkov.cineledger.models.entities.Program;
 import dev.vdrenkov.cineledger.models.requests.ProgramRequest;
@@ -38,9 +37,6 @@ class ProgramServiceTest {
 
     @Mock
     private ProgramRepository programRepository;
-
-    @Mock
-    private ProgramMapper programMapper;
 
     @Mock
     private CinemaService cinemaService;
@@ -96,7 +92,6 @@ class ProgramServiceTest {
     void testGetAllPrograms_dateNotNull_success() {
         final List<ProgramDto> expected = ProgramFactory.getDefaultProgramDtoList();
 
-        when(programMapper.mapProgramListToProgramDtoList(any())).thenReturn(ProgramFactory.getDefaultProgramDtoList());
         when(programRepository.findAllByProgramDate(any())).thenReturn(ProgramFactory.getDefaultProgramList());
 
         final List<ProgramDto> resultList = programService.getAllPrograms(ProgramConstants.DATE);
@@ -111,7 +106,6 @@ class ProgramServiceTest {
     void testGetAllPrograms_dateNull_success() {
         final List<ProgramDto> expected = ProgramFactory.getDefaultProgramDtoList();
 
-        when(programMapper.mapProgramListToProgramDtoList(any())).thenReturn(expected);
         when(programRepository.findAll()).thenReturn(ProgramFactory.getDefaultProgramList());
 
         final List<ProgramDto> resultList = programService.getAllPrograms(null);
@@ -127,7 +121,6 @@ class ProgramServiceTest {
         final List<ProgramDto> expected = ProgramFactory.getDefaultProgramDtoList();
 
         when(cinemaService.getCinemaById(anyInt())).thenReturn(CinemaFactory.getDefaultCinema());
-        when(programMapper.mapProgramListToProgramDtoList(any())).thenReturn(expected);
         when(programRepository.findAllByCinemaId(anyInt())).thenReturn(ProgramFactory.getDefaultProgramList());
 
         final List<ProgramDto> resultList = programService.getProgramsByCinemaId(ProgramConstants.ID);
@@ -164,8 +157,7 @@ class ProgramServiceTest {
     void testGetProgramDtoById_programDtoFound_success() {
         final ProgramDto expected = ProgramFactory.getDefaultProgramDto();
 
-        when(programMapper.mapProgramToProgramDto(any())).thenReturn(expected);
-        when(programRepository.findById(anyInt())).thenReturn(Optional.of(new Program()));
+        when(programRepository.findById(anyInt())).thenReturn(Optional.of(ProgramFactory.getDefaultProgram()));
 
         final ProgramDto program = programService.getProgramDtoById(ProgramConstants.ID);
 
@@ -179,11 +171,11 @@ class ProgramServiceTest {
     void testUpdateProgram_programUpdated_success() {
         final ProgramDto expected = ProgramFactory.getDefaultProgramDto();
 
-        when(programMapper.mapProgramToProgramDto(any())).thenReturn(expected);
         when(programRepository.findById(anyInt())).thenReturn(Optional.of(ProgramFactory.getDefaultProgram()));
+        when(cinemaService.getCinemaById(anyInt())).thenReturn(CinemaFactory.getDefaultCinema());
         when(programRepository.save(any())).thenReturn(ProgramFactory.getDefaultProgram());
 
-        ProgramDto program = programService.updateProgram(programRequest, ProgramConstants.ID);
+        final ProgramDto program = programService.updateProgram(programRequest, ProgramConstants.ID);
 
         assertEquals(expected, program);
 
@@ -196,7 +188,6 @@ class ProgramServiceTest {
     void testUpdateProgram_dateNotPresent_throwsDateNotValidException() {
         programRequest.setProgramDate(ProgramConstants.PAST_DATE);
 
-        when(programMapper.mapProgramToProgramDto(any())).thenReturn(ProgramFactory.getDefaultProgramDto());
         when(programRepository.findById(anyInt())).thenReturn(Optional.of(ProgramFactory.getDefaultProgram()));
 
         assertThrows(DateNotValidException.class,
@@ -210,7 +201,6 @@ class ProgramServiceTest {
     void testDeleteProgram_programDeleted_success() {
         final ProgramDto expected = ProgramFactory.getDefaultProgramDto();
 
-        when(programMapper.mapProgramToProgramDto(any())).thenReturn(expected);
         when(programRepository.findById(anyInt())).thenReturn(Optional.of(ProgramFactory.getDefaultProgram()));
 
         final ProgramDto program = programService.deleteProgram(ProgramConstants.ID);

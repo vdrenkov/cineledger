@@ -4,17 +4,18 @@ import dev.vdrenkov.cineledger.models.dtos.DiscountDto;
 import dev.vdrenkov.cineledger.models.entities.Discount;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Maps discount domain models to DTO representations used by the API.
  */
-@Component
-public class DiscountMapper {
+public final class DiscountMapper {
     private static final Logger log = LoggerFactory.getLogger(DiscountMapper.class);
+
+    private DiscountMapper() {
+        /* This utility class should not be instantiated */
+    }
 
     /**
      * Maps discount values to discount dto values.
@@ -23,8 +24,8 @@ public class DiscountMapper {
      *     discount used by the operation
      * @return discount dto result
      */
-    public DiscountDto mapDiscountToDiscountDto(Discount discount) {
-        log.info(String.format("The discount %s is being mapped to a discount DTO", discount.getType()));
+    public static DiscountDto mapDiscountToDiscountDto(Discount discount) {
+        log.info("Mapping the discount {} to a discount DTO", discount.getType());
         return new DiscountDto(discount.getId(), discount.getType(), discount.getCode(), discount.getPercentage());
     }
 
@@ -35,8 +36,8 @@ public class DiscountMapper {
      *     discounts used by the operation
      * @return matching discount dto values
      */
-    public List<DiscountDto> mapDiscountListToDiscountDtoList(List<Discount> discounts) {
-        return discounts.stream().map(this::mapDiscountToDiscountDto).collect(Collectors.toList());
+    public static List<DiscountDto> mapDiscountListToDiscountDtoList(List<Discount> discounts) {
+        return discounts.stream().map(DiscountMapper::mapDiscountToDiscountDto).toList();
     }
 }
 

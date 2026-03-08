@@ -23,20 +23,16 @@ public class RoleService {
     private static final Logger log = LoggerFactory.getLogger(RoleService.class);
 
     private final RoleRepository roleRepository;
-    private final RoleMapper roleMapper;
 
     /**
      * Creates a new role service with its required collaborators.
      *
      * @param roleRepository
      *     role repository used by the operation
-     * @param roleMapper
-     *     role mapper used by the operation
      */
     @Autowired
-    public RoleService(RoleRepository roleRepository, RoleMapper roleMapper) {
+    public RoleService(RoleRepository roleRepository) {
         this.roleRepository = roleRepository;
-        this.roleMapper = roleMapper;
     }
 
     /**
@@ -73,7 +69,7 @@ public class RoleService {
     public List<RoleDto> getAllRolesDto() {
         log.info("Trying to retrieve all roles DTOs");
 
-        return roleMapper.mapRolesToRoleDtos(getAllRoles());
+        return RoleMapper.mapRolesToRoleDtos(getAllRoles());
     }
 
     /**
@@ -103,7 +99,7 @@ public class RoleService {
     public RoleDto getRoleDtoById(int id) {
         log.info(String.format("Trying to retrieve role DTO with id %d", id));
 
-        return roleMapper.mapRoleToRoleDto(getRoleById(id));
+        return RoleMapper.mapRoleToRoleDto(getRoleById(id));
     }
 
     /**
@@ -133,7 +129,7 @@ public class RoleService {
     public RoleDto getRoleDtoByName(String name) {
         log.info(String.format("Trying to retrieve role DTO with name %s", name));
 
-        return roleMapper.mapRoleToRoleDto(getRoleByName(name));
+        return RoleMapper.mapRoleToRoleDto(getRoleByName(name));
     }
 
     /**

@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,7 +28,6 @@ public class MovieService {
     private static final Logger log = LoggerFactory.getLogger(MovieService.class);
 
     private final MovieRepository movieRepository;
-    private final MovieMapper movieMapper;
     private final CategoryService categoryService;
     private final ImdbService imdbService;
 
@@ -36,18 +36,14 @@ public class MovieService {
      *
      * @param movieRepository
      *     movie repository used by the operation
-     * @param movieMapper
-     *     movie mapper used by the operation
      * @param categoryService
      *     category service used by the operation
      * @param imdbService
      *     imdb service used by the operation
      */
     @Autowired
-    public MovieService(MovieRepository movieRepository, MovieMapper movieMapper, CategoryService categoryService,
-        ImdbService imdbService) {
+    public MovieService(MovieRepository movieRepository, CategoryService categoryService, ImdbService imdbService) {
         this.movieRepository = movieRepository;
-        this.movieMapper = movieMapper;
         this.categoryService = categoryService;
         this.imdbService = imdbService;
     }
@@ -103,12 +99,12 @@ public class MovieService {
         if (minRating == 0.0) {
             log.info(String.format("All movies with title %s were requested from the database", title));
 
-            return movieMapper.mapMovieListToMovieDtoList(movieRepository.findByTitleContaining(title));
+            return MovieMapper.mapMovieListToMovieDtoList(movieRepository.findByTitleContaining(title));
         } else {
             log.info(String.format("All movies with title %s and rating %.2f were requested from the database", title,
                 minRating));
 
-            return movieMapper.mapMovieListToMovieDtoList(
+            return MovieMapper.mapMovieListToMovieDtoList(
                 movieRepository.findByTitleContainingAndAverageRatingGreaterThanEqual(title, minRating));
         }
     }
@@ -128,15 +124,16 @@ public class MovieService {
         if (minRating == 0.0) {
             log.info(String.format("All movies with category id %d were requested from the database", categoryId));
 
-            movies = movieMapper.mapMovieListToMovieDtoList(movieRepository.findByCategoryId(categoryId));
+            movies = MovieMapper.mapMovieListToMovieDtoList(movieRepository.findByCategoryId(categoryId));
         } else {
             log.info(String.format("All movies with category id %d and rating %.2f were requested from the database",
                 categoryId, minRating));
 
-            movies = movieMapper.mapMovieListToMovieDtoList(
+            movies = MovieMapper.mapMovieListToMovieDtoList(
                 movieRepository.findByCategoryIdAndAverageRatingGreaterThanEqual(categoryId, minRating));
         }
 
+        movies = new ArrayList<>(movies);
         movies.sort(Comparator.comparing(MovieDto::getId));
         return movies;
     }
@@ -167,7 +164,7 @@ public class MovieService {
                 movieRepository.findByReleaseDateBefore(releaseDate);
         }
 
-        return movieMapper.mapMovieListToMovieDtoList(movies);
+        return MovieMapper.mapMovieListToMovieDtoList(movies);
     }
 
     /**
@@ -180,7 +177,7 @@ public class MovieService {
     public List<MovieDto> getMoviesByMinRating(double rating) {
         log.info(String.format("All movies with rating of %.2f were requested from the database", rating));
 
-        return movieMapper.mapMovieListToMovieDtoList(movieRepository.findByAverageRatingGreaterThanEqual(rating));
+        return MovieMapper.mapMovieListToMovieDtoList(movieRepository.findByAverageRatingGreaterThanEqual(rating));
     }
 
     /**
@@ -209,7 +206,7 @@ public class MovieService {
     public MovieDto getMovieDtoById(int id) {
         log.info(String.format("An attempt to extract a movie DTO with an id %d from the database", id));
 
-        return movieMapper.mapMovieToMovieDto(getMovieById(id));
+        return MovieMapper.mapMovieToMovieDto(getMovieById(id));
     }
 
     /**
@@ -295,7 +292,7 @@ public class MovieService {
     public MovieDto updateMovieAverageRating(double newRating, int movieId) {
         final Movie movie = getMovieById(movieId);
 
-        final MovieDto movieDto = movieMapper.mapMovieToMovieDto(movie);
+        final MovieDto movieDto = MovieMapper.mapMovieToMovieDto(movie);
 
         movie.setAverageRating(newRating);
         movieDto.setAverageRating(newRating);

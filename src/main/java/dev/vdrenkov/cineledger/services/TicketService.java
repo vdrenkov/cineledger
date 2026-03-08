@@ -27,7 +27,6 @@ public class TicketService {
     private static final Logger log = LoggerFactory.getLogger(TicketService.class);
 
     private final ProjectionService projectionService;
-    private final TicketMapper ticketMapper;
     private final TicketRepository ticketRepository;
 
     /**
@@ -35,16 +34,12 @@ public class TicketService {
      *
      * @param projectionService
      *     projection service used by the operation
-     * @param ticketMapper
-     *     ticket mapper used by the operation
      * @param ticketRepository
      *     ticket repository used by the operation
      */
     @Autowired
-    public TicketService(ProjectionService projectionService, TicketMapper ticketMapper,
-        TicketRepository ticketRepository) {
+    public TicketService(ProjectionService projectionService, TicketRepository ticketRepository) {
         this.projectionService = projectionService;
-        this.ticketMapper = ticketMapper;
         this.ticketRepository = ticketRepository;
     }
 
@@ -89,7 +84,7 @@ public class TicketService {
 
         log.info(String.format("All tickets with projection id %d were requested from the database", id));
 
-        return tickets.stream().map(ticketMapper::mapTicketToTicketDto).collect(Collectors.toList());
+        return tickets.stream().map(TicketMapper::mapTicketToTicketDto).collect(Collectors.toList());
     }
 
     /**

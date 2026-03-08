@@ -23,20 +23,16 @@ public class DiscountService {
     private static final Logger log = LoggerFactory.getLogger(DiscountService.class);
 
     private final DiscountRepository discountRepository;
-    private final DiscountMapper discountMapper;
 
     /**
      * Creates a new discount service with its required collaborators.
      *
      * @param discountRepository
      *     discount repository used by the operation
-     * @param discountMapper
-     *     discount mapper used by the operation
      */
     @Autowired
-    public DiscountService(DiscountRepository discountRepository, DiscountMapper discountMapper) {
+    public DiscountService(DiscountRepository discountRepository) {
         this.discountRepository = discountRepository;
-        this.discountMapper = discountMapper;
     }
 
     /**
@@ -78,7 +74,7 @@ public class DiscountService {
     public List<DiscountDto> getAllDiscountDtos() {
         log.info("An attempt to map all discounts to discount DTOs");
 
-        return discountMapper.mapDiscountListToDiscountDtoList(getAllDiscounts());
+        return DiscountMapper.mapDiscountListToDiscountDtoList(getAllDiscounts());
     }
 
     /**
@@ -145,7 +141,7 @@ public class DiscountService {
     public DiscountDto getDiscountDtoByType(String type) {
         log.info("An attempt to map discount to discount DTO");
 
-        return discountMapper.mapDiscountToDiscountDto(getDiscountByType(type));
+        return DiscountMapper.mapDiscountToDiscountDto(getDiscountByType(type));
     }
 
     /**
@@ -158,7 +154,7 @@ public class DiscountService {
      * @return discount dto result
      */
     public DiscountDto updateDiscount(DiscountRequest request, int id) {
-        final DiscountDto discount = discountMapper.mapDiscountToDiscountDto(getDiscountById(id));
+        final DiscountDto discount = DiscountMapper.mapDiscountToDiscountDto(getDiscountById(id));
 
         discountRepository.save(new Discount(id, request.getType(), request.getCode(), request.getPercentage()));
 
@@ -181,7 +177,7 @@ public class DiscountService {
 
         log.info(String.format("Discount with id %d was deleted", id));
 
-        return discountMapper.mapDiscountToDiscountDto(discount);
+        return DiscountMapper.mapDiscountToDiscountDto(discount);
     }
 
     /**

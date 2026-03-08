@@ -2,7 +2,6 @@ package dev.vdrenkov.cineledger.services;
 
 import dev.vdrenkov.cineledger.exceptions.HallNotAvailableException;
 import dev.vdrenkov.cineledger.exceptions.ProgramNotFoundException;
-import dev.vdrenkov.cineledger.mappers.ProjectionMapper;
 import dev.vdrenkov.cineledger.models.dtos.ProjectionDto;
 import dev.vdrenkov.cineledger.models.entities.Movie;
 import dev.vdrenkov.cineledger.models.entities.Program;
@@ -46,9 +45,6 @@ class ProjectionServiceTest {
     private ProjectionRepository projectionRepository;
 
     @Mock
-    private ProjectionMapper projectionMapper;
-
-    @Mock
     private HallService hallService;
 
     @Mock
@@ -69,7 +65,6 @@ class ProjectionServiceTest {
         final List<ProjectionDto> expected = ProjectionFactory.getDefaultProjectionDtoList();
 
         when(programService.getProgramById(anyInt())).thenReturn(program);
-        when(projectionMapper.mapProjectionListToProjectionDtoList(any())).thenReturn(expected);
         when(projectionRepository.findProjectionsByProgramId(anyInt())).thenReturn(
             ProjectionFactory.getDefaultProjectionList());
 
@@ -87,7 +82,6 @@ class ProjectionServiceTest {
         final List<ProjectionDto> expected = ProjectionFactory.getDefaultProjectionDtoList();
 
         when(movieService.getMovieById(anyInt())).thenReturn(movie);
-        when(projectionMapper.mapProjectionListToProjectionDtoList(any())).thenReturn(expected);
         when(projectionRepository.findProjectionsByMovieId(anyInt())).thenReturn(
             ProjectionFactory.getDefaultProjectionList());
 
@@ -103,7 +97,6 @@ class ProjectionServiceTest {
     void testGetProjectionsByStartTime_isBeforeTrue_success() {
         final List<ProjectionDto> expected = ProjectionFactory.getDefaultProjectionDtoList();
 
-        when(projectionMapper.mapProjectionListToProjectionDtoList(any())).thenReturn(expected);
         when(projectionRepository.findProjectionsByStartTimeBefore(any())).thenReturn(
             ProjectionFactory.getDefaultProjectionList());
 
@@ -120,7 +113,6 @@ class ProjectionServiceTest {
     void testGetProjectionsByStartTime_isBeforeFalse_success() {
         final List<ProjectionDto> expected = ProjectionFactory.getDefaultProjectionDtoList();
 
-        when(projectionMapper.mapProjectionListToProjectionDtoList(any())).thenReturn(expected);
         when(projectionRepository.findProjectionsByStartTimeAfter(any())).thenReturn(
             ProjectionFactory.getDefaultProjectionList());
 
@@ -168,13 +160,14 @@ class ProjectionServiceTest {
     void testUpdateProjection_projectionUpdated_success() {
         final ProjectionDto expected = ProjectionFactory.getDefaultProjectionDto();
 
-        when(projectionMapper.mapProjectionToProjectionDto(any())).thenReturn(expected);
         when(hallService.getHallById(anyInt())).thenReturn(HallFactory.getDefaultHall());
         when(programService.getProgramById(anyInt())).thenReturn(ProgramFactory.getDefaultProgram());
+        when(movieService.getMovieById(anyInt())).thenReturn(MovieFactory.getDefaultMovie());
         when(projectionRepository.findById(anyInt())).thenReturn(Optional.of(ProjectionFactory.getDefaultProjection()));
         when(projectionRepository.save(any())).thenReturn(ProjectionFactory.getDefaultProjection());
 
-        ProjectionDto projectionDto = projectionService.updateProjection(projectionRequest, ProjectionConstants.ID);
+        final ProjectionDto projectionDto = projectionService.updateProjection(projectionRequest,
+            ProjectionConstants.ID);
 
         assertEquals(expected, projectionDto);
     }
@@ -184,10 +177,9 @@ class ProjectionServiceTest {
      */
     @Test
     void testUpdateProjection_hallNotAvailable_throwsHallNotAvailableException() {
-        final ProjectionDto expected = ProjectionFactory.getDefaultProjectionDto();
-        when(projectionMapper.mapProjectionToProjectionDto(any(Projection.class))).thenReturn(expected);
         when(hallService.getHallById(anyInt())).thenReturn(HallFactory.getDefaultHall());
         when(programService.getProgramById(anyInt())).thenReturn(ProgramFactory.getDefaultProgram());
+        when(movieService.getMovieById(anyInt())).thenReturn(MovieFactory.getDefaultMovie());
         when(projectionRepository.findById(anyInt())).thenReturn(Optional.of(ProjectionFactory.getDefaultProjection()));
 
         final ProjectionService spyProjectionService = Mockito.spy(projectionService);
@@ -204,8 +196,7 @@ class ProjectionServiceTest {
     void testDeleteProjection_projectionDeleted_success() {
         final ProjectionDto expected = ProjectionFactory.getDefaultProjectionDto();
 
-        when(projectionMapper.mapProjectionToProjectionDto(any())).thenReturn(expected);
-        when(projectionRepository.findById(anyInt())).thenReturn(Optional.of(new Projection()));
+        when(projectionRepository.findById(anyInt())).thenReturn(Optional.of(ProjectionFactory.getDefaultProjection()));
 
         final ProjectionDto projectionDto = projectionService.deleteProjection(ProjectionConstants.ID);
 

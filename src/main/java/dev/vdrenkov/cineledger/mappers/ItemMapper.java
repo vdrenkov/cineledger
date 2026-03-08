@@ -4,17 +4,18 @@ import dev.vdrenkov.cineledger.models.dtos.ItemDto;
 import dev.vdrenkov.cineledger.models.entities.Item;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Maps item domain models to DTO representations used by the API.
  */
-@Component
-public class ItemMapper {
+public final class ItemMapper {
     private static final Logger log = LoggerFactory.getLogger(ItemMapper.class);
+
+    private ItemMapper() {
+        /* This utility class should not be instantiated */
+    }
 
     /**
      * Maps item values to item dto values.
@@ -23,8 +24,8 @@ public class ItemMapper {
      *     item entity to transform
      * @return item dto result
      */
-    public ItemDto mapItemToItemDto(Item item) {
-        log.info(String.format("The item %s is being mapped to an item DTO", item.getName()));
+    public static ItemDto mapItemToItemDto(Item item) {
+        log.info("Mapping the item {} to an item DTO", item.getName());
         return new ItemDto(item.getId(), item.getName(), item.getPrice(), item.getQuantity());
     }
 
@@ -35,8 +36,8 @@ public class ItemMapper {
      *     item entity to transform
      * @return matching item dto values
      */
-    public List<ItemDto> mapItemToItemDtoList(List<Item> item) {
-        return item.stream().map(this::mapItemToItemDto).collect(Collectors.toList());
+    public static List<ItemDto> mapItemToItemDtoList(List<Item> item) {
+        return item.stream().map(ItemMapper::mapItemToItemDto).toList();
     }
 }
 

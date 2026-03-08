@@ -27,7 +27,6 @@ public class ProgramService {
     private static final Logger log = LoggerFactory.getLogger(ProgramService.class);
 
     private final ProgramRepository programRepository;
-    private final ProgramMapper programMapper;
     private final CinemaService cinemaService;
 
     /**
@@ -35,16 +34,12 @@ public class ProgramService {
      *
      * @param programRepository
      *     program repository used by the operation
-     * @param programMapper
-     *     program mapper used by the operation
      * @param cinemaService
      *     cinema service used by the operation
      */
     @Autowired
-    public ProgramService(ProgramRepository programRepository, ProgramMapper programMapper,
-        CinemaService cinemaService) {
+    public ProgramService(ProgramRepository programRepository, CinemaService cinemaService) {
         this.programRepository = programRepository;
-        this.programMapper = programMapper;
         this.cinemaService = cinemaService;
     }
 
@@ -87,11 +82,11 @@ public class ProgramService {
         if (Objects.nonNull(date)) {
             log.info(String.format("All programs with date %s were requested from the database", date));
 
-            return programMapper.mapProgramListToProgramDtoList(programRepository.findAllByProgramDate(date));
+            return ProgramMapper.mapProgramListToProgramDtoList(programRepository.findAllByProgramDate(date));
         } else {
             log.info("All programs were requested from the database");
 
-            return programMapper.mapProgramListToProgramDtoList(programRepository.findAll());
+            return ProgramMapper.mapProgramListToProgramDtoList(programRepository.findAll());
         }
     }
 
@@ -107,7 +102,7 @@ public class ProgramService {
 
         final Cinema cinema = cinemaService.getCinemaById(cinemaId);
 
-        return programMapper.mapProgramListToProgramDtoList(programRepository.findAllByCinemaId(cinema.getId()));
+        return ProgramMapper.mapProgramListToProgramDtoList(programRepository.findAllByCinemaId(cinema.getId()));
     }
 
     /**
@@ -138,7 +133,7 @@ public class ProgramService {
     public ProgramDto getProgramDtoById(int id) {
         log.info(String.format("An attempt to extract a program DTO with an id %d from the database", id));
 
-        return programMapper.mapProgramToProgramDto(getProgramById(id));
+        return ProgramMapper.mapProgramToProgramDto(getProgramById(id));
     }
 
     /**

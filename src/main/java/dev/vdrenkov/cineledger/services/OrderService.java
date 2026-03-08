@@ -33,7 +33,6 @@ import java.util.stream.Collectors;
 public class OrderService {
     private final Logger log = LoggerFactory.getLogger(OrderService.class);
     private final DiscountService discountService;
-    private final OrderMapper orderMapper;
     private final OrderRepository orderRepository;
     private final UserService userService;
     private final TicketService ticketService;
@@ -45,8 +44,6 @@ public class OrderService {
      *
      * @param discountService
      *     discount service used by the operation
-     * @param orderMapper
-     *     order mapper used by the operation
      * @param orderRepository
      *     order repository used by the operation
      * @param userService
@@ -59,10 +56,9 @@ public class OrderService {
      *     email service used by the operation
      */
     @Autowired
-    public OrderService(DiscountService discountService, OrderMapper orderMapper, OrderRepository orderRepository,
-        UserService userService, TicketService ticketService, ItemService itemService, EmailService emailService) {
+    public OrderService(DiscountService discountService, OrderRepository orderRepository, UserService userService,
+        TicketService ticketService, ItemService itemService, EmailService emailService) {
         this.discountService = discountService;
-        this.orderMapper = orderMapper;
         this.orderRepository = orderRepository;
         this.userService = userService;
         this.ticketService = ticketService;
@@ -181,7 +177,7 @@ public class OrderService {
 
         log.info(String.format("All orders with user id %d were requested from the database", userId));
 
-        return this.orderMapper.mapOrderToOrderDtoList(orderRepository.findOrderByUserId(userId));
+        return OrderMapper.mapOrderToOrderDtoList(orderRepository.findOrderByUserId(userId));
     }
 
     /**
@@ -216,7 +212,7 @@ public class OrderService {
             throw new OrderNotFoundException(ExceptionMessages.ORDER_NOT_FOUND_MESSAGE);
         });
 
-        final OrderDto orderDto = orderMapper.mapOrderToOrderDto(order);
+        final OrderDto orderDto = OrderMapper.mapOrderToOrderDto(order);
 
         final List<Ticket> tickets = request
             .getTicketsIds()
@@ -279,7 +275,7 @@ public class OrderService {
             throw new OrderNotFoundException(ExceptionMessages.ORDER_NOT_FOUND_MESSAGE);
         });
 
-        final OrderDto orderDto = orderMapper.mapOrderToOrderDto(order);
+        final OrderDto orderDto = OrderMapper.mapOrderToOrderDto(order);
 
         orderRepository.delete(order);
         log.info(String.format("Order with id %d was deleted from the database", id));

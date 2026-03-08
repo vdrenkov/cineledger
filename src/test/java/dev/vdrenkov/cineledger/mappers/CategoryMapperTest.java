@@ -5,7 +5,6 @@ import dev.vdrenkov.cineledger.testutils.constants.CategoryConstants;
 import dev.vdrenkov.cineledger.testutils.factories.CategoryFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
@@ -17,16 +16,12 @@ import static org.junit.Assert.assertEquals;
  */
 @ExtendWith(MockitoExtension.class)
 class CategoryMapperTest {
-
-    @InjectMocks
-    private CategoryMapper categoryMapper;
-
     /**
      * Verifies that map Category To Category DTO List success.
      */
     @Test
     void testMapCategoryToCategoryDtoList_success() {
-        List<CategoryDto> categoryDtos = categoryMapper.mapCategoryToCategoryDtoList(
+        List<CategoryDto> categoryDtos = CategoryMapper.mapCategoryToCategoryDtoList(
             CategoryFactory.getDefaultCategoryList());
 
         final CategoryDto categoryDto = categoryDtos.getFirst();
@@ -39,7 +34,7 @@ class CategoryMapperTest {
      */
     @Test
     void testMapCategoryToCategoryDto_success() {
-        final CategoryDto actualDto = categoryMapper.mapCategoryToCategoryDto(CategoryFactory.getDefaultCategory());
+        final CategoryDto actualDto = CategoryMapper.mapCategoryToCategoryDto(CategoryFactory.getDefaultCategory());
 
         assertEquals(CategoryConstants.ID, actualDto.getId());
         assertEquals(CategoryConstants.NAME, actualDto.getName());

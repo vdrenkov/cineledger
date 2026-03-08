@@ -24,20 +24,16 @@ public class CinemaService {
     private static final Logger log = LoggerFactory.getLogger(CinemaService.class);
 
     private final CinemaRepository cinemaRepository;
-    private final CinemaMapper cinemaMapper;
 
     /**
      * Creates a new cinema service with its required collaborators.
      *
      * @param cinemaRepository
      *     cinema repository used by the operation
-     * @param cinemaMapper
-     *     cinema mapper used by the operation
      */
     @Autowired
-    public CinemaService(CinemaRepository cinemaRepository, CinemaMapper cinemaMapper) {
+    public CinemaService(CinemaRepository cinemaRepository) {
         this.cinemaRepository = cinemaRepository;
-        this.cinemaMapper = cinemaMapper;
     }
 
     /**
@@ -75,17 +71,17 @@ public class CinemaService {
             log.info(String.format("All cinemas with city %s and address %s were requested from the database", city,
                 address));
 
-            return cinemaMapper.mapCinemaToCinemaDtoList(cinemaRepository.findAllByCityAndAddress(city, address));
+            return CinemaMapper.mapCinemaToCinemaDtoList(cinemaRepository.findAllByCityAndAddress(city, address));
         } else if (Objects.nonNull(city)) {
 
             log.info(String.format("All cinemas with city %s were requested from the database", city));
 
-            return cinemaMapper.mapCinemaToCinemaDtoList(cinemaRepository.findAllByCity(city));
+            return CinemaMapper.mapCinemaToCinemaDtoList(cinemaRepository.findAllByCity(city));
         } else {
 
             log.info(String.format("All cinemas with address %s were requested from the database", address));
 
-            return cinemaMapper.mapCinemaToCinemaDtoList(cinemaRepository.findAllByAddress(address));
+            return CinemaMapper.mapCinemaToCinemaDtoList(cinemaRepository.findAllByAddress(address));
         }
     }
 
@@ -117,7 +113,7 @@ public class CinemaService {
     public CinemaDto getCinemaDtoById(int id) {
         log.info(String.format("An attempt to extract a cinemaDto with id %d from the database", id));
 
-        return cinemaMapper.mapCinemaToCinemaDto(getCinemaById(id));
+        return CinemaMapper.mapCinemaToCinemaDto(getCinemaById(id));
     }
 
     /**
@@ -151,7 +147,7 @@ public class CinemaService {
      */
     public CinemaDto updateCinemaAverageRating(double newRating, int cinemaId) {
         final Cinema cinema = getCinemaById(cinemaId);
-        final CinemaDto cinemaDto = cinemaMapper.mapCinemaToCinemaDto(cinema);
+        final CinemaDto cinemaDto = CinemaMapper.mapCinemaToCinemaDto(cinema);
         cinema.setAverageRating(newRating);
         cinemaDto.setAverageRating(newRating);
 

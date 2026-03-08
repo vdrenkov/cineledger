@@ -22,20 +22,16 @@ import java.util.List;
 public class CategoryService {
     private final static Logger log = LoggerFactory.getLogger(CategoryService.class);
 
-    private final CategoryMapper categoryMapper;
     private final CategoryRepository categoryRepository;
 
     /**
      * Creates a new category service with its required collaborators.
      *
-     * @param categoryMapper
-     *     category mapper used by the operation
      * @param categoryRepository
      *     category repository used by the operation
      */
     @Autowired
-    public CategoryService(CategoryMapper categoryMapper, CategoryRepository categoryRepository) {
-        this.categoryMapper = categoryMapper;
+    public CategoryService(CategoryRepository categoryRepository) {
         this.categoryRepository = categoryRepository;
     }
 
@@ -62,7 +58,7 @@ public class CategoryService {
     public List<CategoryDto> getAllCategories() {
         log.info("An attempt to extract all categories from the database");
 
-        return categoryMapper.mapCategoryToCategoryDtoList(categoryRepository.findAll());
+        return CategoryMapper.mapCategoryToCategoryDtoList(categoryRepository.findAll());
     }
 
     /**
@@ -75,7 +71,7 @@ public class CategoryService {
     public CategoryDto getCategoryDtoById(int id) {
         log.info(String.format("An attempt to extract category with id %d from the database", id));
 
-        return categoryMapper.mapCategoryToCategoryDto(getCategoryById(id));
+        return CategoryMapper.mapCategoryToCategoryDto(getCategoryById(id));
     }
 
     /**
@@ -88,7 +84,7 @@ public class CategoryService {
     public CategoryDto getCategoryDtoByName(String name) {
         log.info(String.format("An attempt to extract category with name %s from the database", name));
 
-        return categoryMapper.mapCategoryToCategoryDto(categoryRepository.findByName(name).orElseThrow(() -> {
+        return CategoryMapper.mapCategoryToCategoryDto(categoryRepository.findByName(name).orElseThrow(() -> {
 
             log.error(String.format("Exception caught: %s", ExceptionMessages.CATEGORY_NOT_FOUND_MESSAGE));
 

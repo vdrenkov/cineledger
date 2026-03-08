@@ -3,32 +3,28 @@ package dev.vdrenkov.cineledger.mappers;
 import dev.vdrenkov.cineledger.models.dtos.RoleDto;
 import dev.vdrenkov.cineledger.testutils.constants.RoleConstants;
 import dev.vdrenkov.cineledger.testutils.factories.RoleFactory;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Tests role mapper behavior.
  */
 @ExtendWith(MockitoExtension.class)
 class RoleMapperTest {
-
-    @InjectMocks
-    private RoleMapper roleMapper;
-
     /**
      * Verifies that map Role To Role DTO success.
      */
     @Test
     void testMapRoleToRoleDto_success() {
-        final RoleDto roleDto = roleMapper.mapRoleToRoleDto(RoleFactory.getDefaultRole());
+        final RoleDto roleDto = RoleMapper.mapRoleToRoleDto(RoleFactory.getDefaultRole());
 
-        Assertions.assertEquals(RoleConstants.ID, roleDto.getId());
-        Assertions.assertEquals(RoleConstants.NAME, roleDto.getName());
+        assertEquals(RoleConstants.ID, roleDto.getId());
+        assertEquals(RoleConstants.NAME, roleDto.getName());
     }
 
     /**
@@ -36,10 +32,10 @@ class RoleMapperTest {
      */
     @Test
     void testMapRolesToRoleDtos_success() {
-        final List<RoleDto> result = roleMapper.mapRolesToRoleDtos(RoleFactory.getDefaultRoleList());
+        final List<RoleDto> result = RoleMapper.mapRolesToRoleDtos(RoleFactory.getDefaultRoleList());
 
-        Assertions.assertEquals(RoleConstants.ID, result.getFirst().getId());
-        Assertions.assertEquals(RoleConstants.NAME, result.getFirst().getName());
+        assertEquals(RoleConstants.ID, result.getFirst().getId());
+        assertEquals(RoleConstants.NAME, result.getFirst().getName());
     }
 }
 

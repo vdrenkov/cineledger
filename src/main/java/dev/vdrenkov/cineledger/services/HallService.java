@@ -23,7 +23,6 @@ public class HallService {
     private static final Logger log = LoggerFactory.getLogger(HallService.class);
 
     private final HallRepository hallRepository;
-    private final HallMapper hallMapper;
     private final CinemaService cinemaService;
 
     /**
@@ -31,15 +30,12 @@ public class HallService {
      *
      * @param hallRepository
      *     hall repository used by the operation
-     * @param hallMapper
-     *     hall mapper used by the operation
      * @param cinemaService
      *     cinema service used by the operation
      */
     @Autowired
-    public HallService(HallRepository hallRepository, HallMapper hallMapper, CinemaService cinemaService) {
+    public HallService(HallRepository hallRepository, CinemaService cinemaService) {
         this.hallRepository = hallRepository;
-        this.hallMapper = hallMapper;
         this.cinemaService = cinemaService;
     }
 
@@ -68,7 +64,7 @@ public class HallService {
 
         log.info(String.format("All halls with cinema id %d were requested from the database", cinemaId));
 
-        return hallMapper.mapHallListToHallDtoList(hallRepository.findAllByCinemaId(cinema.getId()));
+        return HallMapper.mapHallListToHallDtoList(hallRepository.findAllByCinemaId(cinema.getId()));
     }
 
     /**
@@ -99,7 +95,7 @@ public class HallService {
     public HallDto getHallDtoById(int id) {
         log.info(String.format("An attempt to extract a hall DTO with an id %d from the database", id));
 
-        return hallMapper.mapHallToHallDto(getHallById(id));
+        return HallMapper.mapHallToHallDto(getHallById(id));
     }
 
     /**

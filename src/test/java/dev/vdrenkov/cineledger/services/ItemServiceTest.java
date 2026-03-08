@@ -3,7 +3,6 @@ package dev.vdrenkov.cineledger.services;
 import dev.vdrenkov.cineledger.exceptions.ItemAlreadyExistsException;
 import dev.vdrenkov.cineledger.exceptions.ItemNotFoundException;
 import dev.vdrenkov.cineledger.exceptions.NoAvailableItemsException;
-import dev.vdrenkov.cineledger.mappers.ItemMapper;
 import dev.vdrenkov.cineledger.models.dtos.ItemDto;
 import dev.vdrenkov.cineledger.models.entities.Item;
 import dev.vdrenkov.cineledger.models.requests.ItemRequest;
@@ -36,9 +35,6 @@ class ItemServiceTest {
     @Mock
     private ItemRepository itemRepository;
 
-    @Mock
-    private ItemMapper itemMapper;
-
     @InjectMocks
     private ItemService itemService;
 
@@ -48,7 +44,6 @@ class ItemServiceTest {
     @Test
     void testGetAllItems_noExceptions_success() {
         final List<ItemDto> expected = ItemFactory.getDefaultItemDtoList();
-        when(itemMapper.mapItemToItemDtoList(any())).thenReturn(expected);
         when(itemRepository.findAll()).thenReturn(ItemFactory.getDefaultItemList());
 
         final List<ItemDto> actual = itemService.getAllItems();
@@ -62,7 +57,6 @@ class ItemServiceTest {
     @Test
     void testGetItemDtoById_itemFound_success() {
         final ItemDto expected = ItemFactory.getDefaultItemDto();
-        when(itemMapper.mapItemToItemDto(any())).thenReturn(expected);
         when(itemRepository.findById(anyInt())).thenReturn(Optional.of(ItemFactory.getDefaultItem()));
 
         final ItemDto item = itemService.getItemDtoById(ItemConstants.ID);
@@ -108,7 +102,6 @@ class ItemServiceTest {
     @Test
     void testGetItemDtoByName_noExceptions_success() {
         final ItemDto expected = ItemFactory.getDefaultItemDto();
-        when(itemMapper.mapItemToItemDto(any())).thenReturn(expected);
         when(itemRepository.findByName(anyString())).thenReturn(Optional.of(ItemFactory.getDefaultItem()));
 
         final ItemDto itemDto = itemService.getItemDtoByName(ItemConstants.NAME);
@@ -155,7 +148,6 @@ class ItemServiceTest {
     @Test
     void testUpdateItem_itemUpdated_success() {
         final ItemDto expected = ItemFactory.getDefaultItemDto();
-        when(itemMapper.mapItemToItemDto(any())).thenReturn(expected);
         when(itemRepository.findById(anyInt())).thenReturn(Optional.of(ItemFactory.getDefaultItem()));
         when(itemRepository.save(any())).thenReturn(ItemFactory.getDefaultItem());
 
@@ -170,7 +162,6 @@ class ItemServiceTest {
     @Test
     void testDeleteItem_itemDeleted_success() {
         final ItemDto expected = ItemFactory.getDefaultItemDto();
-        when(itemMapper.mapItemToItemDto(any())).thenReturn(expected);
         when(itemRepository.findById(anyInt())).thenReturn(Optional.of(ItemFactory.getDefaultItem()));
 
         final ItemDto itemDto = itemService.removeItem(ItemConstants.ID);
@@ -224,7 +215,6 @@ class ItemServiceTest {
     void testGetItemsByQuantity_noExceptions_isBelowFalse_success() {
         final List<ItemDto> expected = ItemFactory.getDefaultItemDtoList();
         when(itemRepository.findAll()).thenReturn(ItemFactory.getDefaultItemList());
-        when(itemMapper.mapItemToItemDtoList(any())).thenReturn(expected);
 
         final List<ItemDto> resultList = itemService.getItemsByQuantity(ItemConstants.QUANTITY - 1,
             ItemConstants.IS_BELLOW);
@@ -239,7 +229,6 @@ class ItemServiceTest {
     void testGetItemsByQuantity_noExceptions_isBelowTrue_success() {
         final List<ItemDto> expected = ItemFactory.getDefaultItemDtoList();
         when(itemRepository.findAll()).thenReturn(ItemFactory.getDefaultItemList());
-        when(itemMapper.mapItemToItemDtoList(any())).thenReturn(expected);
 
         final List<ItemDto> resultList = itemService.getItemsByQuantity(ItemConstants.QUANTITY + 1, true);
 

@@ -2,7 +2,6 @@ package dev.vdrenkov.cineledger.services;
 
 import dev.vdrenkov.cineledger.exceptions.NotAuthorizedException;
 import dev.vdrenkov.cineledger.exceptions.ReviewNotFoundException;
-import dev.vdrenkov.cineledger.mappers.ReviewMapper;
 import dev.vdrenkov.cineledger.models.dtos.ReviewDto;
 import dev.vdrenkov.cineledger.models.entities.Review;
 import dev.vdrenkov.cineledger.models.requests.ReviewRequest;
@@ -39,9 +38,6 @@ class ReviewServiceTest {
 
     @Mock
     private ReviewRepository reviewRepository;
-
-    @Mock
-    private ReviewMapper reviewMapper;
 
     @Mock
     private UserService userService;
@@ -81,7 +77,6 @@ class ReviewServiceTest {
      */
     @Test
     void testAddMovieReview_reviewsSize1_success() {
-        final ReviewDto expectedDto = ReviewFactory.getDefaultReviewDto();
         final Review expected = ReviewFactory.getDefaultReview();
 
         when(userService.getCurrentUser()).thenReturn(UserFactory.getDefaultUser());
@@ -90,7 +85,6 @@ class ReviewServiceTest {
         when(movieService.updateMovieAverageRating(anyDouble(), anyInt())).thenReturn(
             MovieFactory.getDefaultMovieDto());
         when(reviewRepository.findByMovieId(anyInt())).thenReturn(ReviewFactory.getDefaultReviewList());
-        when(reviewMapper.mapReviewToReviewDto(any())).thenReturn(expectedDto);
 
         final Review review = reviewService.addMovieReview(reviewRequest, ReviewConstants.ID);
 
@@ -130,7 +124,6 @@ class ReviewServiceTest {
 
         when(movieService.getMovieById(anyInt())).thenReturn(MovieFactory.getDefaultMovie());
         when(reviewRepository.findByMovieId(anyInt())).thenReturn(ReviewFactory.getDefaultReviewList());
-        when(reviewMapper.mapReviewToReviewDto(any())).thenReturn(ReviewFactory.getDefaultReviewDto());
 
         final List<ReviewDto> reviews = reviewService.getReviewsByMovieId(ReviewConstants.ID);
 
@@ -142,10 +135,10 @@ class ReviewServiceTest {
      */
     @Test
     void testGetReviewsByCinemaId_noExceptions_success() {
-        final List<ReviewDto> expectedReviews = ReviewFactory.getDefaultReviewDtoList();
+        final List<ReviewDto> expectedReviews = ReviewFactory.getDefaultReviewDtoListWithCinema();
 
-        when(reviewRepository.findByCinemaId(anyInt())).thenReturn(ReviewFactory.getDefaultReviewList());
-        when(reviewMapper.mapReviewToReviewDto(any())).thenReturn(ReviewFactory.getDefaultReviewDto());
+        when(cinemaService.getCinemaById(anyInt())).thenReturn(CinemaFactory.getDefaultCinema());
+        when(reviewRepository.findByCinemaId(anyInt())).thenReturn(ReviewFactory.getDefaultReviewListWithCinema());
 
         final List<ReviewDto> reviews = reviewService.getReviewsByCinemaId(ReviewConstants.ID);
 
@@ -162,7 +155,6 @@ class ReviewServiceTest {
         when(userService.isCurrentUserAuthorized(anyInt())).thenReturn(true);
         when(reviewRepository.findAllByUserIdAndMovieIsNotNullAndCinemaIsNull(anyInt())).thenReturn(
             ReviewFactory.getDefaultReviewList());
-        when(reviewMapper.mapReviewListToReviewDtoList(any())).thenReturn(expectedReviews);
 
         final List<ReviewDto> reviews = reviewService.getMovieReviewsByUserId(ReviewConstants.ID);
 
@@ -184,10 +176,11 @@ class ReviewServiceTest {
      */
     @Test
     void testGetCinemaReviewsByUserId_userAuthorized_success() {
-        final List<ReviewDto> expectedReviews = ReviewFactory.getDefaultReviewDtoList();
+        final List<ReviewDto> expectedReviews = ReviewFactory.getDefaultReviewDtoListWithCinema();
 
         when(userService.isCurrentUserAuthorized(anyInt())).thenReturn(true);
-        when(reviewMapper.mapReviewListToReviewDtoList(any())).thenReturn(expectedReviews);
+        when(reviewRepository.findAllByUserIdAndMovieIsNullAndCinemaIsNotNull(anyInt())).thenReturn(
+            ReviewFactory.getDefaultReviewListWithCinema());
 
         final List<ReviewDto> reviews = reviewService.getCinemaReviewsByUserId(ReviewConstants.ID);
 
@@ -212,11 +205,9 @@ class ReviewServiceTest {
         final ReviewDto expected = ReviewFactory.getDefaultReviewDto();
 
         when(reviewRepository.findById(anyInt())).thenReturn(Optional.of(ReviewFactory.getDefaultReview()));
-        when(reviewMapper.mapReviewToReviewDto(any())).thenReturn(expected);
         when(reviewRepository.save(any())).thenReturn(ReviewFactory.getDefaultReview());
         when(movieService.updateMovieAverageRating(anyDouble(), anyInt())).thenReturn(
             MovieFactory.getDefaultMovieDto());
-        CinemaFactory.getDefaultCinemaDto();
         when(userService.isCurrentUserAuthorized(anyInt())).thenReturn(true);
 
         final ReviewDto result = reviewService.updateReview(reviewRequest, ReviewConstants.ID);
@@ -240,13 +231,13 @@ class ReviewServiceTest {
      */
     @Test
     void testUpdateReview_movieNull_success() {
-        final Review review = ReviewFactory.getDefaultReview();
-        review.setMovie(null);
-        final ReviewDto expected = ReviewFactory.getDefaultReviewDto();
+        final Review review = ReviewFactory.getDefaultReviewWithCinema();
+        final ReviewDto expected = ReviewFactory.getDefaultReviewDtoWithCinema();
 
         when(reviewRepository.findById(anyInt())).thenReturn(Optional.of(review));
         when(userService.isCurrentUserAuthorized(anyInt())).thenReturn(true);
-        when(reviewMapper.mapReviewToReviewDto(any())).thenReturn(expected);
+        when(cinemaService.updateCinemaAverageRating(anyDouble(), anyInt())).thenReturn(
+            CinemaFactory.getDefaultCinemaDto());
 
         final ReviewDto result = reviewService.updateReview(reviewRequest, ReviewConstants.ID);
 
@@ -284,10 +275,8 @@ class ReviewServiceTest {
 
         when(reviewRepository.findById(anyInt())).thenReturn(Optional.of(ReviewFactory.getDefaultReview()));
         when(userService.isCurrentUserAuthorized(anyInt())).thenReturn(true);
-        when(reviewMapper.mapReviewToReviewDto(any())).thenReturn(expected);
         when(movieService.updateMovieAverageRating(anyDouble(), anyInt())).thenReturn(
             MovieFactory.getDefaultMovieDto());
-        CinemaFactory.getDefaultCinemaDto();
 
         final ReviewDto result = reviewService.deleteReview(ReviewConstants.ID);
 
@@ -299,13 +288,13 @@ class ReviewServiceTest {
      */
     @Test
     void testDeleteReview_movieNull_success() {
-        final Review review = ReviewFactory.getDefaultReview();
-        review.setMovie(null);
-        final ReviewDto expected = ReviewFactory.getDefaultReviewDto();
+        final Review review = ReviewFactory.getDefaultReviewWithCinema();
+        final ReviewDto expected = ReviewFactory.getDefaultReviewDtoWithCinema();
 
         when(reviewRepository.findById(anyInt())).thenReturn(Optional.of(review));
         when(userService.isCurrentUserAuthorized(anyInt())).thenReturn(true);
-        when(reviewMapper.mapReviewToReviewDto(any())).thenReturn(expected);
+        when(cinemaService.updateCinemaAverageRating(anyDouble(), anyInt())).thenReturn(
+            CinemaFactory.getDefaultCinemaDto());
 
         final ReviewDto result = reviewService.deleteReview(ReviewConstants.ID);
 
