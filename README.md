@@ -90,6 +90,7 @@ Start Docker with Linux containers, then run:
 Unit and controller tests run alongside PostgreSQL integration tests covering authorization,
 password recovery, concurrent bookings, stock rollback, scheduling, receipts and reports.
 CI runs the same command and scans the packaged runtime dependencies with Trivy.
+The combined test coverage report is available at `target/site/jacoco/index.html`.
 
 ## Limitations and acknowledgments
 
