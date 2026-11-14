@@ -1,6 +1,7 @@
 package dev.vdrenkov.cineledger.repositories;
 
 import dev.vdrenkov.cineledger.models.entities.Movie;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -15,7 +16,8 @@ public interface MovieRepository extends JpaRepository<Movie, Integer> {
 
     List<Movie> findByTitleContaining(String title);
 
-    List<Movie> findByTitleContainingAndAverageRatingGreaterThanEqual(String title, double minRating);
+    List<Movie> findByTitleContainingAndAverageRatingGreaterThanEqual(
+            String title, double minRating);
 
     List<Movie> findByAverageRatingGreaterThanEqual(double averageRating);
 
@@ -27,7 +29,15 @@ public interface MovieRepository extends JpaRepository<Movie, Integer> {
 
     List<Movie> findByReleaseDateBefore(LocalDate date);
 
-    List<Movie> findByReleaseDateAfterAndAverageRatingGreaterThanEqual(LocalDate date, double rating);
+    List<Movie> findByReleaseDateAfterAndAverageRatingGreaterThanEqual(
+            LocalDate date, double rating);
 
-    List<Movie> findByReleaseDateBeforeAndAverageRatingGreaterThanEqual(LocalDate date, double rating);
+    List<Movie> findByReleaseDateBeforeAndAverageRatingGreaterThanEqual(
+            LocalDate date, double rating);
+
+    @org.springframework.data.jpa.repository.Lock(
+            jakarta.persistence.LockModeType.PESSIMISTIC_WRITE)
+    @org.springframework.data.jpa.repository.Query(
+            "select entity from Movie entity where entity.id = :id")
+    Optional<Movie> findByIdForUpdate(int id);
 }

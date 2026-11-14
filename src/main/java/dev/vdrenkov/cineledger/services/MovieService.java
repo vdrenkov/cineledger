@@ -50,7 +50,7 @@ public class MovieService {
 
             throw new IllegalArgumentException(
                     "Required request parameter 'title' for method parameter type String is present"
-                        + " but converted to null");
+                            + " but converted to null");
         }
 
         if (minRating == 0.0) {
@@ -146,9 +146,8 @@ public class MovieService {
 
     @org.springframework.transaction.annotation.Transactional
     public MovieDto updateMovie(MovieRequest request, int id) {
-        MovieDto movieDto = getMovieDtoById(id);
-
-        final Movie stored = getMovieById(id);
+        final Movie stored = getMovieForUpdate(id);
+        final MovieDto movieDto = MovieMapper.mapMovieToMovieDto(stored);
         stored.setTitle(request.title());
         stored.setDescription(request.description());
         stored.setReleaseDate(request.releaseDate());
@@ -175,5 +174,12 @@ public class MovieService {
         movieRepository.deleteById(id);
 
         return movieDto;
+    }
+
+    public Movie getMovieForUpdate(final int id) {
+        return movieRepository
+                .findByIdForUpdate(id)
+                .orElseThrow(() ->
+                        new MovieNotFoundException(ExceptionMessages.MOVIE_NOT_FOUND_MESSAGE));
     }
 }

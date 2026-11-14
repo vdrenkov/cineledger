@@ -1,6 +1,7 @@
 package dev.vdrenkov.cineledger.repositories;
 
 import dev.vdrenkov.cineledger.models.entities.Cinema;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -17,4 +18,10 @@ public interface CinemaRepository extends JpaRepository<Cinema, Integer> {
     List<Cinema> findAllByCityAndAddress(String city, String address);
 
     Optional<Cinema> findByCityAndAddress(String city, String address);
+
+    @org.springframework.data.jpa.repository.Lock(
+            jakarta.persistence.LockModeType.PESSIMISTIC_WRITE)
+    @org.springframework.data.jpa.repository.Query(
+            "select entity from Cinema entity where entity.id = :id")
+    Optional<Cinema> findByIdForUpdate(int id);
 }

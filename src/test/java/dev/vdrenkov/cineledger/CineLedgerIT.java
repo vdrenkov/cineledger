@@ -68,6 +68,9 @@ class CineLedgerIT {
 
     @MockitoBean private java.time.Clock clock;
 
+    @org.springframework.test.context.bean.override.mockito.MockitoSpyBean
+    private dev.vdrenkov.cineledger.services.MovieService movieService;
+
     @BeforeEach
     void setClock() {
         org.mockito.Mockito.when(clock.instant()).thenAnswer(_ -> java.time.Instant.now());
@@ -854,6 +857,32 @@ class CineLedgerIT {
                                         "$.tickets.length()")
                                 .value(1));
         assertIncome(admin, "movies", fixture.movieId(), "10.25");
+    }
+
+    @Test
+    void addMovieReview_ratingUpdateFails_rollsBackReview() throws Exception {
+        final Session admin = login("integration_admin");
+        final Fixture fixture = fixture(admin, 1, 1);
+        org.mockito.Mockito.doThrow(new IllegalStateException("Simulated rating update failure"))
+                .when(movieService)
+                .updateMovieAverageRating(
+                        org.mockito.ArgumentMatchers.anyDouble(),
+                        org.mockito.ArgumentMatchers.eq(fixture.movieId()));
+
+        mockMvc.perform(
+                        authenticated(post("/movies/" + fixture.movieId() + "/reviews"), admin)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        objectMapper.writeValueAsString(
+                                                Map.of("rating", 4, "reviewText", "A review"))))
+                .andExpect(status().isInternalServerError());
+
+        mockMvc.perform(get("/movies/" + fixture.movieId() + "/reviews"))
+                .andExpect(status().isOk())
+                .andExpect(
+                        org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath(
+                                        "$.length()")
+                                .value(0));
     }
 
     private void assertIncome(

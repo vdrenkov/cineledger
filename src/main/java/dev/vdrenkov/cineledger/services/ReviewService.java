@@ -11,6 +11,7 @@ import dev.vdrenkov.cineledger.models.entities.User;
 import dev.vdrenkov.cineledger.models.requests.ReviewRequest;
 import dev.vdrenkov.cineledger.repositories.ReviewRepository;
 import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
+
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -24,37 +25,42 @@ public class ReviewService {
     private final MovieService movieService;
     private final CinemaService cinemaService;
 
-    public ReviewService(ReviewRepository reviewRepository, UserService userService, MovieService movieService,
-        CinemaService cinemaService) {
+    public ReviewService(
+            ReviewRepository reviewRepository,
+            UserService userService,
+            MovieService movieService,
+            CinemaService cinemaService) {
         this.reviewRepository = reviewRepository;
         this.userService = userService;
         this.movieService = movieService;
         this.cinemaService = cinemaService;
     }
 
+    @org.springframework.transaction.annotation.Transactional
     public Review addMovieReview(ReviewRequest request, int movieId) {
         final User user = userService.getCurrentUser();
-        final Movie movie = movieService.getMovieById(movieId);
+        final Movie movie = movieService.getMovieForUpdate(movieId);
         final LocalDate now = LocalDate.now();
         final Review review = new Review(request.rating(), request.reviewText(), now, movie, user);
 
         reviewRepository.save(review);
 
-        final double averageRating = calculateAverageRatingForMovie(movieId);
+        final double averageRating = reviewRepository.averageRatingByMovieId(movieId);
         movieService.updateMovieAverageRating(averageRating, movieId);
 
         return review;
     }
 
+    @org.springframework.transaction.annotation.Transactional
     public Review addCinemaReview(ReviewRequest request, int cinemaId) {
         final User user = userService.getCurrentUser();
-        final Cinema cinema = cinemaService.getCinemaById(cinemaId);
+        final Cinema cinema = cinemaService.getCinemaForUpdate(cinemaId);
         final LocalDate now = LocalDate.now();
         final Review review = new Review(request.rating(), request.reviewText(), now, cinema, user);
 
         reviewRepository.save(review);
 
-        final double averageRating = calculateAverageRatingForCinema(cinemaId);
+        final double averageRating = reviewRepository.averageRatingByCinemaId(cinemaId);
         cinemaService.updateCinemaAverageRating(averageRating, cinemaId);
 
         return review;
@@ -63,19 +69,23 @@ public class ReviewService {
     public List<ReviewDto> getReviewsByMovieId(int movieId) {
         movieService.getMovieById(movieId);
 
-        return reviewRepository.findByMovieId(movieId).stream().map(ReviewMapper::mapReviewToReviewDto).toList();
+        return reviewRepository.findByMovieId(movieId).stream()
+                .map(ReviewMapper::mapReviewToReviewDto)
+                .toList();
     }
 
     public List<ReviewDto> getReviewsByCinemaId(int cinemaId) {
         cinemaService.getCinemaById(cinemaId);
 
-        return reviewRepository.findByCinemaId(cinemaId).stream().map(ReviewMapper::mapReviewToReviewDto).toList();
+        return reviewRepository.findByCinemaId(cinemaId).stream()
+                .map(ReviewMapper::mapReviewToReviewDto)
+                .toList();
     }
 
     public List<ReviewDto> getMovieReviewsByUserId(int userId) {
         if (userService.isCurrentUserAuthorized(userId)) {
             return ReviewMapper.mapReviewListToReviewDtoList(
-                reviewRepository.findAllByUserIdAndMovieIsNotNullAndCinemaIsNull(userId));
+                    reviewRepository.findAllByUserIdAndMovieIsNotNullAndCinemaIsNull(userId));
         } else {
             throw new NotAuthorizedException(ExceptionMessages.NOT_AUTHORIZED_MESSAGE);
         }
@@ -84,25 +94,31 @@ public class ReviewService {
     public List<ReviewDto> getCinemaReviewsByUserId(int userId) {
         if (userService.isCurrentUserAuthorized(userId)) {
             return ReviewMapper.mapReviewListToReviewDtoList(
-                reviewRepository.findAllByUserIdAndMovieIsNullAndCinemaIsNotNull(userId));
+                    reviewRepository.findAllByUserIdAndMovieIsNullAndCinemaIsNotNull(userId));
         } else {
             throw new NotAuthorizedException(ExceptionMessages.NOT_AUTHORIZED_MESSAGE);
         }
     }
 
+    @org.springframework.transaction.annotation.Transactional
     public ReviewDto updateReview(ReviewRequest request, int reviewId) {
-        final Review review = reviewRepository.findById(reviewId).orElseThrow(() -> {
-
-            return new ReviewNotFoundException(ExceptionMessages.REVIEW_NOT_FOUND_MESSAGE);
-        });
+        final Review review =
+                reviewRepository
+                        .findById(reviewId)
+                        .orElseThrow(() -> {
+                            return new ReviewNotFoundException(
+                                    ExceptionMessages.REVIEW_NOT_FOUND_MESSAGE);
+                        });
 
         if (!userService.isCurrentUserAuthorized(review.getUser().getId())) {
 
             throw new NotAuthorizedException(ExceptionMessages.NOT_AUTHORIZED_MESSAGE);
         }
 
+        lockSubject(review);
         final ReviewDto reviewDto = ReviewMapper.mapReviewToReviewDto(review);
 
+        review.setDateModified(LocalDate.now());
         review.setReviewText(request.reviewText());
         review.setRating(request.rating());
 
@@ -111,17 +127,22 @@ public class ReviewService {
         return getReviewDto(review, reviewDto);
     }
 
+    @org.springframework.transaction.annotation.Transactional
     public ReviewDto deleteReview(int reviewId) {
-        Review review = reviewRepository.findById(reviewId).orElseThrow(() -> {
-
-            return new ReviewNotFoundException(ExceptionMessages.REVIEW_NOT_FOUND_MESSAGE);
-        });
+        Review review =
+                reviewRepository
+                        .findById(reviewId)
+                        .orElseThrow(() -> {
+                            return new ReviewNotFoundException(
+                                    ExceptionMessages.REVIEW_NOT_FOUND_MESSAGE);
+                        });
 
         if (!userService.isCurrentUserAuthorized(review.getUser().getId())) {
 
             throw new NotAuthorizedException(ExceptionMessages.NOT_AUTHORIZED_MESSAGE);
         }
 
+        lockSubject(review);
         final ReviewDto reviewDto = ReviewMapper.mapReviewToReviewDto(review);
 
         reviewRepository.delete(review);
@@ -133,40 +154,22 @@ public class ReviewService {
         double averageRating;
         if (review.getMovie() != null) {
 
-            averageRating = calculateAverageRatingForMovie(review.getMovie().getId());
+            averageRating = reviewRepository.averageRatingByMovieId(review.getMovie().getId());
             movieService.updateMovieAverageRating(averageRating, review.getMovie().getId());
         } else {
 
-            averageRating = calculateAverageRatingForCinema(review.getCinema().getId());
+            averageRating = reviewRepository.averageRatingByCinemaId(review.getCinema().getId());
             cinemaService.updateCinemaAverageRating(averageRating, review.getCinema().getId());
         }
 
         return reviewDto;
     }
 
-    private double calculateAverageRatingForCinema(int cinemaId) {
-        final List<ReviewDto> reviews = getReviewsByCinemaId(cinemaId);
-
-        return calculateAverageRating(reviews);
-    }
-
-    private double calculateAverageRatingForMovie(int movieId) {
-        final List<ReviewDto> reviews = getReviewsByMovieId(movieId);
-
-        return calculateAverageRating(reviews);
-    }
-
-    private static double calculateAverageRating(List<ReviewDto> reviews) {
-        double sum = 0;
-        final int numberOfReviews = reviews.size();
-
-        for (ReviewDto review : reviews) {
-            sum += review.rating();
+    private void lockSubject(final Review review) {
+        if (review.getMovie() != null) {
+            movieService.getMovieForUpdate(review.getMovie().getId());
+        } else {
+            cinemaService.getCinemaForUpdate(review.getCinema().getId());
         }
-
-        if (numberOfReviews == 0) {
-            return sum / (numberOfReviews + 1);
-        }
-        return sum / numberOfReviews;
     }
 }

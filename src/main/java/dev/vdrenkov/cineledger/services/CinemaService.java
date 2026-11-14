@@ -8,6 +8,7 @@ import dev.vdrenkov.cineledger.models.entities.Cinema;
 import dev.vdrenkov.cineledger.models.requests.CinemaRequest;
 import dev.vdrenkov.cineledger.repositories.CinemaRepository;
 import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
+
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,22 +35,25 @@ public class CinemaService {
             throw new IllegalArgumentException("You haven't provided any query parameters");
         } else if (city != null && address != null) {
 
-            return CinemaMapper.mapCinemaToCinemaDtoList(cinemaRepository.findAllByCityAndAddress(city, address));
+            return CinemaMapper.mapCinemaToCinemaDtoList(
+                    cinemaRepository.findAllByCityAndAddress(city, address));
         } else if (city != null) {
 
             return CinemaMapper.mapCinemaToCinemaDtoList(cinemaRepository.findAllByCity(city));
         } else {
 
-            return CinemaMapper.mapCinemaToCinemaDtoList(cinemaRepository.findAllByAddress(address));
+            return CinemaMapper.mapCinemaToCinemaDtoList(
+                    cinemaRepository.findAllByAddress(address));
         }
     }
 
     public Cinema getCinemaById(int id) {
 
-        return cinemaRepository.findById(id).orElseThrow(() -> {
-
-            return new CinemaNotFoundException(ExceptionMessages.CINEMA_NOT_FOUND_MESSAGE);
-        });
+        return cinemaRepository
+                .findById(id)
+                .orElseThrow(() -> {
+                    return new CinemaNotFoundException(ExceptionMessages.CINEMA_NOT_FOUND_MESSAGE);
+                });
     }
 
     public CinemaDto getCinemaDtoById(int id) {
@@ -57,11 +61,13 @@ public class CinemaService {
         return CinemaMapper.mapCinemaToCinemaDto(getCinemaById(id));
     }
 
+    @org.springframework.transaction.annotation.Transactional
     public CinemaDto updateCinema(CinemaRequest cinemaRequest, int id) {
-        CinemaDto cinemaDto = getCinemaDtoById(id);
-
-        cinemaRepository.save(
-            new Cinema(id, cinemaRequest.address(), cinemaRequest.city(), cinemaDto.averageRating()));
+        final Cinema stored = getCinemaForUpdate(id);
+        final CinemaDto cinemaDto = CinemaMapper.mapCinemaToCinemaDto(stored);
+        stored.setAddress(cinemaRequest.address());
+        stored.setCity(cinemaRequest.city());
+        cinemaRepository.save(stored);
 
         return cinemaDto;
     }
@@ -86,9 +92,18 @@ public class CinemaService {
     }
 
     private void cinemaValidation(CinemaRequest cinemaRequest) {
-        cinemaRepository.findByCityAndAddress(cinemaRequest.city(), cinemaRequest.address()).ifPresent(cinema -> {
+        cinemaRepository
+                .findByCityAndAddress(cinemaRequest.city(), cinemaRequest.address())
+                .ifPresent(cinema -> {
+                    throw new CinemaAlreadyExistsException(
+                            ExceptionMessages.CINEMA_ALREADY_EXISTS_MESSAGE);
+                });
+    }
 
-            throw new CinemaAlreadyExistsException(ExceptionMessages.CINEMA_ALREADY_EXISTS_MESSAGE);
-        });
+    public Cinema getCinemaForUpdate(final int id) {
+        return cinemaRepository
+                .findByIdForUpdate(id)
+                .orElseThrow(() ->
+                        new CinemaNotFoundException(ExceptionMessages.CINEMA_NOT_FOUND_MESSAGE));
     }
 }

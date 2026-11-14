@@ -203,7 +203,7 @@ class MovieServiceTest {
     void testUpdateMovie_success() {
         final MovieDto expected = MovieFactory.getDefaultMovieDto();
 
-        when(movieRepository.findById(anyInt()))
+        when(movieRepository.findByIdForUpdate(anyInt()))
                 .thenReturn(Optional.of(MovieFactory.getDefaultMovie()));
         when(categoryService.getCategoryById(anyInt()))
                 .thenReturn(CategoryFactory.getDefaultCategory());
@@ -322,7 +322,7 @@ class MovieServiceTest {
     void updateMovie_existingReviews_preservesAverageRating() {
         final Movie stored = MovieFactory.getDefaultMovie();
         stored.setAverageRating(4.5);
-        when(movieRepository.findById(stored.getId())).thenReturn(Optional.of(stored));
+        when(movieRepository.findByIdForUpdate(stored.getId())).thenReturn(Optional.of(stored));
         when(categoryService.getCategoryById(anyInt()))
                 .thenReturn(CategoryFactory.getDefaultCategory());
 

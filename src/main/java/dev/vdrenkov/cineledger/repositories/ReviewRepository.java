@@ -1,6 +1,7 @@
 package dev.vdrenkov.cineledger.repositories;
 
 import dev.vdrenkov.cineledger.models.entities.Review;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -16,4 +17,14 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
     List<Review> findAllByUserIdAndMovieIsNotNullAndCinemaIsNull(int userId);
 
     List<Review> findAllByUserIdAndMovieIsNullAndCinemaIsNotNull(int userId);
+
+    @org.springframework.data.jpa.repository.Query(
+            "select coalesce(avg(review.rating), 0.0) from Review review where review.movie.id ="
+                + " :id")
+    double averageRatingByMovieId(int id);
+
+    @org.springframework.data.jpa.repository.Query(
+            "select coalesce(avg(review.rating), 0.0) from Review review where review.cinema.id ="
+                + " :id")
+    double averageRatingByCinemaId(int id);
 }
