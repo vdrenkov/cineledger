@@ -1,0 +1,1239 @@
+{
+  "event" : [ {
+    "script" : {
+      "exec" : [ "const date = new Date();", "pm.variables.set('startDate', date.toISOString().slice(0, 10));", "date.setUTCDate(date.getUTCDate() + 1);", "pm.variables.set('releaseDate', date.toISOString().slice(0, 10));", "pm.variables.set('endDate', date.toISOString().slice(0, 10));", "date.setUTCDate(date.getUTCDate() + 1);", "pm.variables.set('programDate', date.toISOString().slice(0, 10));" ],
+      "type" : "text/javascript"
+    },
+    "listen" : "prerequest"
+  } ],
+  "item" : [ {
+    "item" : [ {
+      "name" : "Get CSRF token",
+      "request" : {
+        "method" : "GET",
+        "url" : "{{baseUrl}}/csrf",
+        "header" : [ ]
+      },
+      "event" : [ {
+        "script" : {
+          "exec" : [ "pm.collectionVariables.set('csrfToken', pm.response.json().token);" ],
+          "type" : "text/javascript"
+        },
+        "listen" : "test"
+      } ]
+    }, {
+      "name" : "Login",
+      "request" : {
+        "method" : "POST",
+        "url" : "{{baseUrl}}/login",
+        "body" : {
+          "raw" : "{\"username\":\"{{username}}\",\"password\":\"{{password}}\"}",
+          "mode" : "raw",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        },
+        "header" : [ {
+          "value" : "{{csrfToken}}",
+          "key" : "X-XSRF-TOKEN"
+        }, {
+          "value" : "application/json",
+          "key" : "Content-Type"
+        } ]
+      }
+    }, {
+      "name" : "Request password reset",
+      "request" : {
+        "method" : "POST",
+        "url" : "{{baseUrl}}/password-reset-requests",
+        "body" : {
+          "raw" : "{\"username\":\"{{customerUsername}}\"}",
+          "mode" : "raw",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        },
+        "header" : [ {
+          "value" : "{{csrfToken}}",
+          "key" : "X-XSRF-TOKEN"
+        }, {
+          "value" : "application/json",
+          "key" : "Content-Type"
+        } ]
+      }
+    }, {
+      "name" : "Reset password",
+      "request" : {
+        "method" : "POST",
+        "url" : "{{baseUrl}}/password-resets",
+        "body" : {
+          "raw" : "{\"token\":\"{{resetToken}}\",\"password\":\"{{newUserPassword}}\"}",
+          "mode" : "raw",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        },
+        "header" : [ {
+          "value" : "{{csrfToken}}",
+          "key" : "X-XSRF-TOKEN"
+        }, {
+          "value" : "application/json",
+          "key" : "Content-Type"
+        } ]
+      }
+    }, {
+      "name" : "Logout",
+      "request" : {
+        "method" : "POST",
+        "url" : "{{baseUrl}}/logout",
+        "header" : [ {
+          "value" : "{{csrfToken}}",
+          "key" : "X-XSRF-TOKEN"
+        } ]
+      }
+    } ],
+    "name" : "Authentication"
+  }, {
+    "item" : [ {
+      "name" : "Create customer",
+      "request" : {
+        "method" : "POST",
+        "url" : "{{baseUrl}}/users",
+        "body" : {
+          "raw" : "{\"username\":\"{{customerUsername}}\",\"password\":\"{{newUserPassword}}\",\"email\":\"{{customerEmail}}\",\"firstName\":\"Example\",\"lastName\":\"Customer\"}",
+          "mode" : "raw",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        },
+        "header" : [ {
+          "value" : "{{csrfToken}}",
+          "key" : "X-XSRF-TOKEN"
+        }, {
+          "value" : "application/json",
+          "key" : "Content-Type"
+        } ]
+      },
+      "event" : [ {
+        "script" : {
+          "exec" : [ "pm.test('Created', () => pm.response.to.have.status(201));", "const location = pm.response.headers.get('Location');", "if (location) pm.collectionVariables.set('userId', location.split('/').pop());" ],
+          "type" : "text/javascript"
+        },
+        "listen" : "test"
+      } ]
+    }, {
+      "name" : "Create staff account",
+      "request" : {
+        "method" : "POST",
+        "url" : "{{baseUrl}}/users",
+        "body" : {
+          "raw" : "{\"username\":\"{{staffUsername}}\",\"password\":\"{{newUserPassword}}\",\"email\":\"{{staffEmail}}\",\"firstName\":\"Example\",\"lastName\":\"Vendor\",\"roleNames\":[\"VENDOR\"]}",
+          "mode" : "raw",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        },
+        "header" : [ {
+          "value" : "{{csrfToken}}",
+          "key" : "X-XSRF-TOKEN"
+        }, {
+          "value" : "application/json",
+          "key" : "Content-Type"
+        } ]
+      },
+      "event" : [ {
+        "script" : {
+          "exec" : [ "pm.test('Created', () => pm.response.to.have.status(201));", "const location = pm.response.headers.get('Location');", "if (location) pm.collectionVariables.set('staffId', location.split('/').pop());" ],
+          "type" : "text/javascript"
+        },
+        "listen" : "test"
+      } ]
+    }, {
+      "name" : "Get profile",
+      "request" : {
+        "method" : "GET",
+        "url" : "{{baseUrl}}/users/{{userId}}",
+        "header" : [ ]
+      }
+    }, {
+      "name" : "Find account",
+      "request" : {
+        "method" : "GET",
+        "url" : "{{baseUrl}}/users?username={{customerUsername}}",
+        "header" : [ ]
+      }
+    }, {
+      "name" : "Update own profile",
+      "request" : {
+        "method" : "PUT",
+        "url" : "{{baseUrl}}/users/{{userId}}",
+        "body" : {
+          "raw" : "{\"username\":\"{{customerUsername}}\",\"password\":\"{{newUserPassword}}\",\"email\":\"{{customerEmail}}\",\"firstName\":\"Example\",\"lastName\":\"Customer\"}",
+          "mode" : "raw",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        },
+        "header" : [ {
+          "value" : "{{csrfToken}}",
+          "key" : "X-XSRF-TOKEN"
+        }, {
+          "value" : "application/json",
+          "key" : "Content-Type"
+        } ]
+      }
+    }, {
+      "name" : "Update staff account",
+      "request" : {
+        "method" : "PUT",
+        "url" : "{{baseUrl}}/admins/{{staffId}}",
+        "body" : {
+          "raw" : "{\"username\":\"{{staffUsername}}\",\"password\":\"{{newUserPassword}}\",\"email\":\"{{staffEmail}}\",\"firstName\":\"Example\",\"lastName\":\"Vendor\",\"roleNames\":[\"VENDOR\"]}",
+          "mode" : "raw",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        },
+        "header" : [ {
+          "value" : "{{csrfToken}}",
+          "key" : "X-XSRF-TOKEN"
+        }, {
+          "value" : "application/json",
+          "key" : "Content-Type"
+        } ]
+      }
+    }, {
+      "name" : "Delete account",
+      "request" : {
+        "method" : "DELETE",
+        "url" : "{{baseUrl}}/users/{{userId}}",
+        "header" : [ {
+          "value" : "{{csrfToken}}",
+          "key" : "X-XSRF-TOKEN"
+        } ]
+      }
+    } ],
+    "name" : "Accounts"
+  }, {
+    "item" : [ {
+      "name" : "Create category",
+      "request" : {
+        "method" : "POST",
+        "url" : "{{baseUrl}}/categories",
+        "body" : {
+          "raw" : "{\"name\":\"Drama\"}",
+          "mode" : "raw",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        },
+        "header" : [ {
+          "value" : "{{csrfToken}}",
+          "key" : "X-XSRF-TOKEN"
+        }, {
+          "value" : "application/json",
+          "key" : "Content-Type"
+        } ]
+      },
+      "event" : [ {
+        "script" : {
+          "exec" : [ "pm.test('Created', () => pm.response.to.have.status(201));", "const location = pm.response.headers.get('Location');", "if (location) pm.collectionVariables.set('categoryId', location.split('/').pop());" ],
+          "type" : "text/javascript"
+        },
+        "listen" : "test"
+      } ]
+    }, {
+      "name" : "Update category",
+      "request" : {
+        "method" : "PUT",
+        "url" : "{{baseUrl}}/categories/{{categoryId}}",
+        "body" : {
+          "raw" : "{\"name\":\"Drama\"}",
+          "mode" : "raw",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        },
+        "header" : [ {
+          "value" : "{{csrfToken}}",
+          "key" : "X-XSRF-TOKEN"
+        }, {
+          "value" : "application/json",
+          "key" : "Content-Type"
+        } ]
+      }
+    }, {
+      "name" : "Delete category",
+      "request" : {
+        "method" : "DELETE",
+        "url" : "{{baseUrl}}/categories/{{categoryId}}",
+        "header" : [ {
+          "value" : "{{csrfToken}}",
+          "key" : "X-XSRF-TOKEN"
+        } ]
+      }
+    }, {
+      "name" : "List categories",
+      "request" : {
+        "method" : "GET",
+        "url" : "{{baseUrl}}/categories",
+        "header" : [ ]
+      }
+    } ],
+    "name" : "Categories"
+  }, {
+    "item" : [ {
+      "name" : "Create cinema",
+      "request" : {
+        "method" : "POST",
+        "url" : "{{baseUrl}}/cinemas",
+        "body" : {
+          "raw" : "{\"address\":\"Example Street 1\",\"city\":\"Sofia\"}",
+          "mode" : "raw",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        },
+        "header" : [ {
+          "value" : "{{csrfToken}}",
+          "key" : "X-XSRF-TOKEN"
+        }, {
+          "value" : "application/json",
+          "key" : "Content-Type"
+        } ]
+      },
+      "event" : [ {
+        "script" : {
+          "exec" : [ "pm.test('Created', () => pm.response.to.have.status(201));", "const location = pm.response.headers.get('Location');", "if (location) pm.collectionVariables.set('cinemaId', location.split('/').pop());" ],
+          "type" : "text/javascript"
+        },
+        "listen" : "test"
+      } ]
+    }, {
+      "name" : "Update cinema",
+      "request" : {
+        "method" : "PUT",
+        "url" : "{{baseUrl}}/cinemas/{{cinemaId}}",
+        "body" : {
+          "raw" : "{\"address\":\"Example Street 1\",\"city\":\"Sofia\"}",
+          "mode" : "raw",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        },
+        "header" : [ {
+          "value" : "{{csrfToken}}",
+          "key" : "X-XSRF-TOKEN"
+        }, {
+          "value" : "application/json",
+          "key" : "Content-Type"
+        } ]
+      }
+    }, {
+      "name" : "Delete cinema",
+      "request" : {
+        "method" : "DELETE",
+        "url" : "{{baseUrl}}/cinemas/{{cinemaId}}",
+        "header" : [ {
+          "value" : "{{csrfToken}}",
+          "key" : "X-XSRF-TOKEN"
+        } ]
+      }
+    }, {
+      "name" : "Find cinemas",
+      "request" : {
+        "method" : "GET",
+        "url" : "{{baseUrl}}/cinemas?city=Sofia",
+        "header" : [ ]
+      }
+    }, {
+      "name" : "Create hall",
+      "request" : {
+        "method" : "POST",
+        "url" : "{{baseUrl}}/halls",
+        "body" : {
+          "raw" : "{\"capacity\":50,\"cinemaId\":{{cinemaId}}}",
+          "mode" : "raw",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        },
+        "header" : [ {
+          "value" : "{{csrfToken}}",
+          "key" : "X-XSRF-TOKEN"
+        }, {
+          "value" : "application/json",
+          "key" : "Content-Type"
+        } ]
+      },
+      "event" : [ {
+        "script" : {
+          "exec" : [ "pm.test('Created', () => pm.response.to.have.status(201));", "const location = pm.response.headers.get('Location');", "if (location) pm.collectionVariables.set('hallId', location.split('/').pop());" ],
+          "type" : "text/javascript"
+        },
+        "listen" : "test"
+      } ]
+    }, {
+      "name" : "Update hall",
+      "request" : {
+        "method" : "PUT",
+        "url" : "{{baseUrl}}/halls/{{hallId}}",
+        "body" : {
+          "raw" : "{\"capacity\":50,\"cinemaId\":{{cinemaId}}}",
+          "mode" : "raw",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        },
+        "header" : [ {
+          "value" : "{{csrfToken}}",
+          "key" : "X-XSRF-TOKEN"
+        }, {
+          "value" : "application/json",
+          "key" : "Content-Type"
+        } ]
+      }
+    }, {
+      "name" : "Delete hall",
+      "request" : {
+        "method" : "DELETE",
+        "url" : "{{baseUrl}}/halls/{{hallId}}",
+        "header" : [ {
+          "value" : "{{csrfToken}}",
+          "key" : "X-XSRF-TOKEN"
+        } ]
+      }
+    }, {
+      "name" : "List halls",
+      "request" : {
+        "method" : "GET",
+        "url" : "{{baseUrl}}/cinemas/{{cinemaId}}/halls",
+        "header" : [ ]
+      }
+    } ],
+    "name" : "Cinemas and halls"
+  }, {
+    "item" : [ {
+      "name" : "Create movie",
+      "request" : {
+        "method" : "POST",
+        "url" : "{{baseUrl}}/movies",
+        "body" : {
+          "raw" : "{\"title\":\"Example Movie\",\"description\":\"A feature film\",\"releaseDate\":\"{{releaseDate}}\",\"runtime\":\"PT2H\",\"categoryId\":{{categoryId}}}",
+          "mode" : "raw",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        },
+        "header" : [ {
+          "value" : "{{csrfToken}}",
+          "key" : "X-XSRF-TOKEN"
+        }, {
+          "value" : "application/json",
+          "key" : "Content-Type"
+        } ]
+      },
+      "event" : [ {
+        "script" : {
+          "exec" : [ "pm.test('Created', () => pm.response.to.have.status(201));", "const location = pm.response.headers.get('Location');", "if (location) pm.collectionVariables.set('movieId', location.split('/').pop());" ],
+          "type" : "text/javascript"
+        },
+        "listen" : "test"
+      } ]
+    }, {
+      "name" : "Update movie",
+      "request" : {
+        "method" : "PUT",
+        "url" : "{{baseUrl}}/movies/{{movieId}}",
+        "body" : {
+          "raw" : "{\"title\":\"Example Movie\",\"description\":\"A feature film\",\"releaseDate\":\"{{releaseDate}}\",\"runtime\":\"PT2H\",\"categoryId\":{{categoryId}}}",
+          "mode" : "raw",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        },
+        "header" : [ {
+          "value" : "{{csrfToken}}",
+          "key" : "X-XSRF-TOKEN"
+        }, {
+          "value" : "application/json",
+          "key" : "Content-Type"
+        } ]
+      }
+    }, {
+      "name" : "Delete movie",
+      "request" : {
+        "method" : "DELETE",
+        "url" : "{{baseUrl}}/movies/{{movieId}}",
+        "header" : [ {
+          "value" : "{{csrfToken}}",
+          "key" : "X-XSRF-TOKEN"
+        } ]
+      }
+    }, {
+      "name" : "Get movie",
+      "request" : {
+        "method" : "GET",
+        "url" : "{{baseUrl}}/movies/{{movieId}}",
+        "header" : [ ]
+      }
+    }, {
+      "name" : "Search movies",
+      "request" : {
+        "method" : "GET",
+        "url" : "{{baseUrl}}/movies?title=Example&minimalRating=0",
+        "header" : [ ]
+      }
+    }, {
+      "name" : "Filter by release date",
+      "request" : {
+        "method" : "GET",
+        "url" : "{{baseUrl}}/movies?release={{releaseDate}}&isAfter=true",
+        "header" : [ ]
+      }
+    }, {
+      "name" : "Filter by rating",
+      "request" : {
+        "method" : "GET",
+        "url" : "{{baseUrl}}/movies?minRating=4",
+        "header" : [ ]
+      }
+    }, {
+      "name" : "List category movies",
+      "request" : {
+        "method" : "GET",
+        "url" : "{{baseUrl}}/categories/{{categoryId}}/movies",
+        "header" : [ ]
+      }
+    } ],
+    "name" : "Movies"
+  }, {
+    "item" : [ {
+      "name" : "Create programme",
+      "request" : {
+        "method" : "POST",
+        "url" : "{{baseUrl}}/programs",
+        "body" : {
+          "raw" : "{\"programDate\":\"{{programDate}}\",\"cinemaId\":{{cinemaId}}}",
+          "mode" : "raw",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        },
+        "header" : [ {
+          "value" : "{{csrfToken}}",
+          "key" : "X-XSRF-TOKEN"
+        }, {
+          "value" : "application/json",
+          "key" : "Content-Type"
+        } ]
+      },
+      "event" : [ {
+        "script" : {
+          "exec" : [ "pm.test('Created', () => pm.response.to.have.status(201));", "const location = pm.response.headers.get('Location');", "if (location) pm.collectionVariables.set('programId', location.split('/').pop());" ],
+          "type" : "text/javascript"
+        },
+        "listen" : "test"
+      } ]
+    }, {
+      "name" : "Update programme",
+      "request" : {
+        "method" : "PUT",
+        "url" : "{{baseUrl}}/programs/{{programId}}",
+        "body" : {
+          "raw" : "{\"programDate\":\"{{programDate}}\",\"cinemaId\":{{cinemaId}}}",
+          "mode" : "raw",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        },
+        "header" : [ {
+          "value" : "{{csrfToken}}",
+          "key" : "X-XSRF-TOKEN"
+        }, {
+          "value" : "application/json",
+          "key" : "Content-Type"
+        } ]
+      }
+    }, {
+      "name" : "Delete programme",
+      "request" : {
+        "method" : "DELETE",
+        "url" : "{{baseUrl}}/programs/{{programId}}",
+        "header" : [ {
+          "value" : "{{csrfToken}}",
+          "key" : "X-XSRF-TOKEN"
+        } ]
+      }
+    }, {
+      "name" : "List programmes",
+      "request" : {
+        "method" : "GET",
+        "url" : "{{baseUrl}}/programs",
+        "header" : [ ]
+      }
+    }, {
+      "name" : "List cinema programmes",
+      "request" : {
+        "method" : "GET",
+        "url" : "{{baseUrl}}/cinemas/{{cinemaId}}/programs",
+        "header" : [ ]
+      }
+    }, {
+      "name" : "Create screening",
+      "request" : {
+        "method" : "POST",
+        "url" : "{{baseUrl}}/projections",
+        "body" : {
+          "raw" : "{\"price\":10.25,\"hallId\":{{hallId}},\"programId\":{{programId}},\"movieId\":{{movieId}},\"startTime\":\"18:00:00\"}",
+          "mode" : "raw",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        },
+        "header" : [ {
+          "value" : "{{csrfToken}}",
+          "key" : "X-XSRF-TOKEN"
+        }, {
+          "value" : "application/json",
+          "key" : "Content-Type"
+        } ]
+      },
+      "event" : [ {
+        "script" : {
+          "exec" : [ "pm.test('Created', () => pm.response.to.have.status(201));", "const location = pm.response.headers.get('Location');", "if (location) pm.collectionVariables.set('projectionId', location.split('/').pop());" ],
+          "type" : "text/javascript"
+        },
+        "listen" : "test"
+      } ]
+    }, {
+      "name" : "Update screening",
+      "request" : {
+        "method" : "PUT",
+        "url" : "{{baseUrl}}/projections/{{projectionId}}",
+        "body" : {
+          "raw" : "{\"price\":10.25,\"hallId\":{{hallId}},\"programId\":{{programId}},\"movieId\":{{movieId}},\"startTime\":\"18:00:00\"}",
+          "mode" : "raw",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        },
+        "header" : [ {
+          "value" : "{{csrfToken}}",
+          "key" : "X-XSRF-TOKEN"
+        }, {
+          "value" : "application/json",
+          "key" : "Content-Type"
+        } ]
+      }
+    }, {
+      "name" : "Delete screening",
+      "request" : {
+        "method" : "DELETE",
+        "url" : "{{baseUrl}}/projections/{{projectionId}}",
+        "header" : [ {
+          "value" : "{{csrfToken}}",
+          "key" : "X-XSRF-TOKEN"
+        } ]
+      }
+    }, {
+      "name" : "List programme screenings",
+      "request" : {
+        "method" : "GET",
+        "url" : "{{baseUrl}}/programs/{{programId}}/projections",
+        "header" : [ ]
+      }
+    }, {
+      "name" : "List movie screenings",
+      "request" : {
+        "method" : "GET",
+        "url" : "{{baseUrl}}/movies/{{movieId}}/projections",
+        "header" : [ ]
+      }
+    }, {
+      "name" : "Filter by start time",
+      "request" : {
+        "method" : "GET",
+        "url" : "{{baseUrl}}/projections?startTime=12:00:00&isBefore=false",
+        "header" : [ ]
+      }
+    } ],
+    "name" : "Programmes and screenings"
+  }, {
+    "item" : [ {
+      "name" : "Create item",
+      "request" : {
+        "method" : "POST",
+        "url" : "{{baseUrl}}/items",
+        "body" : {
+          "raw" : "{\"name\":\"Popcorn\",\"price\":2.75,\"quantity\":20}",
+          "mode" : "raw",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        },
+        "header" : [ {
+          "value" : "{{csrfToken}}",
+          "key" : "X-XSRF-TOKEN"
+        }, {
+          "value" : "application/json",
+          "key" : "Content-Type"
+        } ]
+      },
+      "event" : [ {
+        "script" : {
+          "exec" : [ "pm.test('Created', () => pm.response.to.have.status(201));", "const location = pm.response.headers.get('Location');", "if (location) pm.collectionVariables.set('itemId', location.split('/').pop());" ],
+          "type" : "text/javascript"
+        },
+        "listen" : "test"
+      } ]
+    }, {
+      "name" : "Update item",
+      "request" : {
+        "method" : "PUT",
+        "url" : "{{baseUrl}}/items/{{itemId}}",
+        "body" : {
+          "raw" : "{\"name\":\"Popcorn\",\"price\":2.75,\"quantity\":20}",
+          "mode" : "raw",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        },
+        "header" : [ {
+          "value" : "{{csrfToken}}",
+          "key" : "X-XSRF-TOKEN"
+        }, {
+          "value" : "application/json",
+          "key" : "Content-Type"
+        } ]
+      }
+    }, {
+      "name" : "Delete item",
+      "request" : {
+        "method" : "DELETE",
+        "url" : "{{baseUrl}}/items/{{itemId}}",
+        "header" : [ {
+          "value" : "{{csrfToken}}",
+          "key" : "X-XSRF-TOKEN"
+        } ]
+      }
+    }, {
+      "name" : "List items",
+      "request" : {
+        "method" : "GET",
+        "url" : "{{baseUrl}}/items",
+        "header" : [ ]
+      }
+    }, {
+      "name" : "Create discount",
+      "request" : {
+        "method" : "POST",
+        "url" : "{{baseUrl}}/discounts",
+        "body" : {
+          "raw" : "{\"type\":\"Member\",\"code\":\"2468\",\"percentage\":10}",
+          "mode" : "raw",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        },
+        "header" : [ {
+          "value" : "{{csrfToken}}",
+          "key" : "X-XSRF-TOKEN"
+        }, {
+          "value" : "application/json",
+          "key" : "Content-Type"
+        } ]
+      },
+      "event" : [ {
+        "script" : {
+          "exec" : [ "pm.test('Created', () => pm.response.to.have.status(201));", "const location = pm.response.headers.get('Location');", "if (location) pm.collectionVariables.set('discountId', location.split('/').pop());" ],
+          "type" : "text/javascript"
+        },
+        "listen" : "test"
+      } ]
+    }, {
+      "name" : "Update discount",
+      "request" : {
+        "method" : "PUT",
+        "url" : "{{baseUrl}}/discounts/{{discountId}}",
+        "body" : {
+          "raw" : "{\"type\":\"Member\",\"code\":\"2468\",\"percentage\":10}",
+          "mode" : "raw",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        },
+        "header" : [ {
+          "value" : "{{csrfToken}}",
+          "key" : "X-XSRF-TOKEN"
+        }, {
+          "value" : "application/json",
+          "key" : "Content-Type"
+        } ]
+      }
+    }, {
+      "name" : "Delete discount",
+      "request" : {
+        "method" : "DELETE",
+        "url" : "{{baseUrl}}/discounts/{{discountId}}",
+        "header" : [ {
+          "value" : "{{csrfToken}}",
+          "key" : "X-XSRF-TOKEN"
+        } ]
+      }
+    }, {
+      "name" : "List discounts",
+      "request" : {
+        "method" : "GET",
+        "url" : "{{baseUrl}}/discounts",
+        "header" : [ ]
+      }
+    } ],
+    "name" : "Concessions and discounts"
+  }, {
+    "item" : [ {
+      "name" : "Issue ticket",
+      "request" : {
+        "method" : "POST",
+        "url" : "{{baseUrl}}/tickets",
+        "body" : {
+          "raw" : "{\"projectionId\":{{projectionId}}}",
+          "mode" : "raw",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        },
+        "header" : [ {
+          "value" : "{{csrfToken}}",
+          "key" : "X-XSRF-TOKEN"
+        }, {
+          "value" : "application/json",
+          "key" : "Content-Type"
+        } ]
+      },
+      "event" : [ {
+        "script" : {
+          "exec" : [ "pm.test('Created', () => pm.response.to.have.status(201));", "const location = pm.response.headers.get('Location');", "if (location) pm.collectionVariables.set('ticketId', location.split('/').pop());" ],
+          "type" : "text/javascript"
+        },
+        "listen" : "test"
+      } ]
+    }, {
+      "name" : "List screening tickets",
+      "request" : {
+        "method" : "GET",
+        "url" : "{{baseUrl}}/projections/{{projectionId}}/tickets",
+        "header" : [ ]
+      }
+    }, {
+      "name" : "Create order",
+      "request" : {
+        "method" : "POST",
+        "url" : "{{baseUrl}}/orders",
+        "body" : {
+          "raw" : "{\"userId\":{{userId}},\"ticketsIds\":[{{ticketId}}],\"itemsIds\":[{{itemId}},{{itemId}}],\"discountCode\":\"2468\"}",
+          "mode" : "raw",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        },
+        "header" : [ {
+          "value" : "{{csrfToken}}",
+          "key" : "X-XSRF-TOKEN"
+        }, {
+          "value" : "application/json",
+          "key" : "Content-Type"
+        } ]
+      },
+      "event" : [ {
+        "script" : {
+          "exec" : [ "pm.test('Created', () => pm.response.to.have.status(201));", "const location = pm.response.headers.get('Location');", "if (location) pm.collectionVariables.set('orderId', location.split('/').pop());" ],
+          "type" : "text/javascript"
+        },
+        "listen" : "test"
+      } ]
+    }, {
+      "name" : "Update order",
+      "request" : {
+        "method" : "PUT",
+        "url" : "{{baseUrl}}/orders/{{orderId}}",
+        "body" : {
+          "raw" : "{\"userId\":{{userId}},\"ticketsIds\":[{{ticketId}}],\"itemsIds\":[{{itemId}},{{itemId}}],\"discountCode\":\"2468\"}",
+          "mode" : "raw",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        },
+        "header" : [ {
+          "value" : "{{csrfToken}}",
+          "key" : "X-XSRF-TOKEN"
+        }, {
+          "value" : "application/json",
+          "key" : "Content-Type"
+        } ]
+      }
+    }, {
+      "name" : "Delete order",
+      "request" : {
+        "method" : "DELETE",
+        "url" : "{{baseUrl}}/orders/{{orderId}}",
+        "header" : [ {
+          "value" : "{{csrfToken}}",
+          "key" : "X-XSRF-TOKEN"
+        } ]
+      }
+    }, {
+      "name" : "Get receipt",
+      "request" : {
+        "method" : "GET",
+        "url" : "{{baseUrl}}/orders/{{orderId}}",
+        "header" : [ ]
+      }
+    }, {
+      "name" : "List customer orders",
+      "request" : {
+        "method" : "GET",
+        "url" : "{{baseUrl}}/users/{{userId}}/orders",
+        "header" : [ ]
+      }
+    }, {
+      "name" : "Reserve tickets",
+      "request" : {
+        "method" : "POST",
+        "url" : "{{baseUrl}}/users/{{userId}}/orders",
+        "body" : {
+          "raw" : "[{\"projectionId\":{{projectionId}}}]",
+          "mode" : "raw",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        },
+        "header" : [ {
+          "value" : "{{csrfToken}}",
+          "key" : "X-XSRF-TOKEN"
+        }, {
+          "value" : "application/json",
+          "key" : "Content-Type"
+        } ]
+      },
+      "event" : [ {
+        "script" : {
+          "exec" : [ "pm.test('Created', () => pm.response.to.have.status(201));", "const location = pm.response.headers.get('Location');", "if (location) pm.collectionVariables.set('reservationId', location.split('/').pop());" ],
+          "type" : "text/javascript"
+        },
+        "listen" : "test"
+      } ]
+    } ],
+    "name" : "Tickets and orders"
+  }, {
+    "item" : [ {
+      "name" : "Review movie",
+      "request" : {
+        "method" : "POST",
+        "url" : "{{baseUrl}}/movies/{{movieId}}/reviews",
+        "body" : {
+          "raw" : "{\"rating\":4.5,\"reviewText\":\"An enjoyable experience\"}",
+          "mode" : "raw",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        },
+        "header" : [ {
+          "value" : "{{csrfToken}}",
+          "key" : "X-XSRF-TOKEN"
+        }, {
+          "value" : "application/json",
+          "key" : "Content-Type"
+        } ]
+      },
+      "event" : [ {
+        "script" : {
+          "exec" : [ "pm.test('Created', () => pm.response.to.have.status(201));", "const location = pm.response.headers.get('Location');", "if (location) pm.collectionVariables.set('reviewId', location.split('/').pop());" ],
+          "type" : "text/javascript"
+        },
+        "listen" : "test"
+      } ]
+    }, {
+      "name" : "Review cinema",
+      "request" : {
+        "method" : "POST",
+        "url" : "{{baseUrl}}/cinemas/{{cinemaId}}/reviews",
+        "body" : {
+          "raw" : "{\"rating\":4.5,\"reviewText\":\"An enjoyable experience\"}",
+          "mode" : "raw",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        },
+        "header" : [ {
+          "value" : "{{csrfToken}}",
+          "key" : "X-XSRF-TOKEN"
+        }, {
+          "value" : "application/json",
+          "key" : "Content-Type"
+        } ]
+      },
+      "event" : [ {
+        "script" : {
+          "exec" : [ "pm.test('Created', () => pm.response.to.have.status(201));", "const location = pm.response.headers.get('Location');", "if (location) pm.collectionVariables.set('cinemaReviewId', location.split('/').pop());" ],
+          "type" : "text/javascript"
+        },
+        "listen" : "test"
+      } ]
+    }, {
+      "name" : "List movie reviews",
+      "request" : {
+        "method" : "GET",
+        "url" : "{{baseUrl}}/movies/{{movieId}}/reviews",
+        "header" : [ ]
+      }
+    }, {
+      "name" : "List cinema reviews",
+      "request" : {
+        "method" : "GET",
+        "url" : "{{baseUrl}}/cinemas/{{cinemaId}}/reviews",
+        "header" : [ ]
+      }
+    }, {
+      "name" : "Update review",
+      "request" : {
+        "method" : "PUT",
+        "url" : "{{baseUrl}}/reviews/{{reviewId}}",
+        "body" : {
+          "raw" : "{\"rating\":4.5,\"reviewText\":\"An enjoyable experience\"}",
+          "mode" : "raw",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        },
+        "header" : [ {
+          "value" : "{{csrfToken}}",
+          "key" : "X-XSRF-TOKEN"
+        }, {
+          "value" : "application/json",
+          "key" : "Content-Type"
+        } ]
+      }
+    }, {
+      "name" : "Delete review",
+      "request" : {
+        "method" : "DELETE",
+        "url" : "{{baseUrl}}/reviews/{{reviewId}}",
+        "header" : [ {
+          "value" : "{{csrfToken}}",
+          "key" : "X-XSRF-TOKEN"
+        } ]
+      }
+    } ],
+    "name" : "Reviews"
+  }, {
+    "item" : [ {
+      "name" : "cinemas income",
+      "request" : {
+        "method" : "GET",
+        "url" : "{{baseUrl}}/reports/cinemas/{{cinemaId}}/incomes?startDate={{startDate}}&endDate={{endDate}}",
+        "header" : [ ]
+      }
+    }, {
+      "name" : "halls income",
+      "request" : {
+        "method" : "GET",
+        "url" : "{{baseUrl}}/reports/halls/{{hallId}}/incomes?startDate={{startDate}}&endDate={{endDate}}",
+        "header" : [ ]
+      }
+    }, {
+      "name" : "movies income",
+      "request" : {
+        "method" : "GET",
+        "url" : "{{baseUrl}}/reports/movies/{{movieId}}/incomes?startDate={{startDate}}&endDate={{endDate}}",
+        "header" : [ ]
+      }
+    }, {
+      "name" : "items income",
+      "request" : {
+        "method" : "GET",
+        "url" : "{{baseUrl}}/reports/items/{{itemId}}/incomes?startDate={{startDate}}&endDate={{endDate}}",
+        "header" : [ ]
+      }
+    }, {
+      "name" : "users income",
+      "request" : {
+        "method" : "GET",
+        "url" : "{{baseUrl}}/reports/users/{{userId}}/incomes?startDate={{startDate}}&endDate={{endDate}}",
+        "header" : [ ]
+      }
+    }, {
+      "name" : "Category ticket count",
+      "request" : {
+        "method" : "GET",
+        "url" : "{{baseUrl}}/reports/movies/categories/{{categoryId}}/tickets-count?startDate={{startDate}}&endDate={{endDate}}",
+        "header" : [ ]
+      }
+    }, {
+      "name" : "Movie ticket count",
+      "request" : {
+        "method" : "GET",
+        "url" : "{{baseUrl}}/reports/movies/tickets-count?startDate={{startDate}}&endDate={{endDate}}&title=Example%20Movie",
+        "header" : [ ]
+      }
+    }, {
+      "name" : "Concession quantity",
+      "request" : {
+        "method" : "GET",
+        "url" : "{{baseUrl}}/reports/items/items-count?startDate={{startDate}}&endDate={{endDate}}&name=Popcorn",
+        "header" : [ ]
+      }
+    } ],
+    "name" : "Reports"
+  }, {
+    "item" : [ {
+      "name" : "List roles",
+      "request" : {
+        "method" : "GET",
+        "url" : "{{baseUrl}}/roles",
+        "header" : [ ]
+      }
+    } ],
+    "name" : "Roles"
+  } ],
+  "variable" : [ {
+    "value" : "http://localhost:8080",
+    "key" : "baseUrl"
+  }, {
+    "value" : "",
+    "key" : "username"
+  }, {
+    "value" : "",
+    "key" : "password"
+  }, {
+    "value" : "",
+    "key" : "newUserPassword"
+  }, {
+    "value" : "",
+    "key" : "resetToken"
+  }, {
+    "value" : "",
+    "key" : "csrfToken"
+  }, {
+    "value" : "",
+    "key" : "userId"
+  }, {
+    "value" : "",
+    "key" : "staffId"
+  }, {
+    "value" : "",
+    "key" : "categoryId"
+  }, {
+    "value" : "",
+    "key" : "cinemaId"
+  }, {
+    "value" : "",
+    "key" : "hallId"
+  }, {
+    "value" : "",
+    "key" : "movieId"
+  }, {
+    "value" : "",
+    "key" : "programId"
+  }, {
+    "value" : "",
+    "key" : "projectionId"
+  }, {
+    "value" : "",
+    "key" : "itemId"
+  }, {
+    "value" : "",
+    "key" : "discountId"
+  }, {
+    "value" : "",
+    "key" : "ticketId"
+  }, {
+    "value" : "",
+    "key" : "orderId"
+  }, {
+    "value" : "",
+    "key" : "reservationId"
+  }, {
+    "value" : "",
+    "key" : "reviewId"
+  }, {
+    "value" : "",
+    "key" : "cinemaReviewId"
+  }, {
+    "value" : "vendor",
+    "key" : "staffUsername"
+  }, {
+    "value" : "customer",
+    "key" : "customerUsername"
+  }, {
+    "value" : "vendor@example.test",
+    "key" : "staffEmail"
+  }, {
+    "value" : "customer@example.test",
+    "key" : "customerEmail"
+  } ],
+  "info" : {
+    "schema" : "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "name" : "CineLedger"
+  }
+}

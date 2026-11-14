@@ -1,107 +1,103 @@
 # CineLedger
 
-API-first, stateless Spring Boot backend for cinema management. The project exposes REST endpoints for a catalog,
-scheduling, ordering, reporting, reviews and user/security workflows for external clients (frontend/Postman).
+Spring Boot REST API for cinema management, reservations, concession sales, reviews and reporting.
 
-## Tech Stack
+## Features
 
-- Java 25
-- Spring Boot 4.0.3
-- Spring Security (JWT + cookie support)
-- Spring Data JPA + Hibernate ORM
-- Liquibase
-- PostgreSQL
-- Maven
-- JUnit 5 + Mockito + Spring Test (MockMvc)
+- Movie catalogue with title, category, release-date and rating filters.
+- Cinema programmes with runtime-based screening overlap checks.
+- Customer reservations and staff orders with transactional seat and stock allocation.
+- Purchase receipts with quantities, fixed unit prices and allocated discounts.
+- Income and sales reports with inclusive date ranges.
+- JWT authentication, role-based access, CSRF protection and single-use password recovery tokens.
 
-## Project Structure
+## Stack
 
-- `src/main/resources/db/changelog/`: Liquibase changelogs
-- `src/main/resources/DML_Scripts.sql`: Development seed data script
-- `src/main/resources/application.yml`: Runtime configuration
-- `src/main/resources/CineLedger.postman_collection.json`: API collection
+Java 27, Spring Boot 4.1, Spring Security, Spring Data JPA, PostgreSQL 18 and Liquibase.
+Maven Wrapper, JUnit, Mockito and Testcontainers support builds and verification.
 
-## Architecture
+## Setup
 
-- Layered Spring Boot backend with clear controller, service, repository, mapper, and entity boundaries.
-- Controllers expose the HTTP contract, validate input, and delegate orchestration to the service layer.
-- Services hold business rules for catalog management, scheduling, ordering, reporting, reviews, and security flows.
-- Repositories encapsulate database access through Spring Data JPA against PostgreSQL.
-- Manual mappers keep DTO shaping explicit instead of relying on reflection-based mapping.
-- Spring Security enforces stateless JWT-based authentication and role-based authorization across the API surface.
-- Liquibase owns schema evolution, while Hibernate runs in validation mode to detect entity/schema drift early.
+Install JDK 27 and PostgreSQL 18. Create a database named `cineledger`, then set:
 
-## Environment Variables
+| Variable | Value |
+| --- | --- |
+| `SPRING_DATASOURCE_URL` | Defaults to `jdbc:postgresql://localhost:5432/cineledger`. |
+| `SPRING_DATASOURCE_USERNAME` | Defaults to `postgres`. |
+| `SPRING_DATASOURCE_PASSWORD` | Your database password. |
+| `JWT_SECRET` | A randomly generated secret containing at least 64 UTF-8 bytes. |
+| `JWT_COOKIE_SECURE` | Set to `false` for local HTTP; defaults to `true` for HTTPS. |
 
-Set these before running the application:
+For the first administrator, set `APP_BOOTSTRAP_ADMIN_USERNAME`,
+`APP_BOOTSTRAP_ADMIN_PASSWORD` and `APP_BOOTSTRAP_ADMIN_EMAIL` before starting.
+Bootstrap creates missing roles and the configured administrator without replacing existing accounts.
+Remove the bootstrap credentials from the environment afterwards.
 
-- `SPRING_DATASOURCE_URL` (default: `jdbc:postgresql://localhost:5432/cineledger`)
-- `SPRING_DATASOURCE_USERNAME` (default: `postgres`)
-- `SPRING_DATASOURCE_PASSWORD` (required)
-- `JWT_SECRET` (required; use a strong 64+ char secret)
-- `APP_BOOTSTRAP_ROLES` (default: `true`)
-- `APP_BOOTSTRAP_ADMIN_USERNAME` (optional)
-- `APP_BOOTSTRAP_ADMIN_PASSWORD` (optional)
-- `APP_BOOTSTRAP_ADMIN_EMAIL` (optional)
-- `APP_BOOTSTRAP_ADMIN_FIRST_NAME` (optional; default fallback: `Admin`)
-- `APP_BOOTSTRAP_ADMIN_LAST_NAME` (optional; default fallback: `User`)
-- `JWT_COOKIE_SECURE` (default: `true`)
-- `JWT_COOKIE_SAME_SITE` (default: `Lax`)
-- `MAILJET_API_KEY` (optional)
-- `MAILJET_API_SECRET` (optional)
-- `MAIL_SENDER_EMAIL` (default: `no-reply@cineledger.dev`)
-- `MAIL_SENDER_NAME` (default: `CineLedger`)
-
-## Database Setup
-
-1. Create database `cineledger` in PostgreSQL.
-2. Start the application once to let Liquibase apply `src/main/resources/db/changelog/changes/001-init-schema.sql`.
-3. Run `src/main/resources/DML_Scripts.sql` only for local development/testing seed data.
-
-## Run Locally
-
-1. Run the full verification suite:
-
-```bash
-mvn clean verify
+```sh
+./mvnw spring-boot:run
 ```
 
-2. Start the application:
+On Windows, use `mvnw.cmd`. The API runs at `http://localhost:8080`.
+Liquibase applies migrations automatically; Hibernate validates the resulting schema.
+Check `./mvnw --version` if compilation fails: Maven and the IDE must both use JDK 27,
+with preview features disabled.
 
-```bash
-mvn spring-boot:run
+Optional email delivery uses `MAILJET_API_KEY`, `MAILJET_API_SECRET` and a verified
+`MAIL_SENDER_EMAIL`. `MAIL_SENDER_NAME` defaults to `CineLedger`.
+Without credentials, email is disabled and recovery tokens are never exposed by the API.
+Messages are sent after commit; delivery failures are logged without rolling back saved changes.
+
+## API
+
+Import [CineLedger.postman_collection.json](CineLedger.postman_collection.json).
+Set its `baseUrl`, `username` and `password` variables. Run **Get CSRF token**, then **Login**;
+Postman keeps the cookies and stores created resource IDs for subsequent requests.
+Fill the account variables, including `newUserPassword`, before creating customers or staff.
+
+Clients must retain the cookies from `GET /csrf` and send its JSON `token` as
+`X-XSRF-TOKEN` on POST, PUT, PATCH and DELETE requests. Login sets the HttpOnly
+`CINELEDGER_AUTH` cookie. Fetch another CSRF token after logout.
+
+| Operation | Access |
+| --- | --- |
+| Read the catalogue, screening schedules and public reviews | Public. |
+| `POST /users` without `roleNames` | Public; creates a `USER` account. |
+| `POST /users` with `roleNames` | `ADMIN` only; can create staff accounts. |
+| Manage own profile, reservations and reviews | Owner or `ADMIN`. |
+| Manage orders, tickets, concessions and discounts | `VENDOR` or `ADMIN`. |
+| Manage the catalogue, roles, other accounts and reports | `ADMIN`. |
+
+`POST /password-reset-requests` accepts `{"username":"customer"}` and always returns 202.
+The emailed token expires after 30 minutes; requests for the same account have a one-minute cooldown.
+`POST /password-resets` accepts `{"token":"…","password":"new password"}` and returns 204 on success.
+Tokens are hashed in the database and usable once. Password or profile updates invalidate existing
+authentication cookies; log in again afterwards.
+
+Amounts use BGN with two decimal places. Repeated concession IDs in an order represent quantities.
+An omitted discount code means no discount. Discounts apply to the order total, rounded to cents;
+allocated line amounts add up to that total. Cancellation restores stock and releases seats.
+Cinema, hall and movie income includes matching ticket sales; item income covers concessions,
+and customer income covers the whole order.
+
+## Verification
+
+Start Docker with Linux containers, then run:
+
+```sh
+./mvnw --batch-mode --no-transfer-progress clean verify
 ```
 
-3. Import `CineLedger.postman_collection.json` into Postman and test endpoints.
+Unit and controller tests run alongside PostgreSQL integration tests covering authorization,
+password recovery, concurrent bookings, stock rollback, scheduling, receipts and reports.
+CI runs the same command and scans the packaged runtime dependencies with Trivy.
 
-## Current Modules
+## Limitations and acknowledgments
 
-- Categories
-- Cinemas
-- Halls
-- Items
-- Movies
-- Programs
-- Projections
-- Tickets
-- Orders and reservations
-- Discounts
-- Roles
-- Users and authentication
-- Reviews
-- Income/statistics reporting
+This is a personal portfolio project and is not for redistribution. It does not process payments
+or integrate with a cinema operator. Email delivery requires your own Mailjet account;
+notifications have no persistent retry queue. Apply HTTPS, request limits and database backups
+when exposing an instance publicly.
 
-## Production Readiness Notes
-
-- Uses stateless security configuration.
-- `spring.jpa.open-in-view` is disabled.
-- Sensitive values are externalized via environment variables.
-- Liquibase manages the schema and Hibernate validates it on a startup.
-- Liquibase expects a clean `cineledger` database for first startup and applies `001-init-schema.sql`.
-- Core roles (`ADMIN`, `VENDOR`, `USER`) can be bootstrapped automatically on a startup.
-- An initial admin user can be bootstrapped when `APP_BOOTSTRAP_ADMIN_*` values are provided.
-- JWT auth uses the app-specific cookie name `CINELEDGER_AUTH`.
-- `GET /csrf` is available for clients that need to fetch the CSRF token explicitly.
-- `spring.jpa.hibernate.ddl-auto` is set to `validate` so entity/schema drift fails fast.
-- `DML_Scripts.sql` is development-only and should not be executed in production.
-- Full verification passes with `mvn clean verify`.
+Version 1 did not store historical line prices or discounts. Upgrading rounds its saved order totals
+to cents and allocates those totals using the catalogue prices available during migration.
+Original historical unit prices cannot be recovered. New purchases retain their agreed prices.

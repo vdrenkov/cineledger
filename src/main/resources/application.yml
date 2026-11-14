@@ -11,22 +11,10 @@ spring:
     password: ${SPRING_DATASOURCE_PASSWORD}
   jpa:
     open-in-view: false
-    properties:
-      hibernate:
-        default_schema: public
     hibernate:
       ddl-auto: validate
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
-
-logging:
-  file:
-    name: logs/log.log
-  pattern:
-    file: '%d{dd-MM-yyyy HH:mm:ss} [%thread] %-5level %logger{36}.%M -%msg%n'
-  level:
-    root: INFO
-    bg.vdrenkov.cineledger: INFO
 
 app:
   bootstrap:
