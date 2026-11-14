@@ -1,7 +1,7 @@
 package dev.vdrenkov.cineledger.services;
 
 import dev.vdrenkov.cineledger.exceptions.HallNotAvailableException;
-import dev.vdrenkov.cineledger.exceptions.ProgramNotFoundException;
+import dev.vdrenkov.cineledger.exceptions.ProjectionNotFoundException;
 import dev.vdrenkov.cineledger.mappers.ProjectionMapper;
 import dev.vdrenkov.cineledger.models.dtos.ProjectionDto;
 import dev.vdrenkov.cineledger.models.entities.Hall;
@@ -11,7 +11,9 @@ import dev.vdrenkov.cineledger.models.entities.Projection;
 import dev.vdrenkov.cineledger.models.requests.ProjectionRequest;
 import dev.vdrenkov.cineledger.repositories.ProjectionRepository;
 import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
+
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalTime;
 import java.util.List;
@@ -24,43 +26,39 @@ public class ProjectionService {
     private final HallService hallService;
     private final MovieService movieService;
 
-    public ProjectionService(ProjectionRepository projectionRepository, ProgramService programService,
-        HallService hallService, MovieService movieService) {
+    public ProjectionService(
+            ProjectionRepository projectionRepository,
+            ProgramService programService,
+            HallService hallService,
+            MovieService movieService) {
         this.projectionRepository = projectionRepository;
         this.programService = programService;
         this.hallService = hallService;
         this.movieService = movieService;
     }
 
-    public Projection addProjection(ProjectionRequest request) {
-        final Hall hall = hallService.getHallById(request.hallId());
+    @Transactional
+    public Projection addProjection(final ProjectionRequest request) {
+        final Hall hall = hallService.getHallForUpdate(request.hallId());
         final Program program = programService.getProgramById(request.programId());
         final Movie movie = movieService.getMovieById(request.movieId());
-        final LocalTime startTime = request.startTime();
-
-        final boolean isHallAvailable = isHallAvailable(hall.getId(), program.getId(), startTime);
-        if (!isHallAvailable) {
-
-            throw new HallNotAvailableException(ExceptionMessages.HALL_NOT_AVAILABLE_EXCEPTION);
-        }
-
-        final Projection projection = new Projection(request.price(), hall, program, movie, request.startTime());
-
-        return projectionRepository.save(projection);
+        validateSchedule(request, hall, program, movie, 0);
+        return projectionRepository.save(
+                new Projection(request.price(), hall, program, movie, request.startTime()));
     }
 
     public List<ProjectionDto> getProjectionsByProgramId(int programId) {
         final Program program = programService.getProgramById(programId);
 
         return ProjectionMapper.mapProjectionListToProjectionDtoList(
-            projectionRepository.findProjectionsByProgramId(program.getId()));
+                projectionRepository.findProjectionsByProgramId(program.getId()));
     }
 
     public List<ProjectionDto> getProjectionsByMovieId(int movieId) {
         final Movie movie = movieService.getMovieById(movieId);
 
         return ProjectionMapper.mapProjectionListToProjectionDtoList(
-            projectionRepository.findProjectionsByMovieId(movie.getId()));
+                projectionRepository.findProjectionsByMovieId(movie.getId()));
     }
 
     public List<ProjectionDto> getProjectionsByStartTime(LocalTime startTime, boolean isBefore) {
@@ -77,12 +75,22 @@ public class ProjectionService {
         return ProjectionMapper.mapProjectionListToProjectionDtoList(projections);
     }
 
+    public Projection getProjectionForUpdate(final int id) {
+        return projectionRepository
+                .findByIdForUpdate(id)
+                .orElseThrow(() ->
+                        new ProjectionNotFoundException(
+                                ExceptionMessages.PROJECTION_NOT_FOUND_MESSAGE));
+    }
+
     public Projection getProjectionById(int id) {
 
-        return projectionRepository.findById(id).orElseThrow(() -> {
-
-            return new ProgramNotFoundException(ExceptionMessages.PROJECTION_NOT_FOUND_MESSAGE);
-        });
+        return projectionRepository
+                .findById(id)
+                .orElseThrow(() -> {
+                    return new ProjectionNotFoundException(
+                            ExceptionMessages.PROJECTION_NOT_FOUND_MESSAGE);
+                });
     }
 
     public ProjectionDto getProjectionDtoById(int id) {
@@ -90,23 +98,17 @@ public class ProjectionService {
         return ProjectionMapper.mapProjectionToProjectionDto(getProjectionById(id));
     }
 
-    public ProjectionDto updateProjection(ProjectionRequest request, int id) {
-        final ProjectionDto projectionDto = getProjectionDtoById(id);
-        final Hall hall = hallService.getHallById(request.hallId());
+    @Transactional
+    public ProjectionDto updateProjection(final ProjectionRequest request, final int id) {
+        final Projection stored = getProjectionForUpdate(id);
+        final ProjectionDto previous = ProjectionMapper.mapProjectionToProjectionDto(stored);
+        final Hall hall = hallService.getHallForUpdate(request.hallId());
         final Program program = programService.getProgramById(request.programId());
         final Movie movie = movieService.getMovieById(request.movieId());
-        final LocalTime startTime = request.startTime();
-
-        final boolean isHallAvailable = isHallAvailable(hall.getId(), program.getId(), startTime);
-        if (!isHallAvailable) {
-
-            throw new HallNotAvailableException(ExceptionMessages.HALL_NOT_AVAILABLE_EXCEPTION);
-        }
-
-        final Projection projection = new Projection(id, request.price(), hall, program, movie, startTime);
-        projectionRepository.save(projection);
-
-        return projectionDto;
+        validateSchedule(request, hall, program, movie, id);
+        projectionRepository.save(
+                new Projection(id, request.price(), hall, program, movie, request.startTime()));
+        return previous;
     }
 
     public ProjectionDto deleteProjection(int id) {
@@ -117,27 +119,26 @@ public class ProjectionService {
         return projectionDto;
     }
 
-    public boolean isHallAvailable(int hallId, int programId, LocalTime startTime) {
-        final LocalTime before = startTime.minusHours(3).minusMinutes(59);
-        final LocalTime after = startTime.plusHours(3).plusMinutes(59);
+    private void validateSchedule(
+            final ProjectionRequest request,
+            final Hall hall,
+            final Program program,
+            final Movie movie,
+            final int excludedId) {
 
-        if (before.isAfter(after)) {
-            return isHallAvailableInPeriod(hallId, programId, before, LocalTime.MAX) && isHallAvailableInPeriod(hallId,
-                programId, LocalTime.MIN, after);
-        } else {
-            return isHallAvailableInPeriod(hallId, programId, before, after);
+        if (hall.getCinema().getId() != program.getCinema().getId()) {
+            throw new IllegalArgumentException("The hall must belong to the program's cinema");
         }
-    }
 
-    public boolean isHallAvailableInPeriod(int hallId, int programId, LocalTime start, LocalTime end) {
-        List<Projection> projections = projectionRepository.findProjectionsByHallIdAndStartTimeBetween(hallId, start,
-            end);
-
-        for (Projection projection : projections) {
-            if (projection.getProgram().getId() == programId) {
-                return false;
-            }
+        if (movie.getRuntime().isZero() || movie.getRuntime().isNegative()) {
+            throw new IllegalArgumentException("Movie runtime must be positive");
         }
-        return true;
+
+        final var startsAt = program.getProgramDate().atTime(request.startTime());
+        final var endsAt = startsAt.plus(movie.getRuntime());
+
+        if (projectionRepository.overlaps(hall.getId(), excludedId, startsAt, endsAt)) {
+            throw new HallNotAvailableException(ExceptionMessages.HALL_NOT_AVAILABLE_EXCEPTION);
+        }
     }
 }

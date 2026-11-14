@@ -10,7 +10,9 @@ import dev.vdrenkov.cineledger.models.entities.Ticket;
 import dev.vdrenkov.cineledger.models.requests.TicketRequest;
 import dev.vdrenkov.cineledger.repositories.TicketRepository;
 import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
+
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -26,13 +28,15 @@ public class TicketService {
         this.ticketRepository = ticketRepository;
     }
 
+    @Transactional
     public Ticket addTicket(TicketRequest request) {
-        final Projection projection = projectionService.getProjectionById(request.projectionId());
+        final Projection projection =
+                projectionService.getProjectionForUpdate(request.projectionId());
 
         final LocalDate programDate = projection.getProgram().getProgramDate();
         final LocalDate dateOfPurchase = LocalDate.now();
 
-        if (programDate.isBefore(dateOfPurchase)) {
+        if (!programDate.atTime(projection.getStartTime()).isAfter(java.time.LocalDateTime.now())) {
 
             throw new DateNotValidException(ExceptionMessages.DATE_NOT_VALID_MESSAGE);
         }
@@ -52,12 +56,29 @@ public class TicketService {
         return tickets.stream().map(TicketMapper::mapTicketToTicketDto).toList();
     }
 
+    public Ticket getTicketForUpdate(final int id) {
+        return ticketRepository
+                .findByIdForUpdate(id)
+                .orElseThrow(() ->
+                        new TicketNotFoundException(ExceptionMessages.TICKET_NOT_FOUND_MESSAGE));
+    }
+
+    public void cancelTickets(final List<Ticket> tickets) {
+        tickets.stream()
+                .map(ticket -> ticket.getProjection().getId())
+                .distinct()
+                .sorted()
+                .forEach(projectionService::getProjectionForUpdate);
+        ticketRepository.deleteAll(tickets);
+    }
+
     public Ticket getTicketById(int id) {
 
-        return ticketRepository.findById(id).orElseThrow(() -> {
-
-            return new TicketNotFoundException(ExceptionMessages.TICKET_NOT_FOUND_MESSAGE);
-        });
+        return ticketRepository
+                .findById(id)
+                .orElseThrow(() -> {
+                    return new TicketNotFoundException(ExceptionMessages.TICKET_NOT_FOUND_MESSAGE);
+                });
     }
 
     public List<Ticket> getTicketsByDateBetween(LocalDate startDate, LocalDate endDate) {

@@ -19,8 +19,7 @@ public class Projection {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column
-    private double price;
+    @Column private double price;
 
     @ManyToOne
     @JoinColumn(name = "hall_id")
@@ -37,22 +36,36 @@ public class Projection {
     @Column(name = "start_time")
     private LocalTime startTime;
 
+    private java.time.Duration runtime;
+
+    public java.time.Duration getRuntime() {
+        return runtime;
+    }
+
     public Projection(double price, Hall hall, Program program, Movie movie, LocalTime startTime) {
         this.price = price;
         this.hall = hall;
         this.program = program;
         this.movie = movie;
+        this.runtime = movie.getRuntime();
         this.startTime = startTime;
     }
 
     public Projection() {}
 
-    public Projection(final int id, final double price, final Hall hall, final Program program, final Movie movie, final LocalTime startTime) {
+    public Projection(
+            final int id,
+            final double price,
+            final Hall hall,
+            final Program program,
+            final Movie movie,
+            final LocalTime startTime) {
         this.id = id;
         this.price = price;
         this.hall = hall;
         this.program = program;
         this.movie = movie;
+        this.runtime = movie.getRuntime();
         this.startTime = startTime;
     }
 
@@ -94,6 +107,7 @@ public class Projection {
 
     public void setMovie(final Movie movie) {
         this.movie = movie;
+        this.runtime = movie.getRuntime();
     }
 
     public LocalTime getStartTime() {

@@ -26,3 +26,10 @@ databaseChangeLog:
         - sqlFile:
             path: db/changelog/changes/003-password-recovery.sql
             relativeToChangelogFile: false
+  - changeSet:
+      id: 004-booking-integrity
+      author: vdrenkov
+      changes:
+        - sqlFile:
+            path: db/changelog/changes/004-booking-integrity.sql
+            relativeToChangelogFile: false

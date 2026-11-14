@@ -6,7 +6,9 @@ import dev.vdrenkov.cineledger.models.requests.OrderRequest;
 import dev.vdrenkov.cineledger.models.requests.TicketRequest;
 import dev.vdrenkov.cineledger.services.OrderService;
 import dev.vdrenkov.cineledger.utils.constants.URIConstants;
+
 import jakarta.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,24 +37,26 @@ public class OrderController {
 
         final Order order = orderService.addOrder(request);
 
-        URI location = UriComponentsBuilder
-            .fromUriString(URIConstants.ORDERS_ID_PATH)
-            .buildAndExpand(order.getId())
-            .toUri();
+        URI location =
+                UriComponentsBuilder.fromUriString(URIConstants.ORDERS_ID_PATH)
+                        .buildAndExpand(order.getId())
+                        .toUri();
 
         return ResponseEntity.created(location).build();
     }
 
     @PostMapping(URIConstants.USERS_ID_ORDERS_PATH)
-    public ResponseEntity<Void> makeReservationWithUserId(@RequestBody @Valid List<TicketRequest> requests,
-        @PathVariable int id, @RequestParam(required = false, defaultValue = "Code") String discountCode) {
+    public ResponseEntity<Void> makeReservationWithUserId(
+            @RequestBody List<@Valid TicketRequest> requests,
+            @PathVariable int id,
+            @RequestParam(required = false) String discountCode) {
 
         final Order order = orderService.makeReservationWithUserId(requests, id, discountCode);
 
-        URI location = UriComponentsBuilder
-            .fromUriString(URIConstants.ORDERS_ID_PATH)
-            .buildAndExpand(order.getId())
-            .toUri();
+        URI location =
+                UriComponentsBuilder.fromUriString(URIConstants.ORDERS_ID_PATH)
+                        .buildAndExpand(order.getId())
+                        .toUri();
 
         return ResponseEntity.created(location).build();
     }
@@ -65,19 +69,25 @@ public class OrderController {
     }
 
     @PutMapping(URIConstants.ORDERS_ID_PATH)
-    public ResponseEntity<OrderDto> updateOrder(@RequestBody @Valid OrderRequest request, @PathVariable int id,
-        @RequestParam(required = false) Boolean returnOld) {
+    public ResponseEntity<OrderDto> updateOrder(
+            @RequestBody @Valid OrderRequest request,
+            @PathVariable int id,
+            @RequestParam(required = false) Boolean returnOld) {
 
         final OrderDto orderDto = orderService.updateOrder(request, id);
 
-        return Boolean.TRUE.equals(returnOld) ? ResponseEntity.ok(orderDto) : ResponseEntity.noContent().build();
+        return Boolean.TRUE.equals(returnOld)
+                ? ResponseEntity.ok(orderDto)
+                : ResponseEntity.noContent().build();
     }
 
     @DeleteMapping(URIConstants.ORDERS_ID_PATH)
-    public ResponseEntity<OrderDto> deleteOrder(@PathVariable int id,
-        @RequestParam(required = false) Boolean returnOld) {
+    public ResponseEntity<OrderDto> deleteOrder(
+            @PathVariable int id, @RequestParam(required = false) Boolean returnOld) {
         final OrderDto orderDto = orderService.deleteOrder(id);
 
-        return Boolean.TRUE.equals(returnOld) ? ResponseEntity.ok(orderDto) : ResponseEntity.noContent().build();
+        return Boolean.TRUE.equals(returnOld)
+                ? ResponseEntity.ok(orderDto)
+                : ResponseEntity.noContent().build();
     }
 }

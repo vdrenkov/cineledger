@@ -9,6 +9,7 @@ import dev.vdrenkov.cineledger.models.entities.Item;
 import dev.vdrenkov.cineledger.models.requests.ItemRequest;
 import dev.vdrenkov.cineledger.repositories.ItemRepository;
 import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
+
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import java.util.List;
 @Service
 public class ItemService {
 
+    @jakarta.persistence.PersistenceContext private jakarta.persistence.EntityManager entityManager;
     private final ItemRepository itemRepository;
 
     public ItemService(ItemRepository itemRepository) {
@@ -26,12 +28,15 @@ public class ItemService {
 
     public Item addItem(ItemRequest itemRequest) {
 
-        this.itemRepository.findByName(itemRequest.name()).ifPresent(item -> {
+        this.itemRepository
+                .findByName(itemRequest.name())
+                .ifPresent(item -> {
+                    throw new ItemAlreadyExistsException(
+                            ExceptionMessages.ITEM_ALREADY_EXISTS_MESSAGE);
+                });
 
-            throw new ItemAlreadyExistsException(ExceptionMessages.ITEM_ALREADY_EXISTS_MESSAGE);
-        });
-
-        return itemRepository.save(new Item(itemRequest.name(), itemRequest.price(), itemRequest.quantity()));
+        return itemRepository.save(
+                new Item(itemRequest.name(), itemRequest.price(), itemRequest.quantity()));
     }
 
     public ItemDto getItemDtoById(int id) {
@@ -39,20 +44,35 @@ public class ItemService {
         return ItemMapper.mapItemToItemDto(getItemById(id));
     }
 
+    public Item getItemForUpdate(final int id) {
+        final Item stored =
+                itemRepository
+                        .findByIdForUpdate(id)
+                        .orElseThrow(() ->
+                                new ItemNotFoundException(
+                                        ExceptionMessages.ITEM_NOT_FOUND_MESSAGE));
+        entityManager.refresh(stored);
+        return stored;
+    }
+
     public Item getItemById(int id) {
 
-        return itemRepository.findById(id).orElseThrow(() -> {
-
-            return new ItemNotFoundException(ExceptionMessages.ITEM_NOT_FOUND_MESSAGE);
-        });
+        return itemRepository
+                .findById(id)
+                .orElseThrow(() -> {
+                    return new ItemNotFoundException(ExceptionMessages.ITEM_NOT_FOUND_MESSAGE);
+                });
     }
 
     public ItemDto getItemDtoByName(String itemName) {
 
-        return ItemMapper.mapItemToItemDto(itemRepository.findByName(itemName).orElseThrow(() -> {
-
-            return new ItemNotFoundException(ExceptionMessages.ITEM_NOT_FOUND_MESSAGE);
-        }));
+        return ItemMapper.mapItemToItemDto(
+                itemRepository
+                        .findByName(itemName)
+                        .orElseThrow(() -> {
+                            return new ItemNotFoundException(
+                                    ExceptionMessages.ITEM_NOT_FOUND_MESSAGE);
+                        }));
     }
 
     public List<ItemDto> getItemsByQuantity(int quantity, boolean isBelow) {
@@ -80,7 +100,8 @@ public class ItemService {
 
     public List<ItemDto> getAllItems() {
 
-        final List<ItemDto> itemDtos = new ArrayList<>(ItemMapper.mapItemToItemDtoList(itemRepository.findAll()));
+        final List<ItemDto> itemDtos =
+                new ArrayList<>(ItemMapper.mapItemToItemDtoList(itemRepository.findAll()));
         itemDtos.sort(Comparator.comparing(ItemDto::id));
 
         return itemDtos;
@@ -89,7 +110,8 @@ public class ItemService {
     public ItemDto editItem(ItemRequest itemRequest, int id) {
         final ItemDto itemDto = getItemDtoById(id);
 
-        itemRepository.save(new Item(id, itemRequest.name(), itemRequest.price(), itemRequest.quantity()));
+        itemRepository.save(
+                new Item(id, itemRequest.name(), itemRequest.price(), itemRequest.quantity()));
 
         return itemDto;
     }
@@ -115,13 +137,12 @@ public class ItemService {
         final int currentQuantity = item.getQuantity();
         final int decrementedQuantity = currentQuantity - 1;
 
-        item.setQuantity(decrementedQuantity);
-
         if (currentQuantity <= 0) {
 
             throw new NoAvailableItemsException(ExceptionMessages.NO_AVAILABLE_ITEMS_EXCEPTION);
         }
 
+        item.setQuantity(decrementedQuantity);
         return decrementedQuantity;
     }
 }

@@ -8,6 +8,7 @@ import dev.vdrenkov.cineledger.models.entities.Hall;
 import dev.vdrenkov.cineledger.models.requests.HallRequest;
 import dev.vdrenkov.cineledger.repositories.HallRepository;
 import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
+
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,21 +26,34 @@ public class HallService {
 
     public Hall addHall(HallRequest request) {
 
-        return hallRepository.save(new Hall(request.capacity(), cinemaService.getCinemaById(request.cinemaId())));
+        return hallRepository.save(
+                new Hall(request.capacity(), cinemaService.getCinemaById(request.cinemaId())));
     }
 
     public List<HallDto> getHallsByCinemaId(int cinemaId) {
         final Cinema cinema = cinemaService.getCinemaById(cinemaId);
 
-        return HallMapper.mapHallListToHallDtoList(hallRepository.findAllByCinemaId(cinema.getId()));
+        return HallMapper.mapHallListToHallDtoList(
+                hallRepository.findAllByCinemaId(cinema.getId()));
+    }
+
+    public Hall getHallForUpdate(final int id) {
+        final Hall stored =
+                hallRepository
+                        .findByIdForUpdate(id)
+                        .orElseThrow(() ->
+                                new HallNotFoundException(
+                                        ExceptionMessages.HALL_NOT_FOUND_MESSAGE));
+        return stored;
     }
 
     public Hall getHallById(int id) {
 
-        return hallRepository.findById(id).orElseThrow(() -> {
-
-            return new HallNotFoundException(ExceptionMessages.HALL_NOT_FOUND_MESSAGE);
-        });
+        return hallRepository
+                .findById(id)
+                .orElseThrow(() -> {
+                    return new HallNotFoundException(ExceptionMessages.HALL_NOT_FOUND_MESSAGE);
+                });
     }
 
     public HallDto getHallDtoById(int id) {
@@ -50,7 +64,8 @@ public class HallService {
     public HallDto updateHall(HallRequest request, int id) {
         final HallDto hallDto = getHallDtoById(id);
 
-        hallRepository.save(new Hall(id, request.capacity(), cinemaService.getCinemaById(request.cinemaId())));
+        hallRepository.save(
+                new Hall(id, request.capacity(), cinemaService.getCinemaById(request.cinemaId())));
 
         return hallDto;
     }

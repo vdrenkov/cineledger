@@ -1,5 +1,11 @@
 package dev.vdrenkov.cineledger.services;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.when;
+
 import dev.vdrenkov.cineledger.exceptions.DateNotValidException;
 import dev.vdrenkov.cineledger.exceptions.NoAvailableTicketsException;
 import dev.vdrenkov.cineledger.exceptions.TicketNotFoundException;
@@ -12,6 +18,7 @@ import dev.vdrenkov.cineledger.testutils.constants.ReportConstants;
 import dev.vdrenkov.cineledger.testutils.constants.TicketConstants;
 import dev.vdrenkov.cineledger.testutils.factories.ProjectionFactory;
 import dev.vdrenkov.cineledger.testutils.factories.TicketFactory;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -23,23 +30,14 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
 class TicketServiceTest {
 
-    @Mock
-    private TicketRepository ticketRepository;
+    @Mock private TicketRepository ticketRepository;
 
-    @Mock
-    private ProjectionService projectionService;
+    @Mock private ProjectionService projectionService;
 
-    @InjectMocks
-    private TicketService ticketService;
+    @InjectMocks private TicketService ticketService;
 
     @Test
     void testAddTicket_noExceptions_success() {
@@ -55,10 +53,10 @@ class TicketServiceTest {
         final int availableTickets = 10;
         final Ticket expected = TicketFactory.getDefaultTicket();
 
-        when(projectionService.getProjectionById(anyInt())).thenReturn(projection);
+        when(projectionService.getProjectionForUpdate(anyInt())).thenReturn(projection);
         when(ticketRepository.save(any())).thenReturn(expected);
-        when(ticketRepository.countByProjectionId(anyInt())).thenReturn(
-            projection.getHall().getCapacity() - availableTickets);
+        when(ticketRepository.countByProjectionId(anyInt()))
+                .thenReturn(projection.getHall().getCapacity() - availableTickets);
 
         final Ticket ticket = ticketService.addTicket(request);
 
@@ -69,8 +67,10 @@ class TicketServiceTest {
     void testGetTicketsByProjectionId_noExceptions_success() {
         final List<TicketDto> expected = TicketFactory.getDefaultTicketDtoList();
 
-        when(ticketRepository.findTicketByProjectionId(anyInt())).thenReturn(TicketFactory.getDefaultTicketList());
-        when(projectionService.getProjectionById(anyInt())).thenReturn(ProjectionFactory.getDefaultProjection());
+        when(ticketRepository.findTicketByProjectionId(anyInt()))
+                .thenReturn(TicketFactory.getDefaultTicketList());
+        when(projectionService.getProjectionById(anyInt()))
+                .thenReturn(ProjectionFactory.getDefaultProjection());
 
         final List<TicketDto> result = ticketService.getTicketsByProjectionId(TicketConstants.ID);
 
@@ -92,7 +92,9 @@ class TicketServiceTest {
     void testGetTicketById_TicketNotFoundException_fail() {
         when(ticketRepository.findById(anyInt())).thenReturn(Optional.empty());
 
-        assertThrows(TicketNotFoundException.class, () -> ticketService.getTicketById(TicketConstants.ID));
+        assertThrows(
+                TicketNotFoundException.class,
+                () -> ticketService.getTicketById(TicketConstants.ID));
     }
 
     @Test
@@ -116,7 +118,9 @@ class TicketServiceTest {
 
         when(ticketRepository.countByProjectionId(anyInt())).thenReturn(totalTickets);
 
-        assertThrows(NoAvailableTicketsException.class, () -> ticketService.calculateAvailableTickets(projection));
+        assertThrows(
+                NoAvailableTicketsException.class,
+                () -> ticketService.calculateAvailableTickets(projection));
     }
 
     @Test
@@ -130,7 +134,7 @@ class TicketServiceTest {
 
         final TicketRequest request = new TicketRequest(projection.getId());
 
-        when(projectionService.getProjectionById(anyInt())).thenReturn(projection);
+        when(projectionService.getProjectionForUpdate(anyInt())).thenReturn(projection);
 
         assertThrows(DateNotValidException.class, () -> ticketService.addTicket(request));
     }
@@ -139,10 +143,12 @@ class TicketServiceTest {
     void testGetTicketsByDateBetween() {
         final List<Ticket> expected = TicketFactory.getDefaultTicketList();
 
-        when(ticketRepository.findTicketsByDateOfPurchaseBetween(any(), any())).thenReturn(expected);
+        when(ticketRepository.findTicketsByDateOfPurchaseBetween(any(), any()))
+                .thenReturn(expected);
 
-        List<Ticket> tickets = ticketService.getTicketsByDateBetween(ReportConstants.START_DATE,
-            ReportConstants.END_DATE);
+        List<Ticket> tickets =
+                ticketService.getTicketsByDateBetween(
+                        ReportConstants.START_DATE, ReportConstants.END_DATE);
 
         assertEquals(expected, tickets);
     }

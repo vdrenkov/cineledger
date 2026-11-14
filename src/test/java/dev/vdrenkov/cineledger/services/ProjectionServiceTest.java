@@ -1,7 +1,13 @@
 package dev.vdrenkov.cineledger.services;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.when;
+
 import dev.vdrenkov.cineledger.exceptions.HallNotAvailableException;
-import dev.vdrenkov.cineledger.exceptions.ProgramNotFoundException;
+import dev.vdrenkov.cineledger.exceptions.ProjectionNotFoundException;
 import dev.vdrenkov.cineledger.models.dtos.ProjectionDto;
 import dev.vdrenkov.cineledger.models.entities.Movie;
 import dev.vdrenkov.cineledger.models.entities.Program;
@@ -13,45 +19,30 @@ import dev.vdrenkov.cineledger.testutils.factories.HallFactory;
 import dev.vdrenkov.cineledger.testutils.factories.MovieFactory;
 import dev.vdrenkov.cineledger.testutils.factories.ProgramFactory;
 import dev.vdrenkov.cineledger.testutils.factories.ProjectionFactory;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ProjectionServiceTest {
     final ProjectionRequest projectionRequest = ProjectionFactory.getDefaultProjectionRequest();
 
-    @Mock
-    private ProjectionRepository projectionRepository;
+    @Mock private ProjectionRepository projectionRepository;
 
-    @Mock
-    private HallService hallService;
+    @Mock private HallService hallService;
 
-    @Mock
-    private ProgramService programService;
+    @Mock private ProgramService programService;
 
-    @Mock
-    private MovieService movieService;
+    @Mock private MovieService movieService;
 
-    @InjectMocks
-    private ProjectionService projectionService;
+    @InjectMocks private ProjectionService projectionService;
 
     @Test
     void testGetProjectionsByProgramId_programFound_success() {
@@ -59,10 +50,11 @@ class ProjectionServiceTest {
         final List<ProjectionDto> expected = ProjectionFactory.getDefaultProjectionDtoList();
 
         when(programService.getProgramById(anyInt())).thenReturn(program);
-        when(projectionRepository.findProjectionsByProgramId(anyInt())).thenReturn(
-            ProjectionFactory.getDefaultProjectionList());
+        when(projectionRepository.findProjectionsByProgramId(anyInt()))
+                .thenReturn(ProjectionFactory.getDefaultProjectionList());
 
-        final List<ProjectionDto> resultList = projectionService.getProjectionsByProgramId(program.getId());
+        final List<ProjectionDto> resultList =
+                projectionService.getProjectionsByProgramId(program.getId());
 
         assertEquals(expected, resultList);
     }
@@ -73,10 +65,11 @@ class ProjectionServiceTest {
         final List<ProjectionDto> expected = ProjectionFactory.getDefaultProjectionDtoList();
 
         when(movieService.getMovieById(anyInt())).thenReturn(movie);
-        when(projectionRepository.findProjectionsByMovieId(anyInt())).thenReturn(
-            ProjectionFactory.getDefaultProjectionList());
+        when(projectionRepository.findProjectionsByMovieId(anyInt()))
+                .thenReturn(ProjectionFactory.getDefaultProjectionList());
 
-        final List<ProjectionDto> resultList = projectionService.getProjectionsByMovieId(movie.getId());
+        final List<ProjectionDto> resultList =
+                projectionService.getProjectionsByMovieId(movie.getId());
 
         assertEquals(expected, resultList);
     }
@@ -85,11 +78,11 @@ class ProjectionServiceTest {
     void testGetProjectionsByStartTime_isBeforeTrue_success() {
         final List<ProjectionDto> expected = ProjectionFactory.getDefaultProjectionDtoList();
 
-        when(projectionRepository.findProjectionsByStartTimeBefore(any())).thenReturn(
-            ProjectionFactory.getDefaultProjectionList());
+        when(projectionRepository.findProjectionsByStartTimeBefore(any()))
+                .thenReturn(ProjectionFactory.getDefaultProjectionList());
 
-        List<ProjectionDto> resultList = projectionService.getProjectionsByStartTime(ProjectionConstants.START_TIME,
-            true);
+        List<ProjectionDto> resultList =
+                projectionService.getProjectionsByStartTime(ProjectionConstants.START_TIME, true);
 
         assertEquals(expected, resultList);
     }
@@ -98,11 +91,11 @@ class ProjectionServiceTest {
     void testGetProjectionsByStartTime_isBeforeFalse_success() {
         final List<ProjectionDto> expected = ProjectionFactory.getDefaultProjectionDtoList();
 
-        when(projectionRepository.findProjectionsByStartTimeAfter(any())).thenReturn(
-            ProjectionFactory.getDefaultProjectionList());
+        when(projectionRepository.findProjectionsByStartTimeAfter(any()))
+                .thenReturn(ProjectionFactory.getDefaultProjectionList());
 
-        List<ProjectionDto> resultList = projectionService.getProjectionsByStartTime(ProjectionConstants.START_TIME,
-            false);
+        List<ProjectionDto> resultList =
+                projectionService.getProjectionsByStartTime(ProjectionConstants.START_TIME, false);
 
         assertEquals(expected, resultList);
     }
@@ -112,8 +105,9 @@ class ProjectionServiceTest {
         final Projection expected = ProjectionFactory.getDefaultProjection();
 
         when(projectionRepository.save(any())).thenReturn(expected);
-        when(hallService.getHallById(anyInt())).thenReturn(HallFactory.getDefaultHall());
-        when(programService.getProgramById(anyInt())).thenReturn(ProgramFactory.getDefaultProgram());
+        when(hallService.getHallForUpdate(anyInt())).thenReturn(HallFactory.getDefaultHall());
+        when(programService.getProgramById(anyInt()))
+                .thenReturn(ProgramFactory.getDefaultProgram());
         when(movieService.getMovieById(anyInt())).thenReturn(MovieFactory.getDefaultMovie());
 
         final Projection projection = projectionService.addProjection(projectionRequest);
@@ -123,124 +117,97 @@ class ProjectionServiceTest {
 
     @Test
     void testAddProjection_hallNotAvailable_throwsHallNotAvailableException() {
-        when(hallService.getHallById(anyInt())).thenReturn(HallFactory.getDefaultHall());
-        when(programService.getProgramById(anyInt())).thenReturn(ProgramFactory.getDefaultProgram());
+        when(hallService.getHallForUpdate(anyInt())).thenReturn(HallFactory.getDefaultHall());
+        when(programService.getProgramById(anyInt()))
+                .thenReturn(ProgramFactory.getDefaultProgram());
+        when(movieService.getMovieById(anyInt())).thenReturn(MovieFactory.getDefaultMovie());
 
-        final ProjectionService spyProjectionService = Mockito.spy(projectionService);
-        doReturn(false).when(spyProjectionService).isHallAvailable(anyInt(), anyInt(), any(LocalTime.class));
+        when(projectionRepository.overlaps(anyInt(), anyInt(), any(), any())).thenReturn(true);
 
-        assertThrows(HallNotAvailableException.class, () -> spyProjectionService.addProjection(projectionRequest));
+        assertThrows(
+                HallNotAvailableException.class,
+                () -> projectionService.addProjection(projectionRequest));
     }
 
     @Test
     void testUpdateProjection_projectionUpdated_success() {
         final ProjectionDto expected = ProjectionFactory.getDefaultProjectionDto();
 
-        when(hallService.getHallById(anyInt())).thenReturn(HallFactory.getDefaultHall());
-        when(programService.getProgramById(anyInt())).thenReturn(ProgramFactory.getDefaultProgram());
+        when(hallService.getHallForUpdate(anyInt())).thenReturn(HallFactory.getDefaultHall());
+        when(programService.getProgramById(anyInt()))
+                .thenReturn(ProgramFactory.getDefaultProgram());
         when(movieService.getMovieById(anyInt())).thenReturn(MovieFactory.getDefaultMovie());
-        when(projectionRepository.findById(anyInt())).thenReturn(Optional.of(ProjectionFactory.getDefaultProjection()));
+        when(projectionRepository.findByIdForUpdate(anyInt()))
+                .thenReturn(Optional.of(ProjectionFactory.getDefaultProjection()));
         when(projectionRepository.save(any())).thenReturn(ProjectionFactory.getDefaultProjection());
 
-        final ProjectionDto projectionDto = projectionService.updateProjection(projectionRequest,
-            ProjectionConstants.ID);
+        final ProjectionDto projectionDto =
+                projectionService.updateProjection(projectionRequest, ProjectionConstants.ID);
 
         assertEquals(expected, projectionDto);
     }
 
     @Test
     void testUpdateProjection_hallNotAvailable_throwsHallNotAvailableException() {
-        when(hallService.getHallById(anyInt())).thenReturn(HallFactory.getDefaultHall());
-        when(programService.getProgramById(anyInt())).thenReturn(ProgramFactory.getDefaultProgram());
+        when(hallService.getHallForUpdate(anyInt())).thenReturn(HallFactory.getDefaultHall());
+        when(programService.getProgramById(anyInt()))
+                .thenReturn(ProgramFactory.getDefaultProgram());
         when(movieService.getMovieById(anyInt())).thenReturn(MovieFactory.getDefaultMovie());
-        when(projectionRepository.findById(anyInt())).thenReturn(Optional.of(ProjectionFactory.getDefaultProjection()));
+        when(projectionRepository.findByIdForUpdate(anyInt()))
+                .thenReturn(Optional.of(ProjectionFactory.getDefaultProjection()));
 
-        final ProjectionService spyProjectionService = Mockito.spy(projectionService);
-        doReturn(false).when(spyProjectionService).isHallAvailable(anyInt(), anyInt(), any(LocalTime.class));
+        when(projectionRepository.overlaps(anyInt(), anyInt(), any(), any())).thenReturn(true);
 
-        assertThrows(HallNotAvailableException.class,
-            () -> spyProjectionService.updateProjection(projectionRequest, ProjectionConstants.ID));
+        assertThrows(
+                HallNotAvailableException.class,
+                () ->
+                        projectionService.updateProjection(
+                                projectionRequest, ProjectionConstants.ID));
     }
 
     @Test
     void testDeleteProjection_projectionDeleted_success() {
         final ProjectionDto expected = ProjectionFactory.getDefaultProjectionDto();
 
-        when(projectionRepository.findById(anyInt())).thenReturn(Optional.of(ProjectionFactory.getDefaultProjection()));
+        when(projectionRepository.findById(anyInt()))
+                .thenReturn(Optional.of(ProjectionFactory.getDefaultProjection()));
 
-        final ProjectionDto projectionDto = projectionService.deleteProjection(ProjectionConstants.ID);
+        final ProjectionDto projectionDto =
+                projectionService.deleteProjection(ProjectionConstants.ID);
 
         assertEquals(expected, projectionDto);
     }
 
     @Test
-    void testDeleteProjection_projectionNotFound_throwsProgramNotFoundException() {
+    void testDeleteProjection_projectionNotFound_throwsProjectionNotFoundException() {
         when(projectionRepository.findById(anyInt())).thenReturn(Optional.empty());
 
-        assertThrows(ProgramNotFoundException.class, () -> projectionService.deleteProjection(ProjectionConstants.ID));
+        assertThrows(
+                ProjectionNotFoundException.class,
+                () -> projectionService.deleteProjection(ProjectionConstants.ID));
     }
 
     @Test
-    void testIsHallAvailableInPeriod_overlappingProjection_returnsFalse() {
-        final int hallId = 1;
-        final int programId = 1;
-        final LocalTime startTime = LocalTime.of(21, 0);
+    void addProjection_crossesMidnight_checksFullDateTimeRange() {
+        final var hall = HallFactory.getDefaultHall();
+        final var program = ProgramFactory.getDefaultProgram();
+        final var movie = MovieFactory.getDefaultMovie();
+        final var request =
+                new ProjectionRequest(
+                        projectionRequest.price(),
+                        hall.getId(),
+                        program.getId(),
+                        movie.getId(),
+                        LocalTime.of(23, 0));
+        when(hallService.getHallForUpdate(hall.getId())).thenReturn(hall);
+        when(programService.getProgramById(program.getId())).thenReturn(program);
+        when(movieService.getMovieById(movie.getId())).thenReturn(movie);
+        when(projectionRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
-        final Projection overlappingProjection = new Projection();
-        overlappingProjection.setStartTime(LocalTime.of(23, 0));
-        final Program program = new Program();
-        program.setId(programId);
-        overlappingProjection.setProgram(program);
+        projectionService.addProjection(request);
 
-        when(projectionRepository.findProjectionsByHallIdAndStartTimeBetween(anyInt(), any(), any())).thenReturn(
-            Collections.singletonList(overlappingProjection));
-
-        final boolean isAvailable = projectionService.isHallAvailable(hallId, programId, startTime);
-
-        assertFalse(isAvailable);
-    }
-
-    @Test
-    void testIsHallAvailableInPeriod_noOverlappingProjection_returnsTrue() {
-        final int hallId = 1;
-        final int programId = 1;
-        final LocalTime startTime = LocalTime.of(10, 0);
-
-        final boolean isAvailable = projectionService.isHallAvailable(hallId, programId, startTime);
-
-        assertTrue(isAvailable);
-    }
-
-    @Test
-    void testIsHallAvailable_crossMidnight_overlappingProjectionInMorning_returnsFalse() {
-        final int hallId = 1;
-        final int programId = 1;
-        final LocalTime startTime = LocalTime.of(23, 0);
-
-        final Projection overlappingProjection = new Projection();
-        overlappingProjection.setStartTime(LocalTime.of(1, 0));
-        final Program program = new Program();
-        program.setId(programId);
-        overlappingProjection.setProgram(program);
-
-        when(projectionRepository.findProjectionsByHallIdAndStartTimeBetween(anyInt(), any(), any())).thenReturn(
-            Collections.emptyList());
-        when(projectionRepository.findProjectionsByHallIdAndStartTimeBetween(anyInt(), any(), any())).thenReturn(
-            Collections.singletonList(overlappingProjection));
-
-        final boolean isAvailable = projectionService.isHallAvailable(hallId, programId, startTime);
-
-        assertFalse(isAvailable);
-    }
-
-    @Test
-    void testIsHallAvailable_crossMidnight_noOverlappingProjection_returnsTrue() {
-        final int hallId = 1;
-        final int programId = 1;
-        final LocalTime startTime = LocalTime.of(23, 0);
-
-        final boolean isAvailable = projectionService.isHallAvailable(hallId, programId, startTime);
-
-        assertTrue(isAvailable);
+        final var startsAt = program.getProgramDate().atTime(23, 0);
+        org.mockito.Mockito.verify(projectionRepository)
+                .overlaps(hall.getId(), 0, startsAt, startsAt.plus(movie.getRuntime()));
     }
 }

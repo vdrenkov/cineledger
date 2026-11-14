@@ -12,6 +12,7 @@ import dev.vdrenkov.cineledger.models.requests.OrderRequest;
 import dev.vdrenkov.cineledger.models.requests.TicketRequest;
 import dev.vdrenkov.cineledger.repositories.OrderRepository;
 import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,8 +31,13 @@ public class OrderService {
     private final ItemService itemService;
     private final EmailService emailService;
 
-    public OrderService(DiscountService discountService, OrderRepository orderRepository, UserService userService,
-        TicketService ticketService, ItemService itemService, EmailService emailService) {
+    public OrderService(
+            DiscountService discountService,
+            OrderRepository orderRepository,
+            UserService userService,
+            TicketService ticketService,
+            ItemService itemService,
+            EmailService emailService) {
         this.discountService = discountService;
         this.orderRepository = orderRepository;
         this.userService = userService;
@@ -42,12 +48,21 @@ public class OrderService {
 
     @Transactional(rollbackFor = Exception.class)
     public Order addOrder(final OrderRequest request) {
-        final List<Ticket> tickets = request.ticketsIds().stream().map(ticketService::getTicketById).toList();
+        validateTickets(request.ticketsIds());
+        final List<Ticket> tickets =
+                request.ticketsIds().stream()
+                        .sorted()
+                        .map(ticketService::getTicketForUpdate)
+                        .toList();
 
         List<Item> items = new ArrayList<>();
 
         if (request.itemsIds() != null && !request.itemsIds().isEmpty()) {
-            items = request.itemsIds().stream().map(itemService::getItemById).toList();
+            items =
+                    request.itemsIds().stream()
+                            .sorted()
+                            .map(itemService::getItemForUpdate)
+                            .toList();
 
             for (Item item : items) {
                 ItemService.decrementItemQuantity(item);
@@ -59,7 +74,7 @@ public class OrderService {
         double price = calculateOrderPrice(items, tickets);
 
         final String discountCode = request.discountCode();
-        if (discountCode != null) {
+        if (discountCode != null && !discountCode.isBlank()) {
             price = discountService.applyDiscount(price, discountCode);
         }
 
@@ -73,8 +88,12 @@ public class OrderService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public Order makeReservationWithUserId(final List<TicketRequest> requests, final int userId,
-        final String discountCode) {
+    public Order makeReservationWithUserId(
+            final List<TicketRequest> requests, final int userId, final String discountCode) {
+        if (requests.isEmpty()) {
+            throw new IllegalArgumentException("At least one ticket is required");
+        }
+
         final List<Item> items = Collections.emptyList();
         final List<Ticket> tickets = new ArrayList<>();
 
@@ -85,30 +104,35 @@ public class OrderService {
             throw new NotAuthorizedException(ExceptionMessages.NOT_AUTHORIZED_MESSAGE);
         }
 
-        for (TicketRequest request : requests) {
+        for (TicketRequest request :
+                requests.stream()
+                        .sorted(java.util.Comparator.comparingInt(TicketRequest::projectionId))
+                        .toList()) {
             tickets.add(ticketService.addTicket(new TicketRequest(request.projectionId())));
         }
 
         double price = calculateOrderPrice(items, tickets);
 
-        if (discountCode != null) {
+        if (discountCode != null && !discountCode.isBlank()) {
             price = discountService.applyDiscount(price, discountCode);
         }
 
-        final Order order = orderRepository.save(new Order(LocalDate.now(), user, tickets, items, price));
+        final Order order =
+                orderRepository.save(new Order(LocalDate.now(), user, tickets, items, price));
 
         emailService.sendOrderConfirmationEmail(user, order);
 
         return order;
     }
 
+    @Transactional(readOnly = true)
     public List<OrderDto> getOrdersByUserId(final int userId) {
         final User currentUser = userService.getCurrentUser();
 
-        boolean isAdminOrVendor = currentUser
-            .getRoles()
-            .stream()
-            .anyMatch(role -> "ADMIN".equals(role.getName()) || "VENDOR".equals(role.getName()));
+        boolean isAdminOrVendor =
+                currentUser.getRoles().stream()
+                        .anyMatch(role ->
+                                "ADMIN".equals(role.getName()) || "VENDOR".equals(role.getName()));
 
         if (!(isAdminOrVendor || currentUser.getId() == userId)) {
 
@@ -125,18 +149,40 @@ public class OrderService {
 
     @Transactional(rollbackFor = Exception.class)
     public OrderDto updateOrder(final OrderRequest request, final int id) {
-        final Order order = orderRepository.findById(id).orElseThrow(() -> {
-
-            return new OrderNotFoundException(ExceptionMessages.ORDER_NOT_FOUND_MESSAGE);
-        });
+        final Order order =
+                orderRepository
+                        .findByIdForUpdate(id)
+                        .orElseThrow(() -> {
+                            return new OrderNotFoundException(
+                                    ExceptionMessages.ORDER_NOT_FOUND_MESSAGE);
+                        });
 
         final OrderDto orderDto = OrderMapper.mapOrderToOrderDto(order);
+        java.util.stream.Stream.concat(
+                        order.getItems().stream().map(Item::getId),
+                        request.itemsIds() == null
+                                ? java.util.stream.Stream.empty()
+                                : request.itemsIds().stream())
+                .distinct()
+                .sorted()
+                .forEach(itemService::getItemForUpdate);
+        final List<Ticket> removedTickets = new ArrayList<>(order.getTickets());
+        removedTickets.removeIf(ticket -> request.ticketsIds().contains(ticket.getId()));
 
-        final List<Ticket> tickets = request.ticketsIds().stream().map(ticketService::getTicketById).toList();
+        validateTickets(request.ticketsIds());
+        final List<Ticket> tickets =
+                request.ticketsIds().stream()
+                        .sorted()
+                        .map(ticketService::getTicketForUpdate)
+                        .toList();
 
         List<Item> items = new ArrayList<>();
         if (Objects.nonNull(request.itemsIds()) && !request.itemsIds().isEmpty()) {
-            items = request.itemsIds().stream().map(itemService::getItemById).toList();
+            items =
+                    request.itemsIds().stream()
+                            .sorted()
+                            .map(itemService::getItemForUpdate)
+                            .toList();
         }
 
         final User user = userService.getUserById(request.userId());
@@ -166,7 +212,8 @@ public class OrderService {
         order.setUser(user);
         order.setTotalPrice(price);
 
-        orderRepository.save(order);
+        orderRepository.saveAndFlush(order);
+        ticketService.cancelTickets(removedTickets);
 
         emailService.sendOrderConfirmationEmail(user, order);
 
@@ -175,16 +222,35 @@ public class OrderService {
 
     @Transactional
     public OrderDto deleteOrder(final int id) {
-        final Order order = orderRepository.findById(id).orElseThrow(() -> {
-
-            return new OrderNotFoundException(ExceptionMessages.ORDER_NOT_FOUND_MESSAGE);
-        });
+        final Order order =
+                orderRepository
+                        .findByIdForUpdate(id)
+                        .orElseThrow(() -> {
+                            return new OrderNotFoundException(
+                                    ExceptionMessages.ORDER_NOT_FOUND_MESSAGE);
+                        });
 
         final OrderDto orderDto = OrderMapper.mapOrderToOrderDto(order);
 
+        final List<Ticket> tickets = new ArrayList<>(order.getTickets());
+        order.getItems().stream()
+                .map(Item::getId)
+                .distinct()
+                .sorted()
+                .forEach(itemService::getItemForUpdate);
+        order.getItems().forEach(ItemService::incrementItemQuantity);
         orderRepository.delete(order);
+        orderRepository.flush();
+        ticketService.cancelTickets(tickets);
 
         return orderDto;
+    }
+
+    private static void validateTickets(final List<Integer> ticketIds) {
+
+        if (ticketIds.isEmpty() || ticketIds.stream().distinct().count() != ticketIds.size()) {
+            throw new IllegalArgumentException("Tickets must be non-empty and must not repeat");
+        }
     }
 
     private static double calculateOrderPrice(final List<Item> items, final List<Ticket> tickets) {
