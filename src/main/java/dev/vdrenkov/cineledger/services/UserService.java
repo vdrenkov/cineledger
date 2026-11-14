@@ -29,7 +29,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
@@ -37,8 +36,6 @@ import java.util.Objects;
 
 @Service
 public class UserService {
-    private static final String RECOVERY_PASSWORD_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%&*";
-    private static final int RECOVERY_PASSWORD_LENGTH = 12;
 
     private final AuthenticationManager authenticationManager;
     private final BCryptPasswordEncoder passwordEncoder;
@@ -46,7 +43,6 @@ public class UserService {
     private final JwtCookieUtil jwtCookieUtil;
     private final UserRepository userRepository;
     private final RoleService roleService;
-    private final SecureRandom passwordRandom = new SecureRandom();
 
     public UserService(final AuthenticationManager authenticationManager, final BCryptPasswordEncoder passwordEncoder,
         final EmailService emailService, final JwtCookieUtil jwtCookieUtil, final UserRepository userRepository,
@@ -92,39 +88,6 @@ public class UserService {
         }
 
         return getUserDtoById(id);
-    }
-
-    public HttpCookie registerUser(final UserRequest userRequest) {
-        addUser(userRequest);
-
-        return login(new LoginRequest(userRequest.username(), userRequest.password()));
-    }
-
-    public void registerUserByAdmin(final AdminRequest request) {
-        addUserByAdmin(request);
-    }
-
-    public void addUser(final UserRequest userRequest) {
-        final String password = passwordEncoder.encode(userRequest.password());
-
-        userValidation(userRequest.username(), userRequest.email());
-
-        final User user = new User(userRequest.username(), password, userRequest.email(),
-            userRequest.firstName(), userRequest.lastName(), LocalDate.now(), getDefaultRoleList());
-
-        emailService.sendRegistrationConfirmationEmail(user);
-
-        userRepository.save(user);
-    }
-
-    public void addUserByAdmin(final AdminRequest request) {
-        final String password = passwordEncoder.encode(request.password());
-        userValidation(request.username(), request.email());
-
-        final User user = new User(request.username(), password, request.email(), request.firstName(),
-            request.lastName(), LocalDate.now(), getUserRoles(request.roleNames()));
-
-        userRepository.save(user);
     }
 
     public Role getRoleByName(final String roleName) {
@@ -218,32 +181,30 @@ public class UserService {
         return getUserByUsername(currentUsername);
     }
 
+    @Transactional
     public UserDto updateUserByAdmin(final AdminRequest request, final int id) {
-        final UserDto userDto = getUserDtoById(id);
-        final String password = passwordEncoder.encode(request.password());
-        final List<Role> roles = getUserRoles(request.roleNames());
-
-        userRepository.save(new User(id, request.username(), password, request.email(), request.firstName(),
-            request.lastName(), userDto.joinDate(), roles));
-
-        return userDto;
+        final User user = userRepository.findByIdForUpdate(id)
+            .orElseThrow(() -> new UserNotFoundException(ExceptionMessages.USER_NOT_FOUND_MESSAGE));
+        final UserDto previous = UserMapper.mapUserToUserDto(user);
+        applyProfile(user, new UserRequest(request.username(), request.password(), request.email(), request.firstName(), request.lastName()));
+        user.setRoles(getUserRoles(request.roleNames()));
+        userRepository.save(user);
+        return previous;
     }
 
-    public UserDto updateUser(final UserRequest userRequest, final int id) {
-        final User user = getUserById(id);
-        final UserDto oldUser = UserMapper.mapUserToUserDto(user);
-        final String password = passwordEncoder.encode(userRequest.password());
+    @Transactional
+    public UserDto updateUser(final UserRequest request, final int id) {
 
         if (!isAuthorized(id)) {
-
             throw new NotAuthorizedException(ExceptionMessages.NOT_AUTHORIZED_MESSAGE);
         }
 
-        userRepository.save(
-            new User(id, userRequest.username(), password, userRequest.email(), userRequest.firstName(),
-                userRequest.lastName(), user.getJoinDate(), user.getRoles()));
-
-        return oldUser;
+        final User user = userRepository.findByIdForUpdate(id)
+            .orElseThrow(() -> new UserNotFoundException(ExceptionMessages.USER_NOT_FOUND_MESSAGE));
+        final UserDto previous = UserMapper.mapUserToUserDto(user);
+        applyProfile(user, request);
+        userRepository.save(user);
+        return previous;
     }
 
     public UserDto deleteUser(final int id) {
@@ -282,18 +243,16 @@ public class UserService {
         return currentUser.getId() == userId;
     }
 
-    public User recoverPassword(final String username) {
-        final User user = getUserByUsername(username);
-        final String newPassword = generateRandomPassword();
+private void applyProfile(final User user, final UserRequest request) {
+    user.setUsername(request.username());
+    user.setPassword(passwordEncoder.encode(request.password()));
+    user.setCredentialsVersion(user.getCredentialsVersion() + 1);
+    user.setEmail(request.email());
+    user.setFirstName(request.firstName());
+    user.setLastName(request.lastName());
+}
 
-        user.setPassword(passwordEncoder.encode(newPassword));
-        userRepository.save(user);
-        emailService.sendPasswordConfirmationEmail(user, newPassword);
-
-        return user;
-    }
-
-    private boolean isAuthorized(final int userId) {
+private boolean isAuthorized(final int userId) {
         String currentUsername = null;
 
         SecurityContextHolder.getContext();
@@ -333,14 +292,4 @@ public class UserService {
         });
     }
 
-    private String generateRandomPassword() {
-        final StringBuilder password = new StringBuilder(RECOVERY_PASSWORD_LENGTH);
-
-        for (int i = 0; i < RECOVERY_PASSWORD_LENGTH; i++) {
-            final int charIndex = passwordRandom.nextInt(RECOVERY_PASSWORD_CHARACTERS.length());
-            password.append(RECOVERY_PASSWORD_CHARACTERS.charAt(charIndex));
-        }
-
-        return password.toString();
-    }
 }

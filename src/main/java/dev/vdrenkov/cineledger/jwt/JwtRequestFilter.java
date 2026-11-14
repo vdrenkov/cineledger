@@ -34,10 +34,13 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         if (token != null && !token.isBlank() && SecurityContextHolder.getContext().getAuthentication() == null) {
             try {
-                final String username = tokenUtil.getUsernameFromToken(token);
-                final var userDetails = userDetailsService.loadUserByUsername(username);
-                final var authentication = UsernamePasswordAuthenticationToken.authenticated(userDetails, null, userDetails.getAuthorities());
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                final var claims = tokenUtil.parseToken(token);
+                final var userDetails = userDetailsService.loadUserByUsername(claims.getSubject());
+                if (userDetails instanceof AuthenticatedUser user
+                    && claims.get("version", Long.class) == user.credentialsVersion()) {
+                    final var authentication = UsernamePasswordAuthenticationToken.authenticated(userDetails, null, userDetails.getAuthorities());
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
             } catch (final JwtException | IllegalArgumentException | UsernameNotFoundException | UserNotFoundException exception) {
                 SecurityContextHolder.clearContext();
             }

@@ -267,10 +267,4 @@ class UserControllerTest {
         mockMvc.perform(delete(URIConstants.USERS_ID_PATH, ID)).andExpect(status().isNoContent());
     }
 
-    @Test
-    void testRecoverPassword_returnsOk_success() throws Exception {
-        when(userService.recoverPassword(anyString())).thenReturn(UserFactory.getDefaultUser());
-
-        mockMvc.perform(patch(RECOVER_PASSWORD_PATH).queryParam("username", USERNAME)).andExpect(status().isOk());
-    }
 }

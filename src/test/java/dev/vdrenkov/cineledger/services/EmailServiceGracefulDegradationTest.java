@@ -15,9 +15,9 @@ class EmailServiceGracefulDegradationTest {
     }
 
     @Test
-    void sendPasswordConfirmationEmail_withoutMailjetCredentials_doesNotFail() {
+    void sendPasswordResetEmail_withoutMailjetCredentials_doesNotFail() {
         assertDoesNotThrow(
-            () -> emailService.sendPasswordConfirmationEmail(UserFactory.getDefaultUser(), "new-password"));
+            () -> emailService.sendPasswordResetEmail(UserFactory.getDefaultUser(), "new-password"));
     }
 
     @Test

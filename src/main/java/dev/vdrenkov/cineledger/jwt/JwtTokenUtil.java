@@ -37,9 +37,14 @@ public class JwtTokenUtil {
     }
 
     public String generateToken(final UserDetails userDetails) {
-        final Instant now = Instant.now();
+if (!(userDetails instanceof AuthenticatedUser user)) {
+    throw new IllegalArgumentException("Unsupported authentication principal");
+}
+
+final Instant now = Instant.now();
         return Jwts.builder()
             .subject(userDetails.getUsername())
+            .claim("version", user.credentialsVersion())
             .issuedAt(Date.from(now))
             .expiration(Date.from(now.plusSeconds(JwtConstants.JWT_TOKEN_VALIDITY_SECONDS)))
             .signWith(signingKey, Jwts.SIG.HS512)
@@ -58,10 +63,11 @@ public class JwtTokenUtil {
         return getUsernameFromToken(token).equals(userDetails.getUsername());
     }
 
-    private Claims parseToken(final String token) {
+    public Claims parseToken(final String token) {
         final Claims claims = parser.parseSignedClaims(token).getPayload();
 
-        if (claims.getSubject() == null || claims.getSubject().isBlank() || claims.getExpiration() == null) {
+        if (claims.getSubject() == null || claims.getSubject().isBlank() || claims.getExpiration() == null
+            || claims.get("version", Long.class) == null || claims.get("version", Long.class) < 0) {
             throw new JwtException("Authentication token requires a subject and expiry");
         }
 

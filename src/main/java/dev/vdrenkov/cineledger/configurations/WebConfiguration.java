@@ -8,6 +8,11 @@ import org.springframework.web.client.RestTemplate;
 public class WebConfiguration {
 
     @Bean
+    public java.time.Clock clock() {
+        return java.time.Clock.systemUTC();
+    }
+
+    @Bean
     public RestTemplate restTemplate() {
         return new RestTemplate();
     }

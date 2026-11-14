@@ -59,7 +59,7 @@ class JwtRequestFilterTest {
         SecurityContextHolder.setContext(securityContext);
         when(securityContext.getAuthentication()).thenReturn(null);
         when(request.getCookies()).thenReturn(JwtFactory.getDefaultCookieArray());
-        when(tokenUtil.getUsernameFromToken(anyString())).thenReturn(JWT_USERNAME);
+        when(tokenUtil.parseToken(anyString())).thenReturn(new JwtTokenUtil(SECRET).parseToken(JwtFactory.getDefaultJwtToken()));
         when(userDetailsService.loadUserByUsername(anyString())).thenReturn(JwtFactory.getDefaultUserDetails());
 
         requestFilter.doFilterInternal(request, response, filterChain);
@@ -84,7 +84,7 @@ class JwtRequestFilterTest {
         SecurityContextHolder.setContext(securityContext);
         when(securityContext.getAuthentication()).thenReturn(null);
         when(request.getCookies()).thenReturn(JwtFactory.getDefaultCookieArray());
-        when(tokenUtil.getUsernameFromToken(anyString())).thenThrow(new JwtException("invalid token"));
+        when(tokenUtil.parseToken(anyString())).thenThrow(new JwtException("invalid token"));
 
         requestFilter.doFilterInternal(request, response, filterChain);
 

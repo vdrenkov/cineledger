@@ -28,6 +28,9 @@ public class User {
     @Column
     private String password;
 
+    @Column(nullable = false)
+    private long credentialsVersion;
+
     @Column
     private String email;
 
@@ -91,6 +94,14 @@ public class User {
 
     public void setPassword(final String password) {
         this.password = password;
+    }
+
+    public long getCredentialsVersion() {
+        return credentialsVersion;
+    }
+
+    public void setCredentialsVersion(final long credentialsVersion) {
+        this.credentialsVersion = credentialsVersion;
     }
 
     public String getEmail() {

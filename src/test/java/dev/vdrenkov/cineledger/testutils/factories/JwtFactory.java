@@ -46,6 +46,7 @@ public final class JwtFactory {
         return Jwts
             .builder()
             .subject(JWT_USERNAME)
+            .claim("version", 0L)
             .issuedAt(Date.from(issuedAt))
             .expiration(Date.from(expiration))
             .signWith(key, Jwts.SIG.HS512)
@@ -65,7 +66,7 @@ public final class JwtFactory {
     }
 
     public static UserDetails getDefaultUserDetails() {
-        return User.withUsername(JWT_USERNAME).password(JWT_PASSWORD).authorities(getDefaultAuthorities()).build();
+        return new dev.vdrenkov.cineledger.jwt.AuthenticatedUser(JWT_USERNAME, JWT_PASSWORD, java.util.List.copyOf(getDefaultAuthorities()).stream().map(authority -> new SimpleGrantedAuthority(authority.getAuthority())).toList(), 0);
     }
 
     public static Authentication getDefaultAuthentication() {

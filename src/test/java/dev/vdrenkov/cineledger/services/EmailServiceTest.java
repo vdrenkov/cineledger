@@ -50,7 +50,7 @@ class EmailServiceTest {
         data.put("Email", user.getEmail());
         when(mailjetResponse.getData()).thenReturn(new JSONArray().put(data));
 
-        emailService.sendPasswordConfirmationEmail(user, UserConstants.PASSWORD);
+        emailService.sendPasswordResetEmail(user, UserConstants.PASSWORD);
 
         assertEquals(200, mailjetResponse.getStatus());
         assertEquals(user.getEmail(), mailjetResponse.getData().getJSONObject(0).getString("Email"));

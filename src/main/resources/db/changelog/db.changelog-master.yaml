@@ -19,3 +19,10 @@ databaseChangeLog:
             relativeToChangelogFile: false
             splitStatements: true
             stripComments: false
+  - changeSet:
+      id: 003-password-recovery
+      author: vdrenkov
+      changes:
+        - sqlFile:
+            path: db/changelog/changes/003-password-recovery.sql
+            relativeToChangelogFile: false

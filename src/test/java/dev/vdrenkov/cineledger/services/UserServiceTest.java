@@ -83,6 +83,7 @@ class UserServiceTest {
 
     @BeforeEach
     void setUp() {
+        SecurityContextHolder.clearContext();
         JwtFactory.setSecret(SECRET);
     }
 
@@ -104,41 +105,39 @@ class UserServiceTest {
         assertEquals(resultCookie, httpCookie);
     }
 
-    @Test
-    void testRegisterUser_userRegistered_cookieObtained() {
-        final HttpCookie httpCookie = JwtFactory.getDefaultHttpCookie();
+@Test
+void createUser_customerRequest_preservesAuthentication() {
+    when(userRepository.save(any())).thenReturn(UserFactory.getDefaultUser());
+    when(roleService.getRoleByName("USER")).thenReturn(new Role("USER"));
 
-        when(passwordEncoder.encode(anyString())).thenReturn(UserConstants.PASSWORD);
-        when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.empty());
-        when(userRepository.findUserByEmail(anyString())).thenReturn(Optional.empty());
-        when(userRepository.save(any())).thenReturn(UserFactory.getDefaultUser());
-        when(authenticationManager.authenticate(any())).thenReturn(JwtFactory.getDefaultAuthentication());
-        when(jwtCookieUtil.createJWTCookie(any())).thenReturn(httpCookie);
+    final User created = userService.createUser(createRequest());
 
-        final HttpCookie resultCookie = userService.registerUser(userRequest);
+    assertEquals(UserConstants.USERNAME, created.getUsername());
+    verify(authenticationManager, never()).authenticate(any());
+    verify(jwtCookieUtil, never()).createJWTCookie(any());
+}
 
-        assertEquals(resultCookie, httpCookie);
-    }
+@Test
+void createUser_adminRequest_preservesAuthentication() {
+    SecurityContextHolder.getContext().setAuthentication(UsernamePasswordAuthenticationToken.authenticated(
+        "administrator", null, List.of(new org.springframework.security.core.authority.SimpleGrantedAuthority("ADMIN"))));
+    when(userRepository.save(any())).thenReturn(UserFactory.getDefaultUser());
+    when(roleService.getRoleByName("VENDOR")).thenReturn(new Role("VENDOR"));
+    final var request = createRequest();
 
-    @Test
-    void testRegisterUserByAdmin_userRegistered_notLoggedIn() {
-        when(passwordEncoder.encode(anyString())).thenReturn(UserConstants.PASSWORD);
-        when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.empty());
-        when(userRepository.findUserByEmail(anyString())).thenReturn(Optional.empty());
-        when(userRepository.save(any())).thenReturn(UserFactory.getDefaultUser());
+    userService.createUser(new dev.vdrenkov.cineledger.models.requests.CreateUserRequest(request.username(),
+        request.password(), request.email(), request.firstName(), request.lastName(), List.of("VENDOR")));
 
-        userService.registerUserByAdmin(UserFactory.getDefaultAdminRequest());
-
-        verify(authenticationManager, never()).authenticate(any());
-        verify(jwtCookieUtil, never()).createJWTCookie(any());
-    }
+    verify(authenticationManager, never()).authenticate(any());
+    verify(jwtCookieUtil, never()).createJWTCookie(any());
+}
 
     @Test
     void testAddUser_usernameExists_throwsUserEmailAlreadyExistsException() {
         when(passwordEncoder.encode(anyString())).thenReturn(UserConstants.PASSWORD);
         when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.of(new User()));
 
-        assertThrows(UsernameAlreadyExistsException.class, () -> userService.addUser(userRequest));
+        assertThrows(UsernameAlreadyExistsException.class, () -> userService.createUser(createRequest()));
     }
 
     @Test
@@ -147,7 +146,7 @@ class UserServiceTest {
         when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.empty());
         when(userRepository.findUserByEmail(anyString())).thenReturn(Optional.of(new User()));
 
-        assertThrows(UserEmailAlreadyExistsException.class, () -> userService.addUser(userRequest));
+        assertThrows(UserEmailAlreadyExistsException.class, () -> userService.createUser(createRequest()));
     }
 
     @Test
@@ -341,7 +340,7 @@ class UserServiceTest {
     void testUpdateUserByAdmin_userUpdated_success() {
         final UserDto expected = UserFactory.getDefaultUserDto();
 
-        when(userRepository.findById(anyInt())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
+        when(userRepository.findByIdForUpdate(anyInt())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
         when(roleService.getRoleByName(anyString())).thenReturn(RoleFactory.getDefaultRole());
         when(userRepository.save(any())).thenReturn(UserFactory.getDefaultUser());
 
@@ -359,7 +358,7 @@ class UserServiceTest {
         SecurityContextHolder.setContext(securityContext);
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(passwordEncoder.encode(any())).thenReturn(UserConstants.PASSWORD);
-        when(userRepository.findById(anyInt())).thenReturn(Optional.of(expectedUser));
+        when(userRepository.findByIdForUpdate(anyInt())).thenReturn(Optional.of(expectedUser));
         when(userRepository.findUserByUsername(anyString()))
             .thenReturn(Optional.of(expectedUser))
             .thenReturn(Optional.empty());
@@ -378,7 +377,7 @@ class UserServiceTest {
         final Authentication authentication = JwtFactory.getDefaultAuthentication();
 
         when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(userRepository.findById(anyInt())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
+        when(userRepository.findByIdForUpdate(anyInt())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
         when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
         when(roleService.getRoleByName(anyString())).thenReturn(RoleFactory.getDefaultAdminRole());
 
@@ -459,7 +458,7 @@ class UserServiceTest {
         final Authentication authentication = JwtFactory.getDefaultAuthentication();
 
         when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(userRepository.findById(anyInt())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
+        when(userRepository.findByIdForUpdate(anyInt())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
         when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.of(user)).thenReturn(Optional.empty());
         when(roleService.getRoleByName(anyString())).thenReturn(RoleFactory.getDefaultAdminRole());
 
@@ -513,16 +512,13 @@ class UserServiceTest {
         assertTrue(result);
     }
 
-    @Test
-    void testRecoverPassword() {
-        final User expectedUser = UserFactory.getDefaultUser();
-        when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.of(expectedUser));
-        when(passwordEncoder.encode(any())).thenReturn(UserConstants.PASSWORD);
-        when(userRepository.save(any())).thenReturn(expectedUser);
-        Mockito.doNothing().when(emailService).sendPasswordConfirmationEmail(any(), anyString());
+    @org.junit.jupiter.api.AfterEach
+    void clearAuthentication() {
+        SecurityContextHolder.clearContext();
+    }
 
-        final User resultUser = userService.recoverPassword(UserConstants.USERNAME);
-
-        assertEquals(expectedUser, resultUser);
+    private dev.vdrenkov.cineledger.models.requests.CreateUserRequest createRequest() {
+        return new dev.vdrenkov.cineledger.models.requests.CreateUserRequest(userRequest.username(), userRequest.password(),
+            userRequest.email(), userRequest.firstName(), userRequest.lastName(), null);
     }
 }

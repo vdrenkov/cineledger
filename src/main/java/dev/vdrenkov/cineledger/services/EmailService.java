@@ -49,7 +49,7 @@ public class EmailService {
         sendEmail(request, "order confirmation");
     }
 
-    public void sendPasswordConfirmationEmail(User user, String newPassword) {
+    public void sendPasswordResetEmail(User user, String token) {
         final String recipientEmail = user.getEmail();
         final String recipientName = user.getFirstName() + " " + user.getLastName();
 
@@ -58,10 +58,10 @@ public class EmailService {
                 .put(Emailv31.Message.FROM, new JSONObject().put("Email", senderEmail).put("Name", senderName))
                 .put(Emailv31.Message.TO,
                     new JSONArray().put(new JSONObject().put("Email", recipientEmail).put("Name", recipientName)))
-                .put(Emailv31.Message.SUBJECT, "Your password recovery confirmation")
+                .put(Emailv31.Message.SUBJECT, "Reset your CineLedger password")
                 .put(Emailv31.Message.HTMLPART, "<h3>Dear " + recipientName
-                    + ",</h3><p>You successfully changed your password. Here is your new password: <strong>"
-                    + newPassword + "</strong></p>")));
+                    + ",</h3><p>Submit this one-time token to POST /password-resets within 30 minutes: <strong>"
+                    + token + "</strong>. If you did not request this, ignore this message.</p>")));
 
         sendEmail(request, "password recovery");
     }

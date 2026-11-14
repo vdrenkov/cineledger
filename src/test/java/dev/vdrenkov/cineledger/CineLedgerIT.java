@@ -3,6 +3,7 @@ package dev.vdrenkov.cineledger;
 import dev.vdrenkov.cineledger.services.EmailService;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
@@ -60,6 +61,14 @@ class CineLedgerIT {
     @MockitoBean
     private EmailService emailService;
 
+    @MockitoBean
+    private java.time.Clock clock;
+
+    @BeforeEach
+    void setClock() {
+        org.mockito.Mockito.when(clock.instant()).thenAnswer(_ -> java.time.Instant.now());
+    }
+
     @Test
     void catalogue_multiDigitNestedId_remainsPublic() throws Exception {
         mockMvc.perform(get("/cinemas/123/halls")).andExpect(status().isNotFound());
@@ -112,6 +121,100 @@ class CineLedgerIT {
             .andExpect(status().isForbidden());
     }
 
+    @Test
+    void passwordRecovery_validToken_changesPasswordOnceAndRevokesOldAuthentication() throws Exception {
+        final String username = "reset" + UUID.randomUUID().toString().replace("-", "");
+        final MvcResult created = mockMvc.perform(withCsrf(post("/users")).contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(Map.of("username", username, "password", PASSWORD,
+                "email", username + "@example.test", "firstName", "Test", "lastName", "Customer"))))
+            .andExpect(status().isCreated())
+            .andReturn();
+        final String profile = created.getResponse().getHeader("Location");
+        final Session original = login(username);
+        mockMvc.perform(withCsrf(post("/password-reset-requests")).contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(Map.of("username", username))))
+            .andExpect(status().isAccepted());
+        final var token = org.mockito.ArgumentCaptor.forClass(String.class);
+        org.mockito.Mockito.verify(emailService).sendPasswordResetEmail(org.mockito.ArgumentMatchers.any(), token.capture());
+        assertEquals(43, token.getValue().length());
+        login(username);
+        final String replacement = "ChangedPassword123";
+        mockMvc.perform(withCsrf(post("/password-resets")).contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(Map.of("token", token.getValue(), "password", replacement))))
+            .andExpect(status().isNoContent());
+        mockMvc.perform(authenticated(get(profile), original)).andExpect(status().isForbidden());
+        mockMvc.perform(withCsrf(post("/login")).contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(Map.of("username", username, "password", PASSWORD))))
+            .andExpect(status().isUnauthorized());
+        mockMvc.perform(withCsrf(post("/login")).contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(Map.of("username", username, "password", replacement))))
+            .andExpect(status().isOk());
+        mockMvc.perform(withCsrf(post("/password-resets")).contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(Map.of("token", token.getValue(), "password", replacement))))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void passwordRecovery_unknownAccount_returnsSameAcceptedResponse() throws Exception {
+        mockMvc.perform(withCsrf(post("/password-reset-requests")).contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(Map.of("username", "unknown-customer"))))
+            .andExpect(status().isAccepted());
+        org.mockito.Mockito.verify(emailService, org.mockito.Mockito.never())
+            .sendPasswordResetEmail(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any());
+    }
+
+    @Test
+    void passwordRecovery_unknownToken_isRejected() throws Exception {
+        mockMvc.perform(withCsrf(post("/password-resets")).contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(Map.of("token", "a".repeat(43), "password", PASSWORD))))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void passwordRecovery_expiredToken_preservesOriginalPassword() throws Exception {
+        final RecoveryFixture fixture = recoveryFixture();
+        org.mockito.Mockito.when(clock.instant()).thenReturn(java.time.Instant.now().plusSeconds(1801));
+
+        mockMvc.perform(withCsrf(post("/password-resets")).contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(Map.of("token", fixture.token(), "password", "ChangedPassword123"))))
+            .andExpect(status().isBadRequest());
+        login(fixture.username());
+    }
+
+    @Test
+    void passwordRecovery_concurrentTokenUse_succeedsExactlyOnce() throws Exception {
+        final RecoveryFixture fixture = recoveryFixture();
+        final var start = new java.util.concurrent.CountDownLatch(1);
+        try (final var executor = java.util.concurrent.Executors.newVirtualThreadPerTaskExecutor()) {
+            final var attempts = java.util.stream.IntStream.range(0, 2).mapToObj(_ -> executor.submit(() -> {
+                start.await();
+                return mockMvc.perform(withCsrf(post("/password-resets")).contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(Map.of("token", fixture.token(), "password", "ChangedPassword123"))))
+                    .andReturn().getResponse().getStatus();
+            })).toList();
+            start.countDown();
+            final var statuses = new java.util.ArrayList<Integer>();
+            for (final var attempt : attempts) {
+                statuses.add(attempt.get(20, java.util.concurrent.TimeUnit.SECONDS));
+            }
+            assertEquals(java.util.List.of(204, 400), statuses.stream().sorted().toList());
+        }
+    }
+
+    private RecoveryFixture recoveryFixture() throws Exception {
+        final String username = "recovery" + UUID.randomUUID().toString().replace("-", "");
+        mockMvc.perform(withCsrf(post("/users")).contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(Map.of("username", username, "password", PASSWORD,
+                "email", username + "@example.test", "firstName", "Test", "lastName", "Customer"))))
+            .andExpect(status().isCreated());
+        mockMvc.perform(withCsrf(post("/password-reset-requests")).contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(Map.of("username", username))))
+            .andExpect(status().isAccepted());
+        final var token = org.mockito.ArgumentCaptor.forClass(String.class);
+        org.mockito.Mockito.verify(emailService).sendPasswordResetEmail(org.mockito.ArgumentMatchers.any(), token.capture());
+        return new RecoveryFixture(username, token.getValue());
+    }
+
     private Session login(final String username) throws Exception {
         final MvcResult csrfResult = mockMvc.perform(get("/csrf")).andReturn();
         final String csrfToken = objectMapper.readTree(csrfResult.getResponse().getContentAsString()).path("token").asString();
@@ -135,4 +238,5 @@ class CineLedgerIT {
     }
 
     private record Session(Cookie authentication, Cookie csrfCookie, String csrfToken) {}
+    private record RecoveryFixture(String username, String token) {}
 }
