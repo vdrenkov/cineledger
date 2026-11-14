@@ -20,6 +20,12 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
     @Query("select entity from Order entity where entity.id = :id")
     Optional<Order> findByIdForUpdate(int id);
 
+    @Query(
+            "select coalesce(sum(purchase.totalPrice), 0) from Order purchase where"
+                + " purchase.user.id = :userId and purchase.dateOfPurchase between :startDate and"
+                + " :endDate")
+    java.math.BigDecimal incomeByUserId(int userId, LocalDate startDate, LocalDate endDate);
+
     List<Order> findOrderByUserId(int userId);
 
     List<Order> findOrdersByDateOfPurchaseBetween(LocalDate startDate, LocalDate endDate);

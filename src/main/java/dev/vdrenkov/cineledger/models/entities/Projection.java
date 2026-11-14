@@ -9,6 +9,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
+import java.math.BigDecimal;
 import java.time.LocalTime;
 
 @Entity
@@ -19,7 +20,8 @@ public class Projection {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column private double price;
+    @Column(precision = 19, scale = 2, nullable = false)
+    private BigDecimal price;
 
     @ManyToOne
     @JoinColumn(name = "hall_id")
@@ -42,7 +44,8 @@ public class Projection {
         return runtime;
     }
 
-    public Projection(double price, Hall hall, Program program, Movie movie, LocalTime startTime) {
+    public Projection(
+            BigDecimal price, Hall hall, Program program, Movie movie, LocalTime startTime) {
         this.price = price;
         this.hall = hall;
         this.program = program;
@@ -55,7 +58,7 @@ public class Projection {
 
     public Projection(
             final int id,
-            final double price,
+            final BigDecimal price,
             final Hall hall,
             final Program program,
             final Movie movie,
@@ -77,11 +80,11 @@ public class Projection {
         this.id = id;
     }
 
-    public double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(final double price) {
+    public void setPrice(final BigDecimal price) {
         this.price = price;
     }
 

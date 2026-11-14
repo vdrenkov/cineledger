@@ -1,262 +1,236 @@
 package dev.vdrenkov.cineledger.services;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyDouble;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
-import dev.vdrenkov.cineledger.exceptions.DiscountNotValidException;
-import dev.vdrenkov.cineledger.exceptions.NotAuthorizedException;
-import dev.vdrenkov.cineledger.exceptions.OrderNotFoundException;
-import dev.vdrenkov.cineledger.models.dtos.OrderDto;
-import dev.vdrenkov.cineledger.models.entities.Item;
-import dev.vdrenkov.cineledger.models.entities.Order;
-import dev.vdrenkov.cineledger.models.entities.Ticket;
-import dev.vdrenkov.cineledger.models.entities.User;
+import dev.vdrenkov.cineledger.exceptions.*;
+import dev.vdrenkov.cineledger.models.entities.*;
 import dev.vdrenkov.cineledger.models.requests.OrderRequest;
-import dev.vdrenkov.cineledger.models.requests.TicketRequest;
+import dev.vdrenkov.cineledger.repositories.OrderItemRepository;
 import dev.vdrenkov.cineledger.repositories.OrderRepository;
-import dev.vdrenkov.cineledger.testutils.constants.DiscountConstants;
-import dev.vdrenkov.cineledger.testutils.constants.OrderConstants;
-import dev.vdrenkov.cineledger.testutils.constants.ReportConstants;
-import dev.vdrenkov.cineledger.testutils.factories.ItemFactory;
-import dev.vdrenkov.cineledger.testutils.factories.OrderFactory;
-import dev.vdrenkov.cineledger.testutils.factories.ProjectionFactory;
-import dev.vdrenkov.cineledger.testutils.factories.TicketFactory;
-import dev.vdrenkov.cineledger.testutils.factories.UserFactory;
-import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
+import dev.vdrenkov.cineledger.testutils.factories.*;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 class OrderServiceTest {
-    final List<TicketRequest> ticketRequests =
-            Collections.singletonList(TicketFactory.getDefaultTicketRequest());
-    OrderRequest orderRequest = OrderFactory.getDefaultOrderRequest();
-
     @Mock private OrderRepository orderRepository;
-
+    @Mock private OrderItemRepository orderItemRepository;
     @Mock private UserService userService;
-
     @Mock private TicketService ticketService;
-
     @Mock private ItemService itemService;
-
     @Mock private EmailService emailService;
-
     @Mock private DiscountService discountService;
-
+    @Captor private ArgumentCaptor<Iterable<OrderItem>> savedLines;
     @InjectMocks private OrderService orderService;
+    private User user;
+    private Item item;
+    private Ticket ticket;
 
-    @Test
-    void testAddOrder_noExceptions_success() {
-        final Order expected = OrderFactory.getDefaultOrder();
-
-        when(ticketService.getTicketForUpdate(anyInt()))
-                .thenReturn(TicketFactory.getDefaultTicket());
-        when(itemService.getItemForUpdate(anyInt())).thenReturn(ItemFactory.getDefaultItem());
-        when(userService.getUserById(anyInt())).thenReturn(UserFactory.getDefaultUser());
-        when(orderRepository.save(any())).thenReturn(OrderFactory.getDefaultOrder());
-        when(discountService.applyDiscount(anyDouble(), anyString()))
-                .thenReturn(OrderConstants.TOTAL_PRICE);
-
-        final Order order = orderService.addOrder(orderRequest);
-
-        assertEquals(expected, order);
-        verify(emailService).sendOrderConfirmationEmail(any(), any());
+    @BeforeEach
+    void setUp() {
+        user = UserFactory.getDefaultUser();
+        item = ItemFactory.getDefaultItem();
+        ticket = TicketFactory.getDefaultTicket();
     }
 
     @Test
-    void testAddOrder_discountCodeNotValid_throwsDiscountNotValidException() {
-        when(ticketService.getTicketForUpdate(anyInt()))
-                .thenReturn(TicketFactory.getDefaultTicket());
-        when(itemService.getItemForUpdate(anyInt())).thenReturn(ItemFactory.getDefaultItem());
-        when(userService.getUserById(anyInt())).thenReturn(UserFactory.getDefaultUser());
-        when(discountService.applyDiscount(anyDouble(), anyString()))
-                .thenThrow(
-                        new DiscountNotValidException(
-                                ExceptionMessages.DISCOUNT_CODE_NOT_VALID_MESSAGE));
+    void addOrder_decimalPrices_preservesExactTotal() {
+        setPrices("0.10", "0.20");
+        stubResources();
+        stubSave();
 
-        orderRequest =
+        final Order order = orderService.addOrder(request(null));
+
+        assertEquals(new BigDecimal("0.30"), order.getTotalPrice());
+        assertEquals(new BigDecimal("0.10"), ticket.getPaidPrice());
+        verify(orderItemRepository).saveAll(savedLines.capture());
+        final OrderItem line = savedLines.getValue().iterator().next();
+        assertEquals(new BigDecimal("0.20"), line.getPaidTotal());
+        assertEquals(54, item.getQuantity());
+    }
+
+    @Test
+    void addOrder_discountRounding_allocatesTheExactDiscountedTotal() {
+        setPrices("10.25", "2.75");
+        stubResources();
+        stubSave();
+        when(discountService.getDiscountPercentage("1234")).thenReturn(10);
+
+        final Order order = orderService.addOrder(request("1234"));
+
+        assertEquals(new BigDecimal("11.70"), order.getTotalPrice());
+        assertEquals(new BigDecimal("9.23"), ticket.getPaidPrice());
+        verify(orderItemRepository).saveAll(savedLines.capture());
+        assertEquals(
+                new BigDecimal("2.47"), savedLines.getValue().iterator().next().getPaidTotal());
+    }
+
+    @Test
+    void addOrder_duplicateTicketIds_rejectsBeforeDatabaseAccess() {
+        final var request =
                 new OrderRequest(
-                        orderRequest.userId(),
-                        orderRequest.ticketsIds(),
-                        orderRequest.itemsIds(),
-                        "Code");
-        assertThrows(DiscountNotValidException.class, () -> orderService.addOrder(orderRequest));
+                        user.getId(), List.of(ticket.getId(), ticket.getId()), List.of(), null);
+
+        assertThrows(IllegalArgumentException.class, () -> orderService.addOrder(request));
+
+        verifyNoInteractions(orderRepository, ticketService, itemService);
     }
 
     @Test
-    void testMakeReservationWithUserId_noExceptions_success() {
-        final Order expected = OrderFactory.getDefaultOrder();
-        final Ticket ticket = new Ticket();
-        ticket.setId(OrderConstants.ID);
-        ticket.setDateOfPurchase(LocalDate.now());
-        ticket.setProjection(ProjectionFactory.getDefaultProjection());
+    void addOrder_unavailableStock_doesNotSaveOrNotify() {
+        item.setQuantity(0);
+        stubResources();
 
-        when(ticketService.addTicket(any())).thenReturn(ticket);
-        when(userService.getUserById(anyInt())).thenReturn(UserFactory.getDefaultUser());
-        when(userService.isCurrentUserAuthorized(anyInt())).thenReturn(true);
-        when(orderRepository.save(any())).thenReturn(expected);
-        when(discountService.applyDiscount(anyDouble(), anyString()))
-                .thenReturn(OrderConstants.TOTAL_PRICE);
+        assertThrows(NoAvailableItemsException.class, () -> orderService.addOrder(request(null)));
 
-        final Order order =
-                orderService.makeReservationWithUserId(
-                        ticketRequests, OrderConstants.ID, DiscountConstants.CODE);
-
-        assertEquals(expected, order);
+        verifyNoInteractions(orderRepository, emailService);
     }
 
     @Test
-    void testMakeReservationWithUserId_discountCodeNotValid_throwsDiscountNotValidException() {
-        final Ticket ticket = new Ticket();
-        ticket.setId(OrderConstants.ID);
-        ticket.setDateOfPurchase(LocalDate.now());
-        ticket.setProjection(ProjectionFactory.getDefaultProjection());
-
-        final String invalidDiscount = "ABC";
-
-        when(ticketService.addTicket(any())).thenReturn(ticket);
-        when(userService.getUserById(anyInt())).thenReturn(UserFactory.getDefaultUser());
-        when(userService.isCurrentUserAuthorized(anyInt())).thenReturn(true);
-        when(discountService.applyDiscount(anyDouble(), anyString()))
-                .thenThrow(
-                        new DiscountNotValidException(
-                                ExceptionMessages.DISCOUNT_CODE_NOT_VALID_MESSAGE));
+    void addOrder_invalidDiscount_doesNotSaveOrNotify() {
+        stubResources();
+        when(discountService.getDiscountPercentage("invalid"))
+                .thenThrow(new DiscountNotValidException("Invalid code"));
 
         assertThrows(
-                DiscountNotValidException.class,
-                () ->
-                        orderService.makeReservationWithUserId(
-                                ticketRequests, OrderConstants.ID, invalidDiscount));
+                DiscountNotValidException.class, () -> orderService.addOrder(request("invalid")));
+
+        verifyNoInteractions(orderRepository, emailService);
     }
 
     @Test
-    void testMakeReservationWithUserId_invalidUserId_throwsNotAuthorizedException() {
-        when(userService.isCurrentUserAuthorized(anyInt())).thenReturn(false);
+    void getOrderById_otherCustomer_isForbidden() {
+        final Order order = OrderFactory.getDefaultOrder();
+        final User another = UserFactory.getDefaultUser();
+        another.setId(99);
+        when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
+        when(userService.getCurrentUser()).thenReturn(another);
+
+        assertThrows(NotAuthorizedException.class, () -> orderService.getOrderById(order.getId()));
+
+        verifyNoInteractions(orderItemRepository);
+    }
+
+    @Test
+    void updateOrder_existingConcession_preservesAgreedUnitPrice() {
+        final Order order = OrderFactory.getDefaultOrder();
+        final OrderItem previous =
+                new OrderItem(
+                        order.getId(),
+                        item.getId(),
+                        item.getName(),
+                        1,
+                        new BigDecimal("13.00"),
+                        new BigDecimal("13.00"));
+        item.setPrice(new BigDecimal("99.00"));
+        item.setQuantity(10);
+        stubResources();
+        stubSave();
+        when(orderRepository.findByIdForUpdate(order.getId())).thenReturn(Optional.of(order));
+        when(orderItemRepository.findByOrderId(order.getId())).thenReturn(List.of(previous));
+
+        final var result = orderService.updateOrder(request(null), order.getId());
+
+        assertEquals(new BigDecimal("13.00"), result.items().getFirst().unitPrice());
+        assertEquals(10, item.getQuantity());
+        verify(orderItemRepository).saveAll(savedLines.capture());
+        assertEquals(
+                new BigDecimal("13.00"), savedLines.getValue().iterator().next().getUnitPrice());
+    }
+
+    @Test
+    void updateOrder_missingOrder_returnsNotFound() {
+        when(orderRepository.findByIdForUpdate(99)).thenReturn(Optional.empty());
+
+        assertThrows(
+                OrderNotFoundException.class, () -> orderService.updateOrder(request(null), 99));
+    }
+
+    @Test
+    void deleteOrder_existingOrder_restoresQuantitiesAndCancelsTickets() {
+        final Order order = OrderFactory.getDefaultOrder();
+        final OrderItem previous =
+                new OrderItem(
+                        order.getId(),
+                        item.getId(),
+                        item.getName(),
+                        2,
+                        item.getPrice(),
+                        item.getPrice().multiply(BigDecimal.TWO));
+        item.setQuantity(0);
+        when(orderRepository.findByIdForUpdate(order.getId())).thenReturn(Optional.of(order));
+        when(orderItemRepository.findByOrderId(order.getId())).thenReturn(List.of(previous));
+        when(itemService.getItemForUpdate(item.getId())).thenReturn(item);
+
+        orderService.deleteOrder(order.getId());
+
+        assertEquals(2, item.getQuantity());
+        verify(orderRepository).delete(order);
+        verify(ticketService).cancelTickets(order.getTickets());
+    }
+
+    @Test
+    void deleteOrder_missingOrder_returnsNotFound() {
+        when(orderRepository.findByIdForUpdate(99)).thenReturn(Optional.empty());
+
+        assertThrows(OrderNotFoundException.class, () -> orderService.deleteOrder(99));
+    }
+
+    @Test
+    void makeReservation_otherCustomer_isForbidden() {
+        when(userService.isCurrentUserAuthorized(99)).thenReturn(false);
 
         assertThrows(
                 NotAuthorizedException.class,
                 () ->
                         orderService.makeReservationWithUserId(
-                                ticketRequests, OrderConstants.ID, null));
+                                List.of(TicketFactory.getDefaultTicketRequest()), 99, null));
+
+        verifyNoInteractions(ticketService, orderRepository);
     }
 
     @Test
-    void testGetOrdersByUserId_noExceptions_success() {
-        final User user = UserFactory.getDefaultUser();
-
-        when(userService.getCurrentUser()).thenReturn(user);
-        when(orderRepository.findOrderByUserId(anyInt()))
-                .thenReturn(OrderFactory.getDefaultOrderList());
-
-        final List<OrderDto> result = orderService.getOrdersByUserId(OrderConstants.ID);
-
-        assertEquals(OrderFactory.getDefaultOrderDtoList(), result);
-    }
-
-    @Test
-    void testGetOrdersByUserId_invalidUserId_throwsNotAuthorizedException() {
-        final User user = UserFactory.getDefaultUser();
-        when(userService.getCurrentUser()).thenReturn(user);
-
-        final int invalidUserId = 999;
+    void makeReservation_emptyTicketList_isRejected() {
         assertThrows(
-                NotAuthorizedException.class, () -> orderService.getOrdersByUserId(invalidUserId));
+                IllegalArgumentException.class,
+                () -> orderService.makeReservationWithUserId(List.of(), 99, null));
+        verifyNoInteractions(ticketService, orderRepository);
     }
 
-    @Test
-    void testUpdateOrder_noExceptions_success() {
-        final OrderDto expected = OrderFactory.getDefaultOrderDto();
-
-        when(orderRepository.findByIdForUpdate(anyInt()))
-                .thenReturn(Optional.of(OrderFactory.getDefaultOrder()));
-        when(ticketService.getTicketForUpdate(anyInt()))
-                .thenReturn(TicketFactory.getDefaultTicket());
-        when(userService.getUserById(anyInt())).thenReturn(UserFactory.getDefaultUser());
-        when(orderRepository.saveAndFlush(any())).thenReturn(OrderFactory.getDefaultOrder());
-
-        final Item newItem = ItemFactory.getDefaultItem();
-        newItem.setId(999);
-        when(itemService.getItemForUpdate(anyInt()))
-                .thenAnswer(invocation ->
-                        invocation.<Integer>getArgument(0) == newItem.getId()
-                                ? newItem
-                                : ItemFactory.getDefaultItem());
-
-        orderRequest =
-                new OrderRequest(
-                        orderRequest.userId(),
-                        orderRequest.ticketsIds(),
-                        Collections.singletonList(newItem.getId()),
-                        orderRequest.discountCode());
-        final OrderDto result = orderService.updateOrder(orderRequest, OrderConstants.ID);
-
-        orderRequest =
-                new OrderRequest(
-                        orderRequest.userId(),
-                        orderRequest.ticketsIds(),
-                        new ArrayList<>(),
-                        orderRequest.discountCode());
-        orderService.updateOrder(orderRequest, OrderConstants.ID);
-
-        assertEquals(expected, result);
+    private OrderRequest request(final String discountCode) {
+        return new OrderRequest(
+                user.getId(), List.of(ticket.getId()), List.of(item.getId()), discountCode);
     }
 
-    @Test
-    void testUpdateOrder_OrderNotFoundException_fail() {
-        when(orderRepository.findByIdForUpdate(anyInt())).thenReturn(Optional.empty());
-
-        assertThrows(
-                OrderNotFoundException.class,
-                () -> orderService.updateOrder(orderRequest, OrderConstants.ID));
+    private void setPrices(final String ticketPrice, final String itemPrice) {
+        final Projection projection = ProjectionFactory.getDefaultProjection();
+        projection.setPrice(new BigDecimal(ticketPrice));
+        ticket.setProjection(projection);
+        item.setPrice(new BigDecimal(itemPrice));
     }
 
-    @Test
-    void testDeleteOrder_noExceptions_fail() {
-        final OrderDto expected = OrderFactory.getDefaultOrderDto();
-
-        when(orderRepository.findByIdForUpdate(anyInt()))
-                .thenReturn(Optional.of(OrderFactory.getDefaultOrder()));
-
-        final OrderDto result = orderService.deleteOrder(OrderConstants.ID);
-
-        assertEquals(expected, result);
+    private void stubResources() {
+        when(userService.getUserById(user.getId())).thenReturn(user);
+        when(ticketService.getTicketForUpdate(ticket.getId())).thenReturn(ticket);
+        when(itemService.getItemForUpdate(item.getId())).thenReturn(item);
     }
 
-    @Test
-    void testDeleteOrder_OrderNotFoundException_fail() {
-        when(orderRepository.findByIdForUpdate(anyInt())).thenReturn(Optional.empty());
-
-        assertThrows(
-                OrderNotFoundException.class, () -> orderService.deleteOrder(OrderConstants.ID));
-    }
-
-    @Test
-    void testGetOrdersByDateBetween() {
-        final List<Order> expected = OrderFactory.getDefaultOrderList();
-
-        when(orderRepository.findOrdersByDateOfPurchaseBetween(any(), any())).thenReturn(expected);
-
-        final List<Order> orders =
-                orderService.getOrdersByDateBetween(
-                        ReportConstants.START_DATE, ReportConstants.END_DATE);
-
-        assertEquals(expected, orders);
+    private void stubSave() {
+        when(orderRepository.saveAndFlush(any()))
+                .thenAnswer(invocation -> {
+                    final Order order = invocation.getArgument(0);
+                    order.setId(1);
+                    return order;
+                });
     }
 }

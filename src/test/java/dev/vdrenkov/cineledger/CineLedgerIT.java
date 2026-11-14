@@ -592,6 +592,167 @@ class CineLedgerIT {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    void order_decimalPrices_hasExactTotal() throws Exception {
+        final Session admin = login("integration_admin");
+        final Fixture fixture = fixture(admin, 1, 1);
+        mockMvc.perform(
+                        authenticated(
+                                        org.springframework.test.web.servlet.request
+                                                .MockMvcRequestBuilders.put(
+                                                "/items/" + fixture.itemId()),
+                                        admin)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        objectMapper.writeValueAsString(
+                                                Map.of(
+                                                        "name",
+                                                        fixture.itemName(),
+                                                        "price",
+                                                        0.20,
+                                                        "quantity",
+                                                        1))))
+                .andExpect(status().isNoContent());
+        final var screening =
+                new java.util.HashMap<String, Object>(projection(fixture, "18:00:00"));
+        screening.put("price", 0.10);
+        mockMvc.perform(
+                        authenticated(
+                                        org.springframework.test.web.servlet.request
+                                                .MockMvcRequestBuilders.put(
+                                                "/projections/" + fixture.projectionId()),
+                                        admin)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(screening)))
+                .andExpect(status().isNoContent());
+        final int ticketId =
+                create(admin, "/tickets", Map.of("projectionId", fixture.projectionId()));
+        create(
+                admin,
+                "/orders",
+                Map.of(
+                        "userId",
+                        fixture.customerId(),
+                        "ticketsIds",
+                        java.util.List.of(ticketId),
+                        "itemsIds",
+                        java.util.List.of(fixture.itemId())));
+        final var response =
+                mockMvc.perform(
+                                authenticated(
+                                        get("/users/" + fixture.customerId() + "/orders"), admin))
+                        .andExpect(status().isOk())
+                        .andReturn()
+                        .getResponse();
+        final var amount =
+                objectMapper.readTree(response.getContentAsString()).get(0).path("totalPrice");
+        assertEquals(
+                0,
+                new java.math.BigDecimal("0.30")
+                        .compareTo(new java.math.BigDecimal(amount.asString())));
+    }
+
+    @Test
+    void reports_priceChanges_preservePurchaseAmountsAndIncludeEndDate() throws Exception {
+        final Session admin = login("integration_admin");
+        final Fixture fixture = fixture(admin, 1, 1);
+        final int ticketId =
+                create(admin, "/tickets", Map.of("projectionId", fixture.projectionId()));
+        create(
+                admin,
+                "/orders",
+                Map.of(
+                        "userId",
+                        fixture.customerId(),
+                        "ticketsIds",
+                        java.util.List.of(ticketId),
+                        "itemsIds",
+                        java.util.List.of(fixture.itemId()),
+                        "discountCode",
+                        fixture.discountCode()));
+        mockMvc.perform(
+                        authenticated(
+                                        org.springframework.test.web.servlet.request
+                                                .MockMvcRequestBuilders.put(
+                                                "/items/" + fixture.itemId()),
+                                        admin)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        objectMapper.writeValueAsString(
+                                                Map.of(
+                                                        "name",
+                                                        fixture.itemName(),
+                                                        "price",
+                                                        99,
+                                                        "quantity",
+                                                        1))))
+                .andExpect(status().isNoContent());
+        final var screening =
+                new java.util.HashMap<String, Object>(projection(fixture, "18:00:00"));
+        screening.put("price", 100);
+        mockMvc.perform(
+                        authenticated(
+                                        org.springframework.test.web.servlet.request
+                                                .MockMvcRequestBuilders.put(
+                                                "/projections/" + fixture.projectionId()),
+                                        admin)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(screening)))
+                .andExpect(status().isNoContent());
+        assertIncome(admin, "users", fixture.customerId(), "11.70");
+        assertIncome(admin, "items", fixture.itemId(), "2.47");
+        assertIncome(admin, "movies", fixture.movieId(), "9.23");
+        assertIncome(admin, "cinemas", fixture.cinemaId(), "9.23");
+        assertIncome(admin, "halls", fixture.hallId(), "9.23");
+    }
+
+    @Test
+    void reports_mixedCinemaOrder_countsOnlyMatchingTickets() throws Exception {
+        final Session admin = login("integration_admin");
+        final Fixture first = fixture(admin, 1, 1);
+        final Fixture second = fixture(admin, 1, 1);
+        final int firstTicket =
+                create(admin, "/tickets", Map.of("projectionId", first.projectionId()));
+        final int secondTicket =
+                create(admin, "/tickets", Map.of("projectionId", second.projectionId()));
+        create(
+                admin,
+                "/orders",
+                Map.of(
+                        "userId",
+                        first.customerId(),
+                        "ticketsIds",
+                        java.util.List.of(firstTicket, secondTicket),
+                        "itemsIds",
+                        java.util.List.of(first.itemId())));
+        assertIncome(admin, "users", first.customerId(), "23.25");
+        assertIncome(admin, "cinemas", first.cinemaId(), "10.25");
+        assertIncome(admin, "cinemas", second.cinemaId(), "10.25");
+        assertIncome(admin, "halls", first.hallId(), "10.25");
+        assertIncome(admin, "halls", second.hallId(), "10.25");
+    }
+
+    private void assertIncome(
+            final Session admin, final String resource, final int id, final String expected)
+            throws Exception {
+        final var response =
+                mockMvc.perform(
+                                authenticated(
+                                                get("/reports/" + resource + "/" + id + "/incomes"),
+                                                admin)
+                                        .param(
+                                                "startDate",
+                                                java.time.LocalDate.now().minusDays(1).toString())
+                                        .param("endDate", java.time.LocalDate.now().toString()))
+                        .andExpect(status().isOk())
+                        .andReturn()
+                        .getResponse();
+        assertEquals(
+                0,
+                new java.math.BigDecimal(expected)
+                        .compareTo(new java.math.BigDecimal(response.getContentAsString())));
+    }
+
     private Fixture fixture(final Session admin, final int capacity, final int quantity)
             throws Exception {
         final String suffix = UUID.randomUUID().toString().replace("-", "");

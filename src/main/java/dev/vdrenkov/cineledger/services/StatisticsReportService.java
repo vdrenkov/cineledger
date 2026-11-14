@@ -1,100 +1,81 @@
 package dev.vdrenkov.cineledger.services;
 
-import dev.vdrenkov.cineledger.models.entities.Item;
-import dev.vdrenkov.cineledger.models.entities.Order;
-import dev.vdrenkov.cineledger.models.entities.Ticket;
+import dev.vdrenkov.cineledger.exceptions.CategoryNotFoundException;
+import dev.vdrenkov.cineledger.exceptions.ItemNotFoundException;
+import dev.vdrenkov.cineledger.exceptions.MovieNotFoundException;
+import dev.vdrenkov.cineledger.repositories.CategoryRepository;
+import dev.vdrenkov.cineledger.repositories.ItemRepository;
+import dev.vdrenkov.cineledger.repositories.MovieRepository;
+import dev.vdrenkov.cineledger.repositories.OrderItemRepository;
+import dev.vdrenkov.cineledger.repositories.TicketRepository;
+import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
+
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 public class StatisticsReportService {
+    private final CategoryRepository categoryRepository;
+    private final MovieRepository movieRepository;
+    private final ItemRepository itemRepository;
+    private final TicketRepository ticketRepository;
+    private final OrderItemRepository orderItemRepository;
 
-    private final TicketService ticketService;
-    private final MovieService movieService;
-    private final CategoryService categoryService;
-
-    private final ItemService itemService;
-    private final OrderService orderService;
-
-    public StatisticsReportService(TicketService ticketService, MovieService movieService,
-        CategoryService categoryService, ItemService itemService, OrderService orderService) {
-        this.ticketService = ticketService;
-        this.movieService = movieService;
-        this.categoryService = categoryService;
-        this.itemService = itemService;
-        this.orderService = orderService;
+    public StatisticsReportService(
+            final CategoryRepository categoryRepository,
+            final MovieRepository movieRepository,
+            final ItemRepository itemRepository,
+            final TicketRepository ticketRepository,
+            final OrderItemRepository orderItemRepository) {
+        this.categoryRepository = categoryRepository;
+        this.movieRepository = movieRepository;
+        this.itemRepository = itemRepository;
+        this.ticketRepository = ticketRepository;
+        this.orderItemRepository = orderItemRepository;
     }
 
-    public int getPurchasedTicketsCountByMovieCategory(int categoryId, LocalDate startDate, LocalDate endDate) {
-        categoryService.getCategoryById(categoryId);
+    public long getPurchasedTicketsCountByMovieCategory(
+            final int categoryId, final LocalDate startDate, final LocalDate endDate) {
+        requireValidPeriod(startDate, endDate);
 
-        final List<Ticket> allTickets = ticketService.getTicketsByDateBetween(startDate, endDate);
-
-        int totalTickets = 0;
-        for (Ticket ticket : allTickets) {
-            if (isTicketWithinDateRange(ticket, startDate, endDate) && isTicketForMovieCategory(ticket, categoryId)) {
-                totalTickets += 1;
-            }
+        if (!categoryRepository.existsById(categoryId)) {
+            throw new CategoryNotFoundException(ExceptionMessages.CATEGORY_NOT_FOUND_MESSAGE);
         }
 
-        return totalTickets;
+        return ticketRepository.purchasedCountByCategoryId(categoryId, startDate, endDate);
     }
 
-    public int getPurchasedTicketsCountByMovieTitle(String title, LocalDate startDate, LocalDate endDate) {
-        movieService.getMovieByTitle(title);
-        final List<Integer> movieIds = movieService.getIdsOfMoviesByTitle(title);
-        final List<Ticket> tickets = ticketService.getTicketsByDateBetween(startDate, endDate);
+    public long getPurchasedTicketsCountByMovieTitle(
+            final String title, final LocalDate startDate, final LocalDate endDate) {
+        requireValidPeriod(startDate, endDate);
+        final var movie =
+                movieRepository
+                        .findByTitle(title)
+                        .orElseThrow(() ->
+                                new MovieNotFoundException(
+                                        ExceptionMessages.MOVIE_NOT_FOUND_MESSAGE));
+        return ticketRepository.purchasedCountByMovieId(movie.getId(), startDate, endDate);
+    }
 
-        int totalTickets = 0;
-        for (Ticket ticket : tickets) {
-            if (isTicketWithinDateRange(ticket, startDate, endDate) && isTicketForMovieWithTitle(ticket, movieIds)) {
-                totalTickets += 1;
-            }
+    public long getPurchasedItemsCountByItemName(
+            final String name, final LocalDate startDate, final LocalDate endDate) {
+        requireValidPeriod(startDate, endDate);
+        final var item =
+                itemRepository
+                        .findByName(name)
+                        .orElseThrow(() ->
+                                new ItemNotFoundException(
+                                        ExceptionMessages.ITEM_NOT_FOUND_MESSAGE));
+        return orderItemRepository.quantityByItemId(item.getId(), startDate, endDate);
+    }
+
+    private static void requireValidPeriod(final LocalDate startDate, final LocalDate endDate) {
+
+        if (startDate.isAfter(endDate)) {
+            throw new IllegalArgumentException("Start date must not follow end date");
         }
-
-        return totalTickets;
-    }
-
-    public int getPurchasedItemsCountByItemName(String name, LocalDate startDate, LocalDate endDate) {
-        int totalTickets = 0;
-
-        itemService.getItemDtoByName(name);
-        final List<Order> allOrders = orderService.getOrdersByDateBetween(startDate, endDate);
-
-        for (Order order : allOrders) {
-            if (isOrderWithinDateRange(order, startDate, endDate)) {
-                for (Item item : order.getItems()) {
-                    if (name.equals(item.getName())) {
-                        totalTickets += 1;
-                    }
-                }
-            }
-        }
-
-        return totalTickets;
-    }
-
-    private static boolean isOrderWithinDateRange(Order order, LocalDate startDate, LocalDate endDate) {
-        final LocalDate orderDate = order.getDateOfPurchase();
-        return orderDate.isEqual(startDate) || (orderDate.isAfter(startDate) && orderDate.isBefore(endDate));
-    }
-
-    private static boolean isTicketWithinDateRange(Ticket ticket, LocalDate startDate, LocalDate endDate) {
-        final LocalDate ticketDate = ticket.getDateOfPurchase();
-
-        return ticketDate.isEqual(startDate) || ticketDate.isEqual(endDate) || (ticketDate.isAfter(startDate)
-            && ticketDate.isBefore(endDate));
-    }
-
-    private static boolean isTicketForMovieWithTitle(Ticket ticket, List<Integer> movieIds) {
-        final int movieId = ticket.getProjection().getMovie().getId();
-
-        return movieIds.contains(movieId);
-    }
-
-    private static boolean isTicketForMovieCategory(Ticket ticket, int id) {
-        return id == ticket.getProjection().getMovie().getCategory().getId();
     }
 }

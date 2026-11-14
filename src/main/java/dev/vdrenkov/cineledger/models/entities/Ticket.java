@@ -9,6 +9,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
@@ -26,9 +27,28 @@ public class Ticket {
     @JoinColumn(name = "projection_id")
     private Projection projection;
 
+    @Column(precision = 19, scale = 2, nullable = false)
+    private BigDecimal unitPrice;
+
+    @Column(precision = 19, scale = 2)
+    private BigDecimal paidPrice;
+
+    public BigDecimal getUnitPrice() {
+        return unitPrice;
+    }
+
+    public BigDecimal getPaidPrice() {
+        return paidPrice;
+    }
+
+    public void setPaidPrice(final BigDecimal paidPrice) {
+        this.paidPrice = paidPrice;
+    }
+
     public Ticket(LocalDate dateOfPurchase, Projection projection) {
         this.dateOfPurchase = dateOfPurchase;
         this.projection = projection;
+        this.unitPrice = projection.getPrice();
     }
 
     public Ticket() {}
@@ -37,6 +57,7 @@ public class Ticket {
         this.id = id;
         this.dateOfPurchase = dateOfPurchase;
         this.projection = projection;
+        this.unitPrice = projection.getPrice();
     }
 
     public int getId() {
@@ -61,6 +82,7 @@ public class Ticket {
 
     public void setProjection(final Projection projection) {
         this.projection = projection;
+        this.unitPrice = projection.getPrice();
     }
 
     @Override

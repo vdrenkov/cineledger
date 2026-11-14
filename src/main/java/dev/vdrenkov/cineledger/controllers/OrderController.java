@@ -61,6 +61,11 @@ public class OrderController {
         return ResponseEntity.created(location).build();
     }
 
+    @GetMapping(URIConstants.ORDERS_ID_PATH)
+    public ResponseEntity<OrderDto> getOrderById(@PathVariable final int id) {
+        return ResponseEntity.ok(orderService.getOrderById(id));
+    }
+
     @GetMapping(URIConstants.USERS_ID_ORDERS_PATH)
     public ResponseEntity<List<OrderDto>> getOrdersByUserId(@PathVariable int id) {
         final List<OrderDto> orderDtos = orderService.getOrdersByUserId(id);

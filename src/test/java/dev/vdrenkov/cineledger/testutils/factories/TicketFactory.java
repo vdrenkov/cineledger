@@ -1,5 +1,10 @@
 package dev.vdrenkov.cineledger.testutils.factories;
 
+import static dev.vdrenkov.cineledger.testutils.constants.TicketConstants.DATE_OF_PURCHASE;
+import static dev.vdrenkov.cineledger.testutils.constants.TicketConstants.ID;
+import static dev.vdrenkov.cineledger.testutils.factories.ProjectionFactory.getDefaultProjection;
+import static dev.vdrenkov.cineledger.testutils.factories.ProjectionFactory.getDefaultProjectionDto;
+
 import dev.vdrenkov.cineledger.models.dtos.TicketDto;
 import dev.vdrenkov.cineledger.models.entities.Ticket;
 import dev.vdrenkov.cineledger.models.requests.TicketRequest;
@@ -7,11 +12,6 @@ import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
 
 import java.util.Collections;
 import java.util.List;
-
-import static dev.vdrenkov.cineledger.testutils.constants.TicketConstants.DATE_OF_PURCHASE;
-import static dev.vdrenkov.cineledger.testutils.constants.TicketConstants.ID;
-import static dev.vdrenkov.cineledger.testutils.factories.ProjectionFactory.getDefaultProjection;
-import static dev.vdrenkov.cineledger.testutils.factories.ProjectionFactory.getDefaultProjectionDto;
 
 public final class TicketFactory {
 
@@ -32,7 +32,12 @@ public final class TicketFactory {
     }
 
     public static TicketDto getDefaultTicketDto() {
-        return new TicketDto(ID, DATE_OF_PURCHASE, getDefaultProjectionDto());
+        return new TicketDto(
+                ID,
+                DATE_OF_PURCHASE,
+                getDefaultProjectionDto(),
+                getDefaultProjection().getPrice(),
+                null);
     }
 
     public static List<TicketDto> getDefaultTicketDtoList() {

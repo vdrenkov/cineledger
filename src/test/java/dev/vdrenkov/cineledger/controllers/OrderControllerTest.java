@@ -110,9 +110,16 @@ class OrderControllerTest {
                 .andExpect(
                         jsonPath("$[0].items[0]")
                                 .value(
-                                        objectMapper.convertValue(
-                                                orderDto.items().getFirst(), java.util.Map.class)))
-                .andExpect(jsonPath("$[0].totalPrice").value(orderDto.totalPrice()));
+                                        objectMapper.readValue(
+                                                objectMapper.writeValueAsString(
+                                                        orderDto.items().getFirst()),
+                                                java.util.Map.class)))
+                .andExpect(
+                        jsonPath("$[0].totalPrice")
+                                .value(
+                                        org.hamcrest.Matchers.comparesEqualTo(
+                                                orderDto.totalPrice()),
+                                        java.math.BigDecimal.class));
     }
 
     @Test
@@ -138,9 +145,16 @@ class OrderControllerTest {
                 .andExpect(
                         jsonPath("$.items[0]")
                                 .value(
-                                        objectMapper.convertValue(
-                                                orderDto.items().getFirst(), java.util.Map.class)))
-                .andExpect(jsonPath("$.totalPrice").value(orderDto.totalPrice()));
+                                        objectMapper.readValue(
+                                                objectMapper.writeValueAsString(
+                                                        orderDto.items().getFirst()),
+                                                java.util.Map.class)))
+                .andExpect(
+                        jsonPath("$.totalPrice")
+                                .value(
+                                        org.hamcrest.Matchers.comparesEqualTo(
+                                                orderDto.totalPrice()),
+                                        java.math.BigDecimal.class));
     }
 
     @Test
@@ -176,9 +190,16 @@ class OrderControllerTest {
                 .andExpect(
                         jsonPath("$.items[0]")
                                 .value(
-                                        objectMapper.convertValue(
-                                                orderDto.items().getFirst(), java.util.Map.class)))
-                .andExpect(jsonPath("$.totalPrice").value(orderDto.totalPrice()));
+                                        objectMapper.readValue(
+                                                objectMapper.writeValueAsString(
+                                                        orderDto.items().getFirst()),
+                                                java.util.Map.class)))
+                .andExpect(
+                        jsonPath("$.totalPrice")
+                                .value(
+                                        org.hamcrest.Matchers.comparesEqualTo(
+                                                orderDto.totalPrice()),
+                                        java.math.BigDecimal.class));
     }
 
     @Test

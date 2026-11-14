@@ -1,138 +1,77 @@
 package dev.vdrenkov.cineledger.services;
 
-import dev.vdrenkov.cineledger.models.dtos.ItemDto;
-import dev.vdrenkov.cineledger.models.entities.Cinema;
-import dev.vdrenkov.cineledger.models.entities.Hall;
-import dev.vdrenkov.cineledger.models.entities.Movie;
-import dev.vdrenkov.cineledger.models.entities.Order;
-import dev.vdrenkov.cineledger.models.entities.User;
-import dev.vdrenkov.cineledger.testutils.constants.ItemConstants;
-import dev.vdrenkov.cineledger.testutils.constants.OrderConstants;
-import dev.vdrenkov.cineledger.testutils.constants.ProjectionConstants;
-import dev.vdrenkov.cineledger.testutils.constants.ReportConstants;
-import dev.vdrenkov.cineledger.testutils.factories.OrderFactory;
-import dev.vdrenkov.cineledger.testutils.factories.TicketFactory;
-import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import dev.vdrenkov.cineledger.exceptions.*;
+import dev.vdrenkov.cineledger.repositories.*;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.when;
+import java.time.LocalDate;
 
 @ExtendWith(MockitoExtension.class)
 class IncomeReportServiceTest {
-
-    @Mock
-    private OrderService orderService;
-
-    @Mock
-    private TicketService ticketService;
-
-    @Mock
-    private CinemaService cinemaService;
-
-    @Mock
-    private HallService hallService;
-
-    @Mock
-    private ItemService itemService;
-
-    @Mock
-    private MovieService movieService;
-
-    @Mock
-    private UserService userService;
-
-    @InjectMocks
-    private IncomeReportService incomeReportService;
+    private static final LocalDate START = LocalDate.of(2026, 1, 1);
+    private static final LocalDate END = LocalDate.of(2026, 12, 31);
+    @Mock private CinemaRepository cinemaRepository;
+    @Mock private HallRepository hallRepository;
+    @Mock private ItemRepository itemRepository;
+    @Mock private MovieRepository movieRepository;
+    @Mock private UserRepository userRepository;
+    @Mock private OrderRepository orderRepository;
+    @Mock private TicketRepository ticketRepository;
+    @Mock private OrderItemRepository orderItemRepository;
+    @InjectMocks private IncomeReportService reportService;
 
     @Test
-    void testGetAllIncomesByCinemaId_doubleReturned_success() {
-        when(cinemaService.getCinemaById(anyInt())).thenReturn(new Cinema());
-        when(orderService.getOrdersByDateBetween(any(), any())).thenReturn(OrderFactory.getDefaultOrderList());
-
-        double result = incomeReportService.getAllIncomesByCinemaId(ReportConstants.ID, ReportConstants.START_DATE,
-            ReportConstants.END_DATE);
-
-        Assertions.assertEquals(OrderConstants.TOTAL_PRICE, result, 0.0);
+    void income_reversedDates_rejectsBeforeDatabaseAccess() {
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> reportService.getAllIncomesByUserId(1, END, START));
+        verifyNoInteractions(userRepository, orderRepository);
     }
 
     @Test
-    void testGetAllIncomesByCinemaId_cinemaIdDifferent_returnsZero() {
-        final List<Order> orders = OrderFactory.getDefaultOrderList();
-        orders.getFirst().getTickets().getFirst().getProjection().getHall().getCinema().setId(0);
-
-        when(cinemaService.getCinemaById(anyInt())).thenReturn(new Cinema());
-        when(orderService.getOrdersByDateBetween(any(), any())).thenReturn(orders);
-
-        double result = incomeReportService.getAllIncomesByCinemaId(ReportConstants.ID, ReportConstants.START_DATE,
-            ReportConstants.END_DATE);
-
-        assertEquals(0, result, 0.0);
+    void cinemaIncome_missingCinema_returnsNotFound() {
+        assertThrows(
+                CinemaNotFoundException.class,
+                () -> reportService.getAllIncomesByCinemaId(1, START, END));
+        verifyNoInteractions(ticketRepository);
     }
 
     @Test
-    void testGetAllIncomesByHallId_doubleReturned_success() {
-        when(hallService.getHallById(anyInt())).thenReturn(new Hall());
-        when(orderService.getOrdersByDateBetween(any(), any())).thenReturn(OrderFactory.getDefaultOrderList());
-
-        double result = incomeReportService.getAllIncomesByHallId(ReportConstants.ID, ReportConstants.START_DATE,
-            ReportConstants.END_DATE);
-
-        Assertions.assertEquals(OrderConstants.TOTAL_PRICE, result, 0.0);
+    void hallIncome_missingHall_returnsNotFound() {
+        assertThrows(
+                HallNotFoundException.class,
+                () -> reportService.getAllIncomesByHallId(1, START, END));
+        verifyNoInteractions(ticketRepository);
     }
 
     @Test
-    void testGetAllIncomesByHallId_hallIdDifferent_returnsZero() {
-        final List<Order> orders = OrderFactory.getDefaultOrderList();
-        orders.getFirst().getTickets().getFirst().getProjection().getHall().setId(0);
-
-        when(hallService.getHallById(anyInt())).thenReturn(new Hall());
-        when(orderService.getOrdersByDateBetween(any(), any())).thenReturn(orders);
-
-        double result = incomeReportService.getAllIncomesByHallId(ReportConstants.ID, ReportConstants.START_DATE,
-            ReportConstants.END_DATE);
-
-        assertEquals(0, result, 0.0);
+    void itemIncome_missingItem_returnsNotFound() {
+        assertThrows(
+                ItemNotFoundException.class,
+                () -> reportService.getAllIncomesByItemId(1, START, END));
+        verifyNoInteractions(orderItemRepository);
     }
 
     @Test
-    void testGetAllIncomesByItemId_doubleReturned_success() {
-        when(itemService.getItemDtoById(anyInt())).thenReturn(new ItemDto(0, null, null, 0));
-        when(orderService.getOrdersByDateBetween(any(), any())).thenReturn(OrderFactory.getDefaultOrderList());
-
-        double result = incomeReportService.getAllIncomesByItemId(ReportConstants.ID, ReportConstants.START_DATE,
-            ReportConstants.END_DATE);
-
-        Assertions.assertEquals(ItemConstants.PRICE, result, 0.0);
+    void movieIncome_missingMovie_returnsNotFound() {
+        assertThrows(
+                MovieNotFoundException.class,
+                () -> reportService.getAllIncomesByMovieId(1, START, END));
+        verifyNoInteractions(ticketRepository);
     }
 
     @Test
-    void testGetAllIncomesByMovieId_doubleReturned_success() {
-        when(movieService.getMovieById(anyInt())).thenReturn(new Movie());
-        when(ticketService.getTicketsByDateBetween(any(), any())).thenReturn(TicketFactory.getDefaultTicketList());
-
-        double result = incomeReportService.getAllIncomesByMovieId(ReportConstants.ID, ReportConstants.START_DATE,
-            ReportConstants.END_DATE);
-
-        Assertions.assertEquals(ProjectionConstants.PRICE, result, 0.0);
-    }
-
-    @Test
-    void testGetAllIncomesByUserId_doubleReturned_success() {
-        when(userService.getUserById(anyInt())).thenReturn(new User());
-        when(orderService.getOrdersByDateBetween(any(), any())).thenReturn(OrderFactory.getDefaultOrderList());
-
-        double result = incomeReportService.getAllIncomesByUserId(ReportConstants.ID, ReportConstants.START_DATE,
-            ReportConstants.END_DATE);
-
-        Assertions.assertEquals(OrderConstants.TOTAL_PRICE, result, 0.0);
+    void customerIncome_missingCustomer_returnsNotFound() {
+        assertThrows(
+                UserNotFoundException.class,
+                () -> reportService.getAllIncomesByUserId(1, START, END));
+        verifyNoInteractions(orderRepository);
     }
 }

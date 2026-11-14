@@ -1,5 +1,12 @@
 package dev.vdrenkov.cineledger.services;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
+
 import dev.vdrenkov.cineledger.exceptions.DiscountAlreadyExistsException;
 import dev.vdrenkov.cineledger.exceptions.DiscountNotFoundException;
 import dev.vdrenkov.cineledger.exceptions.DiscountNotValidException;
@@ -8,9 +15,9 @@ import dev.vdrenkov.cineledger.models.entities.Discount;
 import dev.vdrenkov.cineledger.models.requests.DiscountRequest;
 import dev.vdrenkov.cineledger.repositories.DiscountRepository;
 import dev.vdrenkov.cineledger.testutils.constants.DiscountConstants;
-import dev.vdrenkov.cineledger.testutils.constants.OrderConstants;
 import dev.vdrenkov.cineledger.testutils.factories.DiscountFactory;
 import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -20,22 +27,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
 class DiscountServiceTest {
     final DiscountRequest discountRequest = DiscountFactory.getDefaultDiscountRequest();
 
-    @Mock
-    private DiscountRepository discountRepository;
+    @Mock private DiscountRepository discountRepository;
 
-    @InjectMocks
-    private DiscountService discountService;
+    @InjectMocks private DiscountService discountService;
 
     @Test
     void testAddDiscount_noExceptions_success() {
@@ -51,7 +49,9 @@ class DiscountServiceTest {
     void testAddDiscount_discountAlreadyExists_throwsDiscountAlreadyExistsException() {
         when(discountRepository.existsByType(any())).thenReturn(true);
 
-        assertThrows(DiscountAlreadyExistsException.class, () -> discountService.addDiscount(discountRequest));
+        assertThrows(
+                DiscountAlreadyExistsException.class,
+                () -> discountService.addDiscount(discountRequest));
     }
 
     @Test
@@ -86,7 +86,9 @@ class DiscountServiceTest {
 
     @Test
     void testGetDiscountById_discountNotFound_throwsDiscountNotFoundException() {
-        assertThrows(DiscountNotFoundException.class, () -> discountService.getDiscountById(DiscountConstants.ID));
+        assertThrows(
+                DiscountNotFoundException.class,
+                () -> discountService.getDiscountById(DiscountConstants.ID));
     }
 
     @Test
@@ -103,7 +105,9 @@ class DiscountServiceTest {
     void testGetDiscountByType_discountNotFound_throwDiscountNotFoundException() {
         when(discountRepository.findByType(anyString())).thenReturn(Optional.empty());
 
-        assertThrows(DiscountNotFoundException.class, () -> discountService.getDiscountByType(DiscountConstants.TYPE));
+        assertThrows(
+                DiscountNotFoundException.class,
+                () -> discountService.getDiscountByType(DiscountConstants.TYPE));
     }
 
     @Test
@@ -120,15 +124,19 @@ class DiscountServiceTest {
     void testGetDiscountByCode_discountNotFound_throwDiscountNotFoundException() {
         when(discountRepository.findByCode(anyString())).thenReturn(Optional.empty());
 
-        assertThrows(DiscountNotFoundException.class, () -> discountService.getDiscountByCode(DiscountConstants.CODE));
+        assertThrows(
+                DiscountNotFoundException.class,
+                () -> discountService.getDiscountByCode(DiscountConstants.CODE));
     }
 
     @Test
     void testGetDiscountDtoByType_discountFound_success() {
         final DiscountDto expected = DiscountFactory.getDefaultDiscountDto();
-        when(discountRepository.findByType(anyString())).thenReturn(Optional.of(DiscountFactory.getDefaultDiscount()));
+        when(discountRepository.findByType(anyString()))
+                .thenReturn(Optional.of(DiscountFactory.getDefaultDiscount()));
 
-        final DiscountDto discountDto = discountService.getDiscountDtoByType(DiscountConstants.TYPE);
+        final DiscountDto discountDto =
+                discountService.getDiscountDtoByType(DiscountConstants.TYPE);
 
         assertEquals(expected, discountDto);
     }
@@ -136,10 +144,12 @@ class DiscountServiceTest {
     @Test
     void testUpdateDiscount_discountUpdated_success() {
         final DiscountDto expected = DiscountFactory.getDefaultDiscountDto();
-        when(discountRepository.findById(anyInt())).thenReturn(Optional.of(DiscountFactory.getDefaultDiscount()));
+        when(discountRepository.findById(anyInt()))
+                .thenReturn(Optional.of(DiscountFactory.getDefaultDiscount()));
         when(discountRepository.save(any())).thenReturn(DiscountFactory.getDefaultDiscount());
 
-        final DiscountDto discountDto = discountService.updateDiscount(discountRequest, DiscountConstants.ID);
+        final DiscountDto discountDto =
+                discountService.updateDiscount(discountRequest, DiscountConstants.ID);
 
         assertEquals(expected, discountDto);
     }
@@ -147,7 +157,8 @@ class DiscountServiceTest {
     @Test
     void testDeleteDiscount_discountDeleted_success() {
         final DiscountDto expected = DiscountFactory.getDefaultDiscountDto();
-        when(discountRepository.findById(anyInt())).thenReturn(Optional.of(DiscountFactory.getDefaultDiscount()));
+        when(discountRepository.findById(anyInt()))
+                .thenReturn(Optional.of(DiscountFactory.getDefaultDiscount()));
 
         final DiscountDto discountDto = discountService.deleteDiscount(DiscountConstants.ID);
 
@@ -156,21 +167,23 @@ class DiscountServiceTest {
 
     @Test
     void testApplyDiscount_success() {
-        final double expected = 90;
+        final int expected = 10;
         final Discount discount = DiscountFactory.getDefaultDiscount();
         when(discountRepository.findByCode(anyString())).thenReturn(Optional.of(discount));
 
-        final double result = discountService.applyDiscount(OrderConstants.TOTAL_PRICE, DiscountConstants.CODE);
+        final int result = discountService.getDiscountPercentage(DiscountConstants.CODE);
 
-        assertEquals(expected, result, 0.0);
+        assertEquals(expected, result);
     }
 
     @Test
     void testApplyDiscount_invalidCode_throwsDiscountNotValidException() {
         when(discountRepository.findByCode(anyString())).thenReturn(Optional.empty());
 
-        final DiscountNotValidException exception = assertThrows(DiscountNotValidException.class,
-            () -> discountService.applyDiscount(OrderConstants.TOTAL_PRICE, DiscountConstants.CODE));
+        final DiscountNotValidException exception =
+                assertThrows(
+                        DiscountNotValidException.class,
+                        () -> discountService.getDiscountPercentage(DiscountConstants.CODE));
 
         assertEquals(ExceptionMessages.DISCOUNT_CODE_NOT_VALID_MESSAGE, exception.getMessage());
     }

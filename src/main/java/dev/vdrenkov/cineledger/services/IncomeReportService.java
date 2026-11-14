@@ -1,163 +1,105 @@
 package dev.vdrenkov.cineledger.services;
 
-import dev.vdrenkov.cineledger.models.entities.Item;
-import dev.vdrenkov.cineledger.models.entities.Order;
-import dev.vdrenkov.cineledger.models.entities.Ticket;
-import org.springframework.stereotype.Service;
+import dev.vdrenkov.cineledger.exceptions.*;
+import dev.vdrenkov.cineledger.repositories.*;
+import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
 
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 public class IncomeReportService {
+    private final CinemaRepository cinemaRepository;
+    private final HallRepository hallRepository;
+    private final ItemRepository itemRepository;
+    private final MovieRepository movieRepository;
+    private final UserRepository userRepository;
+    private final OrderRepository orderRepository;
+    private final TicketRepository ticketRepository;
+    private final OrderItemRepository orderItemRepository;
 
-    private final CinemaService cinemaService;
-    private final HallService hallService;
-    private final ItemService itemService;
-    private final MovieService movieService;
-    private final UserService userService;
-    private final OrderService orderService;
-    private final TicketService ticketService;
-
-    public IncomeReportService(CinemaService cinemaService, HallService hallService, ItemService itemService,
-        MovieService movieService, UserService userService, OrderService orderService, TicketService ticketService) {
-        this.cinemaService = cinemaService;
-        this.hallService = hallService;
-        this.itemService = itemService;
-        this.movieService = movieService;
-        this.userService = userService;
-        this.orderService = orderService;
-        this.ticketService = ticketService;
+    public IncomeReportService(
+            final CinemaRepository cinemaRepository,
+            final HallRepository hallRepository,
+            final ItemRepository itemRepository,
+            final MovieRepository movieRepository,
+            final UserRepository userRepository,
+            final OrderRepository orderRepository,
+            final TicketRepository ticketRepository,
+            final OrderItemRepository orderItemRepository) {
+        this.cinemaRepository = cinemaRepository;
+        this.hallRepository = hallRepository;
+        this.itemRepository = itemRepository;
+        this.movieRepository = movieRepository;
+        this.userRepository = userRepository;
+        this.orderRepository = orderRepository;
+        this.ticketRepository = ticketRepository;
+        this.orderItemRepository = orderItemRepository;
     }
 
-    public double getAllIncomesByCinemaId(int id, LocalDate startDate, LocalDate endDate) {
-        double incomes = 0;
+    public BigDecimal getAllIncomesByCinemaId(
+            final int id, final LocalDate startDate, final LocalDate endDate) {
+        requireValidPeriod(startDate, endDate);
 
-        cinemaService.getCinemaById(id);
-
-        final List<Order> allOrders = orderService.getOrdersByDateBetween(startDate, endDate);
-
-        for (Order order : allOrders) {
-            if (isOrderWithinDateRange(order, startDate, endDate) && isOrderFromCinema(order, id)) {
-                incomes += order.getTotalPrice();
-            }
+        if (!cinemaRepository.existsById(id)) {
+            throw new CinemaNotFoundException(ExceptionMessages.CINEMA_NOT_FOUND_MESSAGE);
         }
 
-        return incomes;
+        return ticketRepository.incomeByCinemaId(id, startDate, endDate);
     }
 
-    public double getAllIncomesByHallId(int id, LocalDate startDate, LocalDate endDate) {
-        double incomes = 0;
+    public BigDecimal getAllIncomesByHallId(
+            final int id, final LocalDate startDate, final LocalDate endDate) {
+        requireValidPeriod(startDate, endDate);
 
-        hallService.getHallById(id);
-
-        final List<Order> allOrders = orderService.getOrdersByDateBetween(startDate, endDate);
-
-        for (Order order : allOrders) {
-            if (isOrderWithinDateRange(order, startDate, endDate) && isOrderFromHall(order, id)) {
-                incomes += order.getTotalPrice();
-            }
+        if (!hallRepository.existsById(id)) {
+            throw new HallNotFoundException(ExceptionMessages.HALL_NOT_FOUND_MESSAGE);
         }
 
-        return incomes;
+        return ticketRepository.incomeByHallId(id, startDate, endDate);
     }
 
-    public double getAllIncomesByItemId(int id, LocalDate startDate, LocalDate endDate) {
-        double incomes = 0;
+    public BigDecimal getAllIncomesByItemId(
+            final int id, final LocalDate startDate, final LocalDate endDate) {
+        requireValidPeriod(startDate, endDate);
 
-        itemService.getItemDtoById(id);
-
-        final List<Order> allOrders = orderService.getOrdersByDateBetween(startDate, endDate);
-
-        for (Order order : allOrders) {
-            if (isOrderWithinDateRange(order, startDate, endDate)) {
-                for (Item item : order.getItems()) {
-                    if (id == item.getId()) {
-                        incomes += item.getPrice();
-                    }
-                }
-            }
+        if (!itemRepository.existsById(id)) {
+            throw new ItemNotFoundException(ExceptionMessages.ITEM_NOT_FOUND_MESSAGE);
         }
 
-        return incomes;
+        return orderItemRepository.incomeByItemId(id, startDate, endDate);
     }
 
-    public double getAllIncomesByMovieId(int id, LocalDate startDate, LocalDate endDate) {
-        double incomes = 0;
+    public BigDecimal getAllIncomesByMovieId(
+            final int id, final LocalDate startDate, final LocalDate endDate) {
+        requireValidPeriod(startDate, endDate);
 
-        movieService.getMovieById(id);
-
-        final List<Ticket> allTickets = ticketService.getTicketsByDateBetween(startDate, endDate);
-
-        for (Ticket ticket : allTickets) {
-            if (isTicketWithinDateRange(ticket, startDate, endDate) && isTicketForMovie(ticket, id)) {
-                incomes += ticket.getProjection().getPrice();
-            }
+        if (!movieRepository.existsById(id)) {
+            throw new MovieNotFoundException(ExceptionMessages.MOVIE_NOT_FOUND_MESSAGE);
         }
 
-        return incomes;
+        return ticketRepository.incomeByMovieId(id, startDate, endDate);
     }
 
-    public double getAllIncomesByUserId(int id, LocalDate startDate, LocalDate endDate) {
-        double incomes = 0;
+    public BigDecimal getAllIncomesByUserId(
+            final int id, final LocalDate startDate, final LocalDate endDate) {
+        requireValidPeriod(startDate, endDate);
 
-        userService.getUserById(id);
-
-        final List<Order> allOrders = orderService.getOrdersByDateBetween(startDate, endDate);
-
-        for (Order order : allOrders) {
-            if (isOrderWithinDateRange(order, startDate, endDate) && isOrderFromUser(order, id)) {
-                incomes += order.getTotalPrice();
-            }
+        if (!userRepository.existsById(id)) {
+            throw new UserNotFoundException(ExceptionMessages.USER_NOT_FOUND_MESSAGE);
         }
 
-        return incomes;
+        return orderRepository.incomeByUserId(id, startDate, endDate);
     }
 
-    private static boolean isOrderFromCinema(Order order, int cinemaId) {
-        final List<Ticket> tickets = order.getTickets();
+    private static void requireValidPeriod(final LocalDate startDate, final LocalDate endDate) {
 
-        for (Ticket ticket : tickets) {
-            if (cinemaId == ticket.getProjection().getHall().getCinema().getId()) {
-
-                return true;
-            }
+        if (startDate.isAfter(endDate)) {
+            throw new IllegalArgumentException("Start date must not follow end date");
         }
-
-        return false;
-    }
-
-    private static boolean isOrderFromHall(Order order, int hallId) {
-        final List<Ticket> tickets = order.getTickets();
-
-        for (Ticket ticket : tickets) {
-            if (hallId == ticket.getProjection().getHall().getId()) {
-
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private static boolean isTicketForMovie(Ticket ticket, int movieId) {
-        return movieId == ticket.getProjection().getMovie().getId();
-    }
-
-    private static boolean isOrderFromUser(Order order, int userId) {
-        return userId == order.getUser().getId();
-    }
-
-    private static boolean isTicketWithinDateRange(Ticket ticket, LocalDate startDate, LocalDate endDate) {
-        final LocalDate ticketDate = ticket.getDateOfPurchase();
-
-        return ticketDate.isEqual(startDate) || ticketDate.isEqual(endDate) || (ticketDate.isAfter(startDate)
-            && ticketDate.isBefore(endDate));
-    }
-
-    private static boolean isOrderWithinDateRange(Order order, LocalDate startDate, LocalDate endDate) {
-        final LocalDate orderDate = order.getDateOfPurchase();
-
-        return orderDate.isEqual(startDate) || (orderDate.isAfter(startDate) && orderDate.isBefore(endDate));
     }
 }

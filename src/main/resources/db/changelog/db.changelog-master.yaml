@@ -33,3 +33,10 @@ databaseChangeLog:
         - sqlFile:
             path: db/changelog/changes/004-booking-integrity.sql
             relativeToChangelogFile: false
+  - changeSet:
+      id: 005-purchase-price-snapshots
+      author: vdrenkov
+      changes:
+        - sqlFile:
+            path: db/changelog/changes/005-purchase-price-snapshots.sql
+            relativeToChangelogFile: false

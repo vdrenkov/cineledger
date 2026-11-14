@@ -1,9 +1,22 @@
 package dev.vdrenkov.cineledger.controllers;
 
+import static dev.vdrenkov.cineledger.testutils.constants.MovieConstants.ID;
+import static dev.vdrenkov.cineledger.testutils.constants.ReportConstants.END_DATE;
+import static dev.vdrenkov.cineledger.testutils.constants.ReportConstants.START_DATE;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import dev.vdrenkov.cineledger.services.StatisticsReportService;
 import dev.vdrenkov.cineledger.testutils.constants.ItemConstants;
 import dev.vdrenkov.cineledger.testutils.constants.MovieConstants;
 import dev.vdrenkov.cineledger.utils.constants.URIConstants;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,26 +27,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static dev.vdrenkov.cineledger.testutils.constants.MovieConstants.ID;
-import static dev.vdrenkov.cineledger.testutils.constants.ReportConstants.END_DATE;
-import static dev.vdrenkov.cineledger.testutils.constants.ReportConstants.START_DATE;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 @ExtendWith(MockitoExtension.class)
 class StatisticsReportControllerTest {
     private MockMvc mockMvc;
 
-    @Mock
-    private StatisticsReportService statisticsReportService;
+    @Mock private StatisticsReportService statisticsReportService;
 
-    @InjectMocks
-    private StatisticsReportController statisticsReportController;
+    @InjectMocks private StatisticsReportController statisticsReportController;
 
     @BeforeEach
     void setUp() {
@@ -42,41 +42,44 @@ class StatisticsReportControllerTest {
 
     @Test
     void testGetPurchasedTicketsCountByMovieCategory_integerReturned_success() throws Exception {
-        when(statisticsReportService.getPurchasedTicketsCountByMovieCategory(anyInt(), any(), any())).thenReturn(1000);
+        when(statisticsReportService.getPurchasedTicketsCountByMovieCategory(
+                        anyInt(), any(), any()))
+                .thenReturn(1000L);
 
-        mockMvc
-            .perform(get(URIConstants.REPORTS_MOVIES_CATEGORIES_ID_TICKETS_COUNT_PATH, ID)
-                .queryParam("startDate", String.valueOf(START_DATE))
-                .queryParam("endDate", String.valueOf(END_DATE)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$").value(1000));
+        mockMvc.perform(
+                        get(URIConstants.REPORTS_MOVIES_CATEGORIES_ID_TICKETS_COUNT_PATH, ID)
+                                .queryParam("startDate", String.valueOf(START_DATE))
+                                .queryParam("endDate", String.valueOf(END_DATE)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").value(1000));
     }
 
     @Test
     void testGetPurchasedTicketsCountByMovieTitle_integerReturned_success() throws Exception {
-        when(statisticsReportService.getPurchasedTicketsCountByMovieTitle(anyString(), any(), any())).thenReturn(10);
+        when(statisticsReportService.getPurchasedTicketsCountByMovieTitle(
+                        anyString(), any(), any()))
+                .thenReturn(10L);
 
-        mockMvc
-            .perform(MockMvcRequestBuilders
-                .get(URIConstants.REPORTS_MOVIES_TICKETS_COUNT_PATH)
-                .queryParam("title", MovieConstants.TITLE)
-                .queryParam("startDate", String.valueOf(START_DATE))
-                .queryParam("endDate", String.valueOf(END_DATE)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$").value(10));
+        mockMvc.perform(
+                        MockMvcRequestBuilders.get(URIConstants.REPORTS_MOVIES_TICKETS_COUNT_PATH)
+                                .queryParam("title", MovieConstants.TITLE)
+                                .queryParam("startDate", String.valueOf(START_DATE))
+                                .queryParam("endDate", String.valueOf(END_DATE)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").value(10));
     }
 
     @Test
     void testGetPurchasedItemsCountByItemName_integerReturned_success() throws Exception {
-        when(statisticsReportService.getPurchasedItemsCountByItemName(anyString(), any(), any())).thenReturn(10);
+        when(statisticsReportService.getPurchasedItemsCountByItemName(anyString(), any(), any()))
+                .thenReturn(10L);
 
-        mockMvc
-            .perform(MockMvcRequestBuilders
-                .get(URIConstants.REPORTS_ITEMS_ITEMS_COUNT_PATH)
-                .queryParam("name", ItemConstants.NAME)
-                .queryParam("startDate", String.valueOf(START_DATE))
-                .queryParam("endDate", String.valueOf(END_DATE)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$").value(10));
+        mockMvc.perform(
+                        MockMvcRequestBuilders.get(URIConstants.REPORTS_ITEMS_ITEMS_COUNT_PATH)
+                                .queryParam("name", ItemConstants.NAME)
+                                .queryParam("startDate", String.valueOf(START_DATE))
+                                .queryParam("endDate", String.valueOf(END_DATE)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").value(10));
     }
 }

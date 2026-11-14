@@ -9,8 +9,8 @@ import dev.vdrenkov.cineledger.models.entities.Discount;
 import dev.vdrenkov.cineledger.models.requests.DiscountRequest;
 import dev.vdrenkov.cineledger.repositories.DiscountRepository;
 import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
+
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -24,12 +24,15 @@ public class DiscountService {
     }
 
     public Discount addDiscount(DiscountRequest request) {
-        if (discountRepository.existsByType(request.type()) || discountRepository.existsByCode(request.code())) {
+        if (discountRepository.existsByType(request.type())
+                || discountRepository.existsByCode(request.code())) {
 
-            throw new DiscountAlreadyExistsException(ExceptionMessages.DISCOUNT_ALREADY_EXISTS_MESSAGE);
+            throw new DiscountAlreadyExistsException(
+                    ExceptionMessages.DISCOUNT_ALREADY_EXISTS_MESSAGE);
         }
 
-        return discountRepository.save(new Discount(request.type(), request.code(), request.percentage()));
+        return discountRepository.save(
+                new Discount(request.type(), request.code(), request.percentage()));
     }
 
     public List<Discount> getAllDiscounts() {
@@ -44,26 +47,32 @@ public class DiscountService {
 
     public Discount getDiscountById(int id) {
 
-        return discountRepository.findById(id).orElseThrow(() -> {
-
-            return new DiscountNotFoundException(ExceptionMessages.DISCOUNT_NOT_FOUND_MESSAGE);
-        });
+        return discountRepository
+                .findById(id)
+                .orElseThrow(() -> {
+                    return new DiscountNotFoundException(
+                            ExceptionMessages.DISCOUNT_NOT_FOUND_MESSAGE);
+                });
     }
 
     public Discount getDiscountByCode(String code) {
 
-        return discountRepository.findByCode(code).orElseThrow(() -> {
-
-            return new DiscountNotFoundException(ExceptionMessages.DISCOUNT_NOT_FOUND_MESSAGE);
-        });
+        return discountRepository
+                .findByCode(code)
+                .orElseThrow(() -> {
+                    return new DiscountNotFoundException(
+                            ExceptionMessages.DISCOUNT_NOT_FOUND_MESSAGE);
+                });
     }
 
     public Discount getDiscountByType(String type) {
 
-        return discountRepository.findByType(type).orElseThrow(() -> {
-
-            return new DiscountNotFoundException(ExceptionMessages.DISCOUNT_NOT_FOUND_MESSAGE);
-        });
+        return discountRepository
+                .findByType(type)
+                .orElseThrow(() -> {
+                    return new DiscountNotFoundException(
+                            ExceptionMessages.DISCOUNT_NOT_FOUND_MESSAGE);
+                });
     }
 
     public DiscountDto getDiscountDtoByType(String type) {
@@ -74,7 +83,8 @@ public class DiscountService {
     public DiscountDto updateDiscount(DiscountRequest request, int id) {
         final DiscountDto discount = DiscountMapper.mapDiscountToDiscountDto(getDiscountById(id));
 
-        discountRepository.save(new Discount(id, request.type(), request.code(), request.percentage()));
+        discountRepository.save(
+                new Discount(id, request.type(), request.code(), request.percentage()));
 
         return discount;
     }
@@ -87,17 +97,17 @@ public class DiscountService {
         return DiscountMapper.mapDiscountToDiscountDto(discount);
     }
 
-    public double applyDiscount(double totalPrice, String discountCode) {
-        if (!StringUtils.hasText(discountCode)) {
+    public int getDiscountPercentage(final String code) {
 
-            throw new DiscountNotValidException(ExceptionMessages.DISCOUNT_CODE_NOT_VALID_MESSAGE);
+        if (code == null || code.isBlank()) {
+            return 0;
         }
 
-        final Discount discount = discountRepository.findByCode(discountCode).orElseThrow(() -> {
-
-            return new DiscountNotValidException(ExceptionMessages.DISCOUNT_CODE_NOT_VALID_MESSAGE);
-        });
-
-        return totalPrice - (totalPrice * discount.getPercentage() / 100);
+        return discountRepository
+                .findByCode(code)
+                .orElseThrow(() ->
+                        new DiscountNotValidException(
+                                ExceptionMessages.DISCOUNT_CODE_NOT_VALID_MESSAGE))
+                .getPercentage();
     }
 }

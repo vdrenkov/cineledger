@@ -1,80 +1,55 @@
 package dev.vdrenkov.cineledger.services;
 
-import dev.vdrenkov.cineledger.models.dtos.ItemDto;
-import dev.vdrenkov.cineledger.models.entities.Category;
-import dev.vdrenkov.cineledger.testutils.constants.ItemConstants;
-import dev.vdrenkov.cineledger.testutils.constants.MovieConstants;
-import dev.vdrenkov.cineledger.testutils.constants.ReportConstants;
-import dev.vdrenkov.cineledger.testutils.factories.OrderFactory;
-import dev.vdrenkov.cineledger.testutils.factories.TicketFactory;
-import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import dev.vdrenkov.cineledger.exceptions.*;
+import dev.vdrenkov.cineledger.repositories.*;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Arrays;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
+import java.time.LocalDate;
 
 @ExtendWith(MockitoExtension.class)
 class StatisticsReportServiceTest {
-
-    @Mock
-    private CategoryService categoryService;
-
-    @Mock
-    private TicketService ticketService;
-
-    @Mock
-    private MovieService movieService;
-
-    @Mock
-    private ItemService itemService;
-
-    @Mock
-    private OrderService orderService;
-
-    @InjectMocks
-    private StatisticsReportService statisticsReportService;
+    private static final LocalDate START = LocalDate.of(2026, 1, 1);
+    private static final LocalDate END = LocalDate.of(2026, 12, 31);
+    @Mock private CategoryRepository categoryRepository;
+    @Mock private MovieRepository movieRepository;
+    @Mock private ItemRepository itemRepository;
+    @Mock private TicketRepository ticketRepository;
+    @Mock private OrderItemRepository orderItemRepository;
+    @InjectMocks private StatisticsReportService reportService;
 
     @Test
-    void testGetPurchasedTicketsCountByMovieCategory_success() {
-        when(categoryService.getCategoryById(anyInt())).thenReturn(new Category());
-        when(ticketService.getTicketsByDateBetween(any(), any())).thenReturn(TicketFactory.getDefaultTicketList());
-
-        int result = statisticsReportService.getPurchasedTicketsCountByMovieCategory(MovieConstants.ID,
-            ReportConstants.START_DATE, ReportConstants.END_DATE);
-
-        assertEquals(1, result);
+    void ticketCount_reversedDates_rejectsBeforeDatabaseAccess() {
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> reportService.getPurchasedTicketsCountByMovieCategory(1, END, START));
+        verifyNoInteractions(categoryRepository, ticketRepository);
     }
 
     @Test
-    void testGetPurchasedTicketsCountByMovieTitle_success() {
-        final List<Integer> movieIds = Arrays.asList(1, 2, 3);
-        when(movieService.getIdsOfMoviesByTitle(anyString())).thenReturn(movieIds);
-        when(ticketService.getTicketsByDateBetween(any(), any())).thenReturn(TicketFactory.getDefaultTicketList());
-
-        int result = statisticsReportService.getPurchasedTicketsCountByMovieTitle(MovieConstants.TITLE,
-            ReportConstants.START_DATE, ReportConstants.END_DATE);
-
-        assertEquals(1, result);
+    void ticketCount_missingCategory_returnsNotFound() {
+        assertThrows(
+                CategoryNotFoundException.class,
+                () -> reportService.getPurchasedTicketsCountByMovieCategory(1, START, END));
     }
 
     @Test
-    void testGetPurchasedItemsCountByItemName_success() {
-        when(itemService.getItemDtoByName(anyString())).thenReturn(new ItemDto(0, null, null, 0));
-        when(orderService.getOrdersByDateBetween(any(), any())).thenReturn(OrderFactory.getDefaultOrderList());
+    void ticketCount_missingMovie_returnsNotFound() {
+        assertThrows(
+                MovieNotFoundException.class,
+                () -> reportService.getPurchasedTicketsCountByMovieTitle("Missing", START, END));
+    }
 
-        int result = statisticsReportService.getPurchasedItemsCountByItemName(ItemConstants.NAME,
-            ReportConstants.START_DATE, ReportConstants.END_DATE);
-
-        Assertions.assertEquals(1, result);
+    @Test
+    void itemCount_missingItem_returnsNotFound() {
+        assertThrows(
+                ItemNotFoundException.class,
+                () -> reportService.getPurchasedItemsCountByItemName("Missing", START, END));
     }
 }

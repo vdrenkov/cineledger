@@ -7,14 +7,16 @@ import java.util.List;
 
 public final class TicketMapper {
 
-    private TicketMapper() {
-
-    }
+    private TicketMapper() {}
 
     public static TicketDto mapTicketToTicketDto(Ticket ticket) {
 
-        return new TicketDto(ticket.getId(), ticket.getDateOfPurchase(),
-            ProjectionMapper.mapProjectionToProjectionDto(ticket.getProjection()));
+        return new TicketDto(
+                ticket.getId(),
+                ticket.getDateOfPurchase(),
+                ProjectionMapper.mapProjectionToProjectionDto(ticket.getProjection()),
+                ticket.getUnitPrice(),
+                ticket.getPaidPrice());
     }
 
     public static List<TicketDto> mapTicketToDtoList(List<Ticket> tickets) {

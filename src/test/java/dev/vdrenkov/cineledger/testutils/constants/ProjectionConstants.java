@@ -8,13 +8,14 @@ import dev.vdrenkov.cineledger.testutils.factories.MovieFactory;
 import dev.vdrenkov.cineledger.testutils.factories.ProgramFactory;
 import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
 
+import java.math.BigDecimal;
 import java.time.LocalTime;
 
 public final class ProjectionConstants {
 
     public static final int ID = 1;
 
-    public static final double PRICE = 10;
+    public static final BigDecimal PRICE = new BigDecimal("10.00");
 
     public static final LocalTime START_TIME = LocalTime.of(1, 0, 1);
 
