@@ -1,10 +1,8 @@
 package dev.vdrenkov.cineledger.services;
 
-import com.mailjet.client.ClientOptions;
 import com.mailjet.client.MailjetClient;
 import com.mailjet.client.MailjetRequest;
 import com.mailjet.client.errors.MailjetException;
-import com.mailjet.client.errors.MailjetSocketTimeoutException;
 import com.mailjet.client.resource.Emailv31;
 import dev.vdrenkov.cineledger.models.entities.Order;
 import dev.vdrenkov.cineledger.models.entities.User;
@@ -133,8 +131,8 @@ public class EmailService {
         }
 
         try {
-            new MailjetClient(apiKey, apiSecretKey, new ClientOptions("v3.1")).post(request);
-        } catch (MailjetSocketTimeoutException | MailjetException exception) {
+            new MailjetClient(apiKey, apiSecretKey).post(request);
+        } catch (final MailjetException exception) {
             log.warn("Could not send {} email", emailType, exception);
         }
     }

@@ -38,3 +38,4 @@ logs
 ### application.properties ###
 *.properties
 application.properties
+!.mvn/wrapper/maven-wrapper.properties

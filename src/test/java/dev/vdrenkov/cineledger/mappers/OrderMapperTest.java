@@ -11,7 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests order mapper behavior.
