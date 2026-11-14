@@ -92,13 +92,12 @@ password recovery, concurrent bookings, stock rollback, scheduling, receipts and
 CI runs the same command and scans the packaged runtime dependencies with Trivy.
 The combined test coverage report is available at `target/site/jacoco/index.html`.
 
-## Limitations and acknowledgments
+## Limitations
 
-This is a personal portfolio project and is not for redistribution. It does not process payments
-or integrate with a cinema operator. Email delivery requires your own Mailjet account;
-notifications have no persistent retry queue. Apply HTTPS, request limits and database backups
-when exposing an instance publicly.
+The API does not process payments or integrate with a cinema operator. Email delivery requires
+your own Mailjet account; notifications have no persistent retry queue. Apply HTTPS, request
+limits and database backups when exposing an instance publicly.
 
-Version 1 did not store historical line prices or discounts. Upgrading rounds its saved order totals
-to cents and allocates those totals using the catalogue prices available during migration.
-Original historical unit prices cannot be recovered. New purchases retain their agreed prices.
+## Acknowledgments
+
+This is a personal portfolio project and is not for redistribution.
