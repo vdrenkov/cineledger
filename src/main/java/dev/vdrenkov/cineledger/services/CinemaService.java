@@ -45,6 +45,13 @@ public class CinemaService {
         }
     }
 
+    public Cinema getCinemaForUpdate(final int id) {
+        return cinemaRepository
+                .findByIdForUpdate(id)
+                .orElseThrow(() ->
+                        new CinemaNotFoundException(ExceptionMessages.CINEMA_NOT_FOUND_MESSAGE));
+    }
+
     public Cinema getCinemaById(int id) {
 
         return cinemaRepository
@@ -96,12 +103,5 @@ public class CinemaService {
                     throw new CinemaAlreadyExistsException(
                             ExceptionMessages.CINEMA_ALREADY_EXISTS_MESSAGE);
                 });
-    }
-
-    public Cinema getCinemaForUpdate(final int id) {
-        return cinemaRepository
-                .findByIdForUpdate(id)
-                .orElseThrow(() ->
-                        new CinemaNotFoundException(ExceptionMessages.CINEMA_NOT_FOUND_MESSAGE));
     }
 }

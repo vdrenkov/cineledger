@@ -63,15 +63,6 @@ public class TicketService {
                         new TicketNotFoundException(ExceptionMessages.TICKET_NOT_FOUND_MESSAGE));
     }
 
-    public void cancelTickets(final List<Ticket> tickets) {
-        tickets.stream()
-                .map(ticket -> ticket.getProjection().getId())
-                .distinct()
-                .sorted()
-                .forEach(projectionService::getProjectionForUpdate);
-        ticketRepository.deleteAll(tickets);
-    }
-
     public int calculateAvailableTickets(Projection projection) {
         final int capacity = projection.getHall().getCapacity();
         final int totalTickets = ticketRepository.countByProjectionId(projection.getId());
@@ -82,5 +73,14 @@ public class TicketService {
         }
 
         return capacity - totalTickets;
+    }
+
+    public void cancelTickets(final List<Ticket> tickets) {
+        tickets.stream()
+                .map(ticket -> ticket.getProjection().getId())
+                .distinct()
+                .sorted()
+                .forEach(projectionService::getProjectionForUpdate);
+        ticketRepository.deleteAll(tickets);
     }
 }

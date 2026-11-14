@@ -44,6 +44,20 @@ public class DiscountService {
         return DiscountMapper.mapDiscountListToDiscountDtoList(getAllDiscounts());
     }
 
+    public int getDiscountPercentage(final String code) {
+
+        if (code == null || code.isBlank()) {
+            return 0;
+        }
+
+        return discountRepository
+                .findByCode(code)
+                .orElseThrow(() ->
+                        new DiscountNotValidException(
+                                ExceptionMessages.DISCOUNT_CODE_NOT_VALID_MESSAGE))
+                .getPercentage();
+    }
+
     public Discount getDiscountById(int id) {
 
         return discountRepository
@@ -94,19 +108,5 @@ public class DiscountService {
         discountRepository.deleteById(id);
 
         return DiscountMapper.mapDiscountToDiscountDto(discount);
-    }
-
-    public int getDiscountPercentage(final String code) {
-
-        if (code == null || code.isBlank()) {
-            return 0;
-        }
-
-        return discountRepository
-                .findByCode(code)
-                .orElseThrow(() ->
-                        new DiscountNotValidException(
-                                ExceptionMessages.DISCOUNT_CODE_NOT_VALID_MESSAGE))
-                .getPercentage();
     }
 }

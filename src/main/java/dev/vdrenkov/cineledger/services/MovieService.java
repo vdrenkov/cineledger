@@ -127,6 +127,13 @@ public class MovieService {
         return MovieMapper.mapMovieToMovieDto(getMovieById(id));
     }
 
+    public Movie getMovieForUpdate(final int id) {
+        return movieRepository
+                .findByIdForUpdate(id)
+                .orElseThrow(() ->
+                        new MovieNotFoundException(ExceptionMessages.MOVIE_NOT_FOUND_MESSAGE));
+    }
+
     public Movie getMovieById(int id) {
 
         return movieRepository
@@ -166,12 +173,5 @@ public class MovieService {
         movieRepository.deleteById(id);
 
         return movieDto;
-    }
-
-    public Movie getMovieForUpdate(final int id) {
-        return movieRepository
-                .findByIdForUpdate(id)
-                .orElseThrow(() ->
-                        new MovieNotFoundException(ExceptionMessages.MOVIE_NOT_FOUND_MESSAGE));
     }
 }

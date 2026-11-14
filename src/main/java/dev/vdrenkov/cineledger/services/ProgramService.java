@@ -70,6 +70,13 @@ public class ProgramService {
                 programRepository.findAllByCinemaId(cinema.getId()));
     }
 
+    public Program getProgramForUpdate(final int id) {
+        return programRepository
+                .findByIdForUpdate(id)
+                .orElseThrow(() ->
+                        new ProgramNotFoundException(ExceptionMessages.PROGRAM_NOT_FOUND_MESSAGE));
+    }
+
     public Program getProgramById(int id) {
 
         return programRepository
@@ -117,12 +124,5 @@ public class ProgramService {
 
     public static boolean isDateNotValid(LocalDate date) {
         return date.isBefore(LocalDate.now());
-    }
-
-    public Program getProgramForUpdate(final int id) {
-        return programRepository
-                .findByIdForUpdate(id)
-                .orElseThrow(() ->
-                        new ProgramNotFoundException(ExceptionMessages.PROGRAM_NOT_FOUND_MESSAGE));
     }
 }
