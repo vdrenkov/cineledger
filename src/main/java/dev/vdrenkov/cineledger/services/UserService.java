@@ -12,20 +12,21 @@ import dev.vdrenkov.cineledger.models.dtos.UserDto;
 import dev.vdrenkov.cineledger.models.entities.Role;
 import dev.vdrenkov.cineledger.models.entities.User;
 import dev.vdrenkov.cineledger.models.requests.AdminRequest;
+import dev.vdrenkov.cineledger.models.requests.CreateUserRequest;
 import dev.vdrenkov.cineledger.models.requests.LoginRequest;
 import dev.vdrenkov.cineledger.models.requests.UserRequest;
-import dev.vdrenkov.cineledger.models.requests.CreateUserRequest;
 import dev.vdrenkov.cineledger.repositories.UserRepository;
 import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
 import dev.vdrenkov.cineledger.utils.constants.RoleConstants;
 import dev.vdrenkov.cineledger.utils.constants.UserConstants;
+
 import org.springframework.http.HttpCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,15 +39,19 @@ import java.util.Objects;
 public class UserService {
 
     private final AuthenticationManager authenticationManager;
-    private final BCryptPasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
     private final JwtCookieUtil jwtCookieUtil;
     private final UserRepository userRepository;
     private final RoleService roleService;
 
-    public UserService(final AuthenticationManager authenticationManager, final BCryptPasswordEncoder passwordEncoder,
-        final EmailService emailService, final JwtCookieUtil jwtCookieUtil, final UserRepository userRepository,
-        final RoleService roleService) {
+    public UserService(
+            final AuthenticationManager authenticationManager,
+            final PasswordEncoder passwordEncoder,
+            final EmailService emailService,
+            final JwtCookieUtil jwtCookieUtil,
+            final UserRepository userRepository,
+            final RoleService roleService) {
         this.authenticationManager = authenticationManager;
         this.passwordEncoder = passwordEncoder;
         this.emailService = emailService;
@@ -56,27 +61,47 @@ public class UserService {
     }
 
     public HttpCookie login(final LoginRequest request) {
-        final UserDetails userDetails = (UserDetails) authenticationManager
-            .authenticate(new UsernamePasswordAuthenticationToken(request.username(), request.password()))
-            .getPrincipal();
+        final UserDetails userDetails =
+                (UserDetails)
+                        authenticationManager
+                                .authenticate(
+                                        new UsernamePasswordAuthenticationToken(
+                                                request.username(), request.password()))
+                                .getPrincipal();
 
         return jwtCookieUtil.createJWTCookie(userDetails);
     }
 
     @Transactional
     public User createUser(final CreateUserRequest request) {
-        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        final boolean administrator = authentication != null && authentication.getAuthorities().stream()
-            .anyMatch(authority -> RoleConstants.DEFAULT_ADMIN_ROLE.equals(authority.getAuthority()));
+        final Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+        final boolean administrator =
+                authentication != null
+                        && authentication.getAuthorities().stream()
+                                .anyMatch(authority ->
+                                        RoleConstants.DEFAULT_ADMIN_ROLE.equals(
+                                                authority.getAuthority()));
 
         if (request.roleNames() != null && !administrator) {
             throw new NotAuthorizedException(ExceptionMessages.NOT_AUTHORIZED_MESSAGE);
         }
 
         userValidation(request.username(), request.email());
-        final List<Role> roles = request.roleNames() == null ? getDefaultRoleList() : getUserRoles(request.roleNames());
-        final User user = userRepository.save(new User(request.username(), passwordEncoder.encode(request.password()),
-            request.email(), request.firstName(), request.lastName(), LocalDate.now(), roles));
+        final List<Role> roles =
+                request.roleNames() == null
+                        ? getDefaultRoleList()
+                        : getUserRoles(request.roleNames());
+        final User user =
+                userRepository.save(
+                        new User(
+                                request.username(),
+                                passwordEncoder.encode(request.password()),
+                                request.email(),
+                                request.firstName(),
+                                request.lastName(),
+                                LocalDate.now(),
+                                roles));
         emailService.sendRegistrationConfirmationEmail(user);
         return user;
     }
@@ -111,10 +136,11 @@ public class UserService {
 
     public User getUserById(final int id) {
 
-        return userRepository.findById(id).orElseThrow(() -> {
-
-            return new UserNotFoundException(ExceptionMessages.USER_NOT_FOUND_MESSAGE);
-        });
+        return userRepository
+                .findById(id)
+                .orElseThrow(() -> {
+                    return new UserNotFoundException(ExceptionMessages.USER_NOT_FOUND_MESSAGE);
+                });
     }
 
     public UserDto getUserDtoById(final int id) {
@@ -124,10 +150,11 @@ public class UserService {
 
     public User getUserByUsername(final String username) {
 
-        return userRepository.findUserByUsername(username).orElseThrow(() -> {
-
-            return new UserNotFoundException(ExceptionMessages.USER_NOT_FOUND_MESSAGE);
-        });
+        return userRepository
+                .findUserByUsername(username)
+                .orElseThrow(() -> {
+                    return new UserNotFoundException(ExceptionMessages.USER_NOT_FOUND_MESSAGE);
+                });
     }
 
     public UserDto getUserDtoByUsername(final String username) {
@@ -137,10 +164,11 @@ public class UserService {
 
     public User getUserByEmail(final String email) {
 
-        return userRepository.findUserByEmail(email).orElseThrow(() -> {
-
-            return new UserNotFoundException(ExceptionMessages.USER_NOT_FOUND_MESSAGE);
-        });
+        return userRepository
+                .findUserByEmail(email)
+                .orElseThrow(() -> {
+                    return new UserNotFoundException(ExceptionMessages.USER_NOT_FOUND_MESSAGE);
+                });
     }
 
     public UserDto getUserDtoByEmail(final String email) {
@@ -159,9 +187,9 @@ public class UserService {
     }
 
     public List<User> getUsersByJoinDate(final LocalDate joinDate, final boolean isBefore) {
-        return isBefore ?
-            userRepository.findAllByJoinDateBefore(joinDate) :
-            userRepository.findAllByJoinDateAfter(joinDate);
+        return isBefore
+                ? userRepository.findAllByJoinDateBefore(joinDate)
+                : userRepository.findAllByJoinDateAfter(joinDate);
     }
 
     public List<UserDto> getUsersDtosByJoinDate(final LocalDate joinDate, final boolean isBefore) {
@@ -169,24 +197,38 @@ public class UserService {
     }
 
     private User getUserByUsernameOnLogin(final String username) {
-        return userRepository.findUserByUsername(username).orElseThrow(() -> {
-
-            return new UserNotFoundException(ExceptionMessages.USER_NOT_FOUND_MESSAGE);
-        });
+        return userRepository
+                .findUserByUsername(username)
+                .orElseThrow(() -> {
+                    return new UserNotFoundException(ExceptionMessages.USER_NOT_FOUND_MESSAGE);
+                });
     }
 
     public User getCurrentUser() {
-        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        final String currentUsername = Objects.isNull(authentication) ? "" : authentication.getName();
+        final Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+        final String currentUsername =
+                Objects.isNull(authentication) ? "" : authentication.getName();
         return getUserByUsername(currentUsername);
     }
 
     @Transactional
     public UserDto updateUserByAdmin(final AdminRequest request, final int id) {
-        final User user = userRepository.findByIdForUpdate(id)
-            .orElseThrow(() -> new UserNotFoundException(ExceptionMessages.USER_NOT_FOUND_MESSAGE));
+        final User user =
+                userRepository
+                        .findByIdForUpdate(id)
+                        .orElseThrow(() ->
+                                new UserNotFoundException(
+                                        ExceptionMessages.USER_NOT_FOUND_MESSAGE));
         final UserDto previous = UserMapper.mapUserToUserDto(user);
-        applyProfile(user, new UserRequest(request.username(), request.password(), request.email(), request.firstName(), request.lastName()));
+        applyProfile(
+                user,
+                new UserRequest(
+                        request.username(),
+                        request.password(),
+                        request.email(),
+                        request.firstName(),
+                        request.lastName()));
         user.setRoles(getUserRoles(request.roleNames()));
         userRepository.save(user);
         return previous;
@@ -199,8 +241,12 @@ public class UserService {
             throw new NotAuthorizedException(ExceptionMessages.NOT_AUTHORIZED_MESSAGE);
         }
 
-        final User user = userRepository.findByIdForUpdate(id)
-            .orElseThrow(() -> new UserNotFoundException(ExceptionMessages.USER_NOT_FOUND_MESSAGE));
+        final User user =
+                userRepository
+                        .findByIdForUpdate(id)
+                        .orElseThrow(() ->
+                                new UserNotFoundException(
+                                        ExceptionMessages.USER_NOT_FOUND_MESSAGE));
         final UserDto previous = UserMapper.mapUserToUserDto(user);
         applyProfile(user, request);
         userRepository.save(user);
@@ -227,10 +273,8 @@ public class UserService {
     public boolean isCurrentUserAdmin() {
         final User currentUser = getCurrentUser();
 
-        return currentUser
-            .getRoles()
-            .stream()
-            .anyMatch(role -> Objects.equals(RoleConstants.DEFAULT_ADMIN_ROLE, role.getName()));
+        return currentUser.getRoles().stream()
+                .anyMatch(role -> Objects.equals(RoleConstants.DEFAULT_ADMIN_ROLE, role.getName()));
     }
 
     public boolean isCurrentUserAuthorized(final int userId) {
@@ -243,16 +287,16 @@ public class UserService {
         return currentUser.getId() == userId;
     }
 
-private void applyProfile(final User user, final UserRequest request) {
-    user.setUsername(request.username());
-    user.setPassword(passwordEncoder.encode(request.password()));
-    user.setCredentialsVersion(user.getCredentialsVersion() + 1);
-    user.setEmail(request.email());
-    user.setFirstName(request.firstName());
-    user.setLastName(request.lastName());
-}
+    private void applyProfile(final User user, final UserRequest request) {
+        user.setUsername(request.username());
+        user.setPassword(passwordEncoder.encode(request.password()));
+        user.setCredentialsVersion(user.getCredentialsVersion() + 1);
+        user.setEmail(request.email());
+        user.setFirstName(request.firstName());
+        user.setLastName(request.lastName());
+    }
 
-private boolean isAuthorized(final int userId) {
+    private boolean isAuthorized(final int userId) {
         String currentUsername = null;
 
         SecurityContextHolder.getContext();
@@ -263,7 +307,8 @@ private boolean isAuthorized(final int userId) {
             }
         }
 
-        if (currentUsername == null || Objects.equals(UserConstants.DEFAULT_GUEST_USERNAME, currentUsername)) {
+        if (currentUsername == null
+                || Objects.equals(UserConstants.DEFAULT_GUEST_USERNAME, currentUsername)) {
 
             throw new NotLoggedInException(ExceptionMessages.NOT_LOGGED_IN_MESSAGE);
         }
@@ -281,15 +326,18 @@ private boolean isAuthorized(final int userId) {
     }
 
     private void userValidation(final String username, final String email) {
-        userRepository.findUserByUsername(username).ifPresent(user -> {
+        userRepository
+                .findUserByUsername(username)
+                .ifPresent(user -> {
+                    throw new UsernameAlreadyExistsException(
+                            ExceptionMessages.USERNAME_ALREADY_EXISTS_MESSAGE);
+                });
 
-            throw new UsernameAlreadyExistsException(ExceptionMessages.USERNAME_ALREADY_EXISTS_MESSAGE);
-        });
-
-        userRepository.findUserByEmail(email).ifPresent(user -> {
-
-            throw new UserEmailAlreadyExistsException(ExceptionMessages.USER_EMAIL_ALREADY_EXISTS_MESSAGE);
-        });
+        userRepository
+                .findUserByEmail(email)
+                .ifPresent(user -> {
+                    throw new UserEmailAlreadyExistsException(
+                            ExceptionMessages.USER_EMAIL_ALREADY_EXISTS_MESSAGE);
+                });
     }
-
 }

@@ -1,104 +1,117 @@
 package dev.vdrenkov.cineledger.services;
 
-import com.mailjet.client.MailjetClient;
-import com.mailjet.client.ClientOptions;
-import com.mailjet.client.MailjetRequest;
-import com.mailjet.client.errors.MailjetException;
-import com.mailjet.client.resource.Emailv31;
 import dev.vdrenkov.cineledger.models.entities.Order;
 import dev.vdrenkov.cineledger.models.entities.User;
-import org.json.JSONArray;
-import org.json.JSONObject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.event.TransactionalEventListener;
 import org.springframework.util.StringUtils;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientException;
+
+import tools.jackson.databind.JsonNode;
+
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class EmailService {
     private static final Logger log = LoggerFactory.getLogger(EmailService.class);
-    private final String apiKey;
-    private final String apiSecretKey;
+    private final RestClient mailjetClient;
+    private final ApplicationEventPublisher events;
+    private final boolean enabled;
     private final String senderEmail;
     private final String senderName;
 
-    public EmailService(@Value("${api.key}") String apiKey, @Value("${api.secret}") String apiSecretKey,
-        @Value("${mail.sender.email}") String senderEmail, @Value("${mail.sender.name}") String senderName) {
-        this.apiKey = apiKey;
-        this.apiSecretKey = apiSecretKey;
+    public EmailService(
+            final RestClient mailjetClient,
+            final ApplicationEventPublisher events,
+            @Value("${api.key}") final String apiKey,
+            @Value("${api.secret}") final String apiSecret,
+            @Value("${mail.sender.email}") final String senderEmail,
+            @Value("${mail.sender.name}") final String senderName) {
+        this.mailjetClient = mailjetClient;
+        this.events = events;
+        this.enabled = StringUtils.hasText(apiKey) && StringUtils.hasText(apiSecret);
         this.senderEmail = senderEmail;
         this.senderName = senderName;
     }
 
-    public void sendOrderConfirmationEmail(User user, Order orderDetails) {
-        final String recipientEmail = user.getEmail();
-        final String recipientName = user.getFirstName() + " " + user.getLastName();
-
-        final MailjetRequest request = new MailjetRequest(Emailv31.resource).property(Emailv31.MESSAGES,
-            new JSONArray().put(new JSONObject()
-                .put(Emailv31.Message.FROM, new JSONObject().put("Email", senderEmail).put("Name", senderName))
-                .put(Emailv31.Message.TO,
-                    new JSONArray().put(new JSONObject().put("Email", recipientEmail).put("Name", recipientName)))
-                .put(Emailv31.Message.SUBJECT, "Your order confirmation")
-                .put(Emailv31.Message.HTMLPART,
-                    "<h3>Dear " + recipientName + ",</h3><p>You successfully created the order number: <strong>"
-                        + orderDetails.getId() + "</strong>. The total price of the order is: <strong>"
-                        + orderDetails.getTotalPrice() + " lv.</strong></p>")));
-
-        sendEmail(request, "order confirmation");
+    public void sendRegistrationConfirmationEmail(final User user) {
+        publish(
+                user,
+                "Your registration confirmation",
+                "Your CineLedger account has been created.");
     }
 
-    public void sendPasswordResetEmail(User user, String token) {
-        final String recipientEmail = user.getEmail();
-        final String recipientName = user.getFirstName() + " " + user.getLastName();
-
-        final MailjetRequest request = new MailjetRequest(Emailv31.resource).property(Emailv31.MESSAGES,
-            new JSONArray().put(new JSONObject()
-                .put(Emailv31.Message.FROM, new JSONObject().put("Email", senderEmail).put("Name", senderName))
-                .put(Emailv31.Message.TO,
-                    new JSONArray().put(new JSONObject().put("Email", recipientEmail).put("Name", recipientName)))
-                .put(Emailv31.Message.SUBJECT, "Reset your CineLedger password")
-                .put(Emailv31.Message.HTMLPART, "<h3>Dear " + recipientName
-                    + ",</h3><p>Submit this one-time token to POST /password-resets within 30 minutes: <strong>"
-                    + token + "</strong>. If you did not request this, ignore this message.</p>")));
-
-        sendEmail(request, "password recovery");
+    public void sendOrderConfirmationEmail(final User user, final Order order) {
+        publish(
+                user,
+                "Your order confirmation",
+                "Your order number is "
+                        + order.getId()
+                        + ". The total is "
+                        + order.getTotalPrice().toPlainString()
+                        + " BGN.");
     }
 
-    public void sendRegistrationConfirmationEmail(User user) {
-        final String recipientEmail = user.getEmail();
-        final String recipientName = user.getFirstName() + " " + user.getLastName();
-
-        final String discountMessage = "As our user here is your discount code for online reservation: 5555";
-
-        final MailjetRequest request = new MailjetRequest(Emailv31.resource).property(Emailv31.MESSAGES,
-            new JSONArray().put(new JSONObject()
-                .put(Emailv31.Message.FROM, new JSONObject().put("Email", senderEmail).put("Name", senderName))
-                .put(Emailv31.Message.TO,
-                    new JSONArray().put(new JSONObject().put("Email", recipientEmail).put("Name", recipientName)))
-                .put(Emailv31.Message.SUBJECT, "Your registration confirmation")
-                .put(Emailv31.Message.HTMLPART,
-                    "<h3>Dear " + recipientName + ",</h3><p>You have successfully registered. " + discountMessage
-                        + "</p>")));
-
-        sendEmail(request, "registration confirmation");
+    public void sendPasswordResetEmail(final User user, final String token) {
+        publish(
+                user,
+                "Reset your CineLedger password",
+                "Submit this one-time token to POST /password-resets within 30 minutes: "
+                        + token
+                        + ". If you did not request this, ignore this message.");
     }
 
-    private void sendEmail(final MailjetRequest request, final String emailType) {
-        if (!StringUtils.hasText(apiKey) || !StringUtils.hasText(apiSecretKey)) {
+    @TransactionalEventListener(fallbackExecution = true)
+    public void deliver(final Notification notification) {
 
+        if (!enabled) {
             return;
         }
 
+        final var message =
+                Map.of(
+                        "From",
+                        Map.of("Email", senderEmail, "Name", senderName),
+                        "To",
+                        List.of(Map.of("Email", notification.email(), "Name", notification.name())),
+                        "Subject",
+                        notification.subject(),
+                        "TextPart",
+                        notification.text());
         try {
-            final var options = ClientOptions.builder()
-                .apiKey(apiKey)
-                .apiSecretKey(apiSecretKey)
-                .build();
-            new MailjetClient(options).post(request);
-        } catch (final MailjetException exception) {
-            log.warn("Could not send {} email", emailType, exception);
+            final JsonNode response =
+                    mailjetClient
+                            .post()
+                            .uri("/v3.1/send")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .body(Map.of("Messages", List.of(message)))
+                            .retrieve()
+                            .body(JsonNode.class);
+
+            if (response == null
+                    || !"success"
+                            .equals(response.path("Messages").path(0).path("Status").asString())) {
+                log.warn("Mailjet did not accept the notification");
+            }
+
+        } catch (final RestClientException exception) {
+            log.warn("Mailjet notification delivery failed");
         }
     }
+
+    private void publish(final User user, final String subject, final String text) {
+        final String name = user.getFirstName() + " " + user.getLastName();
+        events.publishEvent(
+                new Notification(user.getEmail(), name, subject, "Dear " + name + ",\n\n" + text));
+    }
+
+    public record Notification(String email, String name, String subject, String text) {}
 }
