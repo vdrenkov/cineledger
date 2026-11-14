@@ -4,6 +4,7 @@ import dev.vdrenkov.cineledger.models.dtos.UserDto;
 import dev.vdrenkov.cineledger.models.requests.AdminRequest;
 import dev.vdrenkov.cineledger.models.requests.LoginRequest;
 import dev.vdrenkov.cineledger.models.requests.UserRequest;
+import dev.vdrenkov.cineledger.models.requests.CreateUserRequest;
 import dev.vdrenkov.cineledger.services.UserService;
 import dev.vdrenkov.cineledger.utils.constants.URIConstants;
 import jakarta.validation.Valid;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -41,18 +43,15 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).header(HttpHeaders.SET_COOKIE, cookie.toString()).build();
     }
 
-    @PostMapping(URIConstants.REGISTRATION_PATH)
-    public ResponseEntity<Void> registerUser(@RequestBody @Valid UserRequest request) {
-        final HttpCookie cookie = userService.registerUser(request);
-
-        return ResponseEntity.status(HttpStatus.CREATED).header(HttpHeaders.SET_COOKIE, cookie.toString()).build();
+    @PostMapping(URIConstants.USERS_PATH)
+    public ResponseEntity<Void> createUser(@RequestBody @Valid final CreateUserRequest request) {
+        final var user = userService.createUser(request);
+        return ResponseEntity.created(URI.create("/users/" + user.getId())).build();
     }
 
-    @PostMapping(URIConstants.ADMINS_PATH)
-    public ResponseEntity<Void> registerUserByAdmin(@RequestBody @Valid AdminRequest request) {
-        userService.registerUserByAdmin(request);
-
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+    @GetMapping(URIConstants.USERS_ID_PATH)
+    public ResponseEntity<UserDto> getProfile(@PathVariable final int id) {
+        return ResponseEntity.ok(userService.getProfile(id));
     }
 
     @GetMapping(value = URIConstants.USERS_PATH, params = "username")

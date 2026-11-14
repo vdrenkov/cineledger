@@ -61,12 +61,10 @@ class JwtRequestFilterTest {
         when(request.getCookies()).thenReturn(JwtFactory.getDefaultCookieArray());
         when(tokenUtil.getUsernameFromToken(anyString())).thenReturn(JWT_USERNAME);
         when(userDetailsService.loadUserByUsername(anyString())).thenReturn(JwtFactory.getDefaultUserDetails());
-        when(tokenUtil.validateToken(anyString(), any())).thenReturn(true);
 
         requestFilter.doFilterInternal(request, response, filterChain);
 
         verify(userDetailsService, times(1)).loadUserByUsername(JWT_USERNAME);
-        verify(tokenUtil, times(1)).validateToken(any(), any());
         verify(filterChain, times(1)).doFilter(request, response);
     }
 

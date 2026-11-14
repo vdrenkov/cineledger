@@ -14,6 +14,7 @@ import dev.vdrenkov.cineledger.models.entities.User;
 import dev.vdrenkov.cineledger.models.requests.AdminRequest;
 import dev.vdrenkov.cineledger.models.requests.LoginRequest;
 import dev.vdrenkov.cineledger.models.requests.UserRequest;
+import dev.vdrenkov.cineledger.models.requests.CreateUserRequest;
 import dev.vdrenkov.cineledger.repositories.UserRepository;
 import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
 import dev.vdrenkov.cineledger.utils.constants.RoleConstants;
@@ -26,6 +27,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
 import java.time.LocalDate;
@@ -63,6 +65,33 @@ public class UserService {
             .getPrincipal();
 
         return jwtCookieUtil.createJWTCookie(userDetails);
+    }
+
+    @Transactional
+    public User createUser(final CreateUserRequest request) {
+        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        final boolean administrator = authentication != null && authentication.getAuthorities().stream()
+            .anyMatch(authority -> RoleConstants.DEFAULT_ADMIN_ROLE.equals(authority.getAuthority()));
+
+        if (request.roleNames() != null && !administrator) {
+            throw new NotAuthorizedException(ExceptionMessages.NOT_AUTHORIZED_MESSAGE);
+        }
+
+        userValidation(request.username(), request.email());
+        final List<Role> roles = request.roleNames() == null ? getDefaultRoleList() : getUserRoles(request.roleNames());
+        final User user = userRepository.save(new User(request.username(), passwordEncoder.encode(request.password()),
+            request.email(), request.firstName(), request.lastName(), LocalDate.now(), roles));
+        emailService.sendRegistrationConfirmationEmail(user);
+        return user;
+    }
+
+    public UserDto getProfile(final int id) {
+
+        if (!isCurrentUserAuthorized(id)) {
+            throw new NotAuthorizedException(ExceptionMessages.NOT_AUTHORIZED_MESSAGE);
+        }
+
+        return getUserDtoById(id);
     }
 
     public HttpCookie registerUser(final UserRequest userRequest) {

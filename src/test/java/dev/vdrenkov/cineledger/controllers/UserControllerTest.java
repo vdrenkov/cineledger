@@ -82,26 +82,28 @@ class UserControllerTest {
     }
 
     @Test
-    void testRegisterUser_cookieObtained_success() throws Exception {
+    void createUser_customerRequest_returnsLocationWithoutChangingAuthentication() throws Exception {
         final String json = objectMapper.writeValueAsString(UserFactory.getDefaultUserRequest());
-        when(userService.registerUser(any())).thenReturn(HttpCookieFactory.getDefaultHttpCookie());
+        when(userService.createUser(any())).thenReturn(UserFactory.getDefaultUser());
 
         mockMvc
             .perform(MockMvcRequestBuilders
-                .post(URIConstants.REGISTRATION_PATH)
+                .post(URIConstants.USERS_PATH)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json))
             .andExpect(status().isCreated())
-            .andExpect(header().string(SET_COOKIE, COOKIE));
+            .andExpect(header().string("Location", "/users/" + ID))
+            .andExpect(header().doesNotExist(SET_COOKIE));
     }
 
     @Test
-    void testRegisterUserByAdmin_createdWithoutCookie_success() throws Exception {
+    void createUser_adminRequest_returnsLocationWithoutChangingAuthentication() throws Exception {
         final String json = objectMapper.writeValueAsString(UserFactory.getDefaultAdminRequest());
+        when(userService.createUser(any())).thenReturn(UserFactory.getDefaultUser());
 
         mockMvc
             .perform(MockMvcRequestBuilders
-                .post(URIConstants.ADMINS_PATH)
+                .post(URIConstants.USERS_PATH)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json))
             .andExpect(status().isCreated())

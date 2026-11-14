@@ -1,11 +1,11 @@
 package dev.vdrenkov.cineledger.configurations;
 
 import dev.vdrenkov.cineledger.jwt.JwtRequestFilter;
-import dev.vdrenkov.cineledger.utils.constants.JwtConstants;
-import dev.vdrenkov.cineledger.utils.constants.RoleConstants;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -16,36 +16,35 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.session.NullAuthenticatedSessionStrategy;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-import org.springframework.security.web.util.matcher.RegexRequestMatcher;
-import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+import org.springframework.security.web.csrf.CsrfTokenRequestHandler;
+import org.springframework.security.web.csrf.XorCsrfTokenRequestAttributeHandler;
 
-import java.util.Arrays;
+import java.util.function.Supplier;
+
+import static dev.vdrenkov.cineledger.utils.constants.JwtConstants.JWT_COOKIE_NAME;
 
 @EnableWebSecurity
 @Configuration
 public class WebSecurityConfiguration {
-    private static final String LOGOUT_URL = "/logout";
-    private static final String[] AUTH_PATH = { "/csrf", "/login", "/registration", LOGOUT_URL, "/password-recovery"
+    private static final String ADMIN = "ADMIN";
+    private static final String VENDOR = "VENDOR";
+    private static final String[] PUBLIC_READ = {
+        "/categories", "/categories/{id}", "/categories/{id}/movies", "/cinemas", "/cinemas/{id}",
+        "/cinemas/{id}/halls", "/cinemas/{id}/reviews", "/cinemas/{id}/programs", "/items", "/items/{id}",
+        "/movies", "/movies/{id}", "/movies/{id}/reviews", "/movies/{id}/projections", "/programs", "/programs/{id}",
+        "/programs/{id}/projections", "/projections", "/projections/{id}"
     };
-
-    private static final String[] GUEST_GET_LIST = { "/categories.*", "/cinemas.*", "/cinemas/\\d/halls",
-        "/cinemas/\\d/reviews", "/items.*", "/movies.*", "/categories/\\d/movies", "/programs.*",
-        "/cinemas/\\d/programs", "/programs/\\d/projections", "/movies/\\d/projections", "/movies/\\d/reviews",
-        "/projections(\\?.*|\\z)"
+    private static final String[] CUSTOMER_PATHS = {
+        "/users/{id}", "/users/{id}/orders", "/users/{id}/movies/reviews", "/users/{id}/cinemas/reviews",
+        "/reviews/{id}", "/cinemas/{id}/reviews", "/movies/{id}/reviews"
     };
-
-    private static final String[] USER_LIST = { "/reviews/\\d.*", "/cinemas/\\d/reviews", "/movies/\\d/reviews",
-        "/users/\\d/orders", "/users\\?username=.*", "/users\\?email=.*", "/users/\\d.*"
-    };
-
-    private static final String[] VENDOR_LIST = { "/items.*", "/items/\\d.*", "/discounts.*", "/discounts/\\d.*",
-        "/orders.*", "/orders/\\d.*", "/tickets.*", "/projections/\\d/tickets.*"
-    };
-
-    private static final String[] ADMIN_LIST = { "/categories/\\d.*", "/cinemas/\\d.*", "/halls.*", "/halls/\\d.*",
-        "/movies/\\d.*", "/programs/\\d.*", "/projections/\\d.*", "/reports.*", "/roles.*", "/roles/\\d.*",
-        "/users\\?roleName=.*", "/users\\?joinDate=.*", "/admins.*", "/admins/\\d.*"
+    private static final String[] STAFF_PATHS = {
+        "/orders", "/orders/{id}", "/items", "/items/{id}", "/discounts", "/discounts/{id}",
+        "/tickets", "/projections/{id}/tickets"
     };
 
     private final JwtRequestFilter jwtRequestFilter;
@@ -57,30 +56,26 @@ public class WebSecurityConfiguration {
     @Bean
     SecurityFilterChain securityFilterChain(final HttpSecurity httpSecurity) {
         httpSecurity
-            .csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+            .csrf(csrf -> csrf
+                .csrfTokenRepository(new CookieCsrfTokenRepository())
+                .csrfTokenRequestHandler(csrfTokenRequestHandler())
+                .sessionAuthenticationStrategy(new NullAuthenticatedSessionStrategy()))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(AUTH_PATH)
-                .permitAll()
-                .requestMatchers(regexMatchers(HttpMethod.GET, GUEST_GET_LIST))
-                .permitAll()
-                .requestMatchers(regexMatchers(null, USER_LIST))
-                .hasAnyAuthority(RoleConstants.DEFAULT_USER_ROLE, RoleConstants.DEFAULT_VENDOR_ROLE,
-                    RoleConstants.DEFAULT_ADMIN_ROLE)
-                .requestMatchers(regexMatchers(null, VENDOR_LIST))
-                .hasAnyAuthority(RoleConstants.DEFAULT_VENDOR_ROLE, RoleConstants.DEFAULT_ADMIN_ROLE)
-                .requestMatchers(regexMatchers(null, GUEST_GET_LIST))
-                .hasAuthority(RoleConstants.DEFAULT_ADMIN_ROLE)
-                .requestMatchers(regexMatchers(null, ADMIN_LIST))
-                .hasAuthority(RoleConstants.DEFAULT_ADMIN_ROLE)
-                .anyRequest()
-                .authenticated())
+                .requestMatchers(HttpMethod.GET, "/csrf").permitAll()
+                .requestMatchers(HttpMethod.POST, "/login", "/users", "/password-reset-requests", "/password-resets").permitAll()
+                .requestMatchers(HttpMethod.GET, PUBLIC_READ).permitAll()
+                .requestMatchers(CUSTOMER_PATHS).authenticated()
+                .requestMatchers(STAFF_PATHS).hasAnyAuthority(ADMIN, VENDOR)
+                .requestMatchers("/users", "/admins/{id}", "/roles", "/roles/**", "/reports/**", "/halls", "/halls/{id}",
+                    "/categories", "/categories/**", "/cinemas", "/cinemas/**", "/movies", "/movies/**",
+                    "/programs", "/programs/**", "/projections", "/projections/{id}").hasAuthority(ADMIN)
+                .anyRequest().denyAll())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
             .logout(logout -> logout
-                .logoutUrl(LOGOUT_URL)
-                .deleteCookies(JwtConstants.JWT_COOKIE_NAME)
-                .logoutSuccessHandler(
-                    (request, response, authentication) -> response.setStatus(HttpServletResponse.SC_OK)));
+                .logoutUrl("/logout")
+                .deleteCookies(JWT_COOKIE_NAME)
+                .logoutSuccessHandler((_, response, _) -> response.setStatus(HttpServletResponse.SC_OK)));
         return httpSecurity.build();
     }
 
@@ -90,15 +85,32 @@ public class WebSecurityConfiguration {
     }
 
     @Bean
+    public FilterRegistrationBean<JwtRequestFilter> jwtFilterRegistration() {
+        final var registration = new FilterRegistrationBean<>(jwtRequestFilter);
+        registration.setEnabled(false);
+        return registration;
+    }
+
+    @Bean
     public AuthenticationManager authenticationManager(final AuthenticationConfiguration authenticationConfiguration) {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
-    private static RequestMatcher[] regexMatchers(final HttpMethod httpMethod, final String[] patterns) {
-        final String method = httpMethod == null ? null : httpMethod.name();
-        return Arrays
-            .stream(patterns)
-            .map(pattern -> new RegexRequestMatcher(pattern, method))
-            .toArray(RequestMatcher[]::new);
+    private static CsrfTokenRequestHandler csrfTokenRequestHandler() {
+        final var encodedTokens = new XorCsrfTokenRequestAttributeHandler();
+        final var cookieTokens = new CsrfTokenRequestAttributeHandler();
+        return new CsrfTokenRequestHandler() {
+            @Override
+            public void handle(final HttpServletRequest request, final HttpServletResponse response,
+                final Supplier<CsrfToken> csrfToken) {
+                encodedTokens.handle(request, response, csrfToken);
+            }
+
+            @Override
+            public String resolveCsrfTokenValue(final HttpServletRequest request, final CsrfToken csrfToken) {
+                final String encodedToken = encodedTokens.resolveCsrfTokenValue(request, csrfToken);
+                return encodedToken != null ? encodedToken : cookieTokens.resolveCsrfTokenValue(request, csrfToken);
+            }
+        };
     }
 }

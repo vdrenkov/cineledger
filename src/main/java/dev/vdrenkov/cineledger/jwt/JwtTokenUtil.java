@@ -2,87 +2,69 @@ package dev.vdrenkov.cineledger.jwt;
 
 import dev.vdrenkov.cineledger.utils.constants.JwtConstants;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-
 import javax.crypto.SecretKey;
-import java.io.Serial;
-import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Function;
+import java.util.Date;
 
 @Component
-public class JwtTokenUtil implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 4910407962728938714L;
+public class JwtTokenUtil {
+    private final SecretKey signingKey;
+    private final JwtParser parser;
 
-    @Value("${jwt.secret}")
-    private String secret;
+    public JwtTokenUtil(@Value("${jwt.secret}") final String secret) {
+        final byte[] keyBytes = secret.getBytes(StandardCharsets.UTF_8);
 
-    public void setSecret(final String secret) {
-        this.secret = secret;
-    }
+        if (keyBytes.length < 64) {
+            throw new IllegalArgumentException("JWT_SECRET must contain at least 64 UTF-8 bytes");
+        }
 
-    public String getUsernameFromToken(final String token) {
-
-        return getClaimFromToken(token, Claims::getSubject);
-    }
-
-    public Instant getExpirationInstantFromToken(final String token) {
-
-        return getClaimFromToken(token, claims -> claims.getExpiration().toInstant());
-    }
-
-    public <T> T getClaimFromToken(final String token, final Function<Claims, T> claimsResolver) {
-        final Claims claims = getAllClaimsFromToken(token);
-
-        return claimsResolver.apply(claims);
-    }
-
-    private Claims getAllClaimsFromToken(final String token) {
-
-        return Jwts.parser().verifyWith(getSigningKey()).build().parseSignedClaims(token).getPayload();
-    }
-
-    private boolean isTokenExpired(final String token) {
-        final Instant expiration = getExpirationInstantFromToken(token);
-
-        return expiration.isBefore(Instant.now());
+        signingKey = Keys.hmacShaKeyFor(keyBytes);
+        parser = Jwts.parser()
+            .verifyWith(signingKey)
+            .sig()
+            .clear()
+            .add(Jwts.SIG.HS512)
+            .and()
+            .build();
     }
 
     public String generateToken(final UserDetails userDetails) {
-        final Map<String, Object> claims = new HashMap<>();
-
-        return doGenerateToken(claims, userDetails.getUsername());
-    }
-
-    private String doGenerateToken(final Map<String, Object> claims, final String subject) {
         final Instant now = Instant.now();
-        final Instant expiration = now.plusMillis(JwtConstants.JWT_TOKEN_VALIDITY_MILLIS);
-
-        return Jwts
-            .builder()
-            .claims(claims)
-            .subject(subject)
-            .issuedAt(java.util.Date.from(now))
-            .expiration(java.util.Date.from(expiration))
-            .signWith(getSigningKey(), Jwts.SIG.HS512)
+        return Jwts.builder()
+            .subject(userDetails.getUsername())
+            .issuedAt(Date.from(now))
+            .expiration(Date.from(now.plusSeconds(JwtConstants.JWT_TOKEN_VALIDITY_SECONDS)))
+            .signWith(signingKey, Jwts.SIG.HS512)
             .compact();
     }
 
-    public boolean validateToken(final String token, final UserDetails userDetails) {
-        final String username = getUsernameFromToken(token);
-
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    public String getUsernameFromToken(final String token) {
+        return parseToken(token).getSubject();
     }
 
-    private SecretKey getSigningKey() {
-        return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+    public Instant getExpirationInstantFromToken(final String token) {
+        return parseToken(token).getExpiration().toInstant();
+    }
+
+    public boolean validateToken(final String token, final UserDetails userDetails) {
+        return getUsernameFromToken(token).equals(userDetails.getUsername());
+    }
+
+    private Claims parseToken(final String token) {
+        final Claims claims = parser.parseSignedClaims(token).getPayload();
+
+        if (claims.getSubject() == null || claims.getSubject().isBlank() || claims.getExpiration() == null) {
+            throw new JwtException("Authentication token requires a subject and expiry");
+        }
+
+        return claims;
     }
 }
