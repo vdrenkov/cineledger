@@ -31,14 +31,14 @@ class JwtTokenUtilTest {
     }
 
     @Test
-    void testGetUsernameFromToken_usernameExtracted_success() {
+    void parseToken_validToken_readsSubject() {
         final String token = jwtTokenUtil.parseToken(JwtFactory.getDefaultJwtToken()).getSubject();
 
         assertEquals(JWT_USERNAME, token);
     }
 
     @Test
-    void testGetExpirationInstantFromToken_dateValid_returnsTrue() {
+    void parseToken_validToken_readsExpiry() {
         final Instant expiration =
                 jwtTokenUtil
                         .parseToken(JwtFactory.getDefaultJwtToken())

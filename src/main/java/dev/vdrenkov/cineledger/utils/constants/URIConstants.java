@@ -91,13 +91,9 @@ public final class URIConstants {
 
     public static final String USERS_ID_PATH = "/users/{id}";
 
-    public static final String ADMINS_PATH = "/admins";
-
     public static final String ADMINS_ID_PATH = "/admins/{id}";
 
     public static final String LOGIN_PATH = "/login";
-
-    public static final String REGISTRATION_PATH = "/registration";
 
     private URIConstants() {
         throw new IllegalStateException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
