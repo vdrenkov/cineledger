@@ -15,7 +15,7 @@
     <artifactId>cineledger</artifactId>
     <version>2.0.0</version>
     <name>CineLedger</name>
-    <description>CineLedger</description>
+    <description>Spring Boot REST API for cinema management, reservations, concession sales, reviews and reporting.</description>
 
     <properties>
         <java.version>27</java.version>
