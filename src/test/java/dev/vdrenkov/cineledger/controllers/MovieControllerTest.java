@@ -175,21 +175,16 @@ class MovieControllerTest {
     }
 
     @Test
-    void testGetMoviesByImdbTest() throws Exception {
-        final String imdb = "top";
-        final String movies = "[{\"title\":\"title1\", \"year\":\"2001\"},{\"title\":\"title2\", \"year\":\"2002\"}]";
-
-        when(movieService.getImdbMovies(imdb)).thenReturn(movies);
-
-        mockMvc = MockMvcBuilders.standaloneSetup(movieController).build();
+    void getMovies_retiredExternalFilter_returnsBadRequest() throws Exception {
+        mockMvc = MockMvcBuilders.standaloneSetup(movieController)
+            .setControllerAdvice(new dev.vdrenkov.cineledger.handlers.GlobalExceptionHandler()).build();
 
         mockMvc
             .perform(MockMvcRequestBuilders
                 .get(URIConstants.MOVIES_PATH)
-                .param("imdb", imdb)
+                .param("imdb", "top")
                 .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
-            .andExpect(content().json(movies));
+            .andExpect(status().isBadRequest());
     }
 
     @Test

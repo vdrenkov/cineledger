@@ -21,12 +21,10 @@ public class MovieService {
 
     private final MovieRepository movieRepository;
     private final CategoryService categoryService;
-    private final ImdbService imdbService;
 
-    public MovieService(MovieRepository movieRepository, CategoryService categoryService, ImdbService imdbService) {
+    public MovieService(MovieRepository movieRepository, CategoryService categoryService) {
         this.movieRepository = movieRepository;
         this.categoryService = categoryService;
-        this.imdbService = imdbService;
     }
 
     public Movie addMovie(MovieRequest request) {
@@ -126,10 +124,6 @@ public class MovieService {
         final List<Movie> movies = movieRepository.findByTitleContaining(title);
 
         return movies.stream().map(Movie::getId).toList();
-    }
-
-    public String getImdbMovies(String filter) {
-        return imdbService.getMovies(filter);
     }
 
     public MovieDto updateMovie(MovieRequest request, int id) {

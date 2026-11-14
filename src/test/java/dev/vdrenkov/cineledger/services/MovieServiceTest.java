@@ -38,8 +38,6 @@ class MovieServiceTest {
     @Mock
     private CategoryService categoryService;
 
-    @Mock
-    private ImdbService imdbService;
 
     @InjectMocks
     private MovieService movieService;
@@ -149,18 +147,6 @@ class MovieServiceTest {
         final List<MovieDto> resultList = movieService.getMoviesByMinRating(MovieConstants.RATING);
 
         assertEquals(expected, resultList);
-    }
-
-    @Test
-    void testGetImdbMoviesTest_success() {
-        final String filter = "top";
-        final String movies = "[{\"title\":\"title1\", \"year\":\"2001\"},{\"title\":\"title2\", \"year\":\"2002\"}]";
-
-        when(imdbService.getMovies(filter)).thenReturn(movies);
-
-        final String result = movieService.getImdbMovies(filter);
-
-        assertEquals(movies, result);
     }
 
     @Test

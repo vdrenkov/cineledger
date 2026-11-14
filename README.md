@@ -51,8 +51,6 @@ Set these before running the application:
 - `MAILJET_API_SECRET` (optional)
 - `MAIL_SENDER_EMAIL` (default: `no-reply@cineledger.dev`)
 - `MAIL_SENDER_NAME` (default: `CineLedger`)
-- `IMDB_API_KEY` (optional)
-- `IMDB_API_URL` (default: `https://imdb-api.com/en/API/`)
 
 ## Database Setup
 
@@ -104,7 +102,6 @@ mvn spring-boot:run
 - An initial admin user can be bootstrapped when `APP_BOOTSTRAP_ADMIN_*` values are provided.
 - JWT auth uses the app-specific cookie name `CINELEDGER_AUTH`.
 - `GET /csrf` is available for clients that need to fetch the CSRF token explicitly.
-- Mailjet and IMDb integrations degrade gracefully when credentials are not configured.
 - `spring.jpa.hibernate.ddl-auto` is set to `validate` so entity/schema drift fails fast.
 - `DML_Scripts.sql` is development-only and should not be executed in production.
 - Full verification passes with `mvn clean verify`.

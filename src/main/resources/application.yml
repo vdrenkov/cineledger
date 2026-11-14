@@ -47,8 +47,3 @@ mail:
     email: ${MAIL_SENDER_EMAIL:no-reply@cineledger.dev}
     name: ${MAIL_SENDER_NAME:CineLedger}
 
-imdb:
-  key: ${IMDB_API_KEY:}
-  url: ${IMDB_API_URL:https://imdb-api.com/en/API/}
-
-

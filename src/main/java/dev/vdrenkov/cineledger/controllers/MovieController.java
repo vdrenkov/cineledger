@@ -69,13 +69,6 @@ public class MovieController {
         return ResponseEntity.ok(movieDtoList);
     }
 
-    @GetMapping(value = URIConstants.MOVIES_PATH, params = "imdb")
-    public ResponseEntity<String> getMoviesByImdb(@RequestParam String imdb) {
-        final String movies = movieService.getImdbMovies(imdb);
-
-        return ResponseEntity.ok(movies);
-    }
-
     @GetMapping(URIConstants.CATEGORIES_ID_MOVIES_PATH)
     public ResponseEntity<List<MovieDto>> getMoviesByCategory(@PathVariable("id") Integer categoryId,
         @RequestParam(required = false, defaultValue = "0.0") double minRating) {
