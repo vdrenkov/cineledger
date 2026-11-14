@@ -26,9 +26,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 
-/**
- * Tests income report service behavior.
- */
 @ExtendWith(MockitoExtension.class)
 class IncomeReportServiceTest {
 
@@ -56,9 +53,6 @@ class IncomeReportServiceTest {
     @InjectMocks
     private IncomeReportService incomeReportService;
 
-    /**
-     * Verifies that get All Incomes By Cinema Id double Returned success.
-     */
     @Test
     void testGetAllIncomesByCinemaId_doubleReturned_success() {
         when(cinemaService.getCinemaById(anyInt())).thenReturn(new Cinema());
@@ -70,9 +64,6 @@ class IncomeReportServiceTest {
         Assertions.assertEquals(OrderConstants.TOTAL_PRICE, result, 0.0);
     }
 
-    /**
-     * Verifies that get All Incomes By Cinema Id cinema Id Different returns Zero.
-     */
     @Test
     void testGetAllIncomesByCinemaId_cinemaIdDifferent_returnsZero() {
         final List<Order> orders = OrderFactory.getDefaultOrderList();
@@ -87,9 +78,6 @@ class IncomeReportServiceTest {
         assertEquals(0, result, 0.0);
     }
 
-    /**
-     * Verifies that get All Incomes By Hall Id double Returned success.
-     */
     @Test
     void testGetAllIncomesByHallId_doubleReturned_success() {
         when(hallService.getHallById(anyInt())).thenReturn(new Hall());
@@ -101,9 +89,6 @@ class IncomeReportServiceTest {
         Assertions.assertEquals(OrderConstants.TOTAL_PRICE, result, 0.0);
     }
 
-    /**
-     * Verifies that get All Incomes By Hall Id hall Id Different returns Zero.
-     */
     @Test
     void testGetAllIncomesByHallId_hallIdDifferent_returnsZero() {
         final List<Order> orders = OrderFactory.getDefaultOrderList();
@@ -118,12 +103,9 @@ class IncomeReportServiceTest {
         assertEquals(0, result, 0.0);
     }
 
-    /**
-     * Verifies that get All Incomes By Item Id double Returned success.
-     */
     @Test
     void testGetAllIncomesByItemId_doubleReturned_success() {
-        when(itemService.getItemDtoById(anyInt())).thenReturn(new ItemDto());
+        when(itemService.getItemDtoById(anyInt())).thenReturn(new ItemDto(0, null, null, 0));
         when(orderService.getOrdersByDateBetween(any(), any())).thenReturn(OrderFactory.getDefaultOrderList());
 
         double result = incomeReportService.getAllIncomesByItemId(ReportConstants.ID, ReportConstants.START_DATE,
@@ -132,9 +114,6 @@ class IncomeReportServiceTest {
         Assertions.assertEquals(ItemConstants.PRICE, result, 0.0);
     }
 
-    /**
-     * Verifies that get All Incomes By Movie Id double Returned success.
-     */
     @Test
     void testGetAllIncomesByMovieId_doubleReturned_success() {
         when(movieService.getMovieById(anyInt())).thenReturn(new Movie());
@@ -146,9 +125,6 @@ class IncomeReportServiceTest {
         Assertions.assertEquals(ProjectionConstants.PRICE, result, 0.0);
     }
 
-    /**
-     * Verifies that get All Incomes By User Id double Returned success.
-     */
     @Test
     void testGetAllIncomesByUserId_doubleReturned_success() {
         when(userService.getUserById(anyInt())).thenReturn(new User());
@@ -160,6 +136,3 @@ class IncomeReportServiceTest {
         Assertions.assertEquals(OrderConstants.TOTAL_PRICE, result, 0.0);
     }
 }
-
-
-

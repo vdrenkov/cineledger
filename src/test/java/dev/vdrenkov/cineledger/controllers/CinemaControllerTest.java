@@ -28,9 +28,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/**
- * Tests cinema controller behavior.
- */
 @AutoConfigureMockMvc
 @ExtendWith(MockitoExtension.class)
 class CinemaControllerTest {
@@ -44,17 +41,11 @@ class CinemaControllerTest {
     @InjectMocks
     private CinemaController cinemaController;
 
-    /**
-     * Initializes the test fixture before each test case.
-     */
     @BeforeEach
     void setup() {
         mockMvc = MockMvcBuilders.standaloneSetup(cinemaController).build();
     }
 
-    /**
-     * Verifies that add Cinema cinema Added success.
-     */
     @Test
     void testAddCinema_cinemaAdded_success() throws Exception {
         final String json = objectMapper.writeValueAsString(CinemaFactory.getDefaultCinemaRequest());
@@ -69,9 +60,6 @@ class CinemaControllerTest {
             .andExpect(header().string("Location", URIConstants.CINEMAS_PATH + "/" + ID));
     }
 
-    /**
-     * Verifies that get Cinemas get Cinema By City And Address success.
-     */
     @Test
     void testGetCinemas_getCinemaByCityAndAddress_success() throws Exception {
         when(cinemaService.getAllCinemas(CITY, ADDRESS)).thenReturn(CinemaFactory.getDefaultCinemaDtoList());
@@ -85,9 +73,6 @@ class CinemaControllerTest {
             .andExpect(jsonPath("$[0].address").value(ADDRESS));
     }
 
-    /**
-     * Verifies that get Cinemas get Cinema By City success.
-     */
     @Test
     void testGetCinemas_getCinemaByCity_success() throws Exception {
         when(cinemaService.getAllCinemas(CITY, null)).thenReturn(CinemaFactory.getDefaultCinemaDtoList());
@@ -100,9 +85,6 @@ class CinemaControllerTest {
             .andExpect(jsonPath("$[0].address").value(ADDRESS));
     }
 
-    /**
-     * Verifies that get Cinemas get Cinema By Address success.
-     */
     @Test
     void testGetCinemas_getCinemaByAddress_success() throws Exception {
         when(cinemaService.getAllCinemas(null, ADDRESS)).thenReturn(CinemaFactory.getDefaultCinemaDtoList());
@@ -115,9 +97,6 @@ class CinemaControllerTest {
             .andExpect(jsonPath("$[0].address").value(ADDRESS));
     }
 
-    /**
-     * Verifies that update Cinema return Old True success.
-     */
     @Test
     void testUpdateCinema_returnOldTrue_success() throws Exception {
         when(cinemaService.updateCinema(any(), anyInt())).thenReturn(CinemaFactory.getDefaultCinemaDto());
@@ -134,9 +113,6 @@ class CinemaControllerTest {
             .andExpect(jsonPath("$.address").value(ADDRESS));
     }
 
-    /**
-     * Verifies that update Cinema return Old False success.
-     */
     @Test
     void testUpdateCinema_returnOldFalse_success() throws Exception {
         when(cinemaService.updateCinema(any(), anyInt())).thenReturn(CinemaFactory.getDefaultCinemaDto());
@@ -147,9 +123,6 @@ class CinemaControllerTest {
             .andExpect(status().isNoContent());
     }
 
-    /**
-     * Verifies that delete Cinema return Old True success.
-     */
     @Test
     void testDeleteCinema_returnOldTrue_success() throws Exception {
         when(cinemaService.deleteCinema(anyInt())).thenReturn(CinemaFactory.getDefaultCinemaDto());
@@ -162,9 +135,6 @@ class CinemaControllerTest {
             .andExpect(jsonPath("$.address").value(ADDRESS));
     }
 
-    /**
-     * Verifies that delete Cinema return Old False success.
-     */
     @Test
     void testDeleteCinema_returnOldFalse_success() throws Exception {
         when(cinemaService.deleteCinema(anyInt())).thenReturn(CinemaFactory.getDefaultCinemaDto());
@@ -172,8 +142,3 @@ class CinemaControllerTest {
         mockMvc.perform(delete(URIConstants.CINEMAS_ID_PATH, ID)).andExpect(status().isNoContent());
     }
 }
-
-
-
-
-

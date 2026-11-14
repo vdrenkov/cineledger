@@ -26,4 +26,3 @@ class EmailServiceGracefulDegradationTest {
             OrderFactory.getDefaultOrder()));
     }
 }
-

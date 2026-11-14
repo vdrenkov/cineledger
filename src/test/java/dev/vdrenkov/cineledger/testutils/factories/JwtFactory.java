@@ -26,9 +26,6 @@ import static dev.vdrenkov.cineledger.testutils.constants.JwtConstants.JWT_USERN
 import static dev.vdrenkov.cineledger.testutils.constants.JwtConstants.USER_ROLE;
 import static dev.vdrenkov.cineledger.utils.constants.JwtConstants.JWT_COOKIE_NAME;
 
-/**
- * Provides reusable jwt fixtures for tests.
- */
 public final class JwtFactory {
 
     private static String secret = "";
@@ -37,21 +34,10 @@ public final class JwtFactory {
         throw new IllegalStateException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
     }
 
-    /**
-     * Builds reusable jwt test data.
-     *
-     * @param secret
-     *     secret used by the test helper
-     */
     public static void setSecret(final String secret) {
         JwtFactory.secret = Objects.requireNonNull(secret, "secret must not be null");
     }
 
-    /**
-     * Returns the default jwt token fixture used in tests.
-     *
-     * @return test string value
-     */
     public static String getDefaultJwtToken() {
         final SecretKey key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         final Instant issuedAt = Instant.now();
@@ -66,47 +52,22 @@ public final class JwtFactory {
             .compact();
     }
 
-    /**
-     * Returns the default http cookie fixture used in tests.
-     *
-     * @return test http cookie value
-     */
     public static HttpCookie getDefaultHttpCookie() {
         return new HttpCookie(JWT_COOKIE_NAME, JwtFactory.getDefaultJwtToken());
     }
 
-    /**
-     * Returns the default cookie fixture used in tests.
-     *
-     * @return test cookie value
-     */
     public static Cookie getDefaultCookie() {
         return new Cookie(JWT_COOKIE_NAME, JwtFactory.getDefaultJwtToken());
     }
 
-    /**
-     * Returns the default cookie array fixture used in tests.
-     *
-     * @return test cookie[] value
-     */
     public static Cookie[] getDefaultCookieArray() {
         return new Cookie[] { getDefaultCookie() };
     }
 
-    /**
-     * Returns the default user details fixture used in tests.
-     *
-     * @return test user details value
-     */
     public static UserDetails getDefaultUserDetails() {
         return User.withUsername(JWT_USERNAME).password(JWT_PASSWORD).authorities(getDefaultAuthorities()).build();
     }
 
-    /**
-     * Returns the default authentication fixture used in tests.
-     *
-     * @return test authentication value
-     */
     public static Authentication getDefaultAuthentication() {
         return new UsernamePasswordAuthenticationToken(getDefaultUserDetails(), JWT_PASSWORD, getDefaultAuthorities());
     }
@@ -115,5 +76,3 @@ public final class JwtFactory {
         return Collections.singletonList(new SimpleGrantedAuthority(USER_ROLE));
     }
 }
-
-

@@ -41,9 +41,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/**
- * Tests order controller behavior.
- */
 @AutoConfigureMockMvc
 @ExtendWith(MockitoExtension.class)
 class OrderControllerTest {
@@ -58,17 +55,11 @@ class OrderControllerTest {
     @InjectMocks
     private OrderController orderController;
 
-    /**
-     * Initializes the test fixture before each test case.
-     */
     @BeforeEach
     void setup() {
         mockMvc = MockMvcBuilders.standaloneSetup(orderController).build();
     }
 
-    /**
-     * Verifies that add Order order Added success.
-     */
     @Test
     void testAddOrder_orderAdded_success() throws Exception {
         final String json = objectMapper.writeValueAsString(OrderFactory.getDefaultOrderRequest());
@@ -84,9 +75,6 @@ class OrderControllerTest {
             .andExpect(header().string("Location", URIConstants.ORDERS_PATH + "/" + ID));
     }
 
-    /**
-     * Verifies that make Reservation With User Id order Added success.
-     */
     @Test
     void testMakeReservationWithUserId_orderAdded_success() throws Exception {
         String json = objectMapper.writeValueAsString(
@@ -100,9 +88,6 @@ class OrderControllerTest {
             .andExpect(header().string("Location", URIConstants.ORDERS_PATH + "/" + ID));
     }
 
-    /**
-     * Verifies that get Orders By User Id no Exceptions success.
-     */
     @Test
     void testGetOrdersByUserId_noExceptions_success() throws Exception {
         final List<OrderDto> defaultOrderDtoList = OrderFactory.getDefaultOrderDtoList();
@@ -112,21 +97,18 @@ class OrderControllerTest {
         mockMvc
             .perform(get(URIConstants.USERS_ID_ORDERS_PATH, ID))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$[0].id").value(orderDto.getId()))
+            .andExpect(jsonPath("$[0].id").value(orderDto.id()))
             .andExpect(jsonPath("$[0].user.username").value(USERNAME))
             .andExpect(jsonPath("$[0].user.email").value(EMAIL))
             .andExpect(jsonPath("$[0].user.firstName").value(FIRST_NAME))
             .andExpect(jsonPath("$[0].user.lastName").value(LAST_NAME))
             .andExpect(jsonPath("$[0].user.joinDate").value(JOIN_DATE.toString()))
             .andExpect(jsonPath("$[0].user.roles[0].name").value(NAME))
-            .andExpect(jsonPath("$[0].tickets[0].id").value(orderDto.getTickets().getFirst().getId()))
-            .andExpect(jsonPath("$[0].items[0]").value(orderDto.getItems().getFirst()))
-            .andExpect(jsonPath("$[0].totalPrice").value(orderDto.getTotalPrice()));
+            .andExpect(jsonPath("$[0].tickets[0].id").value(orderDto.tickets().getFirst().id()))
+            .andExpect(jsonPath("$[0].items[0]").value(objectMapper.convertValue(orderDto.items().getFirst(), java.util.Map.class)))
+            .andExpect(jsonPath("$[0].totalPrice").value(orderDto.totalPrice()));
     }
 
-    /**
-     * Verifies that update Order return Old True success.
-     */
     @Test
     void testUpdateOrder_returnOldTrue_success() throws Exception {
         final OrderDto orderDto = OrderFactory.getDefaultOrderDto();
@@ -139,21 +121,18 @@ class OrderControllerTest {
                 .content(json)
                 .queryParam(RETURN_OLD, String.valueOf(true)))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(orderDto.getId()))
+            .andExpect(jsonPath("$.id").value(orderDto.id()))
             .andExpect(jsonPath("$.user.username").value(USERNAME))
             .andExpect(jsonPath("$.user.email").value(EMAIL))
             .andExpect(jsonPath("$.user.firstName").value(FIRST_NAME))
             .andExpect(jsonPath("$.user.lastName").value(LAST_NAME))
             .andExpect(jsonPath("$.user.joinDate").value(JOIN_DATE.toString()))
             .andExpect(jsonPath("$.user.roles[0].name").value(NAME))
-            .andExpect(jsonPath("$.tickets[0].id").value(orderDto.getTickets().getFirst().getId()))
-            .andExpect(jsonPath("$.items[0]").value(orderDto.getItems().getFirst()))
-            .andExpect(jsonPath("$.totalPrice").value(orderDto.getTotalPrice()));
+            .andExpect(jsonPath("$.tickets[0].id").value(orderDto.tickets().getFirst().id()))
+            .andExpect(jsonPath("$.items[0]").value(objectMapper.convertValue(orderDto.items().getFirst(), java.util.Map.class)))
+            .andExpect(jsonPath("$.totalPrice").value(orderDto.totalPrice()));
     }
 
-    /**
-     * Verifies that update Order return Old False success.
-     */
     @Test
     void testUpdateOrder_returnOldFalse_success() throws Exception {
         when(orderService.updateOrder(any(), anyInt())).thenReturn(OrderFactory.getDefaultOrderDto());
@@ -164,9 +143,6 @@ class OrderControllerTest {
             .andExpect(status().isNoContent());
     }
 
-    /**
-     * Verifies that delete Order return Old True success.
-     */
     @Test
     void testDeleteOrder_returnOldTrue_success() throws Exception {
         final OrderDto orderDto = OrderFactory.getDefaultOrderDto();
@@ -175,21 +151,18 @@ class OrderControllerTest {
         mockMvc
             .perform(delete(URIConstants.ORDERS_ID_PATH, ID).queryParam(RETURN_OLD, String.valueOf(true)))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(orderDto.getId()))
+            .andExpect(jsonPath("$.id").value(orderDto.id()))
             .andExpect(jsonPath("$.user.username").value(USERNAME))
             .andExpect(jsonPath("$.user.email").value(EMAIL))
             .andExpect(jsonPath("$.user.firstName").value(FIRST_NAME))
             .andExpect(jsonPath("$.user.lastName").value(LAST_NAME))
             .andExpect(jsonPath("$.user.joinDate").value(JOIN_DATE.toString()))
             .andExpect(jsonPath("$.user.roles[0].name").value(NAME))
-            .andExpect(jsonPath("$.tickets[0].id").value(orderDto.getTickets().getFirst().getId()))
-            .andExpect(jsonPath("$.items[0]").value(orderDto.getItems().getFirst()))
-            .andExpect(jsonPath("$.totalPrice").value(orderDto.getTotalPrice()));
+            .andExpect(jsonPath("$.tickets[0].id").value(orderDto.tickets().getFirst().id()))
+            .andExpect(jsonPath("$.items[0]").value(objectMapper.convertValue(orderDto.items().getFirst(), java.util.Map.class)))
+            .andExpect(jsonPath("$.totalPrice").value(orderDto.totalPrice()));
     }
 
-    /**
-     * Verifies that delete Order return Old False success.
-     */
     @Test
     void testDeleteOrder_returnOldFalse_success() throws Exception {
         when(orderService.deleteOrder(anyInt())).thenReturn(OrderFactory.getDefaultOrderDto());
@@ -197,6 +170,3 @@ class OrderControllerTest {
         mockMvc.perform(delete(URIConstants.ORDERS_ID_PATH, ID)).andExpect(status().isNoContent());
     }
 }
-
-
-

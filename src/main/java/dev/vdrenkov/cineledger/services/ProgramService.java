@@ -10,183 +10,92 @@ import dev.vdrenkov.cineledger.models.entities.Program;
 import dev.vdrenkov.cineledger.models.requests.ProgramRequest;
 import dev.vdrenkov.cineledger.repositories.ProgramRepository;
 import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
-import dev.vdrenkov.cineledger.utils.constants.LogMessages;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
 
-/**
- * Contains business logic for program operations.
- */
 @Service
 public class ProgramService {
-    private static final Logger log = LoggerFactory.getLogger(ProgramService.class);
 
     private final ProgramRepository programRepository;
     private final CinemaService cinemaService;
 
-    /**
-     * Creates a new program service with its required collaborators.
-     *
-     * @param programRepository
-     *     program repository used by the operation
-     * @param cinemaService
-     *     cinema service used by the operation
-     */
-    @Autowired
     public ProgramService(ProgramRepository programRepository, CinemaService cinemaService) {
         this.programRepository = programRepository;
         this.cinemaService = cinemaService;
     }
 
-    /**
-     * Creates and persists program.
-     *
-     * @param request
-     *     request payload containing the submitted data
-     * @return requested program value
-     */
     public Program addProgram(ProgramRequest request) {
-        if (isDateNotValid(request.getProgramDate())) {
-            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.DATE_NOT_VALID_MESSAGE);
+        if (isDateNotValid(request.programDate())) {
 
             throw new DateNotValidException(ExceptionMessages.DATE_NOT_VALID_MESSAGE);
         }
 
         programRepository
-            .findByProgramDateAndCinemaId(request.getProgramDate(), request.getCinemaId())
+            .findByProgramDateAndCinemaId(request.programDate(), request.cinemaId())
             .ifPresent(existingProgram -> {
 
-                log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.PROGRAM_ALREADY_EXISTS_MESSAGE);
                 throw new ProgramAlreadyExistsException(ExceptionMessages.PROGRAM_ALREADY_EXISTS_MESSAGE);
             });
 
-        log.info("An attempt to add a new program in the database");
-
         return programRepository.save(
-            new Program(request.getProgramDate(), cinemaService.getCinemaById(request.getCinemaId())));
+            new Program(request.programDate(), cinemaService.getCinemaById(request.cinemaId())));
     }
 
-    /**
-     * Returns all programs matching the supplied criteria.
-     *
-     * @param date
-     *     date used by the operation
-     * @return matching program dto values
-     */
     public List<ProgramDto> getAllPrograms(LocalDate date) {
         if (date != null) {
-            log.info("All programs with date {} requested from the database", date);
 
             return ProgramMapper.mapProgramListToProgramDtoList(programRepository.findAllByProgramDate(date));
         } else {
-            log.info("All programs requested from the database");
 
             return ProgramMapper.mapProgramListToProgramDtoList(programRepository.findAll());
         }
     }
 
-    /**
-     * Returns programs matching the supplied criteria.
-     *
-     * @param cinemaId
-     *     identifier of the target cinema
-     * @return matching program dto values
-     */
     public List<ProgramDto> getProgramsByCinemaId(int cinemaId) {
-        log.info("All programs with cinema id {} requested from the database", cinemaId);
 
         final Cinema cinema = cinemaService.getCinemaById(cinemaId);
 
         return ProgramMapper.mapProgramListToProgramDtoList(programRepository.findAllByCinemaId(cinema.getId()));
     }
 
-    /**
-     * Returns program matching the supplied criteria.
-     *
-     * @param id
-     *     identifier of the target resource
-     * @return requested program value
-     */
     public Program getProgramById(int id) {
-        log.info("An attempt to extract a program with an id {} from the database", id);
 
         return programRepository.findById(id).orElseThrow(() -> {
-            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.PROGRAM_NOT_FOUND_MESSAGE);
 
             return new ProgramNotFoundException(ExceptionMessages.PROGRAM_NOT_FOUND_MESSAGE);
         });
     }
 
-    /**
-     * Returns program matching the supplied criteria.
-     *
-     * @param id
-     *     identifier of the target resource
-     * @return program dto result
-     */
     public ProgramDto getProgramDtoById(int id) {
-        log.info("An attempt to extract a program DTO with an id {} from the database", id);
 
         return ProgramMapper.mapProgramToProgramDto(getProgramById(id));
     }
 
-    /**
-     * Updates program and returns the previous state when needed.
-     *
-     * @param request
-     *     request payload containing the submitted data
-     * @param programId
-     *     identifier of the target program
-     * @return program dto result
-     */
     public ProgramDto updateProgram(ProgramRequest request, int programId) {
         final ProgramDto programDto = getProgramDtoById(programId);
 
-        if (isDateNotValid(request.getProgramDate())) {
-            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.DATE_NOT_VALID_MESSAGE);
+        if (isDateNotValid(request.programDate())) {
 
             throw new DateNotValidException(ExceptionMessages.DATE_NOT_VALID_MESSAGE);
         }
 
         programRepository.save(
-            new Program(programId, request.getProgramDate(), cinemaService.getCinemaById(request.getCinemaId())));
-
-        log.info("Program with an id {} updated", programId);
+            new Program(programId, request.programDate(), cinemaService.getCinemaById(request.cinemaId())));
 
         return programDto;
     }
 
-    /**
-     * Deletes program and returns the removed state when needed.
-     *
-     * @param programId
-     *     identifier of the target program
-     * @return program dto result
-     */
     public ProgramDto deleteProgram(int programId) {
         final ProgramDto programDto = getProgramDtoById(programId);
 
         programRepository.deleteById(programId);
 
-        log.info("Program with an id {} deleted", programId);
-
         return programDto;
     }
 
-    /**
-     * Checks whether the supplied release date violates the application rule set.
-     *
-     * @param date
-     *     date used by the operation
-     * @return true when the requested condition holds; otherwise false
-     */
     public static boolean isDateNotValid(LocalDate date) {
         return date.isBefore(LocalDate.now());
     }
 }
-

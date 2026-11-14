@@ -28,9 +28,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 
-/**
- * Tests program service behavior.
- */
 @ExtendWith(MockitoExtension.class)
 class ProgramServiceTest {
     ProgramRequest programRequest;
@@ -49,9 +46,6 @@ class ProgramServiceTest {
         programRequest = ProgramFactory.getDefaultProgramRequest();
     }
 
-    /**
-     * Verifies that add Program no Exceptions success.
-     */
     @Test
     void testAddProgram_noExceptions_success() {
         final Program expected = ProgramFactory.getDefaultProgram();
@@ -64,19 +58,13 @@ class ProgramServiceTest {
         assertEquals(expected, program);
     }
 
-    /**
-     * Verifies that add Program date Not Present throws Date Not Valid Exception.
-     */
     @Test
     void testAddProgram_dateNotPresent_throwsDateNotValidException() {
-        programRequest.setProgramDate(ProgramConstants.PAST_DATE);
+        programRequest = new ProgramRequest(ProgramConstants.PAST_DATE, programRequest.cinemaId());
 
         assertThrows(DateNotValidException.class, () -> programService.addProgram(programRequest));
     }
 
-    /**
-     * Verifies that add Program program Already Exists throws Program Already Exists Exception.
-     */
     @Test
     void testAddProgram_programAlreadyExists_throwsProgramAlreadyExistsException() {
         when(programRepository.findByProgramDateAndCinemaId(any(), anyInt())).thenReturn(
@@ -85,9 +73,6 @@ class ProgramServiceTest {
         assertThrows(ProgramAlreadyExistsException.class, () -> programService.addProgram(programRequest));
     }
 
-    /**
-     * Verifies that get All Programs date Not Null success.
-     */
     @Test
     void testGetAllPrograms_dateNotNull_success() {
         final List<ProgramDto> expected = ProgramFactory.getDefaultProgramDtoList();
@@ -99,9 +84,6 @@ class ProgramServiceTest {
         assertEquals(expected, resultList);
     }
 
-    /**
-     * Verifies that get All Programs date Null success.
-     */
     @Test
     void testGetAllPrograms_dateNull_success() {
         final List<ProgramDto> expected = ProgramFactory.getDefaultProgramDtoList();
@@ -113,9 +95,6 @@ class ProgramServiceTest {
         assertEquals(expected, resultList);
     }
 
-    /**
-     * Verifies that get Programs By Cinema Id cinema Found success.
-     */
     @Test
     void testGetProgramsByCinemaId_cinemaFound_success() {
         final List<ProgramDto> expected = ProgramFactory.getDefaultProgramDtoList();
@@ -128,9 +107,6 @@ class ProgramServiceTest {
         assertEquals(expected, resultList);
     }
 
-    /**
-     * Verifies that get Program By Id program Found success.
-     */
     @Test
     void testGetProgramById_programFound_success() {
         final Program expected = ProgramFactory.getDefaultProgram();
@@ -142,17 +118,11 @@ class ProgramServiceTest {
         assertEquals(expected, program);
     }
 
-    /**
-     * Verifies that get Program By Id program Not Found throws Program Not Found Exception.
-     */
     @Test
     void testGetProgramById_programNotFound_throwsProgramNotFoundException() {
         assertThrows(ProgramNotFoundException.class, () -> programService.getProgramById(ProgramConstants.ID));
     }
 
-    /**
-     * Verifies that get Program DTO By Id program DTO Found success.
-     */
     @Test
     void testGetProgramDtoById_programDtoFound_success() {
         final ProgramDto expected = ProgramFactory.getDefaultProgramDto();
@@ -164,9 +134,6 @@ class ProgramServiceTest {
         assertEquals(expected, program);
     }
 
-    /**
-     * Verifies that update Program program Updated success.
-     */
     @Test
     void testUpdateProgram_programUpdated_success() {
         final ProgramDto expected = ProgramFactory.getDefaultProgramDto();
@@ -181,12 +148,9 @@ class ProgramServiceTest {
 
     }
 
-    /**
-     * Verifies that update Program date Not Present throws Date Not Valid Exception.
-     */
     @Test
     void testUpdateProgram_dateNotPresent_throwsDateNotValidException() {
-        programRequest.setProgramDate(ProgramConstants.PAST_DATE);
+        programRequest = new ProgramRequest(ProgramConstants.PAST_DATE, programRequest.cinemaId());
 
         when(programRepository.findById(anyInt())).thenReturn(Optional.of(ProgramFactory.getDefaultProgram()));
 
@@ -194,9 +158,6 @@ class ProgramServiceTest {
             () -> programService.updateProgram(programRequest, ProgramConstants.ID));
     }
 
-    /**
-     * Verifies that delete Program program Deleted success.
-     */
     @Test
     void testDeleteProgram_programDeleted_success() {
         final ProgramDto expected = ProgramFactory.getDefaultProgramDto();
@@ -208,9 +169,6 @@ class ProgramServiceTest {
         assertEquals(expected, program);
     }
 
-    /**
-     * Verifies that is Date Not Valid.
-     */
     @Test
     void testIsDateNotValid() {
         final boolean result = programService.isDateNotValid(LocalDate.of(2000, 1, 1));
@@ -218,6 +176,3 @@ class ProgramServiceTest {
         assertTrue(result);
     }
 }
-
-
-

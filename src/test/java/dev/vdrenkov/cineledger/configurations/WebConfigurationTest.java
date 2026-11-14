@@ -8,18 +8,12 @@ import org.springframework.web.client.RestTemplate;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-/**
- * Tests web configuration behavior.
- */
 @ExtendWith(MockitoExtension.class)
 class WebConfigurationTest {
 
     @Spy
     private WebConfiguration webConfiguration;
 
-    /**
-     * Verifies that REST Template is created.
-     */
     @Test
     void testRestTemplate() {
         final RestTemplate restTemplate = webConfiguration.restTemplate();
@@ -27,7 +21,3 @@ class WebConfigurationTest {
         assertNotNull(restTemplate);
     }
 }
-
-
-
-

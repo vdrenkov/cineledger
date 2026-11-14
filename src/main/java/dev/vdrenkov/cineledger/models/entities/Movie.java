@@ -8,21 +8,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.time.Duration;
 import java.time.LocalDate;
 
-/**
- * Represents a persisted movie entity.
- */
 @Entity
 @Table(name = "movies")
-@AllArgsConstructor
-@NoArgsConstructor
-@Data
 public class Movie {
 
     @Id
@@ -48,20 +39,6 @@ public class Movie {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    /**
-     * Creates a new movie with its required collaborators.
-     *
-     * @param title
-     *     title text to search for
-     * @param description
-     *     description used by the operation
-     * @param releaseDate
-     *     release date to validate or persist
-     * @param runtime
-     *     runtime used by the operation
-     * @param category
-     *     category entity to transform
-     */
     public Movie(String title, String description, LocalDate releaseDate, Duration runtime, Category category) {
         this.title = title;
         this.description = description;
@@ -70,22 +47,6 @@ public class Movie {
         this.category = category;
     }
 
-    /**
-     * Creates a new movie with its required collaborators.
-     *
-     * @param id
-     *     identifier of the target resource
-     * @param title
-     *     title text to search for
-     * @param description
-     *     description used by the operation
-     * @param releaseDate
-     *     release date to validate or persist
-     * @param runtime
-     *     runtime used by the operation
-     * @param category
-     *     category entity to transform
-     */
     public Movie(int id, String title, String description, LocalDate releaseDate, Duration runtime, Category category) {
         this.id = id;
         this.title = title;
@@ -94,7 +55,82 @@ public class Movie {
         this.runtime = runtime;
         this.category = category;
     }
+
+    public Movie() {}
+
+    public Movie(final int id, final String title, final double averageRating, final String description, final LocalDate releaseDate, final Duration runtime, final Category category) {
+        this.id = id;
+        this.title = title;
+        this.averageRating = averageRating;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.runtime = runtime;
+        this.category = category;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(final int id) {
+        this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(final String title) {
+        this.title = title;
+    }
+
+    public double getAverageRating() {
+        return averageRating;
+    }
+
+    public void setAverageRating(final double averageRating) {
+        this.averageRating = averageRating;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(final String description) {
+        this.description = description;
+    }
+
+    public LocalDate getReleaseDate() {
+        return releaseDate;
+    }
+
+    public void setReleaseDate(final LocalDate releaseDate) {
+        this.releaseDate = releaseDate;
+    }
+
+    public Duration getRuntime() {
+        return runtime;
+    }
+
+    public void setRuntime(final Duration runtime) {
+        this.runtime = runtime;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(final Category category) {
+        this.category = category;
+    }
+
+    @Override
+    public boolean equals(final Object object) {
+        return this == object || object instanceof Movie other && id != 0 && id == other.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Movie.class.hashCode();
+    }
 }
-
-
-

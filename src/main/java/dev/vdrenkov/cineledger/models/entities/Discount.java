@@ -6,18 +6,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
-/**
- * Represents a persisted discount entity.
- */
 @Entity
 @Table(name = "discounts")
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
 public class Discount {
 
     @Id
@@ -33,22 +24,60 @@ public class Discount {
     @Column
     private int percentage;
 
-    /**
-     * Creates a new discount with its required collaborators.
-     *
-     * @param type
-     *     type used by the operation
-     * @param code
-     *     code used by the operation
-     * @param percentage
-     *     percentage used by the operation
-     */
     public Discount(String type, String code, int percentage) {
         this.type = type;
         this.code = code;
         this.percentage = percentage;
     }
+
+    public Discount() {}
+
+    public Discount(final int id, final String type, final String code, final int percentage) {
+        this.id = id;
+        this.type = type;
+        this.code = code;
+        this.percentage = percentage;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(final int id) {
+        this.id = id;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(final String type) {
+        this.type = type;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(final String code) {
+        this.code = code;
+    }
+
+    public int getPercentage() {
+        return percentage;
+    }
+
+    public void setPercentage(final int percentage) {
+        this.percentage = percentage;
+    }
+
+    @Override
+    public boolean equals(final Object object) {
+        return this == object || object instanceof Discount other && id != 0 && id == other.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Discount.class.hashCode();
+    }
 }
-
-
-

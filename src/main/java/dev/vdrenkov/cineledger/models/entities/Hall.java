@@ -8,18 +8,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-/**
- * Represents a persisted hall entity.
- */
 @Entity
 @Table(name = "halls")
-@AllArgsConstructor
-@NoArgsConstructor
-@Data
 public class Hall {
 
     @Id
@@ -33,19 +24,50 @@ public class Hall {
     @JoinColumn(name = "cinema_id")
     private Cinema cinema;
 
-    /**
-     * Creates a new hall with its required collaborators.
-     *
-     * @param capacity
-     *     capacity used by the operation
-     * @param cinema
-     *     cinema entity to transform
-     */
     public Hall(int capacity, Cinema cinema) {
         this.capacity = capacity;
         this.cinema = cinema;
     }
+
+    public Hall() {}
+
+    public Hall(final int id, final int capacity, final Cinema cinema) {
+        this.id = id;
+        this.capacity = capacity;
+        this.cinema = cinema;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(final int id) {
+        this.id = id;
+    }
+
+    public int getCapacity() {
+        return capacity;
+    }
+
+    public void setCapacity(final int capacity) {
+        this.capacity = capacity;
+    }
+
+    public Cinema getCinema() {
+        return cinema;
+    }
+
+    public void setCinema(final Cinema cinema) {
+        this.cinema = cinema;
+    }
+
+    @Override
+    public boolean equals(final Object object) {
+        return this == object || object instanceof Hall other && id != 0 && id == other.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Hall.class.hashCode();
+    }
 }
-
-
-

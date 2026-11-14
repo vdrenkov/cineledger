@@ -11,35 +11,24 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * Tests category mapper behavior.
- */
 @ExtendWith(MockitoExtension.class)
 class CategoryMapperTest {
-    /**
-     * Verifies that map Category To Category DTO List success.
-     */
+
     @Test
     void testMapCategoryToCategoryDtoList_success() {
         List<CategoryDto> categoryDtos = CategoryMapper.mapCategoryToCategoryDtoList(
             CategoryFactory.getDefaultCategoryList());
 
         final CategoryDto categoryDto = categoryDtos.getFirst();
-        assertEquals(CategoryConstants.ID, categoryDto.getId());
-        assertEquals(CategoryConstants.NAME, categoryDto.getName());
+        assertEquals(CategoryConstants.ID, categoryDto.id());
+        assertEquals(CategoryConstants.NAME, categoryDto.name());
     }
 
-    /**
-     * Verifies that map Category To Category DTO success.
-     */
     @Test
     void testMapCategoryToCategoryDto_success() {
         final CategoryDto actualDto = CategoryMapper.mapCategoryToCategoryDto(CategoryFactory.getDefaultCategory());
 
-        assertEquals(CategoryConstants.ID, actualDto.getId());
-        assertEquals(CategoryConstants.NAME, actualDto.getName());
+        assertEquals(CategoryConstants.ID, actualDto.id());
+        assertEquals(CategoryConstants.NAME, actualDto.name());
     }
 }
-
-
-

@@ -32,9 +32,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/**
- * Tests program controller behavior.
- */
 @ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc
 class ProgramControllerTest {
@@ -46,17 +43,11 @@ class ProgramControllerTest {
     @InjectMocks
     private ProgramController programController;
 
-    /**
-     * Initializes the test fixture before each test case.
-     */
     @BeforeEach
     void setup() {
         mvc = MockMvcBuilders.standaloneSetup(programController).build();
     }
 
-    /**
-     * Verifies that add Program program Added success.
-     */
     @Test
     void testAddProgram_programAdded_success() throws Exception {
         when(programService.addProgram(any())).thenReturn(ProgramFactory.getDefaultProgram());
@@ -72,9 +63,6 @@ class ProgramControllerTest {
             .andExpect(header().string(HttpHeaders.LOCATION, URIConstants.PROGRAMS_PATH + "/" + ID));
     }
 
-    /**
-     * Verifies that get All Programs Test get By Program Date success.
-     */
     @Test
     void testGetAllProgramsTest_getByProgramDate_success() throws Exception {
         when(programService.getAllPrograms(DATE)).thenReturn(ProgramFactory.getDefaultProgramDtoList());
@@ -91,9 +79,6 @@ class ProgramControllerTest {
             .andExpect(jsonPath("$[0].cinema.address").value(CinemaConstants.ADDRESS));
     }
 
-    /**
-     * Verifies that get All Programs Test get A Ll Programs success.
-     */
     @Test
     void testGetAllProgramsTest_getALlPrograms_success() throws Exception {
         when(programService.getAllPrograms(null)).thenReturn(ProgramFactory.getDefaultProgramDtoList());
@@ -108,9 +93,6 @@ class ProgramControllerTest {
             .andExpect(jsonPath("$[0].cinema.address").value(CinemaConstants.ADDRESS));
     }
 
-    /**
-     * Verifies that get Programs By Cinema Id success.
-     */
     @Test
     void testGetProgramsByCinemaId_success() throws Exception {
         when(programService.getProgramsByCinemaId(CinemaConstants.ID)).thenReturn(
@@ -126,9 +108,6 @@ class ProgramControllerTest {
             .andExpect(jsonPath("$[0].cinema.address").value(CinemaConstants.ADDRESS));
     }
 
-    /**
-     * Verifies that update Program return Old True success.
-     */
     @Test
     void testUpdateProgram_returnOldTrue_success() throws Exception {
         when(programService.updateProgram(any(), anyInt())).thenReturn(ProgramFactory.getDefaultProgramDto());
@@ -148,9 +127,6 @@ class ProgramControllerTest {
             .andExpect(jsonPath("$.cinema.address").value(CinemaConstants.ADDRESS));
     }
 
-    /**
-     * Verifies that update Program return Old False success.
-     */
     @Test
     void testUpdateProgram_returnOldFalse_success() throws Exception {
         when(programService.updateProgram(any(), anyInt())).thenReturn(ProgramFactory.getDefaultProgramDto());
@@ -162,9 +138,6 @@ class ProgramControllerTest {
             .andExpect(status().isNoContent());
     }
 
-    /**
-     * Verifies that delete Program return Old True success.
-     */
     @Test
     void testDeleteProgram_returnOldTrue_success() throws Exception {
         when(programService.deleteProgram(anyInt())).thenReturn(ProgramFactory.getDefaultProgramDto());
@@ -179,19 +152,9 @@ class ProgramControllerTest {
             .andExpect(jsonPath("$.cinema.address").value(CinemaConstants.ADDRESS));
     }
 
-    /**
-     * Verifies that delete Program return Old False success.
-     */
     @Test
     void testDeleteProgram_returnOldFalse_success() throws Exception {
         when(programService.deleteProgram(anyInt())).thenReturn(ProgramFactory.getDefaultProgramDto());
         mvc.perform(delete(URIConstants.PROGRAMS_ID_PATH, ID)).andExpect(status().isNoContent());
     }
 }
-
-
-
-
-
-
-

@@ -34,9 +34,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/**
- * Tests review controller behavior.
- */
 @ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc
 class ReviewControllerTest {
@@ -52,17 +49,11 @@ class ReviewControllerTest {
     @InjectMocks
     private ReviewController reviewController;
 
-    /**
-     * Initializes the test fixture before each test case.
-     */
     @BeforeEach
     void setup() {
         mockMvc = MockMvcBuilders.standaloneSetup(reviewController).build();
     }
 
-    /**
-     * Verifies that add Cinema Review review Added success.
-     */
     @Test
     void testAddCinemaReview_reviewAdded_success() throws Exception {
         when(reviewService.addCinemaReview(any(), anyInt())).thenReturn(ReviewFactory.getDefaultReview());
@@ -76,9 +67,6 @@ class ReviewControllerTest {
             .andExpect(header().string("Location", REVIEW_ID_PATH_PLACEHOLDER));
     }
 
-    /**
-     * Verifies that add Movie Review review Added success.
-     */
     @Test
     void testAddMovieReview_reviewAdded_success() throws Exception {
         when(reviewService.addMovieReview(any(), anyInt())).thenReturn(ReviewFactory.getDefaultReview());
@@ -92,9 +80,6 @@ class ReviewControllerTest {
             .andExpect(header().string("Location", REVIEW_ID_PATH_PLACEHOLDER));
     }
 
-    /**
-     * Verifies that get Reviews By Cinema Id no Exceptions success.
-     */
     @Test
     void testGetReviewsByCinemaId_noExceptions_success() throws Exception {
         when(reviewService.getReviewsByCinemaId(anyInt())).thenReturn(
@@ -119,9 +104,6 @@ class ReviewControllerTest {
             .andExpect(jsonPath("$[0].user.joinDate").value(UserConstants.JOIN_DATE.toString()));
     }
 
-    /**
-     * Verifies that get Reviews By Movie Id no Exceptions success.
-     */
     @Test
     void testGetReviewsByMovieId_noExceptions_success() throws Exception {
         when(reviewService.getReviewsByMovieId(anyInt())).thenReturn(ReviewFactory.getDefaultReviewDtoList());
@@ -146,9 +128,6 @@ class ReviewControllerTest {
             .andExpect(jsonPath("$[0].user.joinDate").value(UserConstants.JOIN_DATE.toString()));
     }
 
-    /**
-     * Verifies that get Movie Reviews By User Id no Exceptions success.
-     */
     @Test
     void testGetMovieReviewsByUserId_noExceptions_success() throws Exception {
         when(reviewService.getMovieReviewsByUserId(anyInt())).thenReturn(ReviewFactory.getDefaultReviewDtoList());
@@ -173,9 +152,6 @@ class ReviewControllerTest {
             .andExpect(jsonPath("$[0].user.joinDate").value(UserConstants.JOIN_DATE.toString()));
     }
 
-    /**
-     * Verifies that get Cinema Reviews By User Id no Exceptions success.
-     */
     @Test
     void testGetCinemaReviewsByUserId_noExceptions_success() throws Exception {
         when(reviewService.getCinemaReviewsByUserId(anyInt())).thenReturn(
@@ -200,9 +176,6 @@ class ReviewControllerTest {
             .andExpect(jsonPath("$[0].user.joinDate").value(UserConstants.JOIN_DATE.toString()));
     }
 
-    /**
-     * Verifies that update Review return Old True success.
-     */
     @Test
     void testUpdateReview_returnOldTrue_success() throws Exception {
         when(reviewService.updateReview(any(), anyInt())).thenReturn(ReviewFactory.getDefaultReviewDto());
@@ -231,9 +204,6 @@ class ReviewControllerTest {
             .andExpect(jsonPath("$.user.joinDate").value(UserConstants.JOIN_DATE.toString()));
     }
 
-    /**
-     * Verifies that update Review return Old False success.
-     */
     @Test
     void testUpdateReview_returnOldFalse_success() throws Exception {
         when(reviewService.updateReview(any(), anyInt())).thenReturn(ReviewFactory.getDefaultReviewDto());
@@ -247,9 +217,6 @@ class ReviewControllerTest {
             .andExpect(status().isNoContent());
     }
 
-    /**
-     * Verifies that delete Review return Old True success.
-     */
     @Test
     void testDeleteReview_returnOldTrue_success() throws Exception {
         when(reviewService.deleteReview(anyInt())).thenReturn(ReviewFactory.getDefaultReviewDto());
@@ -274,9 +241,6 @@ class ReviewControllerTest {
             .andExpect(jsonPath("$.user.joinDate").value(UserConstants.JOIN_DATE.toString()));
     }
 
-    /**
-     * Verifies that delete Review return Old False success.
-     */
     @Test
     void testDeleteReview_returnOldFalse_success() throws Exception {
         when(reviewService.deleteReview(anyInt())).thenReturn(ReviewFactory.getDefaultReviewDto());
@@ -286,8 +250,3 @@ class ReviewControllerTest {
             .andExpect(status().isNoContent());
     }
 }
-
-
-
-
-

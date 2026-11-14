@@ -11,27 +11,19 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * Tests discount mapper behavior.
- */
 @ExtendWith(MockitoExtension.class)
 class DiscountMapperTest {
-    /**
-     * Verifies that map Discount To Discount DTO success.
-     */
+
     @Test
     void testMapDiscountToDiscountDto_success() {
         final DiscountDto discountDto = DiscountMapper.mapDiscountToDiscountDto(DiscountFactory.getDefaultDiscount());
 
-        assertEquals(DiscountConstants.ID, discountDto.getId());
-        assertEquals(DiscountConstants.TYPE, discountDto.getType());
-        assertEquals(DiscountConstants.CODE, discountDto.getCode());
-        assertEquals(DiscountConstants.PERCENTAGE, discountDto.getPercentage());
+        assertEquals(DiscountConstants.ID, discountDto.id());
+        assertEquals(DiscountConstants.TYPE, discountDto.type());
+        assertEquals(DiscountConstants.CODE, discountDto.code());
+        assertEquals(DiscountConstants.PERCENTAGE, discountDto.percentage());
     }
 
-    /**
-     * Verifies that map Discount List To Discount DTO List success.
-     */
     @Test
     void testMapDiscountListToDiscountDtoList_success() {
         final List<DiscountDto> discountDtos = DiscountMapper.mapDiscountListToDiscountDtoList(
@@ -39,12 +31,9 @@ class DiscountMapperTest {
 
         assertEquals(1, discountDtos.size());
         final DiscountDto discountDto = discountDtos.getFirst();
-        assertEquals(DiscountConstants.ID, discountDto.getId());
-        assertEquals(DiscountConstants.TYPE, discountDto.getType());
-        assertEquals(DiscountConstants.CODE, discountDto.getCode());
-        assertEquals(DiscountConstants.PERCENTAGE, discountDto.getPercentage());
+        assertEquals(DiscountConstants.ID, discountDto.id());
+        assertEquals(DiscountConstants.TYPE, discountDto.type());
+        assertEquals(DiscountConstants.CODE, discountDto.code());
+        assertEquals(DiscountConstants.PERCENTAGE, discountDto.percentage());
     }
 }
-
-
-

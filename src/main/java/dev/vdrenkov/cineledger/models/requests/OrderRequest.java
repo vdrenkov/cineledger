@@ -2,29 +2,17 @@ package dev.vdrenkov.cineledger.models.requests;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-/**
- * Captures the API request payload for order operations.
- */
-@AllArgsConstructor
-@NoArgsConstructor
-@Data
-public class OrderRequest {
-
+public record OrderRequest(
     @Positive(message = "The user id must be positive")
     @NotNull(message = "The user id can't be empty")
-    private int userId;
+    int userId,
 
     @NotNull(message = "The tickets' ids can not be null")
-    private List<Integer> ticketsIds;
+    List<Integer> ticketsIds,
 
-    private List<Integer> itemsIds;
-    private String discountCode;
-}
-
-
+    List<Integer> itemsIds,
+    String discountCode
+) {}

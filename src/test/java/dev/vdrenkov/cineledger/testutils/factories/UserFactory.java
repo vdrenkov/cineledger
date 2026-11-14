@@ -17,80 +17,40 @@ import static dev.vdrenkov.cineledger.testutils.constants.UserConstants.LAST_NAM
 import static dev.vdrenkov.cineledger.testutils.constants.UserConstants.PASSWORD;
 import static dev.vdrenkov.cineledger.testutils.constants.UserConstants.USERNAME;
 
-/**
- * Provides reusable user fixtures for tests.
- */
 public final class UserFactory {
 
     private UserFactory() {
         throw new IllegalStateException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
     }
 
-    /**
-     * Returns the default admin request fixture used in tests.
-     *
-     * @return test admin request value
-     */
     public static AdminRequest getDefaultAdminRequest() {
         return new AdminRequest(USERNAME, PASSWORD, EMAIL, FIRST_NAME, LAST_NAME,
             RoleFactory.getDefaultRoleNamesList());
     }
 
-    /**
-     * Returns the default user request fixture used in tests.
-     *
-     * @return test user request value
-     */
     public static UserRequest getDefaultUserRequest() {
         return new UserRequest(USERNAME, PASSWORD, EMAIL, FIRST_NAME, LAST_NAME);
     }
 
-    /**
-     * Returns the default user fixture used in tests.
-     *
-     * @return test user value
-     */
     public static User getDefaultUser() {
         return new User(ID, USERNAME, PASSWORD, EMAIL, FIRST_NAME, LAST_NAME, JOIN_DATE,
             RoleFactory.getDefaultRoleList());
     }
 
-    /**
-     * Returns the default admin fixture used in tests.
-     *
-     * @return test user value
-     */
     public static User getDefaultAdmin() {
         return new User(ID, USERNAME, PASSWORD, EMAIL, FIRST_NAME, LAST_NAME, JOIN_DATE,
             RoleFactory.getDefaultAdminRoleList());
     }
 
-    /**
-     * Returns the default user list fixture used in tests.
-     *
-     * @return test user values
-     */
     public static List<User> getDefaultUserList() {
         return Collections.singletonList(getDefaultUser());
     }
 
-    /**
-     * Returns the default user dto fixture used in tests.
-     *
-     * @return test user dto value
-     */
     public static UserDto getDefaultUserDto() {
         return new UserDto(ID, USERNAME, EMAIL, FIRST_NAME, LAST_NAME, JOIN_DATE, RoleFactory.getDefaultRoleDtoList());
     }
 
-    /**
-     * Returns the default user dto list fixture used in tests.
-     *
-     * @return test user dto values
-     */
     public static List<UserDto> getDefaultUserDtoList() {
         return Collections.singletonList(getDefaultUserDto());
     }
 }
-
-

@@ -1,6 +1,5 @@
 package dev.vdrenkov.cineledger.services;
 
-import lombok.Setter;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -11,37 +10,24 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-/**
- * Coordinates outbound IMDb API requests used to enrich movie searches.
- */
 @Service
 public class ImdbService {
     private static final Logger log = LoggerFactory.getLogger(ImdbService.class);
 
     private final RestTemplate restTemplate;
 
-    /**
-     * -- SETTER -- Executes the set imdb key operation for imdb.
-     */
-    @Setter
     private String imdbKey;
 
-    /**
-     * -- SETTER -- Executes the set base url operation for imdb.
-     */
-    @Setter
     private String baseUrl;
 
-    /**
-     * Creates a new imdb service with its required collaborators.
-     *
-     * @param restTemplate
-     *     rest template used by the operation
-     * @param imdbKey
-     *     imdb key used by the operation
-     * @param baseUrl
-     *     base url used by the operation
-     */
+    public void setImdbKey(final String imdbKey) {
+        this.imdbKey = imdbKey;
+    }
+
+    public void setBaseUrl(final String baseUrl) {
+        this.baseUrl = baseUrl;
+    }
+
     public ImdbService(RestTemplate restTemplate, @Value("${imdb.key}") String imdbKey,
         @Value("${imdb.url}") String baseUrl) {
         this.restTemplate = restTemplate;
@@ -49,13 +35,6 @@ public class ImdbService {
         this.baseUrl = baseUrl;
     }
 
-    /**
-     * Returns movies matching the supplied criteria.
-     *
-     * @param filter
-     *     external filter value
-     * @return resulting string value
-     */
     public String getMovies(String filter) {
         String searchUrl = switch (filter) {
             case "top" -> baseUrl + "Top250Movies/" + imdbKey;
@@ -65,7 +44,7 @@ public class ImdbService {
         };
 
         if (!StringUtils.hasText(imdbKey)) {
-            log.info("Skipping IMDb lookup because no API key is configured");
+
             return emptyMoviesResponse();
         }
 
@@ -108,6 +87,3 @@ public class ImdbService {
         return new JSONObject().put("movies", new JSONArray()).toString(2);
     }
 }
-
-
-

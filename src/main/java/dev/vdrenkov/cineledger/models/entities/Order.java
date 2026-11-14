@@ -11,21 +11,12 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.List;
 
-/**
- * Represents a persisted order entity.
- */
 @Entity
 @Table(name = "orders")
-@AllArgsConstructor
-@NoArgsConstructor
-@Data
 public class Order {
 
     @Id
@@ -50,20 +41,6 @@ public class Order {
     @Column(name = "total_price")
     private double totalPrice;
 
-    /**
-     * Creates a new order with its required collaborators.
-     *
-     * @param dateOfPurchase
-     *     date of purchase used by the operation
-     * @param user
-     *     user entity to transform
-     * @param tickets
-     *     ticket entities or values to process
-     * @param items
-     *     item entities or values to process
-     * @param totalPrice
-     *     total price used by the operation
-     */
     public Order(LocalDate dateOfPurchase, User user, List<Ticket> tickets, List<Item> items, double totalPrice) {
         this.dateOfPurchase = dateOfPurchase;
         this.user = user;
@@ -71,7 +48,73 @@ public class Order {
         this.items = items;
         this.totalPrice = totalPrice;
     }
+
+    public Order() {}
+
+    public Order(final int id, final LocalDate dateOfPurchase, final User user, final List<Ticket> tickets, final List<Item> items, final double totalPrice) {
+        this.id = id;
+        this.dateOfPurchase = dateOfPurchase;
+        this.user = user;
+        this.tickets = tickets;
+        this.items = items;
+        this.totalPrice = totalPrice;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(final int id) {
+        this.id = id;
+    }
+
+    public LocalDate getDateOfPurchase() {
+        return dateOfPurchase;
+    }
+
+    public void setDateOfPurchase(final LocalDate dateOfPurchase) {
+        this.dateOfPurchase = dateOfPurchase;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(final User user) {
+        this.user = user;
+    }
+
+    public List<Ticket> getTickets() {
+        return tickets;
+    }
+
+    public void setTickets(final List<Ticket> tickets) {
+        this.tickets = tickets;
+    }
+
+    public List<Item> getItems() {
+        return items;
+    }
+
+    public void setItems(final List<Item> items) {
+        this.items = items;
+    }
+
+    public double getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(final double totalPrice) {
+        this.totalPrice = totalPrice;
+    }
+
+    @Override
+    public boolean equals(final Object object) {
+        return this == object || object instanceof Order other && id != 0 && id == other.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Order.class.hashCode();
+    }
 }
-
-
-

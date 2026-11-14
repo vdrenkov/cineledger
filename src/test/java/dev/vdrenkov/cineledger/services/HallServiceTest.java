@@ -23,9 +23,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 
-/**
- * Tests hall service behavior.
- */
 @ExtendWith(MockitoExtension.class)
 class HallServiceTest {
 
@@ -38,9 +35,6 @@ class HallServiceTest {
     @InjectMocks
     private HallService hallService;
 
-    /**
-     * Verifies that add Hall no Exceptions success.
-     */
     @Test
     void testAddHall_noExceptions_success() {
         final Hall expected = HallFactory.getDefaultHall();
@@ -52,9 +46,6 @@ class HallServiceTest {
         assertEquals(expected, hall);
     }
 
-    /**
-     * Verifies that get Hall By Cinema Id cinema Found success.
-     */
     @Test
     void testGetHallByCinemaId_cinemaFound_success() {
         final Cinema cinema = CinemaFactory.getDefaultCinema();
@@ -68,9 +59,6 @@ class HallServiceTest {
         assertEquals(expected, result);
     }
 
-    /**
-     * Verifies that get Hall By Id hall Found success.
-     */
     @Test
     void testGetHallById_hallFound_success() {
         final Hall expected = HallFactory.getDefaultHall();
@@ -81,9 +69,6 @@ class HallServiceTest {
         assertEquals(expected, hall);
     }
 
-    /**
-     * Verifies that get Hall By Id hall Not Found throws Hall Not Found Exception.
-     */
     @Test
     void testGetHallById_hallNotFound_throwsHallNotFoundException() {
         when(hallRepository.findById(anyInt())).thenReturn(Optional.empty());
@@ -91,9 +76,6 @@ class HallServiceTest {
         assertThrows(HallNotFoundException.class, () -> hallService.getHallById(HallConstants.ID));
     }
 
-    /**
-     * Verifies that get Hall DTO By Id hall DTO Found success.
-     */
     @Test
     void testGetHallDtoById_hallDtoFound_success() {
         final HallDto expected = HallFactory.getDefaultHallDto();
@@ -104,9 +86,6 @@ class HallServiceTest {
         assertEquals(expected, hall);
     }
 
-    /**
-     * Verifies that update Hall hall Updated success.
-     */
     @Test
     void testUpdateHall_hallUpdated_success() {
         final HallDto expected = HallFactory.getDefaultHallDto();
@@ -119,9 +98,6 @@ class HallServiceTest {
         assertEquals(expected, hall);
     }
 
-    /**
-     * Verifies that delete Hall hall Deleted success.
-     */
     @Test
     void testDeleteHall_hallDeleted_success() {
         final HallDto expected = HallFactory.getDefaultHallDto();
@@ -132,8 +108,3 @@ class HallServiceTest {
         assertEquals(expected, hall);
     }
 }
-
-
-
-
-

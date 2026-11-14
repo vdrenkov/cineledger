@@ -44,9 +44,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/**
- * Tests movie controller behavior.
- */
 @AutoConfigureMockMvc
 @ExtendWith(MockitoExtension.class)
 class MovieControllerTest {
@@ -59,17 +56,11 @@ class MovieControllerTest {
     @InjectMocks
     private MovieController movieController;
 
-    /**
-     * Initializes the test fixture before each test case.
-     */
     @BeforeEach
     void setup() {
         mockMvc = MockMvcBuilders.standaloneSetup(movieController).build();
     }
 
-    /**
-     * Verifies that get Movies By Title success.
-     */
     @Test
     void testGetMoviesByTitle_success() throws Exception {
         when(movieService.getMoviesByTitle(anyString(), anyDouble())).thenReturn(getDefaultMovieDtoList());
@@ -86,13 +77,10 @@ class MovieControllerTest {
             .andExpect(jsonPath("$[0].description").value(DESCRIPTION))
             .andExpect(jsonPath("$[0].releaseDate").value(RELEASE_DATE.toString()))
             .andExpect(jsonPath("$[0].runtime").value(RUNTIME.toString()))
-            .andExpect(jsonPath("$[0].category.id").value(CategoryFactory.getDefaultCategoryDto().getId()))
-            .andExpect(jsonPath("$[0].category.name").value(CategoryFactory.getDefaultCategoryDto().getName()));
+            .andExpect(jsonPath("$[0].category.id").value(CategoryFactory.getDefaultCategoryDto().id()))
+            .andExpect(jsonPath("$[0].category.name").value(CategoryFactory.getDefaultCategoryDto().name()));
     }
 
-    /**
-     * Verifies that get Movies By Category success.
-     */
     @Test
     void testGetMoviesByCategory_success() throws Exception {
         final List<MovieDto> movieDtoList = getDefaultMovieDtoList();
@@ -101,19 +89,16 @@ class MovieControllerTest {
         mockMvc
             .perform(get(URIConstants.CATEGORIES_ID_MOVIES_PATH, ID).param("minRating", String.valueOf(RATING)))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$[0].id").value(movieDto.getId()))
+            .andExpect(jsonPath("$[0].id").value(movieDto.id()))
             .andExpect(jsonPath("$[0].title").value(TITLE))
             .andExpect(jsonPath("$[0].averageRating").value(RATING))
             .andExpect(jsonPath("$[0].description").value(DESCRIPTION))
             .andExpect(jsonPath("$[0].releaseDate").value(RELEASE_DATE.toString()))
             .andExpect(jsonPath("$[0].runtime").value(RUNTIME.toString()))
-            .andExpect(jsonPath("$[0].category.id").value(CategoryFactory.getDefaultCategoryDto().getId()))
-            .andExpect(jsonPath("$[0].category.name").value(CategoryFactory.getDefaultCategoryDto().getName()));
+            .andExpect(jsonPath("$[0].category.id").value(CategoryFactory.getDefaultCategoryDto().id()))
+            .andExpect(jsonPath("$[0].category.name").value(CategoryFactory.getDefaultCategoryDto().name()));
     }
 
-    /**
-     * Verifies that get Movies By Release Date After success.
-     */
     @Test
     void testGetMoviesByReleaseDateAfter_success() throws Exception {
         when(movieService.getMoviesByReleaseDate(any(), any(Double.class), anyBoolean())).thenReturn(
@@ -131,13 +116,10 @@ class MovieControllerTest {
             .andExpect(jsonPath("$[0].description").value(DESCRIPTION))
             .andExpect(jsonPath("$[0].releaseDate").value(RELEASE_DATE.toString()))
             .andExpect(jsonPath("$[0].runtime").value(RUNTIME.toString()))
-            .andExpect(jsonPath("$[0].category.id").value(CategoryFactory.getDefaultCategoryDto().getId()))
-            .andExpect(jsonPath("$[0].category.name").value(CategoryFactory.getDefaultCategoryDto().getName()));
+            .andExpect(jsonPath("$[0].category.id").value(CategoryFactory.getDefaultCategoryDto().id()))
+            .andExpect(jsonPath("$[0].category.name").value(CategoryFactory.getDefaultCategoryDto().name()));
     }
 
-    /**
-     * Verifies that get Movies By Min Rating success.
-     */
     @Test
     void testGetMoviesByMinRating_success() throws Exception {
         when(movieService.getMoviesByMinRating(anyDouble())).thenReturn(getDefaultMovieDtoList());
@@ -151,13 +133,10 @@ class MovieControllerTest {
             .andExpect(jsonPath("$[0].description").value(DESCRIPTION))
             .andExpect(jsonPath("$[0].releaseDate").value(RELEASE_DATE.toString()))
             .andExpect(jsonPath("$[0].runtime").value(RUNTIME.toString()))
-            .andExpect(jsonPath("$[0].category.id").value(CategoryFactory.getDefaultCategoryDto().getId()))
-            .andExpect(jsonPath("$[0].category.name").value(CategoryFactory.getDefaultCategoryDto().getName()));
+            .andExpect(jsonPath("$[0].category.id").value(CategoryFactory.getDefaultCategoryDto().id()))
+            .andExpect(jsonPath("$[0].category.name").value(CategoryFactory.getDefaultCategoryDto().name()));
     }
 
-    /**
-     * Verifies that add Movie success.
-     */
     @Test
     void testAddMovie_success() throws Exception {
         when(movieService.addMovie(any())).thenReturn(MovieFactory.getDefaultMovie());
@@ -173,9 +152,6 @@ class MovieControllerTest {
             .andExpect(header().string("Location", URIConstants.MOVIES_PATH + "/" + ID));
     }
 
-    /**
-     * Verifies that update Movie return Old True success.
-     */
     @Test
     void testUpdateMovie_returnOldTrue_success() throws Exception {
         when(movieService.updateMovie(any(), anyInt())).thenReturn(MovieFactory.getDefaultMovieDto());
@@ -194,13 +170,10 @@ class MovieControllerTest {
             .andExpect(jsonPath("$.description").value(DESCRIPTION))
             .andExpect(jsonPath("$.releaseDate").value(RELEASE_DATE.toString()))
             .andExpect(jsonPath("$.runtime").value(RUNTIME.toString()))
-            .andExpect(jsonPath("$.category.id").value(CategoryFactory.getDefaultCategoryDto().getId()))
-            .andExpect(jsonPath("$.category.name").value(CategoryFactory.getDefaultCategoryDto().getName()));
+            .andExpect(jsonPath("$.category.id").value(CategoryFactory.getDefaultCategoryDto().id()))
+            .andExpect(jsonPath("$.category.name").value(CategoryFactory.getDefaultCategoryDto().name()));
     }
 
-    /**
-     * Verifies that get Movies By IMDb Test.
-     */
     @Test
     void testGetMoviesByImdbTest() throws Exception {
         final String imdb = "top";
@@ -219,9 +192,6 @@ class MovieControllerTest {
             .andExpect(content().json(movies));
     }
 
-    /**
-     * Verifies that update Movie return Old False success.
-     */
     @Test
     void testUpdateMovie_returnOldFalse_success() throws Exception {
         when(movieService.updateMovie(any(), anyInt())).thenReturn(MovieFactory.getDefaultMovieDto());
@@ -236,9 +206,6 @@ class MovieControllerTest {
             .andExpect(status().isNoContent());
     }
 
-    /**
-     * Verifies that delete Movie return Old True success.
-     */
     @Test
     void testDeleteMovie_returnOldTrue_success() throws Exception {
         when(movieService.deleteMovie(anyInt())).thenReturn(MovieFactory.getDefaultMovieDto());
@@ -252,13 +219,10 @@ class MovieControllerTest {
             .andExpect(jsonPath("$.description").value(DESCRIPTION))
             .andExpect(jsonPath("$.releaseDate").value(RELEASE_DATE.toString()))
             .andExpect(jsonPath("$.runtime").value(RUNTIME.toString()))
-            .andExpect(jsonPath("$.category.id").value(CategoryFactory.getDefaultCategoryDto().getId()))
-            .andExpect(jsonPath("$.category.name").value(CategoryFactory.getDefaultCategoryDto().getName()));
+            .andExpect(jsonPath("$.category.id").value(CategoryFactory.getDefaultCategoryDto().id()))
+            .andExpect(jsonPath("$.category.name").value(CategoryFactory.getDefaultCategoryDto().name()));
     }
 
-    /**
-     * Verifies that delete Movie return Old False success.
-     */
     @Test
     void testDeleteMovie_returnOldFalse_success() throws Exception {
         when(movieService.deleteMovie(anyInt())).thenReturn(MovieFactory.getDefaultMovieDto());
@@ -266,9 +230,3 @@ class MovieControllerTest {
         mockMvc.perform(delete(URIConstants.MOVIES_ID_PATH, ID)).andExpect(status().isNoContent());
     }
 }
-
-
-
-
-
-

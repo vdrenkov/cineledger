@@ -2,39 +2,27 @@ package dev.vdrenkov.cineledger.models.requests;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-/**
- * Captures the API request payload for admin operations.
- */
-@AllArgsConstructor
-@NoArgsConstructor
-@Data
-public class AdminRequest {
-
+public record AdminRequest(
     @NotNull(message = "The username can't be empty")
-    private String username;
+    String username,
 
     @Pattern(regexp = "^.{8,}$", message = "The password should be at least 8 symbols long")
     @NotNull(message = "The password can't be empty")
-    private String password;
+    String password,
 
     @Pattern(regexp = "^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", message = "Invalid email pattern provided")
     @NotNull(message = "The email can't be empty")
-    private String email;
+    String email,
 
     @NotNull(message = "The first name can't be empty")
-    private String firstName;
+    String firstName,
 
     @NotNull(message = "The last name can't be empty")
-    private String lastName;
+    String lastName,
 
     @NotNull(message = "The user role names can't be empty")
-    private List<String> roleNames;
-}
-
-
+    List<String> roleNames
+) {}

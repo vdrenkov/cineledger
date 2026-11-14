@@ -1,26 +1,17 @@
 package dev.vdrenkov.cineledger.models.dtos;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 
 import java.time.LocalDate;
 
-/**
- * Represents the API response payload for review data.
- */
-@AllArgsConstructor
-@Data
-public class ReviewDto {
-    private int id;
-    private double rating;
-    private String reviewText;
-    private LocalDate dateModified;
+public record ReviewDto(
+    int id,
+    double rating,
+    String reviewText,
+    LocalDate dateModified,
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private MovieDto movie;
+    MovieDto movie,
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private CinemaDto cinema;
-    private UserDto user;
-}
-
-
+    CinemaDto cinema,
+    UserDto user
+) {}

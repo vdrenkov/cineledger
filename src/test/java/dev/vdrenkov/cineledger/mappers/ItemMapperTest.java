@@ -11,39 +11,27 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * Tests item mapper behavior.
- */
 @ExtendWith(MockitoExtension.class)
 class ItemMapperTest {
-    /**
-     * Verifies that map Item To Item DTO success.
-     */
+
     @Test
     void testMapItemToItemDto_success() {
         final ItemDto itemDto = ItemMapper.mapItemToItemDto(ItemFactory.getDefaultItem());
 
-        assertEquals(ItemConstants.ID, itemDto.getId());
-        assertEquals(ItemConstants.NAME, itemDto.getName());
-        assertEquals(ItemConstants.PRICE, itemDto.getPrice(), 0.0);
-        assertEquals(ItemConstants.QUANTITY, itemDto.getQuantity());
+        assertEquals(ItemConstants.ID, itemDto.id());
+        assertEquals(ItemConstants.NAME, itemDto.name());
+        assertEquals(ItemConstants.PRICE, itemDto.price(), 0.0);
+        assertEquals(ItemConstants.QUANTITY, itemDto.quantity());
     }
 
-    /**
-     * Verifies that map Item To Item DTO List success.
-     */
     @Test
     void testMapItemToItemDtoList_success() {
         final List<ItemDto> itemDtos = ItemMapper.mapItemToItemDtoList(ItemFactory.getDefaultItemList());
 
         final ItemDto itemDto = itemDtos.getFirst();
-        assertEquals(ItemConstants.ID, itemDto.getId());
-        assertEquals(ItemConstants.NAME, itemDto.getName());
-        assertEquals(ItemConstants.PRICE, itemDto.getPrice(), 0.0);
-        assertEquals(ItemConstants.QUANTITY, itemDto.getQuantity());
+        assertEquals(ItemConstants.ID, itemDto.id());
+        assertEquals(ItemConstants.NAME, itemDto.name());
+        assertEquals(ItemConstants.PRICE, itemDto.price(), 0.0);
+        assertEquals(ItemConstants.QUANTITY, itemDto.quantity());
     }
 }
-
-
-
-

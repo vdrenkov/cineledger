@@ -19,9 +19,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
-/**
- * Tests jwt user details service behavior.
- */
 @ExtendWith(MockitoExtension.class)
 class JwtUserDetailsServiceTest {
 
@@ -31,9 +28,6 @@ class JwtUserDetailsServiceTest {
     @InjectMocks
     private JwtUserDetailsService jwtUserDetailsService;
 
-    /**
-     * Verifies that load User By Username user Found success.
-     */
     @Test
     void testLoadUserByUsername_userFound_success() {
         when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.of(UserFactory.getDefaultUser()));
@@ -45,9 +39,6 @@ class JwtUserDetailsServiceTest {
         assertEquals(1, userDetails.getAuthorities().size());
     }
 
-    /**
-     * Verifies that load User By Username user Not Found throws User Not Found Exception.
-     */
     @Test
     void testLoadUserByUsername_userNotFound_throwsUserNotFoundException() {
         when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.empty());
@@ -55,6 +46,3 @@ class JwtUserDetailsServiceTest {
         assertThrows(UserNotFoundException.class, () -> jwtUserDetailsService.loadUserByUsername(USERNAME));
     }
 }
-
-
-

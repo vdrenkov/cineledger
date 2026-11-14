@@ -11,28 +11,20 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * Tests program mapper behavior.
- */
 @ExtendWith(MockitoExtension.class)
 class ProgramMapperTest {
-    /**
-     * Verifies that map Program To Program DTO Test no Exceptions success.
-     */
+
     @Test
     void testMapProgramToProgramDtoTest_noExceptions_success() {
         final ProgramDto resultDto = ProgramMapper.mapProgramToProgramDto(ProgramFactory.getDefaultProgram());
 
-        assertEquals(ProgramConstants.ID, resultDto.getId());
-        assertEquals(ProgramConstants.DATE, resultDto.getProgramDate());
-        assertEquals(ProgramConstants.PROGRAM_CINEMA.getId(), resultDto.getCinema().getId());
-        assertEquals(ProgramConstants.PROGRAM_CINEMA.getAddress(), resultDto.getCinema().getAddress());
-        assertEquals(ProgramConstants.PROGRAM_CINEMA.getCity(), resultDto.getCinema().getCity());
+        assertEquals(ProgramConstants.ID, resultDto.id());
+        assertEquals(ProgramConstants.DATE, resultDto.programDate());
+        assertEquals(ProgramConstants.PROGRAM_CINEMA.getId(), resultDto.cinema().id());
+        assertEquals(ProgramConstants.PROGRAM_CINEMA.getAddress(), resultDto.cinema().address());
+        assertEquals(ProgramConstants.PROGRAM_CINEMA.getCity(), resultDto.cinema().city());
     }
 
-    /**
-     * Verifies that map Program List To Program DTO List no Exceptions success.
-     */
     @Test
     void testMapProgramListToProgramDtoList_noExceptions_success() {
         final List<ProgramDto> resultList = ProgramMapper.mapProgramListToProgramDtoList(
@@ -40,14 +32,10 @@ class ProgramMapperTest {
 
         final ProgramDto resultDto = resultList.getFirst();
 
-        assertEquals(ProgramConstants.ID, resultDto.getId());
-        assertEquals(ProgramConstants.DATE, resultDto.getProgramDate());
-        assertEquals(ProgramConstants.PROGRAM_CINEMA.getId(), resultDto.getCinema().getId());
-        assertEquals(ProgramConstants.PROGRAM_CINEMA.getAddress(), resultDto.getCinema().getAddress());
-        assertEquals(ProgramConstants.PROGRAM_CINEMA.getCity(), resultDto.getCinema().getCity());
+        assertEquals(ProgramConstants.ID, resultDto.id());
+        assertEquals(ProgramConstants.DATE, resultDto.programDate());
+        assertEquals(ProgramConstants.PROGRAM_CINEMA.getId(), resultDto.cinema().id());
+        assertEquals(ProgramConstants.PROGRAM_CINEMA.getAddress(), resultDto.cinema().address());
+        assertEquals(ProgramConstants.PROGRAM_CINEMA.getCity(), resultDto.cinema().city());
     }
 }
-
-
-
-

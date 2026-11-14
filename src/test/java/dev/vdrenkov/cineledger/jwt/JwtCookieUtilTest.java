@@ -14,9 +14,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-/**
- * Tests jwt cookie util behavior.
- */
 @ExtendWith(MockitoExtension.class)
 class JwtCookieUtilTest {
     private static final boolean COOKIE_SECURE = false;
@@ -25,9 +22,6 @@ class JwtCookieUtilTest {
     @Mock
     private JwtTokenUtil jwtTokenUtil;
 
-    /**
-     * Verifies that create J W T Cookie cookie Created success.
-     */
     @Test
     void testCreateJWTCookie_cookieCreated_success() {
         final JwtCookieUtil jwtCookieUtil = new JwtCookieUtil(jwtTokenUtil, COOKIE_SECURE, SAME_SITE);
@@ -41,6 +35,3 @@ class JwtCookieUtilTest {
         assertEquals(3600, responseCookie.getMaxAge().toSeconds());
     }
 }
-
-
-

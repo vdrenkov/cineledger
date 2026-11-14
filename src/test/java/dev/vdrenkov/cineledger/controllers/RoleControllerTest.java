@@ -28,9 +28,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/**
- * Tests role controller behavior.
- */
 @AutoConfigureMockMvc
 @ExtendWith(MockitoExtension.class)
 class RoleControllerTest {
@@ -45,17 +42,11 @@ class RoleControllerTest {
     @InjectMocks
     private RoleController roleController;
 
-    /**
-     * Initializes the test fixture before each test case.
-     */
     @BeforeEach
     void setup() {
         mockMvc = MockMvcBuilders.standaloneSetup(roleController).build();
     }
 
-    /**
-     * Verifies that add Role role Added success.
-     */
     @Test
     void testAddRole_roleAdded_success() throws Exception {
         final String json = objectMapper.writeValueAsString(RoleFactory.getDefaultRoleRequest());
@@ -70,9 +61,6 @@ class RoleControllerTest {
             .andExpect(header().string("Location", URIConstants.ROLES_PATH + "/" + ID));
     }
 
-    /**
-     * Verifies that get All Roles no Exceptions success.
-     */
     @Test
     void testGetAllRoles_noExceptions_success() throws Exception {
         when(roleService.getAllRolesDto()).thenReturn(RoleFactory.getDefaultRoleDtoList());
@@ -84,9 +72,6 @@ class RoleControllerTest {
             .andExpect(jsonPath("$[0].name").value(NAME));
     }
 
-    /**
-     * Verifies that get Role By Name role Found success.
-     */
     @Test
     void testGetRoleByName_roleFound_success() throws Exception {
         when(roleService.getRoleDtoByName(anyString())).thenReturn(RoleFactory.getDefaultRoleDto());
@@ -98,9 +83,6 @@ class RoleControllerTest {
             .andExpect(jsonPath("$.name").value(NAME));
     }
 
-    /**
-     * Verifies that update Role return Old True success.
-     */
     @Test
     void testUpdateRole_returnOldTrue_success() throws Exception {
         when(roleService.updateRole(any(), anyInt())).thenReturn(RoleFactory.getDefaultRoleDto());
@@ -116,9 +98,6 @@ class RoleControllerTest {
             .andExpect(jsonPath("$.name").value(NAME));
     }
 
-    /**
-     * Verifies that update Role return Old False success.
-     */
     @Test
     void testUpdateRole_returnOldFalse_success() throws Exception {
         when(roleService.updateRole(any(), anyInt())).thenReturn(RoleFactory.getDefaultRoleDto());
@@ -129,9 +108,6 @@ class RoleControllerTest {
             .andExpect(status().isNoContent());
     }
 
-    /**
-     * Verifies that delete Role return Old True success.
-     */
     @Test
     void testDeleteRole_returnOldTrue_success() throws Exception {
         when(roleService.deleteRole(anyInt())).thenReturn(RoleFactory.getDefaultRoleDto());
@@ -143,9 +119,6 @@ class RoleControllerTest {
             .andExpect(jsonPath("$.name").value(NAME));
     }
 
-    /**
-     * Verifies that delete Role return Old False success.
-     */
     @Test
     void testDeleteRole_returnOldFalse_success() throws Exception {
         when(roleService.deleteRole(anyInt())).thenReturn(RoleFactory.getDefaultRoleDto());
@@ -153,7 +126,3 @@ class RoleControllerTest {
         mockMvc.perform(delete(URIConstants.ROLES_ID_PATH, ID)).andExpect(status().isNoContent());
     }
 }
-
-
-
-

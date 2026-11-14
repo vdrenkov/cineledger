@@ -29,9 +29,6 @@ import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 
-/**
- * Tests review service behavior.
- */
 @ExtendWith(MockitoExtension.class)
 class ReviewServiceTest {
     final ReviewRequest reviewRequest = ReviewFactory.getDefaultReviewRequest();
@@ -51,9 +48,6 @@ class ReviewServiceTest {
     @InjectMocks
     private ReviewService reviewService;
 
-    /**
-     * Verifies that add Movie Review no Exceptions success.
-     */
     @Test
     void testAddMovieReview_noExceptions_success() {
         final Review expected = ReviewFactory.getDefaultReview();
@@ -72,9 +66,6 @@ class ReviewServiceTest {
         Assertions.assertEquals(LocalDate.now(), review.getDateModified());
     }
 
-    /**
-     * Verifies that add Movie Review reviews Size1 success.
-     */
     @Test
     void testAddMovieReview_reviewsSize1_success() {
         final Review expected = ReviewFactory.getDefaultReview();
@@ -94,9 +85,6 @@ class ReviewServiceTest {
         Assertions.assertEquals(LocalDate.now(), review.getDateModified());
     }
 
-    /**
-     * Verifies that add Cinema Review no Exceptions success.
-     */
     @Test
     void testAddCinemaReview_noExceptions_success() {
         final Review expected = ReviewFactory.getDefaultReview();
@@ -115,9 +103,6 @@ class ReviewServiceTest {
         Assertions.assertEquals(LocalDate.now(), review.getDateModified());
     }
 
-    /**
-     * Verifies that get Reviews By Movie Id no Exceptions success.
-     */
     @Test
     void testGetReviewsByMovieId_noExceptions_success() {
         final List<ReviewDto> expectedReviews = ReviewFactory.getDefaultReviewDtoList();
@@ -130,9 +115,6 @@ class ReviewServiceTest {
         assertEquals(expectedReviews, reviews);
     }
 
-    /**
-     * Verifies that get Reviews By Cinema Id no Exceptions success.
-     */
     @Test
     void testGetReviewsByCinemaId_noExceptions_success() {
         final List<ReviewDto> expectedReviews = ReviewFactory.getDefaultReviewDtoListWithCinema();
@@ -145,9 +127,6 @@ class ReviewServiceTest {
         assertEquals(expectedReviews, reviews);
     }
 
-    /**
-     * Verifies that get Movie Reviews By User Id user Authorized success.
-     */
     @Test
     void testGetMovieReviewsByUserId_userAuthorized_success() {
         final List<ReviewDto> expectedReviews = ReviewFactory.getDefaultReviewDtoList();
@@ -161,9 +140,6 @@ class ReviewServiceTest {
         assertEquals(expectedReviews, reviews);
     }
 
-    /**
-     * Verifies that get Movie Reviews By User Id user Not Authorized throws Not Authorized Exception.
-     */
     @Test
     void testGetMovieReviewsByUserId_userNotAuthorized_throwsNotAuthorizedException() {
         when(userService.isCurrentUserAuthorized(anyInt())).thenReturn(false);
@@ -171,9 +147,6 @@ class ReviewServiceTest {
         assertThrows(NotAuthorizedException.class, () -> reviewService.getMovieReviewsByUserId(ReviewConstants.ID));
     }
 
-    /**
-     * Verifies that get Cinema Reviews By User Id user Authorized success.
-     */
     @Test
     void testGetCinemaReviewsByUserId_userAuthorized_success() {
         final List<ReviewDto> expectedReviews = ReviewFactory.getDefaultReviewDtoListWithCinema();
@@ -187,9 +160,6 @@ class ReviewServiceTest {
         assertEquals(expectedReviews, reviews);
     }
 
-    /**
-     * Verifies that get Cinema Reviews By User Id user Not Authorized throws Not Authorized Exception.
-     */
     @Test
     void testGetCinemaReviewsByUserId_userNotAuthorized_throwsNotAuthorizedException() {
         when(userService.isCurrentUserAuthorized(anyInt())).thenReturn(false);
@@ -197,9 +167,6 @@ class ReviewServiceTest {
         assertThrows(NotAuthorizedException.class, () -> reviewService.getCinemaReviewsByUserId(ReviewConstants.ID));
     }
 
-    /**
-     * Verifies that update Review no Exceptions success.
-     */
     @Test
     void testUpdateReview_noExceptions_success() {
         final ReviewDto expected = ReviewFactory.getDefaultReviewDto();
@@ -215,9 +182,6 @@ class ReviewServiceTest {
         assertEquals(expected, result);
     }
 
-    /**
-     * Verifies that update Review user Id Different throws Not Authorized Exception.
-     */
     @Test
     void testUpdateReview_userIdDifferent_throwsNotAuthorizedException() {
         when(reviewRepository.findById(anyInt())).thenReturn(Optional.of(ReviewFactory.getDefaultReview()));
@@ -226,9 +190,6 @@ class ReviewServiceTest {
         assertThrows(NotAuthorizedException.class, () -> reviewService.updateReview(reviewRequest, ReviewConstants.ID));
     }
 
-    /**
-     * Verifies that update Review movie Null success.
-     */
     @Test
     void testUpdateReview_movieNull_success() {
         final Review review = ReviewFactory.getDefaultReviewWithCinema();
@@ -244,9 +205,6 @@ class ReviewServiceTest {
         assertEquals(expected, result);
     }
 
-    /**
-     * Verifies that update Review Review Not Found Exception fail.
-     */
     @Test
     void testUpdateReview_ReviewNotFoundException_fail() {
         when(reviewRepository.findById(anyInt())).thenThrow(ReviewNotFoundException.class);
@@ -255,9 +213,6 @@ class ReviewServiceTest {
             () -> reviewService.updateReview(reviewRequest, ReviewConstants.ID));
     }
 
-    /**
-     * Verifies that update Review Review By User Not Found Exception fail.
-     */
     @Test
     void testUpdateReview_ReviewByUserNotFoundException_fail() {
         when(reviewRepository.findById(anyInt())).thenReturn(Optional.empty());
@@ -266,9 +221,6 @@ class ReviewServiceTest {
             () -> reviewService.updateReview(reviewRequest, ReviewConstants.ID));
     }
 
-    /**
-     * Verifies that delete Review no Exceptions success.
-     */
     @Test
     void testDeleteReview_noExceptions_success() {
         final ReviewDto expected = ReviewFactory.getDefaultReviewDto();
@@ -283,9 +235,6 @@ class ReviewServiceTest {
         assertEquals(expected, result);
     }
 
-    /**
-     * Verifies that delete Review movie Null success.
-     */
     @Test
     void testDeleteReview_movieNull_success() {
         final Review review = ReviewFactory.getDefaultReviewWithCinema();
@@ -301,9 +250,6 @@ class ReviewServiceTest {
         assertEquals(expected, result);
     }
 
-    /**
-     * Verifies that delete Review Review Not Found Exception fail.
-     */
     @Test
     void testDeleteReview_ReviewNotFoundException_fail() {
         when(reviewRepository.findById(anyInt())).thenReturn(Optional.empty());
@@ -311,9 +257,6 @@ class ReviewServiceTest {
         assertThrows(ReviewNotFoundException.class, () -> reviewService.deleteReview(ReviewConstants.ID));
     }
 
-    /**
-     * Verifies that delete Review Review By User Not Found Exception fail.
-     */
     @Test
     void testDeleteReview_ReviewByUserNotFoundException_fail() {
         when(reviewRepository.findById(anyInt())).thenReturn(Optional.of(ReviewFactory.getDefaultReview()));
@@ -322,7 +265,3 @@ class ReviewServiceTest {
         assertThrows(NotAuthorizedException.class, () -> reviewService.deleteReview(ReviewConstants.ID));
     }
 }
-
-
-
-

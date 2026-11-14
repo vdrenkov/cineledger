@@ -17,9 +17,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
-/**
- * Tests imdb service behavior.
- */
 @ExtendWith(MockitoExtension.class)
 class ImdbServiceTest {
     private static final String IMDB_KEY = "test-key";
@@ -32,18 +29,12 @@ class ImdbServiceTest {
     @InjectMocks
     private ImdbService imdbService;
 
-    /**
-     * Initializes the test fixture before each test case.
-     */
     @BeforeEach
     void setUp() {
         imdbService.setImdbKey(IMDB_KEY);
         imdbService.setBaseUrl(BASE_URL);
     }
 
-    /**
-     * Verifies that get Movies return Top success.
-     */
     @Test
     void testGetMovies_returnTop_success() throws JSONException {
         final String filter = "top";
@@ -75,9 +66,6 @@ class ImdbServiceTest {
         assertEquals(expectedImage, actualImage);
     }
 
-    /**
-     * Verifies that get Movies return Box Offices success.
-     */
     @Test
     void testGetMovies_returnBoxOffices_success() throws JSONException {
         final String filter = "box office";
@@ -104,9 +92,6 @@ class ImdbServiceTest {
         assertEquals(expectedYear, actualYear);
     }
 
-    /**
-     * Verifies that get Movies return Coming Soon success.
-     */
     @Test
     void testGetMovies_returnComingSoon_success() throws JSONException {
         final String filter = "coming soon";
@@ -136,9 +121,6 @@ class ImdbServiceTest {
         assertEquals(expectedImage, actualImage);
     }
 
-    /**
-     * Verifies that get Movies invalid Filter success.
-     */
     @Test
     void testGetMovies_invalidFilter_success() {
         final String invalidFilter = "unknown";
@@ -151,7 +133,3 @@ class ImdbServiceTest {
         }
     }
 }
-
-
-
-

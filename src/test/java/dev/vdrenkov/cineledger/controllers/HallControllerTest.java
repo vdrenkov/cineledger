@@ -29,9 +29,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/**
- * Tests hall controller behavior.
- */
 @AutoConfigureMockMvc
 @ExtendWith(MockitoExtension.class)
 class HallControllerTest {
@@ -46,17 +43,11 @@ class HallControllerTest {
     @InjectMocks
     private HallController hallController;
 
-    /**
-     * Initializes the test fixture before each test case.
-     */
     @BeforeEach
     void setup() {
         mockMvc = MockMvcBuilders.standaloneSetup(hallController).build();
     }
 
-    /**
-     * Verifies that add Hall hall Added success.
-     */
     @Test
     void testAddHall_hallAdded_success() throws Exception {
         final String json = objectMapper.writeValueAsString(HallFactory.getDefaultHallRequest());
@@ -71,9 +62,6 @@ class HallControllerTest {
             .andExpect(header().stringValues("Location", URIConstants.HALLS_PATH + "/" + ID));
     }
 
-    /**
-     * Verifies that get Halls By Cinema Id no Exceptions success.
-     */
     @Test
     void testGetHallsByCinemaId_noExceptions_success() throws Exception {
         when(hallService.getHallsByCinemaId(anyInt())).thenReturn(HallFactory.getDefaultHallDtoList());
@@ -83,14 +71,11 @@ class HallControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$[0].id").value(ID))
             .andExpect(jsonPath("$[0].capacity").value(CAPACITY))
-            .andExpect(jsonPath("$[0].cinema.id").value(CinemaFactory.getDefaultCinemaDto().getId()))
-            .andExpect(jsonPath("$[0].cinema.address").value(CinemaFactory.getDefaultCinemaDto().getAddress()))
-            .andExpect(jsonPath("$[0].cinema.city").value(CinemaFactory.getDefaultCinemaDto().getCity()));
+            .andExpect(jsonPath("$[0].cinema.id").value(CinemaFactory.getDefaultCinemaDto().id()))
+            .andExpect(jsonPath("$[0].cinema.address").value(CinemaFactory.getDefaultCinemaDto().address()))
+            .andExpect(jsonPath("$[0].cinema.city").value(CinemaFactory.getDefaultCinemaDto().city()));
     }
 
-    /**
-     * Verifies that update Hall return Old True success.
-     */
     @Test
     void testUpdateHall_returnOldTrue_success() throws Exception {
         when(hallService.updateHall(any(), anyInt())).thenReturn(HallFactory.getDefaultHallDto());
@@ -104,14 +89,11 @@ class HallControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(ID))
             .andExpect(jsonPath("$.capacity").value(CAPACITY))
-            .andExpect(jsonPath("$.cinema.id").value(CinemaFactory.getDefaultCinemaDto().getId()))
-            .andExpect(jsonPath("$.cinema.address").value(CinemaFactory.getDefaultCinemaDto().getAddress()))
-            .andExpect(jsonPath("$.cinema.city").value(CinemaFactory.getDefaultCinemaDto().getCity()));
+            .andExpect(jsonPath("$.cinema.id").value(CinemaFactory.getDefaultCinemaDto().id()))
+            .andExpect(jsonPath("$.cinema.address").value(CinemaFactory.getDefaultCinemaDto().address()))
+            .andExpect(jsonPath("$.cinema.city").value(CinemaFactory.getDefaultCinemaDto().city()));
     }
 
-    /**
-     * Verifies that update Hall return Old False success.
-     */
     @Test
     void testUpdateHall_returnOldFalse_success() throws Exception {
         when(hallService.updateHall(any(), anyInt())).thenReturn(HallFactory.getDefaultHallDto());
@@ -122,9 +104,6 @@ class HallControllerTest {
             .andExpect(status().isNoContent());
     }
 
-    /**
-     * Verifies that delete Hall return Old True success.
-     */
     @Test
     void testDeleteHall_returnOldTrue_success() throws Exception {
         when(hallService.deleteHall(anyInt())).thenReturn(HallFactory.getDefaultHallDto());
@@ -134,14 +113,11 @@ class HallControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(ID))
             .andExpect(jsonPath("$.capacity").value(CAPACITY))
-            .andExpect(jsonPath("$.cinema.id").value(CinemaFactory.getDefaultCinemaDto().getId()))
-            .andExpect(jsonPath("$.cinema.address").value(CinemaFactory.getDefaultCinemaDto().getAddress()))
-            .andExpect(jsonPath("$.cinema.city").value(CinemaFactory.getDefaultCinemaDto().getCity()));
+            .andExpect(jsonPath("$.cinema.id").value(CinemaFactory.getDefaultCinemaDto().id()))
+            .andExpect(jsonPath("$.cinema.address").value(CinemaFactory.getDefaultCinemaDto().address()))
+            .andExpect(jsonPath("$.cinema.city").value(CinemaFactory.getDefaultCinemaDto().city()));
     }
 
-    /**
-     * Verifies that delete Hall return Old False success.
-     */
     @Test
     void testDeleteHall_returnOldFalse_success() throws Exception {
         when(hallService.deleteHall(anyInt())).thenReturn(HallFactory.getDefaultHallDto());
@@ -149,7 +125,3 @@ class HallControllerTest {
         mockMvc.perform(delete(URIConstants.HALLS_ID_PATH, ID)).andExpect(status().isNoContent());
     }
 }
-
-
-
-

@@ -15,9 +15,6 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.when;
 
-/**
- * Tests web security configuration behavior.
- */
 @ExtendWith(MockitoExtension.class)
 class WebSecurityConfigurationTest {
 
@@ -33,9 +30,6 @@ class WebSecurityConfigurationTest {
     @InjectMocks
     private WebSecurityConfiguration webSecurityConfiguration;
 
-    /**
-     * Exercises the password encoder_ should return b crypt password encoder test scenario.
-     */
     @Test
     void passwordEncoder_ShouldReturnBCryptPasswordEncoder() {
         final PasswordEncoder passwordEncoder = webSecurityConfiguration.passwordEncoder();
@@ -43,9 +37,6 @@ class WebSecurityConfigurationTest {
         assertInstanceOf(BCryptPasswordEncoder.class, passwordEncoder);
     }
 
-    /**
-     * Exercises the authentication manager_ should return configured authentication manager test scenario.
-     */
     @Test
     void authenticationManager_ShouldReturnConfiguredAuthenticationManager() throws Exception {
         when(authenticationConfiguration.getAuthenticationManager()).thenReturn(authenticationManager);
@@ -56,6 +47,3 @@ class WebSecurityConfigurationTest {
         assertSame(authenticationManager, result);
     }
 }
-
-
-

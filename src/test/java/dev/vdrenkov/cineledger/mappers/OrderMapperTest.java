@@ -13,40 +13,29 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * Tests order mapper behavior.
- */
 @ExtendWith(MockitoExtension.class)
 class OrderMapperTest {
-    /**
-     * Verifies that map Order To Order DTO success.
-     */
+
     @Test
     void testMapOrderToOrderDto_success() {
         final Order order = OrderFactory.getDefaultOrder();
 
         final OrderDto orderDto = OrderMapper.mapOrderToOrderDto(order);
 
-        assertEquals(OrderConstants.ID, orderDto.getId());
-        assertEquals(UserFactory.getDefaultUserDto(), orderDto.getUser());
-        assertEquals(OrderConstants.TOTAL_PRICE, orderDto.getTotalPrice(), 1.1);
-        assertEquals(OrderConstants.DATE_OF_PURCHASE, orderDto.getDateOfPurchase());
+        assertEquals(OrderConstants.ID, orderDto.id());
+        assertEquals(UserFactory.getDefaultUserDto(), orderDto.user());
+        assertEquals(OrderConstants.TOTAL_PRICE, orderDto.totalPrice(), 1.1);
+        assertEquals(OrderConstants.DATE_OF_PURCHASE, orderDto.dateOfPurchase());
     }
 
-    /**
-     * Verifies that map Order To Order DTO List success.
-     */
     @Test
     void testMapOrderToOrderDtoList_success() {
         final List<OrderDto> orderDtos = OrderMapper.mapOrderToOrderDtoList(OrderFactory.getDefaultOrderList());
         final OrderDto orderDto = orderDtos.getFirst();
 
-        assertEquals(OrderConstants.ID, orderDto.getId());
-        assertEquals(UserFactory.getDefaultUserDto(), orderDto.getUser());
-        assertEquals(OrderConstants.TOTAL_PRICE, orderDto.getTotalPrice(), 1.1);
-        assertEquals(OrderConstants.DATE_OF_PURCHASE, orderDto.getDateOfPurchase());
+        assertEquals(OrderConstants.ID, orderDto.id());
+        assertEquals(UserFactory.getDefaultUserDto(), orderDto.user());
+        assertEquals(OrderConstants.TOTAL_PRICE, orderDto.totalPrice(), 1.1);
+        assertEquals(OrderConstants.DATE_OF_PURCHASE, orderDto.dateOfPurchase());
     }
 }
-
-
-

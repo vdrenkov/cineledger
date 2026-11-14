@@ -39,4 +39,3 @@ class ImdbServiceGracefulDegradationTest {
         assertEquals(0, new JSONObject(response).getJSONArray("movies").length());
     }
 }
-

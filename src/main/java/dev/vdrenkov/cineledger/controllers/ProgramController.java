@@ -6,9 +6,6 @@ import dev.vdrenkov.cineledger.models.requests.ProgramRequest;
 import dev.vdrenkov.cineledger.services.ProgramService;
 import dev.vdrenkov.cineledger.utils.constants.URIConstants;
 import jakarta.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,36 +22,17 @@ import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
 
-/**
- * Exposes REST endpoints for managing program data.
- */
 @RestController
 public class ProgramController {
-    private static final Logger log = LoggerFactory.getLogger(ProgramController.class);
     private final ProgramService programService;
 
-    /**
-     * Creates a new program controller with its required collaborators.
-     *
-     * @param programService
-     *     program service used by the operation
-     */
-    @Autowired
     public ProgramController(ProgramService programService) {
         this.programService = programService;
     }
 
-    /**
-     * Creates and persists program.
-     *
-     * @param programRequest
-     *     request payload for the program operation
-     * @return HTTP response describing the operation result
-     */
     @PostMapping(URIConstants.PROGRAMS_PATH)
     public ResponseEntity<Void> addProgram(@RequestBody @Valid ProgramRequest programRequest) {
         final Program program = programService.addProgram(programRequest);
-        log.info("Request for a program to be added submitted");
 
         URI location = UriComponentsBuilder
             .fromUriString(URIConstants.PROGRAMS_ID_PATH)
@@ -64,78 +42,37 @@ public class ProgramController {
         return ResponseEntity.created(location).build();
     }
 
-    /**
-     * Returns programs matching the supplied criteria.
-     *
-     * @param date
-     *     date used by the operation
-     * @return HTTP response describing the operation result
-     */
     @GetMapping(URIConstants.PROGRAMS_PATH)
     public ResponseEntity<List<ProgramDto>> getProgramsByDate(
         @RequestParam(value = "date", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
 
         final List<ProgramDto> programs = programService.getAllPrograms(date);
-        log.info("All programs by date requested from the database");
 
         return ResponseEntity.ok(programs);
     }
 
-    /**
-     * Returns programs matching the supplied criteria.
-     *
-     * @param id
-     *     identifier of the target resource
-     * @return HTTP response describing the operation result
-     */
     @GetMapping(URIConstants.CINEMAS_ID_PROGRAMS_PATH)
     public ResponseEntity<List<ProgramDto>> getProgramsByCinemaId(@PathVariable int id) {
         final List<ProgramDto> programs = programService.getProgramsByCinemaId(id);
-        log.info("Program by cinema id requested from the database");
 
         return ResponseEntity.ok(programs);
     }
 
-    /**
-     * Updates program and returns the previous state when needed.
-     *
-     * @param programRequest
-     *     request payload for the program operation
-     * @param id
-     *     identifier of the target resource
-     * @param returnOld
-     *     whether the previous persisted state should be returned
-     * @return HTTP response describing the operation result
-     */
     @PutMapping(URIConstants.PROGRAMS_ID_PATH)
     public ResponseEntity<ProgramDto> updateProgram(@RequestBody @Valid ProgramRequest programRequest,
         @PathVariable int id, @RequestParam(required = false) Boolean returnOld) {
 
         final ProgramDto programDto = programService.updateProgram(programRequest, id);
-        log.info("Program with id {} updated", id);
 
         return Boolean.TRUE.equals(returnOld) ? ResponseEntity.ok(programDto) : ResponseEntity.noContent().build();
     }
 
-    /**
-     * Deletes program and returns the removed state when needed.
-     *
-     * @param id
-     *     identifier of the target resource
-     * @param returnOld
-     *     whether the previous persisted state should be returned
-     * @return HTTP response describing the operation result
-     */
     @DeleteMapping(URIConstants.PROGRAMS_ID_PATH)
     public ResponseEntity<ProgramDto> deleteProgram(@PathVariable int id,
         @RequestParam(required = false) Boolean returnOld) {
 
         final ProgramDto programDto = programService.deleteProgram(id);
-        log.info("Program with id {} deleted", id);
 
         return Boolean.TRUE.equals(returnOld) ? ResponseEntity.ok(programDto) : ResponseEntity.noContent().build();
     }
 }
-
-
-

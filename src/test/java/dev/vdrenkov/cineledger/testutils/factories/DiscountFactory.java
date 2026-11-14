@@ -13,59 +13,29 @@ import static dev.vdrenkov.cineledger.testutils.constants.DiscountConstants.ID;
 import static dev.vdrenkov.cineledger.testutils.constants.DiscountConstants.PERCENTAGE;
 import static dev.vdrenkov.cineledger.testutils.constants.DiscountConstants.TYPE;
 
-/**
- * Provides reusable discount fixtures for tests.
- */
 public final class DiscountFactory {
 
     private DiscountFactory() {
         throw new IllegalStateException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
     }
 
-    /**
-     * Returns the default discount request fixture used in tests.
-     *
-     * @return test discount request value
-     */
     public static DiscountRequest getDefaultDiscountRequest() {
         return new DiscountRequest(TYPE, CODE, PERCENTAGE);
     }
 
-    /**
-     * Returns the default discount fixture used in tests.
-     *
-     * @return test discount value
-     */
     public static Discount getDefaultDiscount() {
         return new Discount(ID, TYPE, CODE, PERCENTAGE);
     }
 
-    /**
-     * Returns the default discount list fixture used in tests.
-     *
-     * @return test discount values
-     */
     public static List<Discount> getDefaultDiscountList() {
         return Collections.singletonList(getDefaultDiscount());
     }
 
-    /**
-     * Returns the default discount dto fixture used in tests.
-     *
-     * @return test discount dto value
-     */
     public static DiscountDto getDefaultDiscountDto() {
         return new DiscountDto(ID, TYPE, CODE, PERCENTAGE);
     }
 
-    /**
-     * Returns the default discount dto list fixture used in tests.
-     *
-     * @return test discount dto values
-     */
     public static List<DiscountDto> getDefaultDiscountDtoList() {
         return Collections.singletonList(getDefaultDiscountDto());
     }
 }
-
-

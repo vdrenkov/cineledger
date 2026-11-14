@@ -22,4 +22,3 @@ class CsrfControllerTest {
         assertEquals(Map.of("token", "csrf-token"), body);
     }
 }
-

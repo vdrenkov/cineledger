@@ -11,40 +11,19 @@ import dev.vdrenkov.cineledger.models.entities.User;
 import dev.vdrenkov.cineledger.models.requests.ReviewRequest;
 import dev.vdrenkov.cineledger.repositories.ReviewRepository;
 import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
-import dev.vdrenkov.cineledger.utils.constants.LogMessages;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
 
-/**
- * Contains business logic for review operations.
- */
 @Service
 public class ReviewService {
-    private static final Logger log = LoggerFactory.getLogger(ReviewService.class);
 
     private final ReviewRepository reviewRepository;
     private final UserService userService;
     private final MovieService movieService;
     private final CinemaService cinemaService;
 
-    /**
-     * Creates a new review service with its required collaborators.
-     *
-     * @param reviewRepository
-     *     review repository used by the operation
-     * @param userService
-     *     user service used by the operation
-     * @param movieService
-     *     movie service used by the operation
-     * @param cinemaService
-     *     cinema service used by the operation
-     */
-    @Autowired
     public ReviewService(ReviewRepository reviewRepository, UserService userService, MovieService movieService,
         CinemaService cinemaService) {
         this.reviewRepository = reviewRepository;
@@ -53,22 +32,11 @@ public class ReviewService {
         this.cinemaService = cinemaService;
     }
 
-    /**
-     * Creates and persists movie review.
-     *
-     * @param request
-     *     request payload containing the submitted data
-     * @param movieId
-     *     identifier of the target movie
-     * @return requested review value
-     */
     public Review addMovieReview(ReviewRequest request, int movieId) {
         final User user = userService.getCurrentUser();
         final Movie movie = movieService.getMovieById(movieId);
         final LocalDate now = LocalDate.now();
-        final Review review = new Review(request.getRating(), request.getReviewText(), now, movie, user);
-
-        log.info("An attempt to add a new review in the database");
+        final Review review = new Review(request.rating(), request.reviewText(), now, movie, user);
 
         reviewRepository.save(review);
 
@@ -78,22 +46,11 @@ public class ReviewService {
         return review;
     }
 
-    /**
-     * Creates and persists cinema review.
-     *
-     * @param request
-     *     request payload containing the submitted data
-     * @param cinemaId
-     *     identifier of the target cinema
-     * @return requested review value
-     */
     public Review addCinemaReview(ReviewRequest request, int cinemaId) {
         final User user = userService.getCurrentUser();
         final Cinema cinema = cinemaService.getCinemaById(cinemaId);
         final LocalDate now = LocalDate.now();
-        final Review review = new Review(request.getRating(), request.getReviewText(), now, cinema, user);
-
-        log.info("An attempt to add a new review in the database");
+        final Review review = new Review(request.rating(), request.reviewText(), now, cinema, user);
 
         reviewRepository.save(review);
 
@@ -103,43 +60,18 @@ public class ReviewService {
         return review;
     }
 
-    /**
-     * Returns reviews matching the supplied criteria.
-     *
-     * @param movieId
-     *     identifier of the target movie
-     * @return matching review dto values
-     */
     public List<ReviewDto> getReviewsByMovieId(int movieId) {
         movieService.getMovieById(movieId);
-
-        log.info("An attempt to extract all reviews with movie id {}", movieId);
 
         return reviewRepository.findByMovieId(movieId).stream().map(ReviewMapper::mapReviewToReviewDto).toList();
     }
 
-    /**
-     * Returns reviews matching the supplied criteria.
-     *
-     * @param cinemaId
-     *     identifier of the target cinema
-     * @return matching review dto values
-     */
     public List<ReviewDto> getReviewsByCinemaId(int cinemaId) {
         cinemaService.getCinemaById(cinemaId);
-
-        log.info("An attempt to extract all reviews with cinema id {}", cinemaId);
 
         return reviewRepository.findByCinemaId(cinemaId).stream().map(ReviewMapper::mapReviewToReviewDto).toList();
     }
 
-    /**
-     * Returns movie reviews matching the supplied criteria.
-     *
-     * @param userId
-     *     identifier of the target user
-     * @return matching review dto values
-     */
     public List<ReviewDto> getMovieReviewsByUserId(int userId) {
         if (userService.isCurrentUserAuthorized(userId)) {
             return ReviewMapper.mapReviewListToReviewDtoList(
@@ -149,13 +81,6 @@ public class ReviewService {
         }
     }
 
-    /**
-     * Returns cinema reviews matching the supplied criteria.
-     *
-     * @param userId
-     *     identifier of the target user
-     * @return matching review dto values
-     */
     public List<ReviewDto> getCinemaReviewsByUserId(int userId) {
         if (userService.isCurrentUserAuthorized(userId)) {
             return ReviewMapper.mapReviewListToReviewDtoList(
@@ -165,56 +90,34 @@ public class ReviewService {
         }
     }
 
-    /**
-     * Updates review and returns the previous state when needed.
-     *
-     * @param request
-     *     request payload containing the submitted data
-     * @param reviewId
-     *     identifier of the target review
-     * @return review dto result
-     */
     public ReviewDto updateReview(ReviewRequest request, int reviewId) {
         final Review review = reviewRepository.findById(reviewId).orElseThrow(() -> {
-            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.REVIEW_NOT_FOUND_MESSAGE);
 
             return new ReviewNotFoundException(ExceptionMessages.REVIEW_NOT_FOUND_MESSAGE);
         });
 
         if (!userService.isCurrentUserAuthorized(review.getUser().getId())) {
-            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.NOT_AUTHORIZED_MESSAGE);
 
             throw new NotAuthorizedException(ExceptionMessages.NOT_AUTHORIZED_MESSAGE);
         }
 
         final ReviewDto reviewDto = ReviewMapper.mapReviewToReviewDto(review);
 
-        review.setReviewText(request.getReviewText());
-        review.setRating(request.getRating());
+        review.setReviewText(request.reviewText());
+        review.setRating(request.rating());
 
         reviewRepository.save(review);
-
-        log.info("Review with id {} was updated", reviewId);
 
         return getReviewDto(review, reviewDto);
     }
 
-    /**
-     * Deletes review and returns the removed state when needed.
-     *
-     * @param reviewId
-     *     identifier of the target review
-     * @return review dto result
-     */
     public ReviewDto deleteReview(int reviewId) {
         Review review = reviewRepository.findById(reviewId).orElseThrow(() -> {
-            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.REVIEW_NOT_FOUND_MESSAGE);
 
             return new ReviewNotFoundException(ExceptionMessages.REVIEW_NOT_FOUND_MESSAGE);
         });
 
         if (!userService.isCurrentUserAuthorized(review.getUser().getId())) {
-            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.NOT_AUTHORIZED_MESSAGE);
 
             throw new NotAuthorizedException(ExceptionMessages.NOT_AUTHORIZED_MESSAGE);
         }
@@ -222,8 +125,6 @@ public class ReviewService {
         final ReviewDto reviewDto = ReviewMapper.mapReviewToReviewDto(review);
 
         reviewRepository.delete(review);
-
-        log.info("Review with id {} was deleted", reviewId);
 
         return getReviewDto(review, reviewDto);
     }
@@ -260,7 +161,7 @@ public class ReviewService {
         final int numberOfReviews = reviews.size();
 
         for (ReviewDto review : reviews) {
-            sum += review.getRating();
+            sum += review.rating();
         }
 
         if (numberOfReviews == 0) {
@@ -269,5 +170,3 @@ public class ReviewService {
         return sum / numberOfReviews;
     }
 }
-
-

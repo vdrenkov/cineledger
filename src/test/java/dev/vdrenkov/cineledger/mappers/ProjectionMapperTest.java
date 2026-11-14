@@ -11,33 +11,25 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * Tests projection mapper behavior.
- */
 @ExtendWith(MockitoExtension.class)
 class ProjectionMapperTest {
-    /**
-     * Verifies that map Projection To Projection DTO no Exceptions success.
-     */
+
     @Test
     void testMapProjectionToProjectionDto_noExceptions_success() {
         final ProjectionDto resultDto = ProjectionMapper.mapProjectionToProjectionDto(
             ProjectionFactory.getDefaultProjection());
 
-        assertEquals(ProjectionConstants.ID, resultDto.getId());
-        assertEquals(ProjectionConstants.PROJECTION_HALL_DTO.getId(), resultDto.getHall().getId());
-        assertEquals(ProjectionConstants.PROJECTION_HALL_DTO.getCapacity(), resultDto.getHall().getCapacity());
-        assertEquals(ProjectionConstants.PRICE, resultDto.getPrice(), 0.0);
-        assertEquals(ProjectionConstants.PROJECTION_PROGRAM_DTO, resultDto.getProgram());
-        assertEquals(ProjectionConstants.PROJECTION_MOVIE_DTO.getId(), resultDto.getMovie().getId());
-        assertEquals(ProjectionConstants.PROJECTION_MOVIE_DTO.getTitle(), resultDto.getMovie().getTitle());
-        assertEquals(ProjectionConstants.PROJECTION_MOVIE_DTO.getDescription(), resultDto.getMovie().getDescription());
-        assertEquals(ProjectionConstants.START_TIME, resultDto.getStartTime());
+        assertEquals(ProjectionConstants.ID, resultDto.id());
+        assertEquals(ProjectionConstants.PROJECTION_HALL_DTO.id(), resultDto.hall().id());
+        assertEquals(ProjectionConstants.PROJECTION_HALL_DTO.capacity(), resultDto.hall().capacity());
+        assertEquals(ProjectionConstants.PRICE, resultDto.price(), 0.0);
+        assertEquals(ProjectionConstants.PROJECTION_PROGRAM_DTO, resultDto.program());
+        assertEquals(ProjectionConstants.PROJECTION_MOVIE_DTO.id(), resultDto.movie().id());
+        assertEquals(ProjectionConstants.PROJECTION_MOVIE_DTO.title(), resultDto.movie().title());
+        assertEquals(ProjectionConstants.PROJECTION_MOVIE_DTO.description(), resultDto.movie().description());
+        assertEquals(ProjectionConstants.START_TIME, resultDto.startTime());
     }
 
-    /**
-     * Verifies that map Projection List To Projection DTO List no Exceptions success.
-     */
     @Test
     void testMapProjectionListToProjectionDtoList_noExceptions_success() {
         final List<ProjectionDto> resultList = ProjectionMapper.mapProjectionListToProjectionDtoList(
@@ -45,18 +37,14 @@ class ProjectionMapperTest {
 
         final ProjectionDto resultDto = resultList.getFirst();
 
-        assertEquals(ProjectionConstants.ID, resultDto.getId());
-        assertEquals(ProjectionConstants.PROJECTION_HALL_DTO.getId(), resultDto.getHall().getId());
-        assertEquals(ProjectionConstants.PROJECTION_HALL_DTO.getCapacity(), resultDto.getHall().getCapacity());
-        assertEquals(ProjectionConstants.PRICE, resultDto.getPrice(), 0.0);
-        assertEquals(ProjectionConstants.PROJECTION_PROGRAM_DTO, resultDto.getProgram());
-        assertEquals(ProjectionConstants.PROJECTION_MOVIE_DTO.getId(), resultDto.getMovie().getId());
-        assertEquals(ProjectionConstants.PROJECTION_MOVIE_DTO.getTitle(), resultDto.getMovie().getTitle());
-        assertEquals(ProjectionConstants.PROJECTION_MOVIE_DTO.getDescription(), resultDto.getMovie().getDescription());
-        assertEquals(ProjectionConstants.START_TIME, resultDto.getStartTime());
+        assertEquals(ProjectionConstants.ID, resultDto.id());
+        assertEquals(ProjectionConstants.PROJECTION_HALL_DTO.id(), resultDto.hall().id());
+        assertEquals(ProjectionConstants.PROJECTION_HALL_DTO.capacity(), resultDto.hall().capacity());
+        assertEquals(ProjectionConstants.PRICE, resultDto.price(), 0.0);
+        assertEquals(ProjectionConstants.PROJECTION_PROGRAM_DTO, resultDto.program());
+        assertEquals(ProjectionConstants.PROJECTION_MOVIE_DTO.id(), resultDto.movie().id());
+        assertEquals(ProjectionConstants.PROJECTION_MOVIE_DTO.title(), resultDto.movie().title());
+        assertEquals(ProjectionConstants.PROJECTION_MOVIE_DTO.description(), resultDto.movie().description());
+        assertEquals(ProjectionConstants.START_TIME, resultDto.startTime());
     }
 }
-
-
-
-

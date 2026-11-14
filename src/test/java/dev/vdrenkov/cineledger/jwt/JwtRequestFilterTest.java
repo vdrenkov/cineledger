@@ -26,9 +26,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-/**
- * Tests jwt request filter behavior.
- */
 @ExtendWith(MockitoExtension.class)
 class JwtRequestFilterTest {
     private static final String SECRET = "xJ4nRq8sUv2mKe7pTd5yLa9cBh3wNz6fQg1rMs8vPk4tYd7uCe2hWn5qLb9xRa3mF";
@@ -51,17 +48,11 @@ class JwtRequestFilterTest {
     @InjectMocks
     private JwtRequestFilter requestFilter;
 
-    /**
-     * Initializes the test fixture before each test case.
-     */
     @BeforeEach
     void setUp() {
         JwtFactory.setSecret(SECRET);
     }
 
-    /**
-     * Verifies that do Filter Internal success.
-     */
     @Test
     void testDoFilterInternal_success() throws ServletException, IOException {
         final SecurityContext securityContext = Mockito.mock(SecurityContext.class);
@@ -79,9 +70,6 @@ class JwtRequestFilterTest {
         verify(filterChain, times(1)).doFilter(request, response);
     }
 
-    /**
-     * Verifies that do Filter Internal cookies Are Null.
-     */
     @Test
     void testDoFilterInternal_cookiesAreNull() throws ServletException, IOException {
         when(request.getCookies()).thenReturn(null);
@@ -92,9 +80,6 @@ class JwtRequestFilterTest {
         verify(filterChain, times(1)).doFilter(request, response);
     }
 
-    /**
-     * Verifies that do Filter Internal invalid Jwt does Not Authenticate.
-     */
     @Test
     void testDoFilterInternal_invalidJwt_doesNotAuthenticate() throws ServletException, IOException {
         final SecurityContext securityContext = Mockito.mock(SecurityContext.class);
@@ -109,6 +94,3 @@ class JwtRequestFilterTest {
         verify(filterChain, times(1)).doFilter(request, response);
     }
 }
-
-
-

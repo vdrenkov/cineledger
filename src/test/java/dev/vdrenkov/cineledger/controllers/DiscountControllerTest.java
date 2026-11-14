@@ -30,9 +30,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/**
- * Tests discount controller behavior.
- */
 @ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc
 class DiscountControllerTest {
@@ -45,17 +42,11 @@ class DiscountControllerTest {
     @InjectMocks
     private DiscountController discountController;
 
-    /**
-     * Initializes the test fixture before each test case.
-     */
     @BeforeEach
     void setup() {
         mockMvc = MockMvcBuilders.standaloneSetup(discountController).build();
     }
 
-    /**
-     * Verifies that add Discount no Exceptions success.
-     */
     @Test
     void testAddDiscount_noExceptions_success() throws Exception {
         final String json = mapper.writeValueAsString(DiscountFactory.getDefaultDiscountRequest());
@@ -71,9 +62,6 @@ class DiscountControllerTest {
             .andExpect(header().string("Location", URIConstants.DISCOUNTS_PATH + "/" + ID));
     }
 
-    /**
-     * Verifies that get All Discounts single Discount success.
-     */
     @Test
     void testGetAllDiscounts_singleDiscount_success() throws Exception {
         when(discountService.getAllDiscountDtos()).thenReturn(DiscountFactory.getDefaultDiscountDtoList());
@@ -87,9 +75,6 @@ class DiscountControllerTest {
             .andExpect(jsonPath("$[0].percentage").value(PERCENTAGE));
     }
 
-    /**
-     * Verifies that get Discount By Type discount Found success.
-     */
     @Test
     void testGetDiscountByType_discountFound_success() throws Exception {
         when(discountService.getDiscountDtoByType(anyString())).thenReturn(DiscountFactory.getDefaultDiscountDto());
@@ -103,9 +88,6 @@ class DiscountControllerTest {
             .andExpect(jsonPath("$.percentage").value(PERCENTAGE));
     }
 
-    /**
-     * Verifies that update Discount discount Updated returns Ok.
-     */
     @Test
     void testUpdateDiscount_discountUpdated_returnsOk() throws Exception {
         final String json = mapper.writeValueAsString(DiscountFactory.getDefaultDiscountRequest());
@@ -123,9 +105,6 @@ class DiscountControllerTest {
             .andExpect(jsonPath("$.percentage").value(PERCENTAGE));
     }
 
-    /**
-     * Verifies that update Discount discount Updated returns No Content.
-     */
     @Test
     void testUpdateDiscount_discountUpdated_returnsNoContent() throws Exception {
         final String json = mapper.writeValueAsString(DiscountFactory.getDefaultDiscountRequest());
@@ -136,9 +115,6 @@ class DiscountControllerTest {
             .andExpect(status().isNoContent());
     }
 
-    /**
-     * Verifies that delete Discount discount Deleted returns Ok.
-     */
     @Test
     void testDeleteDiscount_discountDeleted_returnsOk() throws Exception {
         when(discountService.deleteDiscount(anyInt())).thenReturn(DiscountFactory.getDefaultDiscountDto());
@@ -152,9 +128,6 @@ class DiscountControllerTest {
             .andExpect(jsonPath("$.percentage").value(PERCENTAGE));
     }
 
-    /**
-     * Verifies that delete Discount discount Deleted returns No Content.
-     */
     @Test
     void testDeleteDiscount_discountDeleted_returnsNoContent() throws Exception {
         when(discountService.deleteDiscount(anyInt())).thenReturn(DiscountFactory.getDefaultDiscountDto());
@@ -162,8 +135,3 @@ class DiscountControllerTest {
         mockMvc.perform(delete(URIConstants.DISCOUNTS_ID_PATH, ID)).andExpect(status().isNoContent());
     }
 }
-
-
-
-
-

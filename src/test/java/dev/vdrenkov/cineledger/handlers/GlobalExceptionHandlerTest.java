@@ -72,9 +72,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/**
- * Tests global exception handler behavior.
- */
 @AutoConfigureMockMvc
 @ExtendWith(MockitoExtension.class)
 class GlobalExceptionHandlerTest {
@@ -89,9 +86,6 @@ class GlobalExceptionHandlerTest {
     @InjectMocks
     private CategoryController categoryController;
 
-    /**
-     * Initializes the test fixture before each test case.
-     */
     @BeforeEach
     void setup() {
         mockMvc = MockMvcBuilders
@@ -100,13 +94,10 @@ class GlobalExceptionHandlerTest {
             .build();
     }
 
-    /**
-     * Verifies that handle Method Argument Not Valid Exception on Endpoint Get All Orders bad Request.
-     */
     @Test
     void testHandleMethodArgumentNotValidException_onEndpointGetAllOrders_badRequest() throws Exception {
         final ObjectMapper objectMapper = new ObjectMapper();
-        final String json = objectMapper.writeValueAsString(new CategoryRequest());
+        final String json = objectMapper.writeValueAsString(new CategoryRequest(null));
 
         mockMvc
             .perform(post(URI).contentType(MediaType.APPLICATION_JSON).content(json))
@@ -114,9 +105,6 @@ class GlobalExceptionHandlerTest {
             .andExpect(jsonPath(ROOT_ERRORS).exists());
     }
 
-    /**
-     * Verifies that handle Internal Authentication Service Exception on Endpoint Get All Orders bad Request.
-     */
     @Test
     void testHandleInternalAuthenticationServiceException_onEndpointGetAllOrders_badRequest() throws Exception {
         when(categoryService.getAllCategories()).thenThrow(InternalAuthenticationServiceException.class);
@@ -124,9 +112,6 @@ class GlobalExceptionHandlerTest {
         mockMvc.perform(get(URI)).andExpect(status().isBadRequest()).andExpect(jsonPath(ROOT_ERRORS).exists());
     }
 
-    /**
-     * Verifies that handle Bad Credentials Exception on Endpoint Get All Orders bad Request.
-     */
     @Test
     void testHandleBadCredentialsException_onEndpointGetAllOrders_badRequest() throws Exception {
         when(categoryService.getAllCategories()).thenThrow(BadCredentialsException.class);
@@ -138,9 +123,6 @@ class GlobalExceptionHandlerTest {
                 Matchers.containsInAnyOrder(ExceptionMessages.AUTHENTICATION_FAILED_MESSAGE)));
     }
 
-    /**
-     * Verifies that handle Null Pointer Exception on Endpoint Get All Orders bad Request.
-     */
     @Test
     void testHandleNullPointerException_onEndpointGetAllOrders_badRequest() throws Exception {
         when(categoryService.getAllCategories()).thenThrow(NullPointerException.class);
@@ -148,9 +130,6 @@ class GlobalExceptionHandlerTest {
         mockMvc.perform(get(URI)).andExpect(status().isInternalServerError()).andExpect(jsonPath(ROOT_ERRORS).exists());
     }
 
-    /**
-     * Verifies that handle Unexpected Type Exception on Endpoint Get All Orders bad Request.
-     */
     @Test
     void testHandleUnexpectedTypeException_onEndpointGetAllOrders_badRequest() throws Exception {
         when(categoryService.getAllCategories()).thenThrow(UnexpectedTypeException.class);
@@ -158,9 +137,6 @@ class GlobalExceptionHandlerTest {
         mockMvc.perform(get(URI)).andExpect(status().isBadRequest()).andExpect(jsonPath(ROOT_ERRORS).exists());
     }
 
-    /**
-     * Verifies that handle Http Message Not Readable Exception on Endpoint Get All Orders bad Request.
-     */
     @Test
     void testHandleHttpMessageNotReadableException_onEndpointGetAllOrders_badRequest() throws Exception {
         when(categoryService.getAllCategories()).thenThrow(HttpMessageNotReadableException.class);
@@ -168,17 +144,11 @@ class GlobalExceptionHandlerTest {
         mockMvc.perform(get(URI)).andExpect(status().isBadRequest()).andExpect(jsonPath(ROOT_ERRORS).exists());
     }
 
-    /**
-     * Verifies that handle Http Request Method Not Supported Exception on Endpoint Get All Orders bad Request.
-     */
     @Test
     void testHandleHttpRequestMethodNotSupportedException_onEndpointGetAllOrders_badRequest() throws Exception {
         mockMvc.perform(patch(URI)).andExpect(status().isMethodNotAllowed()).andExpect(jsonPath(ROOT_ERRORS).exists());
     }
 
-    /**
-     * Verifies that handle Illegal Argument Exception on Endpoint Get All Orders bad Request.
-     */
     @Test
     void testHandleIllegalArgumentException_onEndpointGetAllOrders_badRequest() throws Exception {
         when(categoryService.getAllCategories()).thenThrow(IllegalArgumentException.class);
@@ -190,9 +160,6 @@ class GlobalExceptionHandlerTest {
                 Matchers.containsInAnyOrder(ExceptionMessages.INVALID_REQUEST_MESSAGE)));
     }
 
-    /**
-     * Verifies that handle Missing Servlet Request Parameter Exception on Endpoint Get All Orders bad Request.
-     */
     @Test
     void testHandleMissingServletRequestParameterException_onEndpointGetAllOrders_badRequest() throws Exception {
         final MovieService movieService = Mockito.mock(MovieService.class);
@@ -206,9 +173,6 @@ class GlobalExceptionHandlerTest {
         movieMockMvc.perform(MockMvcRequestBuilders.get("/movies")).andExpect(status().isBadRequest());
     }
 
-    /**
-     * Verifies that handle Missing Path Variable Exception on Endpoint Get All Movies By Category Id bad Request.
-     */
     @Test
     void testHandleMissingPathVariableException_onEndpointGetAllMoviesByCategoryId_badRequest() throws Exception {
         final MovieService movieService = Mockito.mock(MovieService.class);
@@ -222,9 +186,6 @@ class GlobalExceptionHandlerTest {
         movieMockMvc.perform(MockMvcRequestBuilders.get("/categories/ /movies")).andExpect(status().isBadRequest());
     }
 
-    /**
-     * Verifies that handle Unsatisfied Servlet Request Parameter Exception on Endpoint Get All Orders bad Request.
-     */
     @Test
     void testHandleUnsatisfiedServletRequestParameterException_onEndpointGetAllOrders_badRequest() throws Exception {
         final UserService userService = Mockito.mock(UserService.class);
@@ -242,9 +203,6 @@ class GlobalExceptionHandlerTest {
             .andExpect(jsonPath(ROOT_ERRORS).exists());
     }
 
-    /**
-     * Verifies that handle Date Time Parse Exception on Endpoint Get All Orders bad Request.
-     */
     @Test
     void testHandleDateTimeParseException_onEndpointGetAllOrders_badRequest() throws Exception {
         when(categoryService.getAllCategories()).thenThrow(DateTimeParseException.class);
@@ -252,9 +210,6 @@ class GlobalExceptionHandlerTest {
         mockMvc.perform(get(URI)).andExpect(status().isBadRequest()).andExpect(jsonPath(ROOT_ERRORS).exists());
     }
 
-    /**
-     * Verifies that handle Method Argument Type Mismatch Exception on Endpoint Get All Orders bad Request.
-     */
     @Test
     void testHandleMethodArgumentTypeMismatchException_onEndpointGetAllOrders_badRequest() throws Exception {
         when(categoryService.getAllCategories()).thenThrow(MethodArgumentTypeMismatchException.class);
@@ -262,9 +217,6 @@ class GlobalExceptionHandlerTest {
         mockMvc.perform(get(URI)).andExpect(status().isBadRequest()).andExpect(jsonPath(ROOT_ERRORS).exists());
     }
 
-    /**
-     * Verifies that handle Data Integrity Violation Exception on Endpoint Get All Orders bad Request.
-     */
     @Test
     void testHandleDataIntegrityViolationException_onEndpointGetAllOrders_badRequest() throws Exception {
         when(categoryService.getAllCategories()).thenThrow(DataIntegrityViolationException.class);
@@ -272,9 +224,6 @@ class GlobalExceptionHandlerTest {
         mockMvc.perform(get(URI)).andExpect(status().isConflict()).andExpect(jsonPath(ROOT_ERRORS).exists());
     }
 
-    /**
-     * Verifies that handle Illegal Argument Exception on Endpoint Get All Categories bad Request.
-     */
     @Test
     void testHandleIllegalArgumentException_onEndpointGetAllCategories_badRequest() throws Exception {
         when(categoryService.getAllCategories()).thenThrow(IllegalArgumentException.class);
@@ -282,10 +231,6 @@ class GlobalExceptionHandlerTest {
         mockMvc.perform(get(URI)).andExpect(status().isBadRequest()).andExpect(jsonPath(ROOT_ERRORS).exists());
     }
 
-    /**
-     * Verifies that handle Missing Servlet Request Parameter Exception on Endpoint Get Movies By Release Date bad
-     * Request.
-     */
     @Test
     void testHandleMissingServletRequestParameterException_onEndpointGetMoviesByReleaseDate_badRequest()
         throws Exception {
@@ -303,9 +248,6 @@ class GlobalExceptionHandlerTest {
             .andExpect(jsonPath(ROOT_ERRORS).exists());
     }
 
-    /**
-     * Verifies that handle Category Already Exists Exception on End Point Get All Categories conflict.
-     */
     @Test
     void testHandleCategoryAlreadyExistsException_onEndPointGetAllCategories_conflict() throws Exception {
         when(categoryService.getAllCategories()).thenThrow(
@@ -318,9 +260,6 @@ class GlobalExceptionHandlerTest {
                 Matchers.containsInAnyOrder(ExceptionMessages.CATEGORY_ALREADY_EXISTS_MESSAGE)));
     }
 
-    /**
-     * Verifies that handle Cinema Already Exists Exception on End Point Get All Categories conflict.
-     */
     @Test
     void testHandleCinemaAlreadyExistsException_onEndPointGetAllCategories_conflict() throws Exception {
         when(categoryService.getAllCategories()).thenThrow(
@@ -333,9 +272,6 @@ class GlobalExceptionHandlerTest {
                 Matchers.containsInAnyOrder(ExceptionMessages.CINEMA_ALREADY_EXISTS_MESSAGE)));
     }
 
-    /**
-     * Verifies that handle Program Already Exists Exception on End Point Get All Categories conflict.
-     */
     @Test
     void testHandleProgramAlreadyExistsException_onEndPointGetAllCategories_conflict() throws Exception {
         when(categoryService.getAllCategories()).thenThrow(
@@ -348,9 +284,6 @@ class GlobalExceptionHandlerTest {
                 Matchers.containsInAnyOrder(ExceptionMessages.PROGRAM_ALREADY_EXISTS_MESSAGE)));
     }
 
-    /**
-     * Verifies that handle Role Already Exists Exception on End Point Get All Categories conflict.
-     */
     @Test
     void testHandleRoleAlreadyExistsException_onEndPointGetAllCategories_conflict() throws Exception {
         when(categoryService.getAllCategories()).thenThrow(
@@ -363,9 +296,6 @@ class GlobalExceptionHandlerTest {
                 Matchers.containsInAnyOrder(ExceptionMessages.ROLE_ALREADY_EXISTS_MESSAGE)));
     }
 
-    /**
-     * Verifies that handle User Email Already Exists Exception on End Point Get All Categories conflict.
-     */
     @Test
     void testHandleUserEmailAlreadyExistsException_onEndPointGetAllCategories_conflict() throws Exception {
         when(categoryService.getAllCategories()).thenThrow(
@@ -378,9 +308,6 @@ class GlobalExceptionHandlerTest {
                 Matchers.containsInAnyOrder(ExceptionMessages.USER_EMAIL_ALREADY_EXISTS_MESSAGE)));
     }
 
-    /**
-     * Verifies that handle Username Already Exists Exception on End Point Get All Categories conflict.
-     */
     @Test
     void testHandleUsernameAlreadyExistsException_onEndPointGetAllCategories_conflict() throws Exception {
         when(categoryService.getAllCategories()).thenThrow(
@@ -393,9 +320,6 @@ class GlobalExceptionHandlerTest {
                 Matchers.containsInAnyOrder(ExceptionMessages.USERNAME_ALREADY_EXISTS_MESSAGE)));
     }
 
-    /**
-     * Verifies that handle Projection Not Found Exception on End Point Get All Categories not Found.
-     */
     @Test
     void testHandleProjectionNotFoundException_onEndPointGetAllCategories_notFound() throws Exception {
         when(categoryService.getAllCategories()).thenThrow(
@@ -408,9 +332,6 @@ class GlobalExceptionHandlerTest {
                 Matchers.containsInAnyOrder(ExceptionMessages.PROJECTION_NOT_FOUND_MESSAGE)));
     }
 
-    /**
-     * Verifies that handle Category Not Found Exception on Endpoint Get All Categories not Found.
-     */
     @Test
     void testHandleCategoryNotFoundException_onEndpointGetAllCategories_notFound() throws Exception {
         when(categoryService.getAllCategories()).thenThrow(
@@ -423,9 +344,6 @@ class GlobalExceptionHandlerTest {
                 Matchers.containsInAnyOrder(ExceptionMessages.CATEGORY_NOT_FOUND_MESSAGE)));
     }
 
-    /**
-     * Verifies that handle Cinema Not Found Exception on Endpoint Get All Categories not Found.
-     */
     @Test
     void testHandleCinemaNotFoundException_onEndpointGetAllCategories_notFound() throws Exception {
         when(categoryService.getAllCategories()).thenThrow(
@@ -438,9 +356,6 @@ class GlobalExceptionHandlerTest {
                 Matchers.containsInAnyOrder(ExceptionMessages.CINEMA_NOT_FOUND_MESSAGE)));
     }
 
-    /**
-     * Verifies that handle Program Not Found Exception on Endpoint Get All Categories not Found.
-     */
     @Test
     void testHandleProgramNotFoundException_onEndpointGetAllCategories_notFound() throws Exception {
         when(categoryService.getAllCategories()).thenThrow(
@@ -453,9 +368,6 @@ class GlobalExceptionHandlerTest {
                 Matchers.containsInAnyOrder(ExceptionMessages.PROGRAM_NOT_FOUND_MESSAGE)));
     }
 
-    /**
-     * Verifies that handle User Not Found Exception on Endpoint Get All Categories not Found.
-     */
     @Test
     void testHandleUserNotFoundException_onEndpointGetAllCategories_notFound() throws Exception {
         when(categoryService.getAllCategories()).thenThrow(
@@ -468,9 +380,6 @@ class GlobalExceptionHandlerTest {
                 Matchers.containsInAnyOrder(ExceptionMessages.USER_NOT_FOUND_MESSAGE)));
     }
 
-    /**
-     * Verifies that handle Date Not Valid Exception on Endpoint Get All Categories not Found.
-     */
     @Test
     void testHandleDateNotValidException_onEndpointGetAllCategories_notFound() throws Exception {
         when(categoryService.getAllCategories()).thenThrow(
@@ -483,9 +392,6 @@ class GlobalExceptionHandlerTest {
                 Matchers.containsInAnyOrder(ExceptionMessages.DATE_NOT_VALID_MESSAGE)));
     }
 
-    /**
-     * Verifies that handle Hall Not Found Exception on Endpoint Get All Categories not Found.
-     */
     @Test
     void testHandleHallNotFoundException_onEndpointGetAllCategories_notFound() throws Exception {
         when(categoryService.getAllCategories()).thenThrow(
@@ -498,9 +404,6 @@ class GlobalExceptionHandlerTest {
                 Matchers.containsInAnyOrder(ExceptionMessages.HALL_NOT_FOUND_MESSAGE)));
     }
 
-    /**
-     * Verifies that handle Item Not Found Exception on Endpoint Get All Categories not Found.
-     */
     @Test
     void testHandleItemNotFoundException_onEndpointGetAllCategories_notFound() throws Exception {
         when(categoryService.getAllCategories()).thenThrow(
@@ -513,9 +416,6 @@ class GlobalExceptionHandlerTest {
                 Matchers.containsInAnyOrder(ExceptionMessages.ITEM_NOT_FOUND_MESSAGE)));
     }
 
-    /**
-     * Verifies that handle Existing Item Exception on Endpoint Get All Categories not Found.
-     */
     @Test
     void testHandleExistingItemException_onEndpointGetAllCategories_notFound() throws Exception {
         when(categoryService.getAllCategories()).thenThrow(
@@ -528,9 +428,6 @@ class GlobalExceptionHandlerTest {
                 Matchers.containsInAnyOrder(ExceptionMessages.ITEM_ALREADY_EXISTS_MESSAGE)));
     }
 
-    /**
-     * Verifies that handle Existing Movie Exception on Endpoint Get All Categories not Found.
-     */
     @Test
     void testHandleExistingMovieException_onEndpointGetAllCategories_notFound() throws Exception {
         when(categoryService.getAllCategories()).thenThrow(
@@ -543,9 +440,6 @@ class GlobalExceptionHandlerTest {
                 Matchers.containsInAnyOrder(ExceptionMessages.MOVIE_ALREADY_EXISTS_MESSAGE)));
     }
 
-    /**
-     * Verifies that handle Order Not Found Exception on Endpoint Get All Categories not Found.
-     */
     @Test
     void testHandleOrderNotFoundException_onEndpointGetAllCategories_notFound() throws Exception {
         when(categoryService.getAllCategories()).thenThrow(
@@ -558,9 +452,6 @@ class GlobalExceptionHandlerTest {
                 Matchers.containsInAnyOrder(ExceptionMessages.ORDER_NOT_FOUND_MESSAGE)));
     }
 
-    /**
-     * Verifies that handle Role Not Found Exception on Endpoint Get All Categories not Found.
-     */
     @Test
     void testHandleRoleNotFoundException_onEndpointGetAllCategories_notFound() throws Exception {
         when(categoryService.getAllCategories()).thenThrow(
@@ -573,9 +464,6 @@ class GlobalExceptionHandlerTest {
                 Matchers.containsInAnyOrder(ExceptionMessages.ROLE_NOT_FOUND_MESSAGE)));
     }
 
-    /**
-     * Verifies that handle Role Not Chosen Exception on Endpoint Get All Categories not Found.
-     */
     @Test
     void testHandleRoleNotChosenException_onEndpointGetAllCategories_notFound() throws Exception {
         when(categoryService.getAllCategories()).thenThrow(
@@ -588,9 +476,6 @@ class GlobalExceptionHandlerTest {
                 Matchers.containsInAnyOrder(ExceptionMessages.ROLE_NOT_CHOSEN_MESSAGE)));
     }
 
-    /**
-     * Verifies that handle Movie Not Found Exception on Endpoint Get All Categories not Found.
-     */
     @Test
     void testHandleMovieNotFoundException_onEndpointGetAllCategories_notFound() throws Exception {
         when(categoryService.getAllCategories()).thenThrow(
@@ -603,9 +488,6 @@ class GlobalExceptionHandlerTest {
                 Matchers.containsInAnyOrder(ExceptionMessages.MOVIE_NOT_FOUND_MESSAGE)));
     }
 
-    /**
-     * Verifies that handle Discount Not Found Exception on Endpoint Get All Categories not Found.
-     */
     @Test
     void testHandleDiscountNotFoundException_onEndpointGetAllCategories_notFound() throws Exception {
         when(categoryService.getAllCategories()).thenThrow(
@@ -618,9 +500,6 @@ class GlobalExceptionHandlerTest {
                 Matchers.containsInAnyOrder(ExceptionMessages.DISCOUNT_NOT_FOUND_MESSAGE)));
     }
 
-    /**
-     * Verifies that handle Discount Not Valid Exception on Endpoint Get All Categories not Found.
-     */
     @Test
     void testHandeDiscountNotValidException_onEndpointGetAllCategories_notFound() throws Exception {
         when(categoryService.getAllCategories()).thenThrow(
@@ -633,9 +512,6 @@ class GlobalExceptionHandlerTest {
                 Matchers.containsInAnyOrder(ExceptionMessages.DISCOUNT_CODE_NOT_VALID_MESSAGE)));
     }
 
-    /**
-     * Verifies that handle Review Not Found Exception on Endpoint Get All Categories not Found.
-     */
     @Test
     void testHandleReviewNotFoundException_onEndpointGetAllCategories_notFound() throws Exception {
         when(categoryService.getAllCategories()).thenThrow(
@@ -648,9 +524,6 @@ class GlobalExceptionHandlerTest {
                 Matchers.containsInAnyOrder(ExceptionMessages.REVIEW_NOT_FOUND_MESSAGE)));
     }
 
-    /**
-     * Verifies that handle Ticket Not Found Exception on Endpoint Get All Categories not Found.
-     */
     @Test
     void testHandleTicketNotFoundException_onEndpointGetAllCategories_notFound() throws Exception {
         when(categoryService.getAllCategories()).thenThrow(
@@ -663,9 +536,6 @@ class GlobalExceptionHandlerTest {
                 Matchers.containsInAnyOrder(ExceptionMessages.TICKET_NOT_FOUND_MESSAGE)));
     }
 
-    /**
-     * Verifies that hall Not Available Exception on Endpoint Get All Categories not Found.
-     */
     @Test
     void testHallNotAvailableException_onEndpointGetAllCategories_notFound() throws Exception {
         when(categoryService.getAllCategories()).thenThrow(
@@ -678,9 +548,6 @@ class GlobalExceptionHandlerTest {
                 Matchers.containsInAnyOrder(ExceptionMessages.HALL_NOT_AVAILABLE_EXCEPTION)));
     }
 
-    /**
-     * Verifies that no Available Tickets Exception on Endpoint Get All Categories not Found.
-     */
     @Test
     void testNoAvailableTicketsException_onEndpointGetAllCategories_notFound() throws Exception {
         when(categoryService.getAllCategories()).thenThrow(
@@ -693,9 +560,6 @@ class GlobalExceptionHandlerTest {
                 Matchers.containsInAnyOrder(ExceptionMessages.NO_AVAILABLE_TICKETS_EXCEPTION)));
     }
 
-    /**
-     * Verifies that no Available Items Exception on Endpoint Get All Categories not Found.
-     */
     @Test
     void testNoAvailableItemsException_onEndpointGetAllCategories_notFound() throws Exception {
         when(categoryService.getAllCategories()).thenThrow(
@@ -708,9 +572,6 @@ class GlobalExceptionHandlerTest {
                 Matchers.containsInAnyOrder(ExceptionMessages.NO_AVAILABLE_ITEMS_EXCEPTION)));
     }
 
-    /**
-     * Verifies that handle Not Authorized Exception on Endpoint Get All Categories not Found.
-     */
     @Test
     void testHandleNotAuthorizedException_onEndpointGetAllCategories_notFound() throws Exception {
         when(categoryService.getAllCategories()).thenThrow(
@@ -723,9 +584,6 @@ class GlobalExceptionHandlerTest {
                 Matchers.containsInAnyOrder(ExceptionMessages.NOT_AUTHORIZED_MESSAGE)));
     }
 
-    /**
-     * Verifies that handle Not Logged In Exception on Endpoint Get All Categories not Found.
-     */
     @Test
     void testHandleNotLoggedInException_onEndpointGetAllCategories_notFound() throws Exception {
         when(categoryService.getAllCategories()).thenThrow(
@@ -738,9 +596,6 @@ class GlobalExceptionHandlerTest {
                 Matchers.containsInAnyOrder(ExceptionMessages.NOT_LOGGED_IN_MESSAGE)));
     }
 
-    /**
-     * Verifies that handle Discount Already Exists Exception on Endpoint Get All Categories conflict.
-     */
     @Test
     void testHandleDiscountAlreadyExistsException_onEndpointGetAllCategories_conflict() throws Exception {
         when(categoryService.getAllCategories()).thenThrow(
@@ -753,9 +608,6 @@ class GlobalExceptionHandlerTest {
                 Matchers.containsInAnyOrder(ExceptionMessages.DISCOUNT_ALREADY_EXISTS_MESSAGE)));
     }
 
-    /**
-     * Verifies that handle Exception on Endpoint Get All Categories internal Server Error.
-     */
     @Test
     void testHandleException_onEndpointGetAllCategories_internalServerError() throws Exception {
         when(categoryService.getAllCategories()).thenThrow(IllegalStateException.class);
@@ -767,7 +619,3 @@ class GlobalExceptionHandlerTest {
                 Matchers.containsInAnyOrder(ExceptionMessages.GLOBAL_EXCEPTION)));
     }
 }
-
-
-
-

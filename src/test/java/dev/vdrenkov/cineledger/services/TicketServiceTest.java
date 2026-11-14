@@ -29,9 +29,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 
-/**
- * Tests ticket service behavior.
- */
 @ExtendWith(MockitoExtension.class)
 class TicketServiceTest {
 
@@ -44,9 +41,6 @@ class TicketServiceTest {
     @InjectMocks
     private TicketService ticketService;
 
-    /**
-     * Verifies that add Ticket no Exceptions success.
-     */
     @Test
     void testAddTicket_noExceptions_success() {
         final LocalDate programDate = LocalDate.now().plusDays(1);
@@ -56,8 +50,7 @@ class TicketServiceTest {
         projection.getProgram().setProgramDate(programDate);
         projection.setStartTime(projectionStartTime);
 
-        final TicketRequest request = TicketFactory.getDefaultTicketRequest();
-        request.setProjectionId(projection.getId());
+        final TicketRequest request = new TicketRequest(projection.getId());
 
         final int availableTickets = 10;
         final Ticket expected = TicketFactory.getDefaultTicket();
@@ -72,9 +65,6 @@ class TicketServiceTest {
         assertEquals(expected, ticket);
     }
 
-    /**
-     * Verifies that get Tickets By Projection Id no Exceptions success.
-     */
     @Test
     void testGetTicketsByProjectionId_noExceptions_success() {
         final List<TicketDto> expected = TicketFactory.getDefaultTicketDtoList();
@@ -87,9 +77,6 @@ class TicketServiceTest {
         assertEquals(expected, result);
     }
 
-    /**
-     * Verifies that get Ticket By Id no Exceptions success.
-     */
     @Test
     void testGetTicketById_noExceptions_success() {
         final Ticket expected = TicketFactory.getDefaultTicket();
@@ -101,9 +88,6 @@ class TicketServiceTest {
         assertEquals(expected, result);
     }
 
-    /**
-     * Verifies that get Ticket By Id Ticket Not Found Exception fail.
-     */
     @Test
     void testGetTicketById_TicketNotFoundException_fail() {
         when(ticketRepository.findById(anyInt())).thenReturn(Optional.empty());
@@ -111,9 +95,6 @@ class TicketServiceTest {
         assertThrows(TicketNotFoundException.class, () -> ticketService.getTicketById(TicketConstants.ID));
     }
 
-    /**
-     * Verifies that calculate Available Tickets should Return Correct Available Tickets success.
-     */
     @Test
     void testCalculateAvailableTickets_shouldReturnCorrectAvailableTickets_success() {
         final Projection projection = ProjectionFactory.getDefaultProjection();
@@ -128,9 +109,6 @@ class TicketServiceTest {
         assertEquals(expectedAvailableTickets, actualAvailableTickets);
     }
 
-    /**
-     * Verifies that calculate Available Tickets should Throw No Available Tickets Exception.
-     */
     @Test
     void testCalculateAvailableTickets_shouldThrowNoAvailableTicketsException() {
         final Projection projection = ProjectionFactory.getDefaultProjection();
@@ -141,9 +119,6 @@ class TicketServiceTest {
         assertThrows(NoAvailableTicketsException.class, () -> ticketService.calculateAvailableTickets(projection));
     }
 
-    /**
-     * Verifies that add Ticket date Not Valid throws Date Not Valid Exception.
-     */
     @Test
     void testAddTicket_dateNotValid_throwsDateNotValidException() {
         final LocalDate programDate = LocalDate.now().minusDays(1);
@@ -153,17 +128,13 @@ class TicketServiceTest {
         projection.getProgram().setProgramDate(programDate);
         projection.setStartTime(projectionStartTime);
 
-        final TicketRequest request = TicketFactory.getDefaultTicketRequest();
-        request.setProjectionId(projection.getId());
+        final TicketRequest request = new TicketRequest(projection.getId());
 
         when(projectionService.getProjectionById(anyInt())).thenReturn(projection);
 
         assertThrows(DateNotValidException.class, () -> ticketService.addTicket(request));
     }
 
-    /**
-     * Verifies that get Tickets By Date Between.
-     */
     @Test
     void testGetTicketsByDateBetween() {
         final List<Ticket> expected = TicketFactory.getDefaultTicketList();
@@ -176,7 +147,3 @@ class TicketServiceTest {
         assertEquals(expected, tickets);
     }
 }
-
-
-
-

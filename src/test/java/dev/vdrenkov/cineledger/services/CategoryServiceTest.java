@@ -24,9 +24,6 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
-/**
- * Tests category service behavior.
- */
 @ExtendWith(MockitoExtension.class)
 class CategoryServiceTest {
     final CategoryRequest categoryRequest = CategoryFactory.getDefaultCategoryRequest();
@@ -37,9 +34,6 @@ class CategoryServiceTest {
     @InjectMocks
     private CategoryService categoryService;
 
-    /**
-     * Verifies that add Category no Exceptions success.
-     */
     @Test
     void testAddCategory_noExceptions_success() {
         final Category expected = CategoryFactory.getDefaultCategory();
@@ -50,9 +44,6 @@ class CategoryServiceTest {
         assertEquals(expected, category);
     }
 
-    /**
-     * Verifies that get All Categories no Exceptions success.
-     */
     @Test
     void testGetAllCategories_noExceptions_success() {
         final List<CategoryDto> expected = CategoryFactory.getDefaultCategoryDtoList();
@@ -64,9 +55,6 @@ class CategoryServiceTest {
         assertEquals(expected, result);
     }
 
-    /**
-     * Verifies that get Category DTO By Id no Exceptions success.
-     */
     @Test
     void testGetCategoryDtoById_noExceptions_success() {
         final CategoryDto expected = CategoryFactory.getDefaultCategoryDto();
@@ -77,9 +65,6 @@ class CategoryServiceTest {
         assertEquals(expected, categoryDto);
     }
 
-    /**
-     * Verifies that get Category DTO By Id throws Category Not Found Exception.
-     */
     @Test
     void testGetCategoryDtoById_throwsCategoryNotFoundException() {
         when(categoryRepository.findById(anyInt())).thenReturn(Optional.empty());
@@ -87,9 +72,6 @@ class CategoryServiceTest {
         assertThrows(CategoryNotFoundException.class, () -> categoryService.getCategoryDtoById(CategoryConstants.ID));
     }
 
-    /**
-     * Verifies that get Category DTO By Name no Exceptions success.
-     */
     @Test
     void testGetCategoryDtoByName_noExceptions_success() {
         final CategoryDto expected = CategoryFactory.getDefaultCategoryDto();
@@ -100,9 +82,6 @@ class CategoryServiceTest {
         assertEquals(expected, categoryDto);
     }
 
-    /**
-     * Verifies that get Category DTO By Name throws Category Not Found Exception.
-     */
     @Test
     void testGetCategoryDtoByName_throwsCategoryNotFoundException() {
         when(categoryRepository.findByName(anyString())).thenReturn(Optional.empty());
@@ -111,9 +90,6 @@ class CategoryServiceTest {
             () -> categoryService.getCategoryDtoByName(CategoryConstants.NAME));
     }
 
-    /**
-     * Verifies that update Category success.
-     */
     @Test
     void testUpdateCategory_success() {
         final CategoryDto expected = CategoryFactory.getDefaultCategoryDto();
@@ -125,9 +101,6 @@ class CategoryServiceTest {
         assertEquals(expected, categoryDto);
     }
 
-    /**
-     * Verifies that update Category category Exists throws.
-     */
     @Test
     void testUpdateCategory_categoryExists_throws() {
         when(categoryRepository.findByName(anyString())).thenReturn(Optional.of(new Category()));
@@ -135,9 +108,6 @@ class CategoryServiceTest {
         assertThrows(CategoryAlreadyExistsException.class, () -> categoryService.addCategory(categoryRequest));
     }
 
-    /**
-     * Verifies that delete Category success.
-     */
     @Test
     void testDeleteCategory_success() {
         final CategoryDto expected = CategoryFactory.getDefaultCategoryDto();
@@ -148,14 +118,8 @@ class CategoryServiceTest {
         assertEquals(expected, categoryDto);
     }
 
-    /**
-     * Verifies that get Category By Id category Not Found throws Category Not Found Exception.
-     */
     @Test
     void testGetCategoryById_categoryNotFound_throwsCategoryNotFoundException() {
         assertThrows(CategoryNotFoundException.class, () -> categoryService.getCategoryById(CategoryConstants.ID));
     }
 }
-
-
-

@@ -23,9 +23,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/**
- * Tests income report controller behavior.
- */
 @ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc
 class IncomeReportControllerTest {
@@ -37,17 +34,11 @@ class IncomeReportControllerTest {
     @InjectMocks
     private IncomeReportController incomeReportController;
 
-    /**
-     * Initializes the test fixture before each test case.
-     */
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(incomeReportController).build();
     }
 
-    /**
-     * Verifies that get All Incomes By Cinema Id double Returned success.
-     */
     @Test
     void testGetAllIncomesByCinemaId_doubleReturned_success() throws Exception {
         when(incomeReportService.getAllIncomesByCinemaId(anyInt(), any(), any())).thenReturn(INCOMES);
@@ -60,9 +51,6 @@ class IncomeReportControllerTest {
             .andExpect(jsonPath("$").value(INCOMES));
     }
 
-    /**
-     * Verifies that get All Incomes By Hall Id double Returned success.
-     */
     @Test
     void testGetAllIncomesByHallId_doubleReturned_success() throws Exception {
         when(incomeReportService.getAllIncomesByHallId(anyInt(), any(), any())).thenReturn(INCOMES);
@@ -75,9 +63,6 @@ class IncomeReportControllerTest {
             .andExpect(jsonPath("$").value(INCOMES));
     }
 
-    /**
-     * Verifies that get All Incomes By Item Id double Returned success.
-     */
     @Test
     void testGetAllIncomesByItemId_doubleReturned_success() throws Exception {
         when(incomeReportService.getAllIncomesByItemId(anyInt(), any(), any())).thenReturn(INCOMES);
@@ -90,9 +75,6 @@ class IncomeReportControllerTest {
             .andExpect(jsonPath("$").value(INCOMES));
     }
 
-    /**
-     * Verifies that get All Incomes By Movie Id double Returned success.
-     */
     @Test
     void testGetAllIncomesByMovieId_doubleReturned_success() throws Exception {
         when(incomeReportService.getAllIncomesByMovieId(anyInt(), any(), any())).thenReturn(INCOMES);
@@ -105,9 +87,6 @@ class IncomeReportControllerTest {
             .andExpect(jsonPath("$").value(INCOMES));
     }
 
-    /**
-     * Verifies that get All Incomes By User Id double Returned success.
-     */
     @Test
     void testGetAllIncomesByUserId_doubleReturned_success() throws Exception {
         when(incomeReportService.getAllIncomesByUserId(anyInt(), any(), any())).thenReturn(INCOMES);
@@ -120,7 +99,3 @@ class IncomeReportControllerTest {
             .andExpect(jsonPath("$").value(INCOMES));
     }
 }
-
-
-
-

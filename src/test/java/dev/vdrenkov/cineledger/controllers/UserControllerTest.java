@@ -40,19 +40,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/**
- * Tests user controller behavior.
- */
 @AutoConfigureMockMvc
 @ExtendWith(MockitoExtension.class)
 class UserControllerTest {
-    /**
-     * Provides the default cookie used in tests.
-     */
+
     public static final String COOKIE = COOKIE_NAME + "=" + COOKIE_VALUE;
-    /**
-     * Provides the default return old used in tests.
-     */
+
     public static final String RETURN_OLD = "returnOld";
     private static final String SET_COOKIE = "Set-Cookie";
     private static final String JOIN_DATE_STRING = "joinDate";
@@ -69,17 +62,11 @@ class UserControllerTest {
     @InjectMocks
     private UserController userController;
 
-    /**
-     * Initializes the test fixture before each test case.
-     */
     @BeforeEach
     void setup() {
         mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
     }
 
-    /**
-     * Verifies that login cookie Obtained success.
-     */
     @Test
     void testLogin_cookieObtained_success() throws Exception {
         final String json = objectMapper.writeValueAsString(UserFactory.getDefaultUserRequest());
@@ -94,9 +81,6 @@ class UserControllerTest {
             .andExpect(header().string(SET_COOKIE, COOKIE));
     }
 
-    /**
-     * Verifies that register User cookie Obtained success.
-     */
     @Test
     void testRegisterUser_cookieObtained_success() throws Exception {
         final String json = objectMapper.writeValueAsString(UserFactory.getDefaultUserRequest());
@@ -111,9 +95,6 @@ class UserControllerTest {
             .andExpect(header().string(SET_COOKIE, COOKIE));
     }
 
-    /**
-     * Verifies that register User By Admin created Without Cookie success.
-     */
     @Test
     void testRegisterUserByAdmin_createdWithoutCookie_success() throws Exception {
         final String json = objectMapper.writeValueAsString(UserFactory.getDefaultAdminRequest());
@@ -127,9 +108,6 @@ class UserControllerTest {
             .andExpect(header().doesNotExist(SET_COOKIE));
     }
 
-    /**
-     * Verifies that get User By Username user Found success.
-     */
     @Test
     void testGetUserByUsername_userFound_success() throws Exception {
         when(userService.getUserDtoByUsername(anyString())).thenReturn(UserFactory.getDefaultUserDto());
@@ -147,9 +125,6 @@ class UserControllerTest {
             .andExpect(jsonPath("$.roles[0].name").value(NAME));
     }
 
-    /**
-     * Verifies that get User By Email user Found success.
-     */
     @Test
     void testGetUserByEmail_userFound_success() throws Exception {
         when(userService.getUserDtoByEmail(anyString())).thenReturn(UserFactory.getDefaultUserDto());
@@ -167,9 +142,6 @@ class UserControllerTest {
             .andExpect(jsonPath("$.roles[0].name").value(NAME));
     }
 
-    /**
-     * Verifies that get User By Role Name user Found success.
-     */
     @Test
     void testGetUserByRoleName_userFound_success() throws Exception {
         when(userService.getUsersDtoByRoleName(anyString())).thenReturn(UserFactory.getDefaultUserDtoList());
@@ -187,9 +159,6 @@ class UserControllerTest {
             .andExpect(jsonPath("$[0].roles[0].name").value(NAME));
     }
 
-    /**
-     * Verifies that get Users By Join Date returns Users List success.
-     */
     @Test
     void testGetUsersByJoinDate_returnsUsersList_success() throws Exception {
         when(userService.getUsersDtosByJoinDate(any(), anyBoolean())).thenReturn(UserFactory.getDefaultUserDtoList());
@@ -210,9 +179,6 @@ class UserControllerTest {
             .andExpect(jsonPath("$[0].roles[0].name").value(NAME));
     }
 
-    /**
-     * Verifies that update User return Old True success.
-     */
     @Test
     void testUpdateUser_returnOldTrue_success() throws Exception {
         when(userService.updateUser(any(), anyInt())).thenReturn(UserFactory.getDefaultUserDto());
@@ -234,9 +200,6 @@ class UserControllerTest {
             .andExpect(jsonPath("$.roles[0].name").value(NAME));
     }
 
-    /**
-     * Verifies that update User return Old False success.
-     */
     @Test
     void testUpdateUser_returnOldFalse_success() throws Exception {
         when(userService.updateUser(any(), anyInt())).thenReturn(UserFactory.getDefaultUserDto());
@@ -247,9 +210,6 @@ class UserControllerTest {
             .andExpect(status().isNoContent());
     }
 
-    /**
-     * Verifies that update User By Admin return Old True success.
-     */
     @Test
     void testUpdateUserByAdmin_returnOldTrue_success() throws Exception {
         when(userService.updateUserByAdmin(any(), anyInt())).thenReturn(UserFactory.getDefaultUserDto());
@@ -271,9 +231,6 @@ class UserControllerTest {
             .andExpect(jsonPath("$.roles[0].name").value(NAME));
     }
 
-    /**
-     * Verifies that update User By Admin return Old False success.
-     */
     @Test
     void testUpdateUserByAdmin_returnOldFalse_success() throws Exception {
         when(userService.updateUserByAdmin(any(), anyInt())).thenReturn(UserFactory.getDefaultUserDto());
@@ -284,9 +241,6 @@ class UserControllerTest {
             .andExpect(status().isNoContent());
     }
 
-    /**
-     * Verifies that delete User return Old True success.
-     */
     @Test
     void testDeleteUser_returnOldTrue_success() throws Exception {
         when(userService.deleteUser(anyInt())).thenReturn(UserFactory.getDefaultUserDto());
@@ -304,9 +258,6 @@ class UserControllerTest {
             .andExpect(jsonPath("$.roles[0].name").value(NAME));
     }
 
-    /**
-     * Verifies that delete User return Old False success.
-     */
     @Test
     void testDeleteUser_returnOldFalse_success() throws Exception {
         when(userService.deleteUser(anyInt())).thenReturn(UserFactory.getDefaultUserDto());
@@ -314,9 +265,6 @@ class UserControllerTest {
         mockMvc.perform(delete(URIConstants.USERS_ID_PATH, ID)).andExpect(status().isNoContent());
     }
 
-    /**
-     * Verifies that recover Password returns Ok success.
-     */
     @Test
     void testRecoverPassword_returnsOk_success() throws Exception {
         when(userService.recoverPassword(anyString())).thenReturn(UserFactory.getDefaultUser());
@@ -324,6 +272,3 @@ class UserControllerTest {
         mockMvc.perform(patch(RECOVER_PASSWORD_PATH).queryParam("username", USERNAME)).andExpect(status().isOk());
     }
 }
-
-
-

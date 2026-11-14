@@ -13,44 +13,33 @@ import java.util.Objects;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * Tests movie mapper behavior.
- */
 @ExtendWith(MockitoExtension.class)
 class MovieMapperTest {
-    /**
-     * Verifies that map Movie To Movie DTO success.
-     */
+
     @Test
     void testMapMovieToMovieDto_success() {
         final MovieDto movieDto = MovieMapper.mapMovieToMovieDto(MovieFactory.getDefaultMovie());
 
-        assertEquals(MovieConstants.ID, movieDto.getId());
-        assertEquals(MovieConstants.TITLE, movieDto.getTitle());
-        assertEquals(MovieConstants.RATING, movieDto.getAverageRating(), 0.0);
-        assertEquals(MovieConstants.DESCRIPTION, movieDto.getDescription());
-        assertTrue(MovieConstants.RELEASE_DATE.isEqual(movieDto.getReleaseDate()));
-        assertEquals(MovieConstants.RUNTIME, movieDto.getRuntime());
-        assertTrue(Objects.nonNull(movieDto.getCategory()));
+        assertEquals(MovieConstants.ID, movieDto.id());
+        assertEquals(MovieConstants.TITLE, movieDto.title());
+        assertEquals(MovieConstants.RATING, movieDto.averageRating(), 0.0);
+        assertEquals(MovieConstants.DESCRIPTION, movieDto.description());
+        assertTrue(MovieConstants.RELEASE_DATE.isEqual(movieDto.releaseDate()));
+        assertEquals(MovieConstants.RUNTIME, movieDto.runtime());
+        assertTrue(Objects.nonNull(movieDto.category()));
     }
 
-    /**
-     * Verifies that map Movie List To Movie DTO List success.
-     */
     @Test
     void testMapMovieListToMovieDtoList_success() {
         final List<MovieDto> movieDtos = MovieMapper.mapMovieListToMovieDtoList(MovieFactory.getDefaultMovieList());
         final MovieDto movieDto = movieDtos.getFirst();
 
-        assertEquals(MovieConstants.ID, movieDto.getId());
-        assertEquals(MovieConstants.TITLE, movieDto.getTitle());
-        assertEquals(MovieConstants.RATING, movieDto.getAverageRating(), 0.0);
-        assertEquals(MovieConstants.DESCRIPTION, movieDto.getDescription());
-        assertTrue(MovieConstants.RELEASE_DATE.isEqual(movieDto.getReleaseDate()));
-        assertEquals(MovieConstants.RUNTIME, movieDto.getRuntime());
-        assertTrue(Objects.nonNull(movieDto.getCategory()));
+        assertEquals(MovieConstants.ID, movieDto.id());
+        assertEquals(MovieConstants.TITLE, movieDto.title());
+        assertEquals(MovieConstants.RATING, movieDto.averageRating(), 0.0);
+        assertEquals(MovieConstants.DESCRIPTION, movieDto.description());
+        assertTrue(MovieConstants.RELEASE_DATE.isEqual(movieDto.releaseDate()));
+        assertEquals(MovieConstants.RUNTIME, movieDto.runtime());
+        assertTrue(Objects.nonNull(movieDto.category()));
     }
 }
-
-
-

@@ -44,13 +44,10 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/**
- * Tests order service behavior.
- */
 @ExtendWith(MockitoExtension.class)
 class OrderServiceTest {
     final List<TicketRequest> ticketRequests = Collections.singletonList(TicketFactory.getDefaultTicketRequest());
-    final OrderRequest orderRequest = OrderFactory.getDefaultOrderRequest();
+    OrderRequest orderRequest = OrderFactory.getDefaultOrderRequest();
 
     @Mock
     private OrderRepository orderRepository;
@@ -73,9 +70,6 @@ class OrderServiceTest {
     @InjectMocks
     private OrderService orderService;
 
-    /**
-     * Verifies that add Order no Exceptions success.
-     */
     @Test
     void testAddOrder_noExceptions_success() {
         final Order expected = OrderFactory.getDefaultOrder();
@@ -92,9 +86,6 @@ class OrderServiceTest {
         verify(emailService).sendOrderConfirmationEmail(any(), any());
     }
 
-    /**
-     * Verifies that add Order discount Code Not Valid throws Discount Not Valid Exception.
-     */
     @Test
     void testAddOrder_discountCodeNotValid_throwsDiscountNotValidException() {
         when(ticketService.getTicketById(anyInt())).thenReturn(TicketFactory.getDefaultTicket());
@@ -103,13 +94,10 @@ class OrderServiceTest {
         when(discountService.applyDiscount(anyDouble(), anyString())).thenThrow(
             new DiscountNotValidException(ExceptionMessages.DISCOUNT_CODE_NOT_VALID_MESSAGE));
 
-        orderRequest.setDiscountCode("Code");
+        orderRequest = new OrderRequest(orderRequest.userId(), orderRequest.ticketsIds(), orderRequest.itemsIds(), "Code");
         assertThrows(DiscountNotValidException.class, () -> orderService.addOrder(orderRequest));
     }
 
-    /**
-     * Verifies that make Reservation With User Id no Exceptions success.
-     */
     @Test
     void testMakeReservationWithUserId_noExceptions_success() {
         final Order expected = OrderFactory.getDefaultOrder();
@@ -130,9 +118,6 @@ class OrderServiceTest {
         assertEquals(expected, order);
     }
 
-    /**
-     * Verifies that make Reservation With User Id discount Code Not Valid throws Discount Not Valid Exception.
-     */
     @Test
     void testMakeReservationWithUserId_discountCodeNotValid_throwsDiscountNotValidException() {
         final Ticket ticket = new Ticket();
@@ -152,9 +137,6 @@ class OrderServiceTest {
             () -> orderService.makeReservationWithUserId(ticketRequests, OrderConstants.ID, invalidDiscount));
     }
 
-    /**
-     * Verifies that make Reservation With User Id invalid User Id throws Not Authorized Exception.
-     */
     @Test
     void testMakeReservationWithUserId_invalidUserId_throwsNotAuthorizedException() {
         when(userService.isCurrentUserAuthorized(anyInt())).thenReturn(false);
@@ -163,9 +145,6 @@ class OrderServiceTest {
             () -> orderService.makeReservationWithUserId(ticketRequests, OrderConstants.ID, null));
     }
 
-    /**
-     * Verifies that get Orders By User Id no Exceptions success.
-     */
     @Test
     void testGetOrdersByUserId_noExceptions_success() {
         final User user = UserFactory.getDefaultUser();
@@ -178,9 +157,6 @@ class OrderServiceTest {
         assertEquals(OrderFactory.getDefaultOrderDtoList(), result);
     }
 
-    /**
-     * Verifies that get Orders By User Id invalid User Id throws Not Authorized Exception.
-     */
     @Test
     void testGetOrdersByUserId_invalidUserId_throwsNotAuthorizedException() {
         final User user = UserFactory.getDefaultUser();
@@ -190,9 +166,6 @@ class OrderServiceTest {
         assertThrows(NotAuthorizedException.class, () -> orderService.getOrdersByUserId(invalidUserId));
     }
 
-    /**
-     * Verifies that update Order no Exceptions success.
-     */
     @Test
     void testUpdateOrder_noExceptions_success() {
         final OrderDto expected = OrderFactory.getDefaultOrderDto();
@@ -206,18 +179,15 @@ class OrderServiceTest {
         newItem.setId(999);
         when(itemService.getItemById(newItem.getId())).thenReturn(newItem);
 
-        orderRequest.setItemsIds(Collections.singletonList(newItem.getId()));
+        orderRequest = new OrderRequest(orderRequest.userId(), orderRequest.ticketsIds(), Collections.singletonList(newItem.getId()), orderRequest.discountCode());
         final OrderDto result = orderService.updateOrder(orderRequest, OrderConstants.ID);
 
-        orderRequest.setItemsIds(new ArrayList<>());
+        orderRequest = new OrderRequest(orderRequest.userId(), orderRequest.ticketsIds(), new ArrayList<>(), orderRequest.discountCode());
         orderService.updateOrder(orderRequest, OrderConstants.ID);
 
         assertEquals(expected, result);
     }
 
-    /**
-     * Verifies that update Order Order Not Found Exception fail.
-     */
     @Test
     void testUpdateOrder_OrderNotFoundException_fail() {
         when(orderRepository.findById(anyInt())).thenReturn(Optional.empty());
@@ -225,9 +195,6 @@ class OrderServiceTest {
         assertThrows(OrderNotFoundException.class, () -> orderService.updateOrder(orderRequest, OrderConstants.ID));
     }
 
-    /**
-     * Verifies that delete Order no Exceptions fail.
-     */
     @Test
     void testDeleteOrder_noExceptions_fail() {
         final OrderDto expected = OrderFactory.getDefaultOrderDto();
@@ -239,9 +206,6 @@ class OrderServiceTest {
         assertEquals(expected, result);
     }
 
-    /**
-     * Verifies that delete Order Order Not Found Exception fail.
-     */
     @Test
     void testDeleteOrder_OrderNotFoundException_fail() {
         when(orderRepository.findById(anyInt())).thenReturn(Optional.empty());
@@ -249,9 +213,6 @@ class OrderServiceTest {
         assertThrows(OrderNotFoundException.class, () -> orderService.deleteOrder(OrderConstants.ID));
     }
 
-    /**
-     * Verifies that get Orders By Date Between.
-     */
     @Test
     void testGetOrdersByDateBetween() {
         final List<Order> expected = OrderFactory.getDefaultOrderList();
@@ -264,9 +225,6 @@ class OrderServiceTest {
         assertEquals(expected, orders);
     }
 
-    /**
-     * Verifies that order Mutations are Transactional.
-     */
     @Test
     void testOrderMutations_areTransactional() throws NoSuchMethodException {
         final Method addOrder = OrderService.class.getMethod("addOrder", OrderRequest.class);
@@ -281,6 +239,3 @@ class OrderServiceTest {
         assertTrue(deleteOrder.isAnnotationPresent(Transactional.class));
     }
 }
-
-
-

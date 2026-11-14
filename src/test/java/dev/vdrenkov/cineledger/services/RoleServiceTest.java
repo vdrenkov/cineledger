@@ -24,9 +24,6 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
-/**
- * Tests role service behavior.
- */
 @ExtendWith(MockitoExtension.class)
 class RoleServiceTest {
 
@@ -36,9 +33,6 @@ class RoleServiceTest {
     @InjectMocks
     private RoleService roleService;
 
-    /**
-     * Verifies that add Role no Exceptions success.
-     */
     @Test
     void testAddRole_noExceptions_success() {
         final Role expected = RoleFactory.getDefaultRole();
@@ -50,9 +44,6 @@ class RoleServiceTest {
         assertEquals(expected, role);
     }
 
-    /**
-     * Verifies that get All Roles roles Found success.
-     */
     @Test
     void testGetAllRoles_rolesFound_success() {
         final List<Role> expected = RoleFactory.getDefaultRoleList();
@@ -64,9 +55,6 @@ class RoleServiceTest {
         assertEquals(expected, roles);
     }
 
-    /**
-     * Verifies that get All Roles DTO roles Found success.
-     */
     @Test
     void testGetAllRolesDto_rolesFound_success() {
         final List<RoleDto> expected = RoleFactory.getDefaultRoleDtoList();
@@ -78,9 +66,6 @@ class RoleServiceTest {
         assertEquals(expected, roles);
     }
 
-    /**
-     * Verifies that get Role By Id role Found success.
-     */
     @Test
     void testGetRoleById_roleFound_success() {
         final Role expected = RoleFactory.getDefaultRole();
@@ -92,17 +77,11 @@ class RoleServiceTest {
         assertEquals(expected, role);
     }
 
-    /**
-     * Verifies that get Role By Id role Not Found throws Role Not Found Exception.
-     */
     @Test
     void testGetRoleById_roleNotFound_throwsRoleNotFoundException() {
         assertThrows(RoleNotFoundException.class, () -> roleService.getRoleById(RoleConstants.ID));
     }
 
-    /**
-     * Verifies that get Role DTO By Id role DTO Found success.
-     */
     @Test
     void testGetRoleDtoById_roleDtoFound_success() {
         final RoleDto expected = RoleFactory.getDefaultRoleDto();
@@ -114,9 +93,6 @@ class RoleServiceTest {
         assertEquals(expected, role);
     }
 
-    /**
-     * Verifies that get Role By Name role Found success.
-     */
     @Test
     void testGetRoleByName_roleFound_success() {
         final Role expected = RoleFactory.getDefaultRole();
@@ -128,9 +104,6 @@ class RoleServiceTest {
         assertEquals(expected, role);
     }
 
-    /**
-     * Verifies that get Role By Name role Not Found throw Role Not Found Exception.
-     */
     @Test
     void testGetRoleByName_roleNotFound_throwRoleNotFoundException() {
         when(roleRepository.findRoleByName(anyString())).thenReturn(Optional.empty());
@@ -138,9 +111,6 @@ class RoleServiceTest {
         assertThrows(RoleNotFoundException.class, () -> roleService.getRoleByName(RoleConstants.NAME));
     }
 
-    /**
-     * Verifies that get Role DTO By Name role DTO Found success.
-     */
     @Test
     void testGetRoleDtoByName_roleDtoFound_success() {
         final RoleDto expected = RoleFactory.getDefaultRoleDto();
@@ -152,9 +122,6 @@ class RoleServiceTest {
         assertEquals(expected, role);
     }
 
-    /**
-     * Verifies that update Role role Updated success.
-     */
     @Test
     void testUpdateRole_roleUpdated_success() {
         final RoleDto expected = RoleFactory.getDefaultRoleDto();
@@ -167,9 +134,6 @@ class RoleServiceTest {
         assertEquals(expected, role);
     }
 
-    /**
-     * Verifies that add Role role Exists throws Role Already Exists Exception.
-     */
     @Test
     void testAddRole_roleExists_throwsRoleAlreadyExistsException() {
         when(roleRepository.findRoleByName(anyString())).thenReturn(Optional.of(new Role()));
@@ -178,9 +142,6 @@ class RoleServiceTest {
         assertThrows(RoleAlreadyExistsException.class, () -> roleService.addRole(roleRequest));
     }
 
-    /**
-     * Verifies that delete Role role Deleted success.
-     */
     @Test
     void testDeleteRole_roleDeleted_success() {
         final RoleDto expected = RoleFactory.getDefaultRoleDto();
@@ -192,6 +153,3 @@ class RoleServiceTest {
         assertEquals(expected, role);
     }
 }
-
-
-

@@ -25,9 +25,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/**
- * Tests statistics report controller behavior.
- */
 @ExtendWith(MockitoExtension.class)
 class StatisticsReportControllerTest {
     private MockMvc mockMvc;
@@ -38,17 +35,11 @@ class StatisticsReportControllerTest {
     @InjectMocks
     private StatisticsReportController statisticsReportController;
 
-    /**
-     * Initializes the test fixture before each test case.
-     */
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(statisticsReportController).build();
     }
 
-    /**
-     * Verifies that get Purchased Tickets Count By Movie Category integer Returned success.
-     */
     @Test
     void testGetPurchasedTicketsCountByMovieCategory_integerReturned_success() throws Exception {
         when(statisticsReportService.getPurchasedTicketsCountByMovieCategory(anyInt(), any(), any())).thenReturn(1000);
@@ -61,9 +52,6 @@ class StatisticsReportControllerTest {
             .andExpect(jsonPath("$").value(1000));
     }
 
-    /**
-     * Verifies that get Purchased Tickets Count By Movie Title integer Returned success.
-     */
     @Test
     void testGetPurchasedTicketsCountByMovieTitle_integerReturned_success() throws Exception {
         when(statisticsReportService.getPurchasedTicketsCountByMovieTitle(anyString(), any(), any())).thenReturn(10);
@@ -78,9 +66,6 @@ class StatisticsReportControllerTest {
             .andExpect(jsonPath("$").value(10));
     }
 
-    /**
-     * Verifies that get Purchased Items Count By Item Name integer Returned success.
-     */
     @Test
     void testGetPurchasedItemsCountByItemName_integerReturned_success() throws Exception {
         when(statisticsReportService.getPurchasedItemsCountByItemName(anyString(), any(), any())).thenReturn(10);
@@ -95,6 +80,3 @@ class StatisticsReportControllerTest {
             .andExpect(jsonPath("$").value(10));
     }
 }
-
-
-

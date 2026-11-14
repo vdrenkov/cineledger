@@ -29,9 +29,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/**
- * Tests ticket controller behavior.
- */
 @AutoConfigureMockMvc
 @ExtendWith(MockitoExtension.class)
 class TicketControllerTest {
@@ -45,17 +42,11 @@ class TicketControllerTest {
     @InjectMocks
     private TicketController ticketController;
 
-    /**
-     * Initializes the test fixture before each test case.
-     */
     @BeforeEach
     void setup() {
         mockMvc = MockMvcBuilders.standaloneSetup(ticketController).build();
     }
 
-    /**
-     * Verifies that add Ticket ticket Added success.
-     */
     @Test
     void testAddTicket_ticketAdded_success() throws Exception {
         final String json = objectMapper.writeValueAsString(TicketFactory.getDefaultTicketRequest());
@@ -70,9 +61,6 @@ class TicketControllerTest {
             .andExpect(header().string("Location", URIConstants.TICKETS_PATH + "/" + ID));
     }
 
-    /**
-     * Verifies that get Tickets By Projection Id.
-     */
     @Test
     void testGetTicketsByProjectionId() throws Exception {
         final List<TicketDto> defaultTicketDtoList = TicketFactory.getDefaultTicketDtoList();
@@ -84,31 +72,27 @@ class TicketControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$[0].id").value(ID))
             .andExpect(jsonPath("$[0].dateOfPurchase").value(DATE_OF_PURCHASE.toString()))
-            .andExpect(jsonPath("$[0].projection.id").value(defaultTicketDto.getProjection().getId()))
-            .andExpect(jsonPath("$[0].projection.hall").value(defaultTicketDto.getProjection().getHall()))
-            .andExpect(jsonPath("$[0].projection.price").value(defaultTicketDto.getProjection().getPrice()))
+            .andExpect(jsonPath("$[0].projection.id").value(defaultTicketDto.projection().id()))
+            .andExpect(jsonPath("$[0].projection.hall").value(objectMapper.convertValue(defaultTicketDto.projection().hall(), java.util.Map.class)))
+            .andExpect(jsonPath("$[0].projection.price").value(defaultTicketDto.projection().price()))
             .andExpect(jsonPath("$[0].projection.program.programDate").value(
-                defaultTicketDto.getProjection().getProgram().getProgramDate().toString()))
+                defaultTicketDto.projection().program().programDate().toString()))
             .andExpect(jsonPath("$[0].projection.program.cinema").value(
-                defaultTicketDto.getProjection().getProgram().getCinema()))
-            .andExpect(jsonPath("$[0].projection.movie.id").value(defaultTicketDto.getProjection().getMovie().getId()))
+                objectMapper.convertValue(defaultTicketDto.projection().program().cinema(), java.util.Map.class)))
+            .andExpect(jsonPath("$[0].projection.movie.id").value(defaultTicketDto.projection().movie().id()))
             .andExpect(
-                jsonPath("$[0].projection.movie.title").value(defaultTicketDto.getProjection().getMovie().getTitle()))
+                jsonPath("$[0].projection.movie.title").value(defaultTicketDto.projection().movie().title()))
             .andExpect(jsonPath("$[0].projection.movie.averageRating").value(
-                defaultTicketDto.getProjection().getMovie().getAverageRating()))
+                defaultTicketDto.projection().movie().averageRating()))
             .andExpect(jsonPath("$[0].projection.movie.description").value(
-                defaultTicketDto.getProjection().getMovie().getDescription()))
+                defaultTicketDto.projection().movie().description()))
             .andExpect(jsonPath("$[0].projection.movie.releaseDate").value(
-                defaultTicketDto.getProjection().getMovie().getReleaseDate().toString()))
+                defaultTicketDto.projection().movie().releaseDate().toString()))
             .andExpect(jsonPath("$[0].projection.movie.runtime").value(
-                defaultTicketDto.getProjection().getMovie().getRuntime().toString()))
+                defaultTicketDto.projection().movie().runtime().toString()))
             .andExpect(jsonPath("$[0].projection.movie.category").value(
-                defaultTicketDto.getProjection().getMovie().getCategory()))
+                objectMapper.convertValue(defaultTicketDto.projection().movie().category(), java.util.Map.class)))
             .andExpect(jsonPath("$[0].projection.startTime").value(
-                defaultTicketDto.getProjection().getStartTime().toString()));
+                defaultTicketDto.projection().startTime().toString()));
     }
 }
-
-
-
-

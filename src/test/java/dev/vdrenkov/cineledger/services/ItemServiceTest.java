@@ -25,9 +25,6 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
-/**
- * Tests item service behavior.
- */
 @ExtendWith(MockitoExtension.class)
 class ItemServiceTest {
     final ItemRequest itemRequest = ItemFactory.getDefaultItemRequest();
@@ -38,9 +35,6 @@ class ItemServiceTest {
     @InjectMocks
     private ItemService itemService;
 
-    /**
-     * Verifies that get All Items no Exceptions success.
-     */
     @Test
     void testGetAllItems_noExceptions_success() {
         final List<ItemDto> expected = ItemFactory.getDefaultItemDtoList();
@@ -51,9 +45,6 @@ class ItemServiceTest {
         assertEquals(expected, actual);
     }
 
-    /**
-     * Verifies that get Item DTO By Id item Found success.
-     */
     @Test
     void testGetItemDtoById_itemFound_success() {
         final ItemDto expected = ItemFactory.getDefaultItemDto();
@@ -64,18 +55,12 @@ class ItemServiceTest {
         assertEquals(expected, item);
     }
 
-    /**
-     * Verifies that get Item DTO By Id item Not Found throws Item Not Found Exception.
-     */
     @Test
     void testGetItemDtoById_itemNotFound_throwsItemNotFoundException() {
         when(itemRepository.findById(anyInt())).thenThrow(new ItemNotFoundException(anyString()));
         assertThrows(ItemNotFoundException.class, () -> itemService.getItemDtoById(ItemConstants.ID));
     }
 
-    /**
-     * Verifies that find Item By Id item Found success.
-     */
     @Test
     void testFindItemById_itemFound_success() {
         final Item expected = ItemFactory.getDefaultItem();
@@ -86,9 +71,6 @@ class ItemServiceTest {
         assertEquals(expected, item);
     }
 
-    /**
-     * Verifies that find Item By Id item Not Found throws Item Not Found Exception.
-     */
     @Test
     void testFindItemById_itemNotFound_throwsItemNotFoundException() {
         when(itemRepository.findById(anyInt())).thenReturn(Optional.empty());
@@ -96,9 +78,6 @@ class ItemServiceTest {
         assertThrows(ItemNotFoundException.class, () -> itemService.getItemById(ItemConstants.ID));
     }
 
-    /**
-     * Verifies that get Item DTO By Name no Exceptions success.
-     */
     @Test
     void testGetItemDtoByName_noExceptions_success() {
         final ItemDto expected = ItemFactory.getDefaultItemDto();
@@ -109,9 +88,6 @@ class ItemServiceTest {
         assertEquals(expected, itemDto);
     }
 
-    /**
-     * Verifies that get Item DTO By Name throws Category Not Found Exception.
-     */
     @Test
     void testGetItemDtoByName_throwsCategoryNotFoundException() {
         when(itemRepository.findByName(anyString())).thenReturn(Optional.empty());
@@ -119,9 +95,6 @@ class ItemServiceTest {
         assertThrows(ItemNotFoundException.class, () -> itemService.getItemDtoByName(ItemConstants.NAME));
     }
 
-    /**
-     * Verifies that add Item no Exceptions success.
-     */
     @Test
     void testAddItem_noExceptions_success() {
         final Item expected = ItemFactory.getDefaultItem();
@@ -132,9 +105,6 @@ class ItemServiceTest {
         assertEquals(expected, item);
     }
 
-    /**
-     * Verifies that add Item item Already Exists throws Existing Item Exception.
-     */
     @Test
     void testAddItem_itemAlreadyExists_throwsExistingItemException() {
         when(itemRepository.findByName(anyString())).thenReturn(Optional.of(new Item()));
@@ -142,9 +112,6 @@ class ItemServiceTest {
         assertThrows(ItemAlreadyExistsException.class, () -> itemService.addItem(itemRequest));
     }
 
-    /**
-     * Verifies that update Item item Updated success.
-     */
     @Test
     void testUpdateItem_itemUpdated_success() {
         final ItemDto expected = ItemFactory.getDefaultItemDto();
@@ -156,9 +123,6 @@ class ItemServiceTest {
         assertEquals(expected, itemDto);
     }
 
-    /**
-     * Verifies that delete Item item Deleted success.
-     */
     @Test
     void testDeleteItem_itemDeleted_success() {
         final ItemDto expected = ItemFactory.getDefaultItemDto();
@@ -169,9 +133,6 @@ class ItemServiceTest {
         assertEquals(expected, itemDto);
     }
 
-    /**
-     * Verifies that increment Item Quantity should Incremented Item Quantity success.
-     */
     @Test
     void testIncrementItemQuantity_shouldIncrementedItemQuantity_success() {
         final Item item = new Item();
@@ -183,9 +144,6 @@ class ItemServiceTest {
         assertEquals(6, item.getQuantity());
     }
 
-    /**
-     * Verifies that decrement Item Quantity should Decrement Item Quantity success.
-     */
     @Test
     void testDecrementItemQuantity_shouldDecrementItemQuantity_success() {
         final Item item = new Item();
@@ -197,9 +155,6 @@ class ItemServiceTest {
         assertEquals(4, item.getQuantity());
     }
 
-    /**
-     * Verifies that decrement Item Quantity should Throw No Available Items Exception.
-     */
     @Test
     void testDecrementItemQuantity_shouldThrowNoAvailableItemsException() {
         final Item item = new Item();
@@ -208,9 +163,6 @@ class ItemServiceTest {
         assertThrows(NoAvailableItemsException.class, () -> ItemService.decrementItemQuantity(item));
     }
 
-    /**
-     * Verifies that get Items By Quantity no Exceptions is Below False success.
-     */
     @Test
     void testGetItemsByQuantity_noExceptions_isBelowFalse_success() {
         final List<ItemDto> expected = ItemFactory.getDefaultItemDtoList();
@@ -222,9 +174,6 @@ class ItemServiceTest {
         assertEquals(expected, resultList);
     }
 
-    /**
-     * Verifies that get Items By Quantity no Exceptions is Below True success.
-     */
     @Test
     void testGetItemsByQuantity_noExceptions_isBelowTrue_success() {
         final List<ItemDto> expected = ItemFactory.getDefaultItemDtoList();
@@ -235,7 +184,3 @@ class ItemServiceTest {
         assertEquals(expected, resultList);
     }
 }
-
-
-
-

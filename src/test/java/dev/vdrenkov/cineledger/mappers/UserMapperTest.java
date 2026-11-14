@@ -13,14 +13,9 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * Tests user mapper behavior.
- */
 @ExtendWith(MockitoExtension.class)
 class UserMapperTest {
-    /**
-     * Verifies that map Users To User DTOs success.
-     */
+
     @Test
     void testMapUsersToUserDtos_success() {
         final List<User> users = UserFactory.getDefaultUserList();
@@ -34,36 +29,29 @@ class UserMapperTest {
             final UserDto expectedDto = expectedDtoList.get(i);
             final UserDto actualDto = actualDtoList.get(i);
 
-            assertEquals(expectedDto.getId(), actualDto.getId());
-            assertEquals(expectedDto.getUsername(), actualDto.getUsername());
-            assertEquals(expectedDto.getEmail(), actualDto.getEmail());
-            assertEquals(expectedDto.getFirstName(), actualDto.getFirstName());
-            assertEquals(expectedDto.getLastName(), actualDto.getLastName());
-            assertEquals(expectedDto.getJoinDate(), actualDto.getJoinDate());
-            assertEquals(expectedDto.getRoles().getFirst().getId(), actualDto.getRoles().getFirst().getId());
-            assertEquals(expectedDto.getRoles().getFirst().getName(), actualDto.getRoles().getFirst().getName());
+            assertEquals(expectedDto.id(), actualDto.id());
+            assertEquals(expectedDto.username(), actualDto.username());
+            assertEquals(expectedDto.email(), actualDto.email());
+            assertEquals(expectedDto.firstName(), actualDto.firstName());
+            assertEquals(expectedDto.lastName(), actualDto.lastName());
+            assertEquals(expectedDto.joinDate(), actualDto.joinDate());
+            assertEquals(expectedDto.roles().getFirst().id(), actualDto.roles().getFirst().id());
+            assertEquals(expectedDto.roles().getFirst().name(), actualDto.roles().getFirst().name());
         }
     }
 
-    /**
-     * Verifies that map User To User DTO success.
-     */
     @Test
     void testMapUserToUserDto_success() {
         final User user = UserFactory.getDefaultUser();
 
         final UserDto actualDto = UserMapper.mapUserToUserDto(user);
 
-        assertEquals(UserConstants.USERNAME, actualDto.getUsername());
-        assertEquals(UserConstants.EMAIL, actualDto.getEmail());
-        assertEquals(UserConstants.FIRST_NAME, actualDto.getFirstName());
-        assertEquals(UserConstants.LAST_NAME, actualDto.getLastName());
-        assertEquals(UserConstants.JOIN_DATE, actualDto.getJoinDate());
-        assertEquals(RoleFactory.getDefaultRoleDtoList().getFirst().getName(),
-            actualDto.getRoles().getFirst().getName());
+        assertEquals(UserConstants.USERNAME, actualDto.username());
+        assertEquals(UserConstants.EMAIL, actualDto.email());
+        assertEquals(UserConstants.FIRST_NAME, actualDto.firstName());
+        assertEquals(UserConstants.LAST_NAME, actualDto.lastName());
+        assertEquals(UserConstants.JOIN_DATE, actualDto.joinDate());
+        assertEquals(RoleFactory.getDefaultRoleDtoList().getFirst().name(),
+            actualDto.roles().getFirst().name());
     }
 }
-
-
-
-

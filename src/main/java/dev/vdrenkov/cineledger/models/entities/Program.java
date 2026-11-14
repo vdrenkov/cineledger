@@ -8,20 +8,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
-/**
- * Represents a persisted program entity.
- */
 @Entity
 @Table(name = "programs")
-@AllArgsConstructor
-@NoArgsConstructor
-@Data
 public class Program {
 
     @Id
@@ -35,19 +26,50 @@ public class Program {
     @JoinColumn(name = "cinema_id")
     private Cinema cinema;
 
-    /**
-     * Creates a new program with its required collaborators.
-     *
-     * @param programDate
-     *     program date value to evaluate
-     * @param cinema
-     *     cinema entity to transform
-     */
     public Program(LocalDate programDate, Cinema cinema) {
         this.programDate = programDate;
         this.cinema = cinema;
     }
+
+    public Program() {}
+
+    public Program(final int id, final LocalDate programDate, final Cinema cinema) {
+        this.id = id;
+        this.programDate = programDate;
+        this.cinema = cinema;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(final int id) {
+        this.id = id;
+    }
+
+    public LocalDate getProgramDate() {
+        return programDate;
+    }
+
+    public void setProgramDate(final LocalDate programDate) {
+        this.programDate = programDate;
+    }
+
+    public Cinema getCinema() {
+        return cinema;
+    }
+
+    public void setCinema(final Cinema cinema) {
+        this.cinema = cinema;
+    }
+
+    @Override
+    public boolean equals(final Object object) {
+        return this == object || object instanceof Program other && id != 0 && id == other.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Program.class.hashCode();
+    }
 }
-
-
-

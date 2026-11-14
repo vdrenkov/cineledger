@@ -35,9 +35,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/**
- * Tests item controller behavior.
- */
 @ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc
 class ItemControllerTest {
@@ -48,17 +45,11 @@ class ItemControllerTest {
     @InjectMocks
     private ItemController itemController;
 
-    /**
-     * Initializes the test fixture before each test case.
-     */
     @BeforeEach
     void setup() {
         mockMvc = MockMvcBuilders.standaloneSetup(itemController).build();
     }
 
-    /**
-     * Verifies that add Item no Exceptions success.
-     */
     @Test
     void testAddItem_noExceptions_success() throws Exception {
         final ObjectMapper mapper = new ObjectMapper();
@@ -75,9 +66,6 @@ class ItemControllerTest {
             .andExpect(header().string("Location", URIConstants.ITEMS_PATH + "/" + ID));
     }
 
-    /**
-     * Verifies that get All Items success.
-     */
     @Test
     void testGetAllItems_success() throws Exception {
         when(itemService.getAllItems()).thenReturn(Collections.singletonList(ItemFactory.getDefaultItemDto()));
@@ -92,9 +80,6 @@ class ItemControllerTest {
             .andExpect(jsonPath("$[0].quantity").value(QUANTITY));
     }
 
-    /**
-     * Verifies that get Item By Name item Found success.
-     */
     @Test
     void testGetItemByName_itemFound_success() throws Exception {
         when(itemService.getItemDtoByName(anyString())).thenReturn(ItemFactory.getDefaultItemDto());
@@ -107,9 +92,6 @@ class ItemControllerTest {
             .andExpect(jsonPath("$.name").value(NAME));
     }
 
-    /**
-     * Verifies that edit Item no Response success.
-     */
     @Test
     void testEditItem_noResponse_success() throws Exception {
         final ObjectMapper mapper = new ObjectMapper();
@@ -122,9 +104,6 @@ class ItemControllerTest {
             .andExpect(status().isNoContent());
     }
 
-    /**
-     * Verifies that edit Item requested Response success.
-     */
     @Test
     void testEditItem_requestedResponse_success() throws Exception {
         final ObjectMapper mapper = new ObjectMapper();
@@ -141,9 +120,6 @@ class ItemControllerTest {
             .andExpect(jsonPath("$.id").value(ID));
     }
 
-    /**
-     * Verifies that delete Item no Response success.
-     */
     @Test
     void testDeleteItem_noResponse_success() throws Exception {
         when(itemService.removeItem(ID)).thenReturn(ItemFactory.getDefaultItemDto());
@@ -151,9 +127,6 @@ class ItemControllerTest {
         mockMvc.perform(delete(URIConstants.ITEMS_ID_PATH, ID)).andExpect(status().isNoContent());
     }
 
-    /**
-     * Verifies that delete Item requested Response success.
-     */
     @Test
     void testDeleteItem_requestedResponse_success() throws Exception {
         when(itemService.removeItem(ID)).thenReturn(ItemFactory.getDefaultItemDto());
@@ -164,9 +137,6 @@ class ItemControllerTest {
             .andExpect(jsonPath("$.id").value(ID));
     }
 
-    /**
-     * Verifies that get Items By Quantity.
-     */
     @Test
     void testGetItemsByQuantity() throws Exception {
         when(itemService.getItemsByQuantity(anyInt(), anyBoolean())).thenReturn(ItemFactory.getDefaultItemDtoList());
@@ -183,8 +153,3 @@ class ItemControllerTest {
             .andExpect(jsonPath("$[0].quantity").value(QUANTITY));
     }
 }
-
-
-
-
-

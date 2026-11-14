@@ -9,197 +9,95 @@ import dev.vdrenkov.cineledger.models.entities.Discount;
 import dev.vdrenkov.cineledger.models.requests.DiscountRequest;
 import dev.vdrenkov.cineledger.repositories.DiscountRepository;
 import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
-import dev.vdrenkov.cineledger.utils.constants.LogMessages;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
 
-/**
- * Contains business logic for discount operations.
- */
 @Service
 public class DiscountService {
-    private static final Logger log = LoggerFactory.getLogger(DiscountService.class);
 
     private final DiscountRepository discountRepository;
 
-    /**
-     * Creates a new discount service with its required collaborators.
-     *
-     * @param discountRepository
-     *     discount repository used by the operation
-     */
-    @Autowired
     public DiscountService(DiscountRepository discountRepository) {
         this.discountRepository = discountRepository;
     }
 
-    /**
-     * Creates and persists discount.
-     *
-     * @param request
-     *     request payload containing the submitted data
-     * @return requested discount value
-     */
     public Discount addDiscount(DiscountRequest request) {
-        if (discountRepository.existsByType(request.getType()) || discountRepository.existsByCode(request.getCode())) {
-            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.DISCOUNT_ALREADY_EXISTS_MESSAGE);
+        if (discountRepository.existsByType(request.type()) || discountRepository.existsByCode(request.code())) {
 
             throw new DiscountAlreadyExistsException(ExceptionMessages.DISCOUNT_ALREADY_EXISTS_MESSAGE);
         }
 
-        log.info("An attempt to add a discount with type {}", request.getType());
-
-        return discountRepository.save(new Discount(request.getType(), request.getCode(), request.getPercentage()));
+        return discountRepository.save(new Discount(request.type(), request.code(), request.percentage()));
     }
 
-    /**
-     * Returns all discounts matching the supplied criteria.
-     *
-     * @return matching discount values
-     */
     public List<Discount> getAllDiscounts() {
-        log.info("All discounts requested from the database");
 
         return discountRepository.findAll();
     }
 
-    /**
-     * Returns all discount matching the supplied criteria.
-     *
-     * @return matching discount dto values
-     */
     public List<DiscountDto> getAllDiscountDtos() {
-        log.info("An attempt to map all discounts to discount DTOs");
 
         return DiscountMapper.mapDiscountListToDiscountDtoList(getAllDiscounts());
     }
 
-    /**
-     * Returns discount matching the supplied criteria.
-     *
-     * @param id
-     *     identifier of the target resource
-     * @return requested discount value
-     */
     public Discount getDiscountById(int id) {
-        log.info("An attempt to get a discount with an id {}", id);
 
         return discountRepository.findById(id).orElseThrow(() -> {
-            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.DISCOUNT_NOT_FOUND_MESSAGE);
 
             return new DiscountNotFoundException(ExceptionMessages.DISCOUNT_NOT_FOUND_MESSAGE);
         });
     }
 
-    /**
-     * Returns discount matching the supplied criteria.
-     *
-     * @param code
-     *     code used by the operation
-     * @return requested discount value
-     */
     public Discount getDiscountByCode(String code) {
-        log.info("An attempt to get a discount with a code {}", code);
 
         return discountRepository.findByCode(code).orElseThrow(() -> {
-            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.DISCOUNT_NOT_FOUND_MESSAGE);
 
             return new DiscountNotFoundException(ExceptionMessages.DISCOUNT_NOT_FOUND_MESSAGE);
         });
     }
 
-    /**
-     * Returns discount matching the supplied criteria.
-     *
-     * @param type
-     *     type used by the operation
-     * @return requested discount value
-     */
     public Discount getDiscountByType(String type) {
-        log.info("An attempt to get a discount with a type {}", type);
 
         return discountRepository.findByType(type).orElseThrow(() -> {
-            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.DISCOUNT_NOT_FOUND_MESSAGE);
 
             return new DiscountNotFoundException(ExceptionMessages.DISCOUNT_NOT_FOUND_MESSAGE);
         });
     }
 
-    /**
-     * Returns discount matching the supplied criteria.
-     *
-     * @param type
-     *     type used by the operation
-     * @return discount dto result
-     */
     public DiscountDto getDiscountDtoByType(String type) {
-        log.info("An attempt to map discount to discount DTO");
 
         return DiscountMapper.mapDiscountToDiscountDto(getDiscountByType(type));
     }
 
-    /**
-     * Updates discount and returns the previous state when needed.
-     *
-     * @param request
-     *     request payload containing the submitted data
-     * @param id
-     *     identifier of the target resource
-     * @return discount dto result
-     */
     public DiscountDto updateDiscount(DiscountRequest request, int id) {
         final DiscountDto discount = DiscountMapper.mapDiscountToDiscountDto(getDiscountById(id));
 
-        discountRepository.save(new Discount(id, request.getType(), request.getCode(), request.getPercentage()));
-        log.info("Discount with id {} was updated", id);
+        discountRepository.save(new Discount(id, request.type(), request.code(), request.percentage()));
 
         return discount;
     }
 
-    /**
-     * Deletes discount and returns the removed state when needed.
-     *
-     * @param id
-     *     identifier of the target resource
-     * @return discount dto result
-     */
     public DiscountDto deleteDiscount(int id) {
         final Discount discount = getDiscountById(id);
 
         discountRepository.deleteById(id);
 
-        log.info("Discount with id {} was deleted", id);
-
         return DiscountMapper.mapDiscountToDiscountDto(discount);
     }
 
-    /**
-     * Executes the apply discount operation for discount.
-     *
-     * @param totalPrice
-     *     total price used by the operation
-     * @param discountCode
-     *     discount code to validate or apply
-     * @return requested double value
-     */
     public double applyDiscount(double totalPrice, String discountCode) {
         if (!StringUtils.hasText(discountCode)) {
-            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.DISCOUNT_CODE_NOT_VALID_MESSAGE);
+
             throw new DiscountNotValidException(ExceptionMessages.DISCOUNT_CODE_NOT_VALID_MESSAGE);
         }
 
         final Discount discount = discountRepository.findByCode(discountCode).orElseThrow(() -> {
-            log.error(LogMessages.EXCEPTION_CAUGHT_LOG, ExceptionMessages.DISCOUNT_CODE_NOT_VALID_MESSAGE);
+
             return new DiscountNotValidException(ExceptionMessages.DISCOUNT_CODE_NOT_VALID_MESSAGE);
         });
 
         return totalPrice - (totalPrice * discount.getPercentage() / 100);
     }
 }
-
-

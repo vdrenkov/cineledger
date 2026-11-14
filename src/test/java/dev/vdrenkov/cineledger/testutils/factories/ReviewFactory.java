@@ -19,95 +19,45 @@ import static dev.vdrenkov.cineledger.testutils.constants.ReviewConstants.REVIEW
 import static dev.vdrenkov.cineledger.testutils.constants.ReviewConstants.REVIEW_USER;
 import static dev.vdrenkov.cineledger.testutils.constants.ReviewConstants.REVIEW_USER_DTO;
 
-/**
- * Provides reusable review fixtures for tests.
- */
 public final class ReviewFactory {
 
     private ReviewFactory() {
         throw new IllegalStateException(ExceptionMessages.NON_INSTANTIABLE_CLASS_MESSAGE);
     }
 
-    /**
-     * Returns the default review fixture used in tests.
-     *
-     * @return test review value
-     */
     public static Review getDefaultReview() {
         return new Review(ID, RATING, REVIEW_TEXT, DATE_MODIFIED, REVIEW_MOVIE, REVIEW_CINEMA, REVIEW_USER);
     }
 
-    /**
-     * Returns the default review list fixture used in tests.
-     *
-     * @return test review values
-     */
     public static List<Review> getDefaultReviewList() {
         return Collections.singletonList(getDefaultReview());
     }
 
-    /**
-     * Returns the default review dto fixture used in tests.
-     *
-     * @return test review dto value
-     */
     public static ReviewDto getDefaultReviewDto() {
         return new ReviewDto(ID, RATING, REVIEW_TEXT, DATE_MODIFIED, REVIEW_MOVIE_DTO, null, REVIEW_USER_DTO);
     }
 
-    /**
-     * Returns the default cinema review dto fixture used in tests.
-     *
-     * @return test review dto value
-     */
     public static ReviewDto getDefaultReviewDtoWithCinema() {
         return new ReviewDto(ID, RATING, REVIEW_TEXT, DATE_MODIFIED, null, REVIEW_CINEMA_DTO, REVIEW_USER_DTO);
     }
 
-    /**
-     * Returns the default review with cinema fixture used in tests.
-     *
-     * @return test review value
-     */
     public static Review getDefaultReviewWithCinema() {
         return new Review(ID, RATING, REVIEW_TEXT, DATE_MODIFIED, null, REVIEW_CINEMA, REVIEW_USER);
     }
 
-    /**
-     * Returns the default review list with cinema fixture used in tests.
-     *
-     * @return test review values
-     */
     public static List<Review> getDefaultReviewListWithCinema() {
         return Collections.singletonList(getDefaultReviewWithCinema());
     }
 
-    /**
-     * Returns the default review dto list fixture used in tests.
-     *
-     * @return test review dto values
-     */
     public static List<ReviewDto> getDefaultReviewDtoList() {
         return Collections.singletonList(getDefaultReviewDto());
     }
 
-    /**
-     * Returns the default cinema review dto list fixture used in tests.
-     *
-     * @return test review dto values
-     */
     public static List<ReviewDto> getDefaultReviewDtoListWithCinema() {
         return Collections.singletonList(getDefaultReviewDtoWithCinema());
     }
 
-    /**
-     * Returns the default review request fixture used in tests.
-     *
-     * @return test review request value
-     */
     public static ReviewRequest getDefaultReviewRequest() {
         return new ReviewRequest(RATING, REVIEW_TEXT);
     }
 }
-
-

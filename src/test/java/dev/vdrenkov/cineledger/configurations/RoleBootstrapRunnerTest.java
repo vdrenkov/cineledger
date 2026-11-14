@@ -90,16 +90,6 @@ class RoleBootstrapRunnerTest {
 
     private static BootstrapProperties bootstrapProperties(final boolean roles, final String username,
         final String password, final String email, final String firstName, final String lastName) {
-        final BootstrapProperties bootstrapProperties = new BootstrapProperties();
-        final BootstrapProperties.Admin admin = bootstrapProperties.getAdmin();
-
-        bootstrapProperties.setRoles(roles);
-        admin.setUsername(username);
-        admin.setPassword(password);
-        admin.setEmail(email);
-        admin.setFirstName(firstName);
-        admin.setLastName(lastName);
-        return bootstrapProperties;
+        return new BootstrapProperties(roles, new BootstrapProperties.Admin(username, password, email, firstName, lastName));
     }
 }
-

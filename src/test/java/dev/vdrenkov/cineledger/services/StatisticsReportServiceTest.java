@@ -23,9 +23,6 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
-/**
- * Tests statistics report service behavior.
- */
 @ExtendWith(MockitoExtension.class)
 class StatisticsReportServiceTest {
 
@@ -47,9 +44,6 @@ class StatisticsReportServiceTest {
     @InjectMocks
     private StatisticsReportService statisticsReportService;
 
-    /**
-     * Verifies that get Purchased Tickets Count By Movie Category success.
-     */
     @Test
     void testGetPurchasedTicketsCountByMovieCategory_success() {
         when(categoryService.getCategoryById(anyInt())).thenReturn(new Category());
@@ -61,9 +55,6 @@ class StatisticsReportServiceTest {
         assertEquals(1, result);
     }
 
-    /**
-     * Verifies that get Purchased Tickets Count By Movie Title success.
-     */
     @Test
     void testGetPurchasedTicketsCountByMovieTitle_success() {
         final List<Integer> movieIds = Arrays.asList(1, 2, 3);
@@ -76,12 +67,9 @@ class StatisticsReportServiceTest {
         assertEquals(1, result);
     }
 
-    /**
-     * Verifies that get Purchased Items Count By Item Name success.
-     */
     @Test
     void testGetPurchasedItemsCountByItemName_success() {
-        when(itemService.getItemDtoByName(anyString())).thenReturn(new ItemDto());
+        when(itemService.getItemDtoByName(anyString())).thenReturn(new ItemDto(0, null, null, 0));
         when(orderService.getOrdersByDateBetween(any(), any())).thenReturn(OrderFactory.getDefaultOrderList());
 
         int result = statisticsReportService.getPurchasedItemsCountByItemName(ItemConstants.NAME,
@@ -90,6 +78,3 @@ class StatisticsReportServiceTest {
         Assertions.assertEquals(1, result);
     }
 }
-
-
-

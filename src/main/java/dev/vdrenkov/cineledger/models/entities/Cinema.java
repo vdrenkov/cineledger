@@ -6,18 +6,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-/**
- * Represents a persisted cinema entity.
- */
 @Entity
 @Table(name = "cinemas")
-@AllArgsConstructor
-@NoArgsConstructor
-@Data
 public class Cinema {
 
     @Id
@@ -33,22 +24,60 @@ public class Cinema {
     @Column(name = "average_rating")
     private double averageRating;
 
-    /**
-     * Creates a new cinema with its required collaborators.
-     *
-     * @param address
-     *     address used by the operation
-     * @param city
-     *     city used by the operation
-     * @param averageRating
-     *     average rating used by the operation
-     */
     public Cinema(String address, String city, double averageRating) {
         this.address = address;
         this.city = city;
         this.averageRating = averageRating;
     }
+
+    public Cinema() {}
+
+    public Cinema(final int id, final String address, final String city, final double averageRating) {
+        this.id = id;
+        this.address = address;
+        this.city = city;
+        this.averageRating = averageRating;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(final int id) {
+        this.id = id;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(final String address) {
+        this.address = address;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(final String city) {
+        this.city = city;
+    }
+
+    public double getAverageRating() {
+        return averageRating;
+    }
+
+    public void setAverageRating(final double averageRating) {
+        this.averageRating = averageRating;
+    }
+
+    @Override
+    public boolean equals(final Object object) {
+        return this == object || object instanceof Cinema other && id != 0 && id == other.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Cinema.class.hashCode();
+    }
 }
-
-
-

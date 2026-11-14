@@ -18,9 +18,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-/**
- * Tests email service behavior.
- */
 @ExtendWith(MockitoExtension.class)
 class EmailServiceTest {
 
@@ -30,9 +27,6 @@ class EmailServiceTest {
     @InjectMocks
     private EmailService emailService;
 
-    /**
-     * Verifies that send Order Confirmation Email.
-     */
     @Test
     void testSendOrderConfirmationEmail() throws JSONException {
         final User user = UserFactory.getDefaultUser();
@@ -48,9 +42,6 @@ class EmailServiceTest {
         assertEquals(user.getEmail(), mailjetResponse.getData().getJSONObject(0).getString("Email"));
     }
 
-    /**
-     * Verifies that send Password Confirmation Email.
-     */
     @Test
     void testSendPasswordConfirmationEmail() throws JSONException {
         final User user = UserFactory.getDefaultUser();
@@ -65,9 +56,6 @@ class EmailServiceTest {
         assertEquals(user.getEmail(), mailjetResponse.getData().getJSONObject(0).getString("Email"));
     }
 
-    /**
-     * Verifies that send Registration Confirmation Email.
-     */
     @Test
     void testSendRegistrationConfirmationEmail() throws JSONException {
 
@@ -84,7 +72,3 @@ class EmailServiceTest {
         assertEquals(user.getEmail(), mailjetResponse.getData().getJSONObject(0).getString("Email"));
     }
 }
-
-
-
-

@@ -8,20 +8,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalTime;
 
-/**
- * Represents a persisted projection entity.
- */
 @Entity
 @Table(name = "projections")
-@AllArgsConstructor
-@NoArgsConstructor
-@Data
 public class Projection {
 
     @Id
@@ -46,20 +37,6 @@ public class Projection {
     @Column(name = "start_time")
     private LocalTime startTime;
 
-    /**
-     * Creates a new projection with its required collaborators.
-     *
-     * @param price
-     *     price used by the operation
-     * @param hall
-     *     hall entity to transform
-     * @param program
-     *     program entity to transform
-     * @param movie
-     *     movie entity to transform
-     * @param startTime
-     *     start time used by the operation
-     */
     public Projection(double price, Hall hall, Program program, Movie movie, LocalTime startTime) {
         this.price = price;
         this.hall = hall;
@@ -67,7 +44,73 @@ public class Projection {
         this.movie = movie;
         this.startTime = startTime;
     }
+
+    public Projection() {}
+
+    public Projection(final int id, final double price, final Hall hall, final Program program, final Movie movie, final LocalTime startTime) {
+        this.id = id;
+        this.price = price;
+        this.hall = hall;
+        this.program = program;
+        this.movie = movie;
+        this.startTime = startTime;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(final int id) {
+        this.id = id;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(final double price) {
+        this.price = price;
+    }
+
+    public Hall getHall() {
+        return hall;
+    }
+
+    public void setHall(final Hall hall) {
+        this.hall = hall;
+    }
+
+    public Program getProgram() {
+        return program;
+    }
+
+    public void setProgram(final Program program) {
+        this.program = program;
+    }
+
+    public Movie getMovie() {
+        return movie;
+    }
+
+    public void setMovie(final Movie movie) {
+        this.movie = movie;
+    }
+
+    public LocalTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(final LocalTime startTime) {
+        this.startTime = startTime;
+    }
+
+    @Override
+    public boolean equals(final Object object) {
+        return this == object || object instanceof Projection other && id != 0 && id == other.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Projection.class.hashCode();
+    }
 }
-
-
-

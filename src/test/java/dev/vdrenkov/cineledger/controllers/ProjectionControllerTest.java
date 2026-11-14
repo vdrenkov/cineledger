@@ -39,9 +39,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/**
- * Tests projection controller behavior.
- */
 @AutoConfigureMockMvc
 @ExtendWith(MockitoExtension.class)
 class ProjectionControllerTest {
@@ -58,17 +55,11 @@ class ProjectionControllerTest {
     @InjectMocks
     private ProjectionController projectionController;
 
-    /**
-     * Initializes the test fixture before each test case.
-     */
     @BeforeEach
     void setup() {
         mockMvc = MockMvcBuilders.standaloneSetup(projectionController).build();
     }
 
-    /**
-     * Verifies that add Projection projection Added success.
-     */
     @Test
     void testAddProjection_projectionAdded_success() throws Exception {
         when(projectionService.addProjection(any())).thenReturn(getDefaultProjection());
@@ -84,9 +75,6 @@ class ProjectionControllerTest {
             .andExpect(header().string("Location", URIConstants.PROJECTIONS_PATH + "/" + ID));
     }
 
-    /**
-     * Verifies that get Projections By Program Id no Exceptions success.
-     */
     @Test
     void testGetProjectionsByProgramId_noExceptions_success() throws Exception {
         when(projectionService.getProjectionsByProgramId(anyInt())).thenReturn(getDefaultProjectionDtoList());
@@ -95,24 +83,21 @@ class ProjectionControllerTest {
             .perform(get(URIConstants.PROGRAMS_ID_PROJECTIONS_PATH, ID))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$[0].id").value(ID))
-            .andExpect(jsonPath("$[0].hall").value(HallFactory.getDefaultHallDto()))
+            .andExpect(jsonPath("$[0].hall").value(objectMapper.convertValue(HallFactory.getDefaultHallDto(), java.util.Map.class)))
             .andExpect(jsonPath("$[0].price").value(PRICE))
             .andExpect(jsonPath("$[0].program.id").value(ProgramConstants.ID))
             .andExpect(jsonPath("$[0].program.programDate", is(ProgramConstants.DATE.toString())))
-            .andExpect(jsonPath("$[0].program.cinema").value(CinemaFactory.getDefaultCinemaDto()))
+            .andExpect(jsonPath("$[0].program.cinema").value(objectMapper.convertValue(CinemaFactory.getDefaultCinemaDto(), java.util.Map.class)))
             .andExpect(jsonPath("$[0].movie.id").value(MovieConstants.ID))
             .andExpect(jsonPath("$[0].movie.title").value(MovieConstants.TITLE))
             .andExpect(jsonPath("$[0].movie.averageRating").value(MovieConstants.RATING))
             .andExpect(jsonPath("$[0].movie.description").value(MovieConstants.DESCRIPTION))
             .andExpect(jsonPath("$[0].movie.releaseDate", is(MovieConstants.RELEASE_DATE.toString())))
             .andExpect(jsonPath("$[0].movie.runtime").value(MovieConstants.RUNTIME.toString()))
-            .andExpect(jsonPath("$[0].movie.category").value(CategoryFactory.getDefaultCategoryDto()))
+            .andExpect(jsonPath("$[0].movie.category").value(objectMapper.convertValue(CategoryFactory.getDefaultCategoryDto(), java.util.Map.class)))
             .andExpect(jsonPath("$[0].startTime", is(START_TIME.toString())));
     }
 
-    /**
-     * Verifies that get Projections By Movie Id no Exceptions success.
-     */
     @Test
     void testGetProjectionsByMovieId_noExceptions_success() throws Exception {
         when(projectionService.getProjectionsByMovieId(anyInt())).thenReturn(getDefaultProjectionDtoList());
@@ -121,24 +106,21 @@ class ProjectionControllerTest {
             .perform(get(URIConstants.MOVIES_ID_PROJECTIONS_PATH, ID))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$[0].id").value(ID))
-            .andExpect(jsonPath("$[0].hall").value(HallFactory.getDefaultHallDto()))
+            .andExpect(jsonPath("$[0].hall").value(objectMapper.convertValue(HallFactory.getDefaultHallDto(), java.util.Map.class)))
             .andExpect(jsonPath("$[0].price").value(PRICE))
             .andExpect(jsonPath("$[0].program.id").value(ProgramConstants.ID))
             .andExpect(jsonPath("$[0].program.programDate", is(ProgramConstants.DATE.toString())))
-            .andExpect(jsonPath("$[0].program.cinema").value(CinemaFactory.getDefaultCinemaDto()))
+            .andExpect(jsonPath("$[0].program.cinema").value(objectMapper.convertValue(CinemaFactory.getDefaultCinemaDto(), java.util.Map.class)))
             .andExpect(jsonPath("$[0].movie.id").value(MovieConstants.ID))
             .andExpect(jsonPath("$[0].movie.title").value(MovieConstants.TITLE))
             .andExpect(jsonPath("$[0].movie.averageRating").value(MovieConstants.RATING))
             .andExpect(jsonPath("$[0].movie.description").value(MovieConstants.DESCRIPTION))
             .andExpect(jsonPath("$[0].movie.releaseDate", is(MovieConstants.RELEASE_DATE.toString())))
             .andExpect(jsonPath("$[0].movie.runtime").value(MovieConstants.RUNTIME.toString()))
-            .andExpect(jsonPath("$[0].movie.category").value(CategoryFactory.getDefaultCategoryDto()))
+            .andExpect(jsonPath("$[0].movie.category").value(objectMapper.convertValue(CategoryFactory.getDefaultCategoryDto(), java.util.Map.class)))
             .andExpect(jsonPath("$[0].startTime", is(START_TIME.toString())));
     }
 
-    /**
-     * Verifies that get Projections By Start Time returns Projections List success.
-     */
     @Test
     void testGetProjectionsByStartTime_returnsProjectionsList_success() throws Exception {
         when(projectionService.getProjectionsByStartTime(any(), anyBoolean())).thenReturn(
@@ -151,24 +133,21 @@ class ProjectionControllerTest {
                 .queryParam(IS_BEFORE, String.valueOf(true)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$[0].id").value(ID))
-            .andExpect(jsonPath("$[0].hall").value(HallFactory.getDefaultHallDto()))
+            .andExpect(jsonPath("$[0].hall").value(objectMapper.convertValue(HallFactory.getDefaultHallDto(), java.util.Map.class)))
             .andExpect(jsonPath("$[0].price").value(PRICE))
             .andExpect(jsonPath("$[0].program.id").value(ProgramConstants.ID))
             .andExpect(jsonPath("$[0].program.programDate", is(ProgramConstants.DATE.toString())))
-            .andExpect(jsonPath("$[0].program.cinema").value(CinemaFactory.getDefaultCinemaDto()))
+            .andExpect(jsonPath("$[0].program.cinema").value(objectMapper.convertValue(CinemaFactory.getDefaultCinemaDto(), java.util.Map.class)))
             .andExpect(jsonPath("$[0].movie.id").value(MovieConstants.ID))
             .andExpect(jsonPath("$[0].movie.title").value(MovieConstants.TITLE))
             .andExpect(jsonPath("$[0].movie.averageRating").value(MovieConstants.RATING))
             .andExpect(jsonPath("$[0].movie.description").value(MovieConstants.DESCRIPTION))
             .andExpect(jsonPath("$[0].movie.releaseDate", is(MovieConstants.RELEASE_DATE.toString())))
             .andExpect(jsonPath("$[0].movie.runtime").value(MovieConstants.RUNTIME.toString()))
-            .andExpect(jsonPath("$[0].movie.category").value(CategoryFactory.getDefaultCategoryDto()))
+            .andExpect(jsonPath("$[0].movie.category").value(objectMapper.convertValue(CategoryFactory.getDefaultCategoryDto(), java.util.Map.class)))
             .andExpect(jsonPath("$[0].startTime", is(START_TIME.toString())));
     }
 
-    /**
-     * Verifies that update Projection return Old True success.
-     */
     @Test
     void testUpdateProjection_returnOldTrue_success() throws Exception {
         when(projectionService.updateProjection(any(), anyInt())).thenReturn(getDefaultProjectionDto());
@@ -182,24 +161,21 @@ class ProjectionControllerTest {
                 .queryParam(RETURN_OLD, String.valueOf(true)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(ID))
-            .andExpect(jsonPath("$.hall").value(HallFactory.getDefaultHallDto()))
+            .andExpect(jsonPath("$.hall").value(objectMapper.convertValue(HallFactory.getDefaultHallDto(), java.util.Map.class)))
             .andExpect(jsonPath("$.price").value(PRICE))
             .andExpect(jsonPath("$.program.id").value(ProgramConstants.ID))
             .andExpect(jsonPath("$.program.programDate", is(ProgramConstants.DATE.toString())))
-            .andExpect(jsonPath("$.program.cinema").value(CinemaFactory.getDefaultCinemaDto()))
+            .andExpect(jsonPath("$.program.cinema").value(objectMapper.convertValue(CinemaFactory.getDefaultCinemaDto(), java.util.Map.class)))
             .andExpect(jsonPath("$.movie.id").value(MovieConstants.ID))
             .andExpect(jsonPath("$.movie.title").value(MovieConstants.TITLE))
             .andExpect(jsonPath("$.movie.averageRating").value(MovieConstants.RATING))
             .andExpect(jsonPath("$.movie.description").value(MovieConstants.DESCRIPTION))
             .andExpect(jsonPath("$.movie.releaseDate", is(MovieConstants.RELEASE_DATE.toString())))
             .andExpect(jsonPath("$.movie.runtime").value(MovieConstants.RUNTIME.toString()))
-            .andExpect(jsonPath("$.movie.category").value(CategoryFactory.getDefaultCategoryDto()))
+            .andExpect(jsonPath("$.movie.category").value(objectMapper.convertValue(CategoryFactory.getDefaultCategoryDto(), java.util.Map.class)))
             .andExpect(jsonPath("$.startTime", is(START_TIME.toString())));
     }
 
-    /**
-     * Verifies that update Projection return Old False success.
-     */
     @Test
     void testUpdateProjection_returnOldFalse_success() throws Exception {
         when(projectionService.updateProjection(any(), anyInt())).thenReturn(getDefaultProjectionDto());
@@ -214,9 +190,6 @@ class ProjectionControllerTest {
             .andExpect(status().isNoContent());
     }
 
-    /**
-     * Verifies that delete Projection return Old True success.
-     */
     @Test
     void testDeleteProjection_returnOldTrue_success() throws Exception {
         when(projectionService.deleteProjection(anyInt())).thenReturn(getDefaultProjectionDto());
@@ -225,24 +198,21 @@ class ProjectionControllerTest {
             .perform(delete(URIConstants.PROJECTIONS_ID_PATH, ID).queryParam(RETURN_OLD, String.valueOf(true)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(ID))
-            .andExpect(jsonPath("$.hall").value(HallFactory.getDefaultHallDto()))
+            .andExpect(jsonPath("$.hall").value(objectMapper.convertValue(HallFactory.getDefaultHallDto(), java.util.Map.class)))
             .andExpect(jsonPath("$.price").value(PRICE))
             .andExpect(jsonPath("$.program.id").value(ProgramConstants.ID))
             .andExpect(jsonPath("$.program.programDate", is(ProgramConstants.DATE.toString())))
-            .andExpect(jsonPath("$.program.cinema").value(CinemaFactory.getDefaultCinemaDto()))
+            .andExpect(jsonPath("$.program.cinema").value(objectMapper.convertValue(CinemaFactory.getDefaultCinemaDto(), java.util.Map.class)))
             .andExpect(jsonPath("$.movie.id").value(MovieConstants.ID))
             .andExpect(jsonPath("$.movie.title").value(MovieConstants.TITLE))
             .andExpect(jsonPath("$.movie.averageRating").value(MovieConstants.RATING))
             .andExpect(jsonPath("$.movie.description").value(MovieConstants.DESCRIPTION))
             .andExpect(jsonPath("$.movie.releaseDate", is(MovieConstants.RELEASE_DATE.toString())))
             .andExpect(jsonPath("$.movie.runtime").value(MovieConstants.RUNTIME.toString()))
-            .andExpect(jsonPath("$.movie.category").value(CategoryFactory.getDefaultCategoryDto()))
+            .andExpect(jsonPath("$.movie.category").value(objectMapper.convertValue(CategoryFactory.getDefaultCategoryDto(), java.util.Map.class)))
             .andExpect(jsonPath("$.startTime", is(START_TIME.toString())));
     }
 
-    /**
-     * Verifies that delete Projection return Old False success.
-     */
     @Test
     void testDeleteProjection_returnOldFalse_success() throws Exception {
         when(projectionService.deleteProjection(anyInt())).thenReturn(getDefaultProjectionDto());
@@ -250,9 +220,3 @@ class ProjectionControllerTest {
         mockMvc.perform(delete(URIConstants.PROJECTIONS_ID_PATH, ID)).andExpect(status().isNoContent());
     }
 }
-
-
-
-
-
-

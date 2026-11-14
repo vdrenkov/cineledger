@@ -53,9 +53,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/**
- * Tests user service behavior.
- */
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 class UserServiceTest {
@@ -84,17 +81,11 @@ class UserServiceTest {
     @InjectMocks
     private UserService userService;
 
-    /**
-     * Initializes the test fixture before each test case.
-     */
     @BeforeEach
     void setUp() {
         JwtFactory.setSecret(SECRET);
     }
 
-    /**
-     * Verifies that login cookie Obtained success.
-     */
     @Test
     void testLogin_cookieObtained_success() {
         final UserDetails userDetails = mock(UserDetails.class);
@@ -113,9 +104,6 @@ class UserServiceTest {
         assertEquals(resultCookie, httpCookie);
     }
 
-    /**
-     * Verifies that register User user Registered cookie Obtained.
-     */
     @Test
     void testRegisterUser_userRegistered_cookieObtained() {
         final HttpCookie httpCookie = JwtFactory.getDefaultHttpCookie();
@@ -132,9 +120,6 @@ class UserServiceTest {
         assertEquals(resultCookie, httpCookie);
     }
 
-    /**
-     * Verifies that register User By Admin user Registered not Logged In.
-     */
     @Test
     void testRegisterUserByAdmin_userRegistered_notLoggedIn() {
         when(passwordEncoder.encode(anyString())).thenReturn(UserConstants.PASSWORD);
@@ -148,9 +133,6 @@ class UserServiceTest {
         verify(jwtCookieUtil, never()).createJWTCookie(any());
     }
 
-    /**
-     * Verifies that add User username Exists throws User Email Already Exists Exception.
-     */
     @Test
     void testAddUser_usernameExists_throwsUserEmailAlreadyExistsException() {
         when(passwordEncoder.encode(anyString())).thenReturn(UserConstants.PASSWORD);
@@ -159,9 +141,6 @@ class UserServiceTest {
         assertThrows(UsernameAlreadyExistsException.class, () -> userService.addUser(userRequest));
     }
 
-    /**
-     * Verifies that add User email Exists throws User Email Already Exists Exception.
-     */
     @Test
     void testAddUser_emailExists_throwsUserEmailAlreadyExistsException() {
         when(passwordEncoder.encode(anyString())).thenReturn(UserConstants.PASSWORD);
@@ -171,9 +150,6 @@ class UserServiceTest {
         assertThrows(UserEmailAlreadyExistsException.class, () -> userService.addUser(userRequest));
     }
 
-    /**
-     * Verifies that get Role By Name success.
-     */
     @Test
     void testGetRoleByName_success() {
         when(roleService.getRoleByName(anyString())).thenReturn(RoleFactory.getDefaultRole());
@@ -183,9 +159,6 @@ class UserServiceTest {
         assertEquals(RoleFactory.getDefaultRole(), result);
     }
 
-    /**
-     * Verifies that get Default Role List success.
-     */
     @Test
     void testGetDefaultRoleList_success() {
         final List<Role> expected = RoleFactory.getDefaultRoleList();
@@ -197,9 +170,6 @@ class UserServiceTest {
         assertEquals(expected, roles);
     }
 
-    /**
-     * Verifies that get User Roles success.
-     */
     @Test
     void testGetUserRoles_success() {
         final Role role1 = new Role(1, "ADMIN");
@@ -217,18 +187,12 @@ class UserServiceTest {
         assertEquals(role2, roles.get(1));
     }
 
-    /**
-     * Verifies that get User Roles roles Empty throws Role Not Chosen Exception.
-     */
     @Test
     void testGetUserRoles_rolesEmpty_throwsRoleNotChosenException() {
         final List<String> emptyList = Collections.emptyList();
         assertThrows(RoleNotChosenException.class, () -> userService.getUserRoles(emptyList));
     }
 
-    /**
-     * Verifies that get User By Id success.
-     */
     @Test
     void testGetUserById_success() {
         final User expected = UserFactory.getDefaultUser();
@@ -240,9 +204,6 @@ class UserServiceTest {
         assertEquals(expected, user);
     }
 
-    /**
-     * Verifies that get User By Id user Not Found.
-     */
     @Test
     void testGetUserById_userNotFound() {
         when(userRepository.findById(anyInt())).thenReturn(Optional.empty());
@@ -250,9 +211,6 @@ class UserServiceTest {
         assertThrows(UserNotFoundException.class, () -> userService.getUserById(UserConstants.ID));
     }
 
-    /**
-     * Verifies that get User DTO By Id success.
-     */
     @Test
     void testGetUserDtoById_success() {
         final UserDto expected = UserFactory.getDefaultUserDto();
@@ -264,9 +222,6 @@ class UserServiceTest {
         assertEquals(expected, userDto);
     }
 
-    /**
-     * Verifies that get User By Username success.
-     */
     @Test
     void testGetUserByUsername_success() {
         final User expected = UserFactory.getDefaultUser();
@@ -278,9 +233,6 @@ class UserServiceTest {
         assertEquals(expected, user);
     }
 
-    /**
-     * Verifies that get User By Username user Not Found.
-     */
     @Test
     void testGetUserByUsername_userNotFound() {
         when(userRepository.findUserByUsername(anyString())).thenReturn(Optional.empty());
@@ -288,9 +240,6 @@ class UserServiceTest {
         assertThrows(UserNotFoundException.class, () -> userService.getUserByUsername(UserConstants.USERNAME));
     }
 
-    /**
-     * Verifies that get User DTO By Username success.
-     */
     @Test
     void testGetUserDtoByUsername_success() {
         final UserDto expected = UserFactory.getDefaultUserDto();
@@ -302,9 +251,6 @@ class UserServiceTest {
         assertEquals(expected, user);
     }
 
-    /**
-     * Verifies that get User By Email success.
-     */
     @Test
     void testGetUserByEmail_success() {
         final User expected = UserFactory.getDefaultUser();
@@ -316,9 +262,6 @@ class UserServiceTest {
         assertEquals(expected, user);
     }
 
-    /**
-     * Verifies that get User By Email user Not Found.
-     */
     @Test
     void testGetUserByEmail_userNotFound() {
         when(userRepository.findUserByEmail(anyString())).thenReturn(Optional.empty());
@@ -326,9 +269,6 @@ class UserServiceTest {
         assertThrows(UserNotFoundException.class, () -> userService.getUserByEmail(UserConstants.EMAIL));
     }
 
-    /**
-     * Verifies that get User DTO By Email success.
-     */
     @Test
     void testGetUserDtoByEmail_success() {
         final UserDto expected = UserFactory.getDefaultUserDto();
@@ -340,9 +280,6 @@ class UserServiceTest {
         assertEquals(expected, result);
     }
 
-    /**
-     * Verifies that get Users By Role Name success.
-     */
     @Test
     void testGetUsersByRoleName_success() {
         final List<User> expected = UserFactory.getDefaultUserList();
@@ -354,9 +291,6 @@ class UserServiceTest {
         assertEquals(expected, result);
     }
 
-    /**
-     * Verifies that get Users DTO By Role Name success.
-     */
     @Test
     void testGetUsersDtoByRoleName_success() {
         final List<UserDto> expected = UserFactory.getDefaultUserDtoList();
@@ -368,9 +302,6 @@ class UserServiceTest {
         assertEquals(expected, resultList);
     }
 
-    /**
-     * Verifies that get Users By Join Date before success.
-     */
     @Test
     void testGetUsersByJoinDate_before_success() {
         final User user2 = UserFactory.getDefaultUser();
@@ -384,9 +315,6 @@ class UserServiceTest {
         assertEquals(expectedUsers, users);
     }
 
-    /**
-     * Verifies that get Users By Join Date after success.
-     */
     @Test
     void testGetUsersByJoinDate_after_success() {
         final User user2 = UserFactory.getDefaultUser();
@@ -400,9 +328,6 @@ class UserServiceTest {
         assertEquals(expectedUsers, users);
     }
 
-    /**
-     * Exercises the get users dtos by join date test scenario.
-     */
     @Test
     void getUsersDtosByJoinDate() {
         when(userRepository.findAllByJoinDateBefore(UserConstants.JOIN_DATE)).thenReturn(
@@ -412,9 +337,6 @@ class UserServiceTest {
         assertEquals(UserFactory.getDefaultUserDtoList(), actualUserDtos);
     }
 
-    /**
-     * Verifies that update User By Admin user Updated success.
-     */
     @Test
     void testUpdateUserByAdmin_userUpdated_success() {
         final UserDto expected = UserFactory.getDefaultUserDto();
@@ -428,9 +350,6 @@ class UserServiceTest {
         assertEquals(expected, result);
     }
 
-    /**
-     * Verifies that update User user Updated success.
-     */
     @Test
     void testUpdateUser_userUpdated_success() {
         final User expectedUser = UserFactory.getDefaultUser();
@@ -452,9 +371,6 @@ class UserServiceTest {
         assertEquals(expectedUserDto, resultUser);
     }
 
-    /**
-     * Verifies that update User user Not Authorized throws Not Authorized Exception.
-     */
     @Test
     void testUpdateUser_userNotAuthorized_throwsNotAuthorizedException() {
         final SecurityContext securityContext = Mockito.mock(SecurityContext.class);
@@ -469,9 +385,6 @@ class UserServiceTest {
         assertThrows(NotAuthorizedException.class, () -> userService.updateUser(userRequest, INVALID_ID));
     }
 
-    /**
-     * Verifies that delete User user Deleted success.
-     */
     @Test
     void testDeleteUser_userDeleted_success() {
         final UserDto userDto = UserFactory.getDefaultUserDto();
@@ -489,9 +402,6 @@ class UserServiceTest {
         assertEquals(userDto, result);
     }
 
-    /**
-     * Verifies that delete User user Not Authorized throws Not Authorized Exception.
-     */
     @Test
     void testDeleteUser_userNotAuthorized_throwsNotAuthorizedException() {
         final SecurityContext securityContext = Mockito.mock(SecurityContext.class);
@@ -506,9 +416,6 @@ class UserServiceTest {
         assertThrows(NotAuthorizedException.class, () -> userService.deleteUser(INVALID_ID));
     }
 
-    /**
-     * Verifies that get Current User user Logged In success.
-     */
     @Test
     void testGetCurrentUser_userLoggedIn_success() {
         final User expected = UserFactory.getDefaultUser();
@@ -524,17 +431,11 @@ class UserServiceTest {
         assertEquals(expected, result);
     }
 
-    /**
-     * Verifies that get User By Username On Login user Not Found throws User Not Found Exception.
-     */
     @Test
     void testGetUserByUsernameOnLogin_userNotFound_throwsUserNotFoundException() {
         assertThrows(UserNotFoundException.class, () -> userService.deleteUser(UserConstants.ID));
     }
 
-    /**
-     * Verifies that is Authorized user Not Logged throws Not Logged In Exception.
-     */
     @Test
     void testIsAuthorized_userNotLogged_throwsNotLoggedInException() {
         final SecurityContext securityContext = Mockito.mock(SecurityContext.class);
@@ -548,9 +449,6 @@ class UserServiceTest {
         assertThrows(NotLoggedInException.class, () -> userService.updateUser(userRequest, UserConstants.ID));
     }
 
-    /**
-     * Verifies that is Authorized role Admin returns True.
-     */
     @Test
     void testIsAuthorized_roleAdmin_returnsTrue() {
         final User user = UserFactory.getDefaultUser();
@@ -570,9 +468,6 @@ class UserServiceTest {
         assertEquals(userDto, result);
     }
 
-    /**
-     * Verifies that is Current User Admin role Admin returns True.
-     */
     @Test
     void testIsCurrentUserAdmin_roleAdmin_returnsTrue() {
         final User expected = UserFactory.getDefaultAdmin();
@@ -588,9 +483,6 @@ class UserServiceTest {
         assertTrue(result);
     }
 
-    /**
-     * Verifies that is Current User Authorized user Is Admin returns True.
-     */
     @Test
     void testIsCurrentUserAuthorized_userIsAdmin_returnsTrue() {
         final User expected = UserFactory.getDefaultAdmin();
@@ -606,9 +498,6 @@ class UserServiceTest {
         assertTrue(result);
     }
 
-    /**
-     * Verifies that is Current User Authorized user Authorized returns True.
-     */
     @Test
     void testIsCurrentUserAuthorized_userAuthorized_returnsTrue() {
         final User expected = UserFactory.getDefaultUser();
@@ -624,9 +513,6 @@ class UserServiceTest {
         assertTrue(result);
     }
 
-    /**
-     * Verifies that recover Password.
-     */
     @Test
     void testRecoverPassword() {
         final User expectedUser = UserFactory.getDefaultUser();
@@ -640,6 +526,3 @@ class UserServiceTest {
         assertEquals(expectedUser, resultUser);
     }
 }
-
-
-

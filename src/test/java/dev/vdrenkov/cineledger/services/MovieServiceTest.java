@@ -29,9 +29,6 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
-/**
- * Tests movie service behavior.
- */
 @ExtendWith(MockitoExtension.class)
 class MovieServiceTest {
 
@@ -47,9 +44,6 @@ class MovieServiceTest {
     @InjectMocks
     private MovieService movieService;
 
-    /**
-     * Verifies that get Movies By Title min Rating Not Null success.
-     */
     @Test
     void testGetMoviesByTitle_minRatingNotNull_success() {
         final List<MovieDto> expected = MovieFactory.getDefaultMovieDtoList();
@@ -63,9 +57,6 @@ class MovieServiceTest {
         assertEquals(expected, resultList);
     }
 
-    /**
-     * Verifies that get Movies By Title min Rating Null success.
-     */
     @Test
     void testGetMoviesByTitle_minRatingNull_success() {
         final List<MovieDto> expected = MovieFactory.getDefaultMovieDtoList();
@@ -77,9 +68,6 @@ class MovieServiceTest {
         assertEquals(expected, resultList);
     }
 
-    /**
-     * Verifies that get Movies By Category min Rating Not Null success.
-     */
     @Test
     void testGetMoviesByCategory_minRatingNotNull_success() {
         final List<MovieDto> expected = MovieFactory.getDefaultMovieDtoList();
@@ -92,9 +80,6 @@ class MovieServiceTest {
         assertEquals(expected, resultList);
     }
 
-    /**
-     * Verifies that get Movies By Category min Rating Null success.
-     */
     @Test
     void testGetMoviesByCategory_minRatingNull_success() {
         final List<MovieDto> expected = MovieFactory.getDefaultMovieDtoList();
@@ -106,9 +91,6 @@ class MovieServiceTest {
         assertEquals(expected, resultList);
     }
 
-    /**
-     * Verifies that get Movies By Release Date After is After True min Rating Not Null success.
-     */
     @Test
     void testGetMoviesByReleaseDateAfter_isAfterTrue_minRatingNotNull_success() {
         final List<MovieDto> expected = MovieFactory.getDefaultMovieDtoList();
@@ -122,9 +104,6 @@ class MovieServiceTest {
         assertEquals(expected, resultList);
     }
 
-    /**
-     * Verifies that get Movies By Release Date After is After True min Rating Null success.
-     */
     @Test
     void testGetMoviesByReleaseDateAfter_isAfterTrue_minRatingNull_success() {
         final List<MovieDto> expected = MovieFactory.getDefaultMovieDtoList();
@@ -136,9 +115,6 @@ class MovieServiceTest {
         assertEquals(expected, resultList);
     }
 
-    /**
-     * Verifies that get Movies By Release Date After is After False min Rating Null success.
-     */
     @Test
     void testGetMoviesByReleaseDateAfter_isAfterFalse_minRatingNull_success() {
         final List<MovieDto> expected = MovieFactory.getDefaultMovieDtoList();
@@ -150,9 +126,6 @@ class MovieServiceTest {
         assertEquals(expected, resultList);
     }
 
-    /**
-     * Verifies that get Movies By Release Date After is After False min Rating Not Null success.
-     */
     @Test
     void testGetMoviesByReleaseDateAfter_isAfterFalse_minRatingNotNull_success() {
         final List<MovieDto> expected = MovieFactory.getDefaultMovieDtoList();
@@ -166,9 +139,6 @@ class MovieServiceTest {
         assertEquals(expected, resultList);
     }
 
-    /**
-     * Verifies that get Movies By Min Rating success.
-     */
     @Test
     void testGetMoviesByMinRating_success() {
         final List<MovieDto> expected = MovieFactory.getDefaultMovieDtoList();
@@ -181,9 +151,6 @@ class MovieServiceTest {
         assertEquals(expected, resultList);
     }
 
-    /**
-     * Verifies that get IMDb Movies Test success.
-     */
     @Test
     void testGetImdbMoviesTest_success() {
         final String filter = "top";
@@ -196,9 +163,6 @@ class MovieServiceTest {
         assertEquals(movies, result);
     }
 
-    /**
-     * Verifies that add Movie no Exceptions success.
-     */
     @Test
     void testAddMovie_noExceptions_success() {
         final Movie expected = MovieFactory.getDefaultMovie();
@@ -211,20 +175,14 @@ class MovieServiceTest {
         assertEquals(expected, movie);
     }
 
-    /**
-     * Verifies that add Movie throws Date Not Valid Exception.
-     */
     @Test
     void testAddMovie_throwsDateNotValidException() {
-        final MovieRequest request = MovieFactory.getDefaultMovieRequest();
-        request.setReleaseDate(LocalDate.of(2000, 1, 1));
+        final MovieRequest defaults = MovieFactory.getDefaultMovieRequest();
+        final MovieRequest request = new MovieRequest(defaults.title(), defaults.description(), LocalDate.of(2000, 1, 1), defaults.runtime(), defaults.categoryId());
 
         assertThrows(DateNotValidException.class, () -> movieService.addMovie(request));
     }
 
-    /**
-     * Verifies that get Movies By Title With Empty Title Should Throw Illegal Argument Exception.
-     */
     @Test
     void testGetMoviesByTitle_WithEmptyTitle_ShouldThrowIllegalArgumentException() {
         assertThrows(IllegalArgumentException.class, () -> {
@@ -237,22 +195,16 @@ class MovieServiceTest {
         });
     }
 
-    /**
-     * Verifies that add Movie throws Existing Movie Exception.
-     */
     @Test
     void testAddMovie_throwsExistingMovieException() {
-        final MovieRequest request = MovieFactory.getDefaultMovieRequest();
+        final MovieRequest defaults = MovieFactory.getDefaultMovieRequest();
         final String existingTitle = "Existing Movie Title";
-        request.setTitle(existingTitle);
+        final MovieRequest request = new MovieRequest(existingTitle, defaults.description(), defaults.releaseDate(), defaults.runtime(), defaults.categoryId());
         when(movieRepository.findByTitle(existingTitle)).thenReturn(Optional.of(MovieFactory.getDefaultMovie()));
 
         assertThrows(MovieAlreadyExistsException.class, () -> movieService.addMovie(request));
     }
 
-    /**
-     * Verifies that update Movie success.
-     */
     @Test
     void testUpdateMovie_success() {
         final MovieDto expected = MovieFactory.getDefaultMovieDto();
@@ -266,31 +218,22 @@ class MovieServiceTest {
         assertEquals(expected, movie);
     }
 
-    /**
-     * Verifies that is Date Not Valid.
-     */
     @Test
     void testIsDateNotValid() {
         final boolean result = movieService.isDateNotValid(LocalDate.of(2000, 1, 1));
         assertTrue(result);
     }
 
-    /**
-     * Verifies that update Movie throws Date Not Valid Exception.
-     */
     @Test
     void testUpdateMovie_throwsDateNotValidException() {
-        final MovieRequest request = MovieFactory.getDefaultMovieRequest();
-        request.setReleaseDate(LocalDate.of(2000, 1, 1));
+        final MovieRequest defaults = MovieFactory.getDefaultMovieRequest();
+        final MovieRequest request = new MovieRequest(defaults.title(), defaults.description(), LocalDate.of(2000, 1, 1), defaults.runtime(), defaults.categoryId());
 
         when(movieRepository.findById(anyInt())).thenReturn(Optional.of(MovieFactory.getDefaultMovie()));
 
         assertThrows(DateNotValidException.class, () -> movieService.updateMovie(request, MovieConstants.ID));
     }
 
-    /**
-     * Verifies that delete Movie success.
-     */
     @Test
     void testDeleteMovie_success() {
         final MovieDto expected = MovieFactory.getDefaultMovieDto();
@@ -302,9 +245,6 @@ class MovieServiceTest {
         assertEquals(expected, movie);
     }
 
-    /**
-     * Verifies that get Movie By Id success.
-     */
     @Test
     void testGetMovieById_success() {
         final Movie expected = MovieFactory.getDefaultMovie();
@@ -316,9 +256,6 @@ class MovieServiceTest {
         assertEquals(expected, movie);
     }
 
-    /**
-     * Verifies that get Movie By Id movie Not Found throws Movie Not Found Exception.
-     */
     @Test
     void testGetMovieById_movieNotFound_throwsMovieNotFoundException() {
         when(movieRepository.findById(anyInt())).thenReturn(Optional.empty());
@@ -326,9 +263,6 @@ class MovieServiceTest {
         assertThrows(MovieNotFoundException.class, () -> movieService.getMovieById(MovieConstants.ID));
     }
 
-    /**
-     * Verifies that get Movie DTO By Id success.
-     */
     @Test
     void testGetMovieDtoById_success() {
         final MovieDto expected = MovieFactory.getDefaultMovieDto();
@@ -340,9 +274,6 @@ class MovieServiceTest {
         assertEquals(expected, movieDto);
     }
 
-    /**
-     * Verifies that get Movie By Title returns Movie success.
-     */
     @Test
     void testGetMovieByTitle_returnsMovie_success() {
         final Movie expected = MovieFactory.getDefaultMovie();
@@ -354,9 +285,6 @@ class MovieServiceTest {
         assertEquals(expected, result);
     }
 
-    /**
-     * Verifies that get Movie By Title movie Not Found throws Movie Not Found Exception.
-     */
     @Test
     void testGetMovieByTitle_movieNotFound_throwsMovieNotFoundException() {
         when(movieRepository.findByTitle(anyString())).thenReturn(Optional.empty());
@@ -364,9 +292,6 @@ class MovieServiceTest {
         assertThrows(MovieNotFoundException.class, () -> movieService.getMovieByTitle(MovieConstants.TITLE));
     }
 
-    /**
-     * Verifies that get Ids Of Movies By Title success.
-     */
     @Test
     void testGetIdsOfMoviesByTitle_success() {
         when(movieRepository.findByTitleContaining(anyString())).thenReturn(MovieFactory.getDefaultMovieList());
@@ -376,9 +301,6 @@ class MovieServiceTest {
         assertEquals(1, result.size());
     }
 
-    /**
-     * Verifies that update Movie Average Rating success.
-     */
     @Test
     void testUpdateMovieAverageRating_success() {
         final double newRating = 4.5;
@@ -387,9 +309,6 @@ class MovieServiceTest {
 
         final MovieDto result = movieService.updateMovieAverageRating(newRating, MovieConstants.ID);
 
-        assertEquals(newRating, result.getAverageRating(), 0.01);
+        assertEquals(newRating, result.averageRating(), 0.01);
     }
 }
-
-
-
