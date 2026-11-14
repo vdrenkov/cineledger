@@ -42,6 +42,8 @@ class ProjectionServiceTest {
 
     @Mock private MovieService movieService;
 
+    @Mock private dev.vdrenkov.cineledger.repositories.TicketRepository ticketRepository;
+
     @InjectMocks private ProjectionService projectionService;
 
     @Test
@@ -106,7 +108,7 @@ class ProjectionServiceTest {
 
         when(projectionRepository.save(any())).thenReturn(expected);
         when(hallService.getHallForUpdate(anyInt())).thenReturn(HallFactory.getDefaultHall());
-        when(programService.getProgramById(anyInt()))
+        when(programService.getProgramForUpdate(anyInt()))
                 .thenReturn(ProgramFactory.getDefaultProgram());
         when(movieService.getMovieById(anyInt())).thenReturn(MovieFactory.getDefaultMovie());
 
@@ -118,7 +120,7 @@ class ProjectionServiceTest {
     @Test
     void testAddProjection_hallNotAvailable_throwsHallNotAvailableException() {
         when(hallService.getHallForUpdate(anyInt())).thenReturn(HallFactory.getDefaultHall());
-        when(programService.getProgramById(anyInt()))
+        when(programService.getProgramForUpdate(anyInt()))
                 .thenReturn(ProgramFactory.getDefaultProgram());
         when(movieService.getMovieById(anyInt())).thenReturn(MovieFactory.getDefaultMovie());
 
@@ -134,7 +136,7 @@ class ProjectionServiceTest {
         final ProjectionDto expected = ProjectionFactory.getDefaultProjectionDto();
 
         when(hallService.getHallForUpdate(anyInt())).thenReturn(HallFactory.getDefaultHall());
-        when(programService.getProgramById(anyInt()))
+        when(programService.getProgramForUpdate(anyInt()))
                 .thenReturn(ProgramFactory.getDefaultProgram());
         when(movieService.getMovieById(anyInt())).thenReturn(MovieFactory.getDefaultMovie());
         when(projectionRepository.findByIdForUpdate(anyInt()))
@@ -150,7 +152,7 @@ class ProjectionServiceTest {
     @Test
     void testUpdateProjection_hallNotAvailable_throwsHallNotAvailableException() {
         when(hallService.getHallForUpdate(anyInt())).thenReturn(HallFactory.getDefaultHall());
-        when(programService.getProgramById(anyInt()))
+        when(programService.getProgramForUpdate(anyInt()))
                 .thenReturn(ProgramFactory.getDefaultProgram());
         when(movieService.getMovieById(anyInt())).thenReturn(MovieFactory.getDefaultMovie());
         when(projectionRepository.findByIdForUpdate(anyInt()))
@@ -200,7 +202,7 @@ class ProjectionServiceTest {
                         movie.getId(),
                         LocalTime.of(23, 0));
         when(hallService.getHallForUpdate(hall.getId())).thenReturn(hall);
-        when(programService.getProgramById(program.getId())).thenReturn(program);
+        when(programService.getProgramForUpdate(program.getId())).thenReturn(program);
         when(movieService.getMovieById(movie.getId())).thenReturn(movie);
         when(projectionRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 

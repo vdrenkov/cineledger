@@ -45,4 +45,8 @@ public interface ProjectionRepository extends JpaRepository<Projection, Integer>
 
     List<Projection> findProjectionsByHallIdAndStartTimeBetween(
             int hallId, LocalTime startTimeBefore, LocalTime startTimeAfter);
+
+    boolean existsByProgramId(int programId);
+
+    boolean existsByHallId(int hallId);
 }

@@ -1,5 +1,11 @@
 package dev.vdrenkov.cineledger.services;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.when;
+
 import dev.vdrenkov.cineledger.exceptions.HallNotFoundException;
 import dev.vdrenkov.cineledger.models.dtos.HallDto;
 import dev.vdrenkov.cineledger.models.entities.Cinema;
@@ -8,6 +14,7 @@ import dev.vdrenkov.cineledger.repositories.HallRepository;
 import dev.vdrenkov.cineledger.testutils.constants.HallConstants;
 import dev.vdrenkov.cineledger.testutils.factories.CinemaFactory;
 import dev.vdrenkov.cineledger.testutils.factories.HallFactory;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -17,23 +24,16 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
 class HallServiceTest {
 
-    @Mock
-    private HallRepository hallRepository;
+    @Mock private HallRepository hallRepository;
 
-    @Mock
-    private CinemaService cinemaService;
+    @Mock private CinemaService cinemaService;
 
-    @InjectMocks
-    private HallService hallService;
+    @Mock private dev.vdrenkov.cineledger.repositories.ProjectionRepository projectionRepository;
+
+    @InjectMocks private HallService hallService;
 
     @Test
     void testAddHall_noExceptions_success() {
@@ -52,7 +52,8 @@ class HallServiceTest {
         final List<HallDto> expected = HallFactory.getDefaultHallDtoList();
 
         when(cinemaService.getCinemaById(anyInt())).thenReturn(cinema);
-        when(hallRepository.findAllByCinemaId(anyInt())).thenReturn(HallFactory.getDefaultHallList());
+        when(hallRepository.findAllByCinemaId(anyInt()))
+                .thenReturn(HallFactory.getDefaultHallList());
 
         final List<HallDto> result = hallService.getHallsByCinemaId(cinema.getId());
 
@@ -79,7 +80,8 @@ class HallServiceTest {
     @Test
     void testGetHallDtoById_hallDtoFound_success() {
         final HallDto expected = HallFactory.getDefaultHallDto();
-        when(hallRepository.findById(anyInt())).thenReturn(Optional.of(HallFactory.getDefaultHall()));
+        when(hallRepository.findById(anyInt()))
+                .thenReturn(Optional.of(HallFactory.getDefaultHall()));
 
         final HallDto hall = hallService.getHallDtoById(HallConstants.ID);
 
@@ -89,11 +91,13 @@ class HallServiceTest {
     @Test
     void testUpdateHall_hallUpdated_success() {
         final HallDto expected = HallFactory.getDefaultHallDto();
-        when(hallRepository.findById(anyInt())).thenReturn(Optional.of(HallFactory.getDefaultHall()));
+        when(hallRepository.findByIdForUpdate(anyInt()))
+                .thenReturn(Optional.of(HallFactory.getDefaultHall()));
         when(cinemaService.getCinemaById(anyInt())).thenReturn(CinemaFactory.getDefaultCinema());
         when(hallRepository.save(any())).thenReturn(HallFactory.getDefaultHall());
 
-        final HallDto hall = hallService.updateHall(HallFactory.getDefaultHallRequest(), HallConstants.ID);
+        final HallDto hall =
+                hallService.updateHall(HallFactory.getDefaultHallRequest(), HallConstants.ID);
 
         assertEquals(expected, hall);
     }
@@ -101,7 +105,8 @@ class HallServiceTest {
     @Test
     void testDeleteHall_hallDeleted_success() {
         final HallDto expected = HallFactory.getDefaultHallDto();
-        when(hallRepository.findById(anyInt())).thenReturn(Optional.of(HallFactory.getDefaultHall()));
+        when(hallRepository.findById(anyInt()))
+                .thenReturn(Optional.of(HallFactory.getDefaultHall()));
 
         final HallDto hall = hallService.deleteHall(HallConstants.ID);
 

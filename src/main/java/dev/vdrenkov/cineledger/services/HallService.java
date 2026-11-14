@@ -15,11 +15,16 @@ import java.util.List;
 
 @Service
 public class HallService {
+    private final dev.vdrenkov.cineledger.repositories.ProjectionRepository projectionRepository;
 
     private final HallRepository hallRepository;
     private final CinemaService cinemaService;
 
-    public HallService(HallRepository hallRepository, CinemaService cinemaService) {
+    public HallService(
+            dev.vdrenkov.cineledger.repositories.ProjectionRepository projectionRepository,
+            HallRepository hallRepository,
+            CinemaService cinemaService) {
+        this.projectionRepository = projectionRepository;
         this.hallRepository = hallRepository;
         this.cinemaService = cinemaService;
     }
@@ -61,13 +66,22 @@ public class HallService {
         return HallMapper.mapHallToHallDto(getHallById(id));
     }
 
-    public HallDto updateHall(HallRequest request, int id) {
-        final HallDto hallDto = getHallDtoById(id);
+    @org.springframework.transaction.annotation.Transactional
+    public HallDto updateHall(final HallRequest request, final int id) {
+        final Hall stored = getHallForUpdate(id);
+        final HallDto previous = HallMapper.mapHallToHallDto(stored);
 
-        hallRepository.save(
-                new Hall(id, request.capacity(), cinemaService.getCinemaById(request.cinemaId())));
+        if ((request.cinemaId() != stored.getCinema().getId()
+                        || request.capacity() < stored.getCapacity())
+                && projectionRepository.existsByHallId(id)) {
+            throw new dev.vdrenkov.cineledger.exceptions.ResourceInUseException(
+                    "A hall with screenings cannot move cinema or reduce its capacity");
+        }
 
-        return hallDto;
+        stored.setCapacity(request.capacity());
+        stored.setCinema(cinemaService.getCinemaById(request.cinemaId()));
+        hallRepository.save(stored);
+        return previous;
     }
 
     public HallDto deleteHall(int id) {

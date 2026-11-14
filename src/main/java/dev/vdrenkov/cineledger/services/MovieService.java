@@ -1,6 +1,5 @@
 package dev.vdrenkov.cineledger.services;
 
-import dev.vdrenkov.cineledger.exceptions.DateNotValidException;
 import dev.vdrenkov.cineledger.exceptions.MovieAlreadyExistsException;
 import dev.vdrenkov.cineledger.exceptions.MovieNotFoundException;
 import dev.vdrenkov.cineledger.mappers.MovieMapper;
@@ -9,6 +8,7 @@ import dev.vdrenkov.cineledger.models.entities.Movie;
 import dev.vdrenkov.cineledger.models.requests.MovieRequest;
 import dev.vdrenkov.cineledger.repositories.MovieRepository;
 import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
+
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -29,35 +29,39 @@ public class MovieService {
 
     public Movie addMovie(MovieRequest request) {
 
-        if (isDateNotValid(request.releaseDate())) {
-
-            throw new DateNotValidException(ExceptionMessages.DATE_NOT_VALID_MESSAGE);
-        }
-
-        this.movieRepository.findByTitle(request.title()).ifPresent(movie -> {
-
-            throw new MovieAlreadyExistsException(ExceptionMessages.MOVIE_ALREADY_EXISTS_MESSAGE);
-        });
+        this.movieRepository
+                .findByTitle(request.title())
+                .ifPresent(movie -> {
+                    throw new MovieAlreadyExistsException(
+                            ExceptionMessages.MOVIE_ALREADY_EXISTS_MESSAGE);
+                });
 
         return movieRepository.save(
-            new Movie(request.title(), request.description(), request.releaseDate(), request.runtime(),
-                categoryService.getCategoryById(request.categoryId())));
+                new Movie(
+                        request.title(),
+                        request.description(),
+                        request.releaseDate(),
+                        request.runtime(),
+                        categoryService.getCategoryById(request.categoryId())));
     }
 
     public List<MovieDto> getMoviesByTitle(String title, double minRating) {
         if (title == null || title.isEmpty()) {
 
             throw new IllegalArgumentException(
-                "Required request parameter 'title' for method parameter type String is present but converted to null");
+                    "Required request parameter 'title' for method parameter type String is present"
+                        + " but converted to null");
         }
 
         if (minRating == 0.0) {
 
-            return MovieMapper.mapMovieListToMovieDtoList(movieRepository.findByTitleContaining(title));
+            return MovieMapper.mapMovieListToMovieDtoList(
+                    movieRepository.findByTitleContaining(title));
         } else {
 
             return MovieMapper.mapMovieListToMovieDtoList(
-                movieRepository.findByTitleContainingAndAverageRatingGreaterThanEqual(title, minRating));
+                    movieRepository.findByTitleContainingAndAverageRatingGreaterThanEqual(
+                            title, minRating));
         }
     }
 
@@ -66,11 +70,15 @@ public class MovieService {
 
         if (minRating == 0.0) {
 
-            movies = MovieMapper.mapMovieListToMovieDtoList(movieRepository.findByCategoryId(categoryId));
+            movies =
+                    MovieMapper.mapMovieListToMovieDtoList(
+                            movieRepository.findByCategoryId(categoryId));
         } else {
 
-            movies = MovieMapper.mapMovieListToMovieDtoList(
-                movieRepository.findByCategoryIdAndAverageRatingGreaterThanEqual(categoryId, minRating));
+            movies =
+                    MovieMapper.mapMovieListToMovieDtoList(
+                            movieRepository.findByCategoryIdAndAverageRatingGreaterThanEqual(
+                                    categoryId, minRating));
         }
 
         movies = new ArrayList<>(movies);
@@ -78,17 +86,24 @@ public class MovieService {
         return movies;
     }
 
-    public List<MovieDto> getMoviesByReleaseDate(LocalDate releaseDate, Double minRating, boolean isAfter) {
+    public List<MovieDto> getMoviesByReleaseDate(
+            LocalDate releaseDate, Double minRating, boolean isAfter) {
         List<Movie> movies;
 
         if (isAfter) {
-            movies = minRating != null ?
-                movieRepository.findByReleaseDateAfterAndAverageRatingGreaterThanEqual(releaseDate, minRating) :
-                movieRepository.findByReleaseDateAfter(releaseDate);
+            movies =
+                    minRating != null
+                            ? movieRepository
+                                    .findByReleaseDateAfterAndAverageRatingGreaterThanEqual(
+                                            releaseDate, minRating)
+                            : movieRepository.findByReleaseDateAfter(releaseDate);
         } else {
-            movies = minRating != null ?
-                movieRepository.findByReleaseDateBeforeAndAverageRatingGreaterThanEqual(releaseDate, minRating) :
-                movieRepository.findByReleaseDateBefore(releaseDate);
+            movies =
+                    minRating != null
+                            ? movieRepository
+                                    .findByReleaseDateBeforeAndAverageRatingGreaterThanEqual(
+                                            releaseDate, minRating)
+                            : movieRepository.findByReleaseDateBefore(releaseDate);
         }
 
         return MovieMapper.mapMovieListToMovieDtoList(movies);
@@ -96,14 +111,16 @@ public class MovieService {
 
     public List<MovieDto> getMoviesByMinRating(double rating) {
 
-        return MovieMapper.mapMovieListToMovieDtoList(movieRepository.findByAverageRatingGreaterThanEqual(rating));
+        return MovieMapper.mapMovieListToMovieDtoList(
+                movieRepository.findByAverageRatingGreaterThanEqual(rating));
     }
 
     public Movie getMovieByTitle(String title) {
-        return movieRepository.findByTitle(title).orElseThrow(() -> {
-
-            return new MovieNotFoundException(ExceptionMessages.MOVIE_NOT_FOUND_MESSAGE);
-        });
+        return movieRepository
+                .findByTitle(title)
+                .orElseThrow(() -> {
+                    return new MovieNotFoundException(ExceptionMessages.MOVIE_NOT_FOUND_MESSAGE);
+                });
     }
 
     public MovieDto getMovieDtoById(int id) {
@@ -113,10 +130,11 @@ public class MovieService {
 
     public Movie getMovieById(int id) {
 
-        return movieRepository.findById(id).orElseThrow(() -> {
-
-            return new MovieNotFoundException(ExceptionMessages.MOVIE_NOT_FOUND_MESSAGE);
-        });
+        return movieRepository
+                .findById(id)
+                .orElseThrow(() -> {
+                    return new MovieNotFoundException(ExceptionMessages.MOVIE_NOT_FOUND_MESSAGE);
+                });
     }
 
     public List<Integer> getIdsOfMoviesByTitle(String title) {
@@ -126,17 +144,17 @@ public class MovieService {
         return movies.stream().map(Movie::getId).toList();
     }
 
+    @org.springframework.transaction.annotation.Transactional
     public MovieDto updateMovie(MovieRequest request, int id) {
         MovieDto movieDto = getMovieDtoById(id);
 
-        if (isDateNotValid(request.releaseDate())) {
-
-            throw new DateNotValidException(ExceptionMessages.DATE_NOT_VALID_MESSAGE);
-        }
-
-        movieRepository.save(
-            new Movie(id, request.title(), request.description(), request.releaseDate(), request.runtime(),
-                categoryService.getCategoryById(request.categoryId())));
+        final Movie stored = getMovieById(id);
+        stored.setTitle(request.title());
+        stored.setDescription(request.description());
+        stored.setReleaseDate(request.releaseDate());
+        stored.setRuntime(request.runtime());
+        stored.setCategory(categoryService.getCategoryById(request.categoryId()));
+        movieRepository.save(stored);
 
         return movieDto;
     }
@@ -157,9 +175,5 @@ public class MovieService {
         movieRepository.deleteById(id);
 
         return movieDto;
-    }
-
-    public static boolean isDateNotValid(LocalDate releaseDate) {
-        return releaseDate.isBefore(LocalDate.now());
     }
 }

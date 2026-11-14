@@ -5,7 +5,9 @@ import dev.vdrenkov.cineledger.models.entities.Movie;
 import dev.vdrenkov.cineledger.models.requests.MovieRequest;
 import dev.vdrenkov.cineledger.services.MovieService;
 import dev.vdrenkov.cineledger.utils.constants.URIConstants;
+
 import jakarta.validation.Valid;
+
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -35,17 +37,23 @@ public class MovieController {
     public ResponseEntity<Void> addMovie(@RequestBody @Valid MovieRequest movieRequest) {
         final Movie movie = movieService.addMovie(movieRequest);
 
-        URI location = UriComponentsBuilder
-            .fromUriString(URIConstants.MOVIES_ID_PATH)
-            .buildAndExpand(movie.getId())
-            .toUri();
+        URI location =
+                UriComponentsBuilder.fromUriString(URIConstants.MOVIES_ID_PATH)
+                        .buildAndExpand(movie.getId())
+                        .toUri();
 
         return ResponseEntity.created(location).build();
     }
 
+    @GetMapping(URIConstants.MOVIES_ID_PATH)
+    public ResponseEntity<MovieDto> getMovieById(@PathVariable final int id) {
+        return ResponseEntity.ok(movieService.getMovieDtoById(id));
+    }
+
     @GetMapping(value = URIConstants.MOVIES_PATH, params = "title")
-    public ResponseEntity<List<MovieDto>> getMoviesByTitle(@RequestParam String title,
-        @RequestParam(required = false, defaultValue = "0.0") double minimalRating) {
+    public ResponseEntity<List<MovieDto>> getMoviesByTitle(
+            @RequestParam String title,
+            @RequestParam(required = false, defaultValue = "0.0") double minimalRating) {
 
         final List<MovieDto> movieDtoList = movieService.getMoviesByTitle(title, minimalRating);
 
@@ -54,10 +62,12 @@ public class MovieController {
 
     @GetMapping(value = URIConstants.MOVIES_PATH, params = "release")
     public ResponseEntity<List<MovieDto>> getMoviesByReleaseDate(
-        @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate release,
-        @RequestParam(required = false) Double rating, @RequestParam(required = false) Boolean isAfter) {
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate release,
+            @RequestParam(required = false) Double rating,
+            @RequestParam(defaultValue = "true") boolean isAfter) {
 
-        final List<MovieDto> movieDtoList = movieService.getMoviesByReleaseDate(release, rating, isAfter);
+        final List<MovieDto> movieDtoList =
+                movieService.getMoviesByReleaseDate(release, rating, isAfter);
 
         return ResponseEntity.ok(movieDtoList);
     }
@@ -70,8 +80,9 @@ public class MovieController {
     }
 
     @GetMapping(URIConstants.CATEGORIES_ID_MOVIES_PATH)
-    public ResponseEntity<List<MovieDto>> getMoviesByCategory(@PathVariable("id") Integer categoryId,
-        @RequestParam(required = false, defaultValue = "0.0") double minRating) {
+    public ResponseEntity<List<MovieDto>> getMoviesByCategory(
+            @PathVariable("id") Integer categoryId,
+            @RequestParam(required = false, defaultValue = "0.0") double minRating) {
 
         final List<MovieDto> movieDtoList = movieService.getMoviesByCategory(categoryId, minRating);
 
@@ -79,20 +90,26 @@ public class MovieController {
     }
 
     @PutMapping(URIConstants.MOVIES_ID_PATH)
-    public ResponseEntity<MovieDto> updateMovie(@RequestBody @Valid MovieRequest movieRequest, @PathVariable int id,
-        @RequestParam(required = false) Boolean returnOld) {
+    public ResponseEntity<MovieDto> updateMovie(
+            @RequestBody @Valid MovieRequest movieRequest,
+            @PathVariable int id,
+            @RequestParam(required = false) Boolean returnOld) {
 
         final MovieDto movieDto = movieService.updateMovie(movieRequest, id);
 
-        return Boolean.TRUE.equals(returnOld) ? ResponseEntity.ok(movieDto) : ResponseEntity.noContent().build();
+        return Boolean.TRUE.equals(returnOld)
+                ? ResponseEntity.ok(movieDto)
+                : ResponseEntity.noContent().build();
     }
 
     @DeleteMapping(URIConstants.MOVIES_ID_PATH)
-    public ResponseEntity<MovieDto> deleteMovie(@PathVariable int id,
-        @RequestParam(required = false) Boolean returnOld) {
+    public ResponseEntity<MovieDto> deleteMovie(
+            @PathVariable int id, @RequestParam(required = false) Boolean returnOld) {
 
         final MovieDto movieDto = movieService.deleteMovie(id);
 
-        return Boolean.TRUE.equals(returnOld) ? ResponseEntity.ok(movieDto) : ResponseEntity.noContent().build();
+        return Boolean.TRUE.equals(returnOld)
+                ? ResponseEntity.ok(movieDto)
+                : ResponseEntity.noContent().build();
     }
 }

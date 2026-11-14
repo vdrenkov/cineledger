@@ -732,6 +732,130 @@ class CineLedgerIT {
         assertIncome(admin, "halls", second.hallId(), "10.25");
     }
 
+    @Test
+    void orders_nullTicketId_returnsBadRequest() throws Exception {
+        final Session admin = login("integration_admin");
+        mockMvc.perform(
+                        authenticated(post("/orders"), admin)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"userId\":1,\"ticketsIds\":[null]}"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void categories_blankName_returnsBadRequest() throws Exception {
+        final Session admin = login("integration_admin");
+        mockMvc.perform(
+                        authenticated(post("/categories"), admin)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"name\":\" \"}"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void catalogue_unknownResource_returnsNotFound() throws Exception {
+        mockMvc.perform(get("/movies/999999")).andExpect(status().isNotFound());
+    }
+
+    @Test
+    void getMovies_releaseFilterWithoutDirection_usesDefaultDirection() throws Exception {
+        mockMvc.perform(get("/movies").param("release", java.time.LocalDate.now().toString()))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void updateProgram_existingScreenings_preservesSchedule() throws Exception {
+        final Session admin = login("integration_admin");
+        final Fixture fixture = fixture(admin, 1, 1);
+        mockMvc.perform(
+                        authenticated(
+                                        org.springframework.test.web.servlet.request
+                                                .MockMvcRequestBuilders.put(
+                                                "/programs/" + fixture.programId()),
+                                        admin)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        objectMapper.writeValueAsString(
+                                                Map.of(
+                                                        "programDate",
+                                                        java.time.LocalDate.now()
+                                                                .plusDays(3)
+                                                                .toString(),
+                                                        "cinemaId",
+                                                        fixture.cinemaId()))))
+                .andExpect(status().isConflict());
+    }
+
+    @Test
+    void updateHall_existingScreenings_cannotMoveCinema() throws Exception {
+        final Session admin = login("integration_admin");
+        final Fixture fixture = fixture(admin, 1, 1);
+        final int cinemaId =
+                create(
+                        admin,
+                        "/cinemas",
+                        Map.of("address", "Different " + UUID.randomUUID(), "city", "Varna"));
+        mockMvc.perform(
+                        authenticated(
+                                        org.springframework.test.web.servlet.request
+                                                .MockMvcRequestBuilders.put(
+                                                "/halls/" + fixture.hallId()),
+                                        admin)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        objectMapper.writeValueAsString(
+                                                Map.of("capacity", 21, "cinemaId", cinemaId))))
+                .andExpect(status().isConflict());
+    }
+
+    @Test
+    void updateProjection_issuedTickets_cannotChangeMovieOrVenue() throws Exception {
+        final Session admin = login("integration_admin");
+        final Fixture first = fixture(admin, 1, 1);
+        final Fixture second = fixture(admin, 1, 1);
+        mockMvc.perform(
+                        authenticated(
+                                        org.springframework.test.web.servlet.request
+                                                .MockMvcRequestBuilders.put(
+                                                "/projections/" + first.projectionId()),
+                                        admin)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        objectMapper.writeValueAsString(
+                                                projection(second, "21:00:00"))))
+                .andExpect(status().isConflict());
+    }
+
+    @Test
+    void deleteProjection_purchasedTicket_preservesOrderAndIncome() throws Exception {
+        final Session admin = login("integration_admin");
+        final Fixture fixture = fixture(admin, 1, 1);
+        final int ticketId =
+                create(admin, "/tickets", Map.of("projectionId", fixture.projectionId()));
+        final int orderId =
+                create(
+                        admin,
+                        "/orders",
+                        Map.of(
+                                "userId",
+                                fixture.customerId(),
+                                "ticketsIds",
+                                java.util.List.of(ticketId)));
+        mockMvc.perform(
+                        authenticated(
+                                org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+                                        .delete("/projections/" + fixture.projectionId()),
+                                admin))
+                .andExpect(status().isConflict());
+        mockMvc.perform(authenticated(get("/orders/" + orderId), admin))
+                .andExpect(status().isOk())
+                .andExpect(
+                        org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath(
+                                        "$.tickets.length()")
+                                .value(1));
+        assertIncome(admin, "movies", fixture.movieId(), "10.25");
+    }
+
     private void assertIncome(
             final Session admin, final String resource, final int id, final String expected)
             throws Exception {

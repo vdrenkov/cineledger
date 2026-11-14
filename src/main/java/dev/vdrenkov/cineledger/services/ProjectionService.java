@@ -20,6 +20,7 @@ import java.util.List;
 
 @Service
 public class ProjectionService {
+    private final dev.vdrenkov.cineledger.repositories.TicketRepository ticketRepository;
 
     private final ProjectionRepository projectionRepository;
     private final ProgramService programService;
@@ -27,10 +28,12 @@ public class ProjectionService {
     private final MovieService movieService;
 
     public ProjectionService(
+            dev.vdrenkov.cineledger.repositories.TicketRepository ticketRepository,
             ProjectionRepository projectionRepository,
             ProgramService programService,
             HallService hallService,
             MovieService movieService) {
+        this.ticketRepository = ticketRepository;
         this.projectionRepository = projectionRepository;
         this.programService = programService;
         this.hallService = hallService;
@@ -40,9 +43,9 @@ public class ProjectionService {
     @Transactional
     public Projection addProjection(final ProjectionRequest request) {
         final Hall hall = hallService.getHallForUpdate(request.hallId());
-        final Program program = programService.getProgramById(request.programId());
+        final Program program = programService.getProgramForUpdate(request.programId());
         final Movie movie = movieService.getMovieById(request.movieId());
-        validateSchedule(request, hall, program, movie, 0);
+        validateSchedule(request, hall, program, movie.getRuntime(), 0);
         return projectionRepository.save(
                 new Projection(request.price(), hall, program, movie, request.startTime()));
     }
@@ -102,12 +105,34 @@ public class ProjectionService {
     public ProjectionDto updateProjection(final ProjectionRequest request, final int id) {
         final Projection stored = getProjectionForUpdate(id);
         final ProjectionDto previous = ProjectionMapper.mapProjectionToProjectionDto(stored);
+        final boolean identityChanged =
+                request.hallId() != stored.getHall().getId()
+                        || request.programId() != stored.getProgram().getId()
+                        || request.movieId() != stored.getMovie().getId();
+
+        if (identityChanged && ticketRepository.countByProjectionId(id) > 0) {
+            throw new dev.vdrenkov.cineledger.exceptions.ResourceInUseException(
+                    "A screening with issued tickets cannot change its movie, hall or program");
+        }
+
         final Hall hall = hallService.getHallForUpdate(request.hallId());
-        final Program program = programService.getProgramById(request.programId());
+        final Program program = programService.getProgramForUpdate(request.programId());
         final Movie movie = movieService.getMovieById(request.movieId());
-        validateSchedule(request, hall, program, movie, id);
-        projectionRepository.save(
-                new Projection(id, request.price(), hall, program, movie, request.startTime()));
+        final var runtime =
+                request.movieId() == stored.getMovie().getId()
+                        ? stored.getRuntime()
+                        : movie.getRuntime();
+        validateSchedule(request, hall, program, runtime, id);
+        stored.setPrice(request.price());
+        stored.setHall(hall);
+        stored.setProgram(program);
+
+        if (request.movieId() != stored.getMovie().getId()) {
+            stored.setMovie(movie);
+        }
+
+        stored.setStartTime(request.startTime());
+        projectionRepository.save(stored);
         return previous;
     }
 
@@ -123,19 +148,19 @@ public class ProjectionService {
             final ProjectionRequest request,
             final Hall hall,
             final Program program,
-            final Movie movie,
+            final java.time.Duration runtime,
             final int excludedId) {
 
         if (hall.getCinema().getId() != program.getCinema().getId()) {
             throw new IllegalArgumentException("The hall must belong to the program's cinema");
         }
 
-        if (movie.getRuntime().isZero() || movie.getRuntime().isNegative()) {
+        if (runtime.isZero() || runtime.isNegative()) {
             throw new IllegalArgumentException("Movie runtime must be positive");
         }
 
         final var startsAt = program.getProgramDate().atTime(request.startTime());
-        final var endsAt = startsAt.plus(movie.getRuntime());
+        final var endsAt = startsAt.plus(runtime);
 
         if (projectionRepository.overlaps(hall.getId(), excludedId, startsAt, endsAt)) {
             throw new HallNotAvailableException(ExceptionMessages.HALL_NOT_AVAILABLE_EXCEPTION);

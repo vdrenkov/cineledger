@@ -1,5 +1,12 @@
 package dev.vdrenkov.cineledger.services;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.when;
+
 import dev.vdrenkov.cineledger.exceptions.DateNotValidException;
 import dev.vdrenkov.cineledger.exceptions.ProgramAlreadyExistsException;
 import dev.vdrenkov.cineledger.exceptions.ProgramNotFoundException;
@@ -10,6 +17,7 @@ import dev.vdrenkov.cineledger.repositories.ProgramRepository;
 import dev.vdrenkov.cineledger.testutils.constants.ProgramConstants;
 import dev.vdrenkov.cineledger.testutils.factories.CinemaFactory;
 import dev.vdrenkov.cineledger.testutils.factories.ProgramFactory;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,25 +29,17 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
 class ProgramServiceTest {
     ProgramRequest programRequest;
 
-    @Mock
-    private ProgramRepository programRepository;
+    @Mock private ProgramRepository programRepository;
 
-    @Mock
-    private CinemaService cinemaService;
+    @Mock private CinemaService cinemaService;
 
-    @InjectMocks
-    private ProgramService programService;
+    @Mock private dev.vdrenkov.cineledger.repositories.ProjectionRepository projectionRepository;
+
+    @InjectMocks private ProgramService programService;
 
     @BeforeEach
     void setUp() {
@@ -67,17 +67,20 @@ class ProgramServiceTest {
 
     @Test
     void testAddProgram_programAlreadyExists_throwsProgramAlreadyExistsException() {
-        when(programRepository.findByProgramDateAndCinemaId(any(), anyInt())).thenReturn(
-            Optional.of(ProgramFactory.getDefaultProgram()));
+        when(programRepository.findByProgramDateAndCinemaId(any(), anyInt()))
+                .thenReturn(Optional.of(ProgramFactory.getDefaultProgram()));
 
-        assertThrows(ProgramAlreadyExistsException.class, () -> programService.addProgram(programRequest));
+        assertThrows(
+                ProgramAlreadyExistsException.class,
+                () -> programService.addProgram(programRequest));
     }
 
     @Test
     void testGetAllPrograms_dateNotNull_success() {
         final List<ProgramDto> expected = ProgramFactory.getDefaultProgramDtoList();
 
-        when(programRepository.findAllByProgramDate(any())).thenReturn(ProgramFactory.getDefaultProgramList());
+        when(programRepository.findAllByProgramDate(any()))
+                .thenReturn(ProgramFactory.getDefaultProgramList());
 
         final List<ProgramDto> resultList = programService.getAllPrograms(ProgramConstants.DATE);
 
@@ -100,9 +103,11 @@ class ProgramServiceTest {
         final List<ProgramDto> expected = ProgramFactory.getDefaultProgramDtoList();
 
         when(cinemaService.getCinemaById(anyInt())).thenReturn(CinemaFactory.getDefaultCinema());
-        when(programRepository.findAllByCinemaId(anyInt())).thenReturn(ProgramFactory.getDefaultProgramList());
+        when(programRepository.findAllByCinemaId(anyInt()))
+                .thenReturn(ProgramFactory.getDefaultProgramList());
 
-        final List<ProgramDto> resultList = programService.getProgramsByCinemaId(ProgramConstants.ID);
+        final List<ProgramDto> resultList =
+                programService.getProgramsByCinemaId(ProgramConstants.ID);
 
         assertEquals(expected, resultList);
     }
@@ -120,14 +125,17 @@ class ProgramServiceTest {
 
     @Test
     void testGetProgramById_programNotFound_throwsProgramNotFoundException() {
-        assertThrows(ProgramNotFoundException.class, () -> programService.getProgramById(ProgramConstants.ID));
+        assertThrows(
+                ProgramNotFoundException.class,
+                () -> programService.getProgramById(ProgramConstants.ID));
     }
 
     @Test
     void testGetProgramDtoById_programDtoFound_success() {
         final ProgramDto expected = ProgramFactory.getDefaultProgramDto();
 
-        when(programRepository.findById(anyInt())).thenReturn(Optional.of(ProgramFactory.getDefaultProgram()));
+        when(programRepository.findById(anyInt()))
+                .thenReturn(Optional.of(ProgramFactory.getDefaultProgram()));
 
         final ProgramDto program = programService.getProgramDtoById(ProgramConstants.ID);
 
@@ -138,31 +146,35 @@ class ProgramServiceTest {
     void testUpdateProgram_programUpdated_success() {
         final ProgramDto expected = ProgramFactory.getDefaultProgramDto();
 
-        when(programRepository.findById(anyInt())).thenReturn(Optional.of(ProgramFactory.getDefaultProgram()));
+        when(programRepository.findByIdForUpdate(anyInt()))
+                .thenReturn(Optional.of(ProgramFactory.getDefaultProgram()));
         when(cinemaService.getCinemaById(anyInt())).thenReturn(CinemaFactory.getDefaultCinema());
         when(programRepository.save(any())).thenReturn(ProgramFactory.getDefaultProgram());
 
-        final ProgramDto program = programService.updateProgram(programRequest, ProgramConstants.ID);
+        final ProgramDto program =
+                programService.updateProgram(programRequest, ProgramConstants.ID);
 
         assertEquals(expected, program);
-
     }
 
     @Test
     void testUpdateProgram_dateNotPresent_throwsDateNotValidException() {
         programRequest = new ProgramRequest(ProgramConstants.PAST_DATE, programRequest.cinemaId());
 
-        when(programRepository.findById(anyInt())).thenReturn(Optional.of(ProgramFactory.getDefaultProgram()));
+        when(programRepository.findByIdForUpdate(anyInt()))
+                .thenReturn(Optional.of(ProgramFactory.getDefaultProgram()));
 
-        assertThrows(DateNotValidException.class,
-            () -> programService.updateProgram(programRequest, ProgramConstants.ID));
+        assertThrows(
+                DateNotValidException.class,
+                () -> programService.updateProgram(programRequest, ProgramConstants.ID));
     }
 
     @Test
     void testDeleteProgram_programDeleted_success() {
         final ProgramDto expected = ProgramFactory.getDefaultProgramDto();
 
-        when(programRepository.findById(anyInt())).thenReturn(Optional.of(ProgramFactory.getDefaultProgram()));
+        when(programRepository.findById(anyInt()))
+                .thenReturn(Optional.of(ProgramFactory.getDefaultProgram()));
 
         final ProgramDto program = programService.deleteProgram(ProgramConstants.ID);
 

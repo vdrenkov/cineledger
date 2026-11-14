@@ -1,453 +1,166 @@
 package dev.vdrenkov.cineledger.handlers;
 
-import dev.vdrenkov.cineledger.exceptions.CategoryAlreadyExistsException;
-import dev.vdrenkov.cineledger.exceptions.CategoryNotFoundException;
-import dev.vdrenkov.cineledger.exceptions.CinemaAlreadyExistsException;
-import dev.vdrenkov.cineledger.exceptions.CinemaNotFoundException;
-import dev.vdrenkov.cineledger.exceptions.DateNotValidException;
-import dev.vdrenkov.cineledger.exceptions.DiscountAlreadyExistsException;
-import dev.vdrenkov.cineledger.exceptions.DiscountNotFoundException;
-import dev.vdrenkov.cineledger.exceptions.DiscountNotValidException;
-import dev.vdrenkov.cineledger.exceptions.HallNotAvailableException;
-import dev.vdrenkov.cineledger.exceptions.HallNotFoundException;
-import dev.vdrenkov.cineledger.exceptions.ItemAlreadyExistsException;
-import dev.vdrenkov.cineledger.exceptions.ItemNotFoundException;
-import dev.vdrenkov.cineledger.exceptions.MovieAlreadyExistsException;
-import dev.vdrenkov.cineledger.exceptions.MovieNotFoundException;
-import dev.vdrenkov.cineledger.exceptions.NoAvailableItemsException;
-import dev.vdrenkov.cineledger.exceptions.NoAvailableTicketsException;
-import dev.vdrenkov.cineledger.exceptions.NotAuthorizedException;
-import dev.vdrenkov.cineledger.exceptions.NotLoggedInException;
-import dev.vdrenkov.cineledger.exceptions.OrderNotFoundException;
-import dev.vdrenkov.cineledger.exceptions.ProgramAlreadyExistsException;
-import dev.vdrenkov.cineledger.exceptions.ProgramNotFoundException;
-import dev.vdrenkov.cineledger.exceptions.ProjectionNotFoundException;
-import dev.vdrenkov.cineledger.exceptions.ReviewNotFoundException;
-import dev.vdrenkov.cineledger.exceptions.RoleAlreadyExistsException;
-import dev.vdrenkov.cineledger.exceptions.RoleNotChosenException;
-import dev.vdrenkov.cineledger.exceptions.RoleNotFoundException;
-import dev.vdrenkov.cineledger.exceptions.TicketNotFoundException;
-import dev.vdrenkov.cineledger.exceptions.UserEmailAlreadyExistsException;
-import dev.vdrenkov.cineledger.exceptions.UserNotFoundException;
-import dev.vdrenkov.cineledger.exceptions.UsernameAlreadyExistsException;
+import dev.vdrenkov.cineledger.exceptions.*;
 import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
+
+import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.UnexpectedTypeException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.MissingPathVariableException;
-import org.springframework.web.bind.MissingServletRequestParameterException;
-import org.springframework.web.bind.UnsatisfiedServletRequestParameterException;
+import org.springframework.web.bind.*;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-import java.time.format.DateTimeParseException;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.time.DateTimeException;
 import java.util.List;
 import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<Map<String, List<String>>> handleIllegalArgumentException(
-        IllegalArgumentException exception) {
-
-        final Map<String, List<String>> errorsMap = formatErrorsResponse(ExceptionMessages.INVALID_REQUEST_MESSAGE);
-
-        return new ResponseEntity<>(errorsMap, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(UnsatisfiedServletRequestParameterException.class)
-    public ResponseEntity<Map<String, List<String>>> handleUnsatisfiedServletRequestParameterException(
-        UnsatisfiedServletRequestParameterException exception) {
-
-        final Map<String, List<String>> errorsMap = formatErrorsResponse(ExceptionMessages.INVALID_REQUEST_MESSAGE);
-
-        return new ResponseEntity<>(errorsMap, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(NullPointerException.class)
-    public ResponseEntity<Map<String, List<String>>> handleNullPointerException(NullPointerException exception) {
-
-        final Map<String, List<String>> errorsMap = formatErrorsResponse(ExceptionMessages.GLOBAL_EXCEPTION);
-
-        return new ResponseEntity<>(errorsMap, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    @ExceptionHandler(UnexpectedTypeException.class)
-    public ResponseEntity<Map<String, List<String>>> handleUnexpectedTypeException(UnexpectedTypeException exception) {
-
-        final Map<String, List<String>> errorsMap = formatErrorsResponse(ExceptionMessages.INVALID_REQUEST_MESSAGE);
-
-        return new ResponseEntity<>(errorsMap, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<Map<String, List<String>>> handleHttpMessageNotReadableException(
-        HttpMessageNotReadableException exception) {
-
-        final Map<String, List<String>> errorsMap = formatErrorsResponse(ExceptionMessages.INVALID_REQUEST_MESSAGE);
-
-        return new ResponseEntity<>(errorsMap, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    public ResponseEntity<Map<String, List<String>>> handleHttpRequestMethodNotSupportedException(
-        HttpRequestMethodNotSupportedException exception) {
-
-        final Map<String, List<String>> errorsMap = formatErrorsResponse(ExceptionMessages.METHOD_NOT_ALLOWED_MESSAGE);
-
-        return new ResponseEntity<>(errorsMap, HttpStatus.METHOD_NOT_ALLOWED);
-    }
-
-    @ExceptionHandler(MissingServletRequestParameterException.class)
-    public ResponseEntity<Map<String, List<String>>> handleMissingServletRequestParameterException(
-        MissingServletRequestParameterException exception) {
-
-        final Map<String, List<String>> errorsMap = formatErrorsResponse(ExceptionMessages.INVALID_REQUEST_MESSAGE);
-
-        return new ResponseEntity<>(errorsMap, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(MissingPathVariableException.class)
-    public ResponseEntity<Map<String, List<String>>> handleMissingPathVariableException(
-        MissingPathVariableException exception) {
-
-        final Map<String, List<String>> errorsMap = formatErrorsResponse(ExceptionMessages.INVALID_REQUEST_MESSAGE);
-
-        return new ResponseEntity<>(errorsMap, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(DateTimeParseException.class)
-    public ResponseEntity<Map<String, List<String>>> handleDateTimeParseException(DateTimeParseException exception) {
-
-        final Map<String, List<String>> errorsMap = formatErrorsResponse(ExceptionMessages.INVALID_REQUEST_MESSAGE);
-
-        return new ResponseEntity<>(errorsMap, HttpStatus.BAD_REQUEST);
+    @ExceptionHandler({
+        IllegalArgumentException.class,
+        UnsatisfiedServletRequestParameterException.class,
+        UnexpectedTypeException.class,
+        HttpMessageNotReadableException.class,
+        MissingServletRequestParameterException.class,
+        MissingPathVariableException.class,
+        DateTimeException.class,
+        MethodArgumentTypeMismatchException.class,
+        HandlerMethodValidationException.class,
+        ConstraintViolationException.class
+    })
+    public ResponseEntity<Map<String, List<String>>> handleInvalidRequest(
+            final Exception exception) {
+        return error(HttpStatus.BAD_REQUEST, ExceptionMessages.INVALID_REQUEST_MESSAGE);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, List<String>>> handleControllerValidationException(
-        MethodArgumentNotValidException exception) {
-
-        List<String> errors = exception
-            .getBindingResult()
-            .getFieldErrors()
-            .stream()
-            .map(FieldError::getDefaultMessage)
-            .toList();
-        return new ResponseEntity<>(formatErrorsResponse(errors), HttpStatus.BAD_REQUEST);
+    public ResponseEntity<Map<String, List<String>>> handleValidation(
+            final MethodArgumentNotValidException exception) {
+        final List<String> errors =
+                exception.getBindingResult().getFieldErrors().stream()
+                        .map(FieldError::getDefaultMessage)
+                        .toList();
+        return ResponseEntity.badRequest().body(Map.of("Errors", errors));
     }
 
-    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<Map<String, List<String>>> handleMethodArgumentTypeMismatchException(
-        MethodArgumentTypeMismatchException exception) {
-
-        final Map<String, List<String>> errorsMap = formatErrorsResponse(ExceptionMessages.INVALID_REQUEST_MESSAGE);
-
-        return new ResponseEntity<>(errorsMap, HttpStatus.BAD_REQUEST);
+    @ExceptionHandler({
+        RoleNotChosenException.class,
+        DateNotValidException.class,
+        HallNotAvailableException.class,
+        NoAvailableTicketsException.class,
+        NoAvailableItemsException.class,
+        DiscountNotValidException.class
+    })
+    public ResponseEntity<Map<String, List<String>>> handleBusinessValidation(
+            final RuntimeException exception) {
+        return error(HttpStatus.BAD_REQUEST, exception.getMessage());
     }
 
-    @ExceptionHandler(InternalAuthenticationServiceException.class)
-    public ResponseEntity<Map<String, List<String>>> handleInternalAuthenticationServiceException(
-        InternalAuthenticationServiceException exception) {
-
-        final Map<String, List<String>> errorsMap = formatErrorsResponse(
-            ExceptionMessages.AUTHENTICATION_FAILED_MESSAGE);
-
-        return new ResponseEntity<>(errorsMap, HttpStatus.BAD_REQUEST);
+    @ExceptionHandler({
+        CategoryNotFoundException.class,
+        CinemaNotFoundException.class,
+        DiscountNotFoundException.class,
+        HallNotFoundException.class,
+        ItemNotFoundException.class,
+        MovieNotFoundException.class,
+        OrderNotFoundException.class,
+        ProgramNotFoundException.class,
+        ProjectionNotFoundException.class,
+        ReviewNotFoundException.class,
+        RoleNotFoundException.class,
+        TicketNotFoundException.class,
+        UserNotFoundException.class
+    })
+    public ResponseEntity<Map<String, List<String>>> handleNotFound(
+            final RuntimeException exception) {
+        return error(HttpStatus.NOT_FOUND, exception.getMessage());
     }
 
-    @ExceptionHandler(RoleNotChosenException.class)
-    public ResponseEntity<Map<String, List<String>>> handleRoleNotChosenException(RoleNotChosenException exception) {
-
-        final Map<String, List<String>> errorsMap = formatErrorsResponse(exception.getMessage());
-
-        return new ResponseEntity<>(errorsMap, HttpStatus.BAD_REQUEST);
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<Map<String, List<String>>> handleMissingRoute(
+            final NoResourceFoundException exception) {
+        return error(HttpStatus.NOT_FOUND, "Resource not found");
     }
 
-    @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<Map<String, List<String>>> handleBadCredentialsException(BadCredentialsException exception) {
-
-        final Map<String, List<String>> errorsMap = formatErrorsResponse(
-            ExceptionMessages.AUTHENTICATION_FAILED_MESSAGE);
-
-        return new ResponseEntity<>(errorsMap, HttpStatus.UNAUTHORIZED);
+    @ExceptionHandler({
+        CategoryAlreadyExistsException.class,
+        CinemaAlreadyExistsException.class,
+        DiscountAlreadyExistsException.class,
+        ItemAlreadyExistsException.class,
+        MovieAlreadyExistsException.class,
+        ProgramAlreadyExistsException.class,
+        RoleAlreadyExistsException.class,
+        UserEmailAlreadyExistsException.class,
+        UsernameAlreadyExistsException.class,
+        ResourceInUseException.class
+    })
+    public ResponseEntity<Map<String, List<String>>> handleConflict(
+            final RuntimeException exception) {
+        return error(HttpStatus.CONFLICT, exception.getMessage());
     }
 
-    @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<Map<String, List<String>>> handleDataIntegrityViolationException(
-        DataIntegrityViolationException exception) {
-
-        final Map<String, List<String>> errorsMap = formatErrorsResponse(ExceptionMessages.DATA_CONFLICT_MESSAGE);
-
-        return new ResponseEntity<>(errorsMap, HttpStatus.CONFLICT);
+    @ExceptionHandler({DataIntegrityViolationException.class, ConcurrencyFailureException.class})
+    public ResponseEntity<Map<String, List<String>>> handleDataConflict(
+            final RuntimeException exception) {
+        return error(HttpStatus.CONFLICT, ExceptionMessages.DATA_CONFLICT_MESSAGE);
     }
 
-    @ExceptionHandler(DateNotValidException.class)
-    public ResponseEntity<Map<String, List<String>>> handleDateNotValidException(DateNotValidException exception) {
-
-        final Map<String, List<String>> errorsMap = formatErrorsResponse(exception.getMessage());
-
-        return new ResponseEntity<>(errorsMap, HttpStatus.BAD_REQUEST);
+    @ExceptionHandler({NotAuthorizedException.class, AccessDeniedException.class})
+    public ResponseEntity<Map<String, List<String>>> handleForbidden(
+            final RuntimeException exception) {
+        return error(HttpStatus.FORBIDDEN, ExceptionMessages.NOT_AUTHORIZED_MESSAGE);
     }
 
     @ExceptionHandler(NotLoggedInException.class)
-    public ResponseEntity<Map<String, List<String>>> handleNotLoggedInException(NotLoggedInException exception) {
-
-        final Map<String, List<String>> errorsMap = formatErrorsResponse(exception.getMessage());
-
-        return new ResponseEntity<>(errorsMap, HttpStatus.UNAUTHORIZED);
+    public ResponseEntity<Map<String, List<String>>> handleNotLoggedIn(
+            final NotLoggedInException exception) {
+        return error(HttpStatus.UNAUTHORIZED, exception.getMessage());
     }
 
-    @ExceptionHandler(NotAuthorizedException.class)
-    public ResponseEntity<Map<String, List<String>>> handleNotAuthorizedException(NotAuthorizedException exception) {
-
-        final Map<String, List<String>> errorsMap = formatErrorsResponse(exception.getMessage());
-
-        return new ResponseEntity<>(errorsMap, HttpStatus.FORBIDDEN);
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<Map<String, List<String>>> handleBadCredentials(
+            final BadCredentialsException exception) {
+        return error(HttpStatus.UNAUTHORIZED, ExceptionMessages.AUTHENTICATION_FAILED_MESSAGE);
     }
 
-    @ExceptionHandler(ProjectionNotFoundException.class)
-    public ResponseEntity<Map<String, List<String>>> handleProjectionNotFoundException(
-        ProjectionNotFoundException exception) {
-
-        final Map<String, List<String>> errorsMap = formatErrorsResponse(exception.getMessage());
-        return new ResponseEntity<>(errorsMap, HttpStatus.NOT_FOUND);
+    @ExceptionHandler(InternalAuthenticationServiceException.class)
+    public ResponseEntity<Map<String, List<String>>> handleAuthenticationFailure(
+            final InternalAuthenticationServiceException exception) {
+        return error(HttpStatus.BAD_REQUEST, ExceptionMessages.AUTHENTICATION_FAILED_MESSAGE);
     }
 
-    @ExceptionHandler(CategoryNotFoundException.class)
-    public ResponseEntity<Map<String, List<String>>> handleCategoryNotFoundException(
-        CategoryNotFoundException exception) {
-
-        final Map<String, List<String>> errorsMap = formatErrorsResponse(exception.getMessage());
-
-        return new ResponseEntity<>(errorsMap, HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler(CinemaNotFoundException.class)
-    public ResponseEntity<Map<String, List<String>>> handleCinemaNotFoundException(CinemaNotFoundException exception) {
-
-        final Map<String, List<String>> errorsMap = formatErrorsResponse(exception.getMessage());
-
-        return new ResponseEntity<>(errorsMap, HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler(ProgramNotFoundException.class)
-    public ResponseEntity<Map<String, List<String>>> handleProgramNotFoundException(
-        ProgramNotFoundException exception) {
-
-        final Map<String, List<String>> errorsMap = formatErrorsResponse(exception.getMessage());
-
-        return new ResponseEntity<>(errorsMap, HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<Map<String, List<String>>> handleUserNotFoundException(UserNotFoundException exception) {
-
-        final Map<String, List<String>> errorsMap = formatErrorsResponse(exception.getMessage());
-
-        return new ResponseEntity<>(errorsMap, HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler(HallNotFoundException.class)
-    public ResponseEntity<Map<String, List<String>>> handleHallNotFoundException(HallNotFoundException exception) {
-
-        final Map<String, List<String>> errorsMap = formatErrorsResponse(exception.getMessage());
-
-        return new ResponseEntity<>(errorsMap, HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler(ItemNotFoundException.class)
-    public ResponseEntity<Map<String, List<String>>> handleItemNotFoundException(ItemNotFoundException exception) {
-
-        final Map<String, List<String>> errorsMap = formatErrorsResponse(exception.getMessage());
-
-        return new ResponseEntity<>(errorsMap, HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler(OrderNotFoundException.class)
-    public ResponseEntity<Map<String, List<String>>> handleOrderNotFoundException(OrderNotFoundException exception) {
-
-        final Map<String, List<String>> errorsMap = formatErrorsResponse(exception.getMessage());
-        return new ResponseEntity<>(errorsMap, HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler(MovieNotFoundException.class)
-    public ResponseEntity<Map<String, List<String>>> handleMovieNotFoundException(MovieNotFoundException exception) {
-
-        final Map<String, List<String>> errorsMap = formatErrorsResponse(exception.getMessage());
-
-        return new ResponseEntity<>(errorsMap, HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler(RoleNotFoundException.class)
-    public ResponseEntity<Map<String, List<String>>> handleRoleNotFoundException(RoleNotFoundException exception) {
-
-        final Map<String, List<String>> errorsMap = formatErrorsResponse(exception.getMessage());
-
-        return new ResponseEntity<>(errorsMap, HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler(TicketNotFoundException.class)
-    public ResponseEntity<Map<String, List<String>>> handleTicketNotFoundException(TicketNotFoundException exception) {
-
-        final Map<String, List<String>> errorsMap = formatErrorsResponse(exception.getMessage());
-
-        return new ResponseEntity<>(errorsMap, HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler(DiscountNotFoundException.class)
-    public ResponseEntity<Map<String, List<String>>> handleDiscountNotFoundException(
-        DiscountNotFoundException exception) {
-
-        final Map<String, List<String>> errorsMap = formatErrorsResponse(exception.getMessage());
-
-        return new ResponseEntity<>(errorsMap, HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler(ReviewNotFoundException.class)
-    public ResponseEntity<Map<String, List<String>>> handleReviewNotFoundException(ReviewNotFoundException exception) {
-
-        final Map<String, List<String>> errorsMap = formatErrorsResponse(exception.getMessage());
-
-        return new ResponseEntity<>(errorsMap, HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler(HallNotAvailableException.class)
-    public ResponseEntity<Map<String, List<String>>> handleHallNotAvailableException(
-        HallNotAvailableException exception) {
-
-        final Map<String, List<String>> errorsMap = formatErrorsResponse(exception.getMessage());
-
-        return new ResponseEntity<>(errorsMap, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(NoAvailableTicketsException.class)
-    public ResponseEntity<Map<String, List<String>>> handleNoAvailableTicketsException(
-        NoAvailableTicketsException exception) {
-
-        final Map<String, List<String>> errorsMap = formatErrorsResponse(exception.getMessage());
-
-        return new ResponseEntity<>(errorsMap, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(NoAvailableItemsException.class)
-    public ResponseEntity<Map<String, List<String>>> handleNoAvailableItemsException(
-        NoAvailableItemsException exception) {
-
-        final Map<String, List<String>> errorsMap = formatErrorsResponse(exception.getMessage());
-
-        return new ResponseEntity<>(errorsMap, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(CategoryAlreadyExistsException.class)
-    public ResponseEntity<Map<String, List<String>>> handleCategoryAlreadyExistsException(
-        CategoryAlreadyExistsException exception) {
-
-        final Map<String, List<String>> errorsMap = formatErrorsResponse(exception.getMessage());
-        return new ResponseEntity<>(errorsMap, HttpStatus.CONFLICT);
-    }
-
-    @ExceptionHandler(CinemaAlreadyExistsException.class)
-    public ResponseEntity<Map<String, List<String>>> handleCinemaAlreadyExistsException(
-        CinemaAlreadyExistsException exception) {
-
-        final Map<String, List<String>> errorsMap = formatErrorsResponse(exception.getMessage());
-        return new ResponseEntity<>(errorsMap, HttpStatus.CONFLICT);
-    }
-
-    @ExceptionHandler(ProgramAlreadyExistsException.class)
-    public ResponseEntity<Map<String, List<String>>> handleProgramAlreadyExistsException(
-        ProgramAlreadyExistsException exception) {
-
-        final Map<String, List<String>> errorsMap = formatErrorsResponse(exception.getMessage());
-        return new ResponseEntity<>(errorsMap, HttpStatus.CONFLICT);
-    }
-
-    @ExceptionHandler(RoleAlreadyExistsException.class)
-    public ResponseEntity<Map<String, List<String>>> handleRoleAlreadyExistsException(
-        RoleAlreadyExistsException exception) {
-
-        final Map<String, List<String>> errorsMap = formatErrorsResponse(exception.getMessage());
-        return new ResponseEntity<>(errorsMap, HttpStatus.CONFLICT);
-    }
-
-    @ExceptionHandler(UserEmailAlreadyExistsException.class)
-    public ResponseEntity<Map<String, List<String>>> handleUserEmailAlreadyExistsException(
-        UserEmailAlreadyExistsException exception) {
-
-        final Map<String, List<String>> errorsMap = formatErrorsResponse(exception.getMessage());
-        return new ResponseEntity<>(errorsMap, HttpStatus.CONFLICT);
-    }
-
-    @ExceptionHandler(UsernameAlreadyExistsException.class)
-    public ResponseEntity<Map<String, List<String>>> handleUsernameAlreadyExistsException(
-        UsernameAlreadyExistsException exception) {
-
-        final Map<String, List<String>> errorsMap = formatErrorsResponse(exception.getMessage());
-        return new ResponseEntity<>(errorsMap, HttpStatus.CONFLICT);
-    }
-
-    @ExceptionHandler(ItemAlreadyExistsException.class)
-    public ResponseEntity<Map<String, List<String>>> handleExistingItemException(ItemAlreadyExistsException exception) {
-
-        final Map<String, List<String>> errorsMap = formatErrorsResponse(exception.getMessage());
-
-        return new ResponseEntity<>(errorsMap, HttpStatus.CONFLICT);
-    }
-
-    @ExceptionHandler(MovieAlreadyExistsException.class)
-    public ResponseEntity<Map<String, List<String>>> handleExistingMovieException(
-        MovieAlreadyExistsException exception) {
-
-        final Map<String, List<String>> errorsMap = formatErrorsResponse(exception.getMessage());
-
-        return new ResponseEntity<>(errorsMap, HttpStatus.CONFLICT);
-    }
-
-    @ExceptionHandler(DiscountNotValidException.class)
-    public ResponseEntity<Map<String, List<String>>> handleDiscountNotValidException(
-        DiscountNotValidException exception) {
-
-        final Map<String, List<String>> errorsMap = formatErrorsResponse(exception.getMessage());
-
-        return new ResponseEntity<>(errorsMap, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(DiscountAlreadyExistsException.class)
-    public ResponseEntity<Map<String, List<String>>> handleDiscountAlreadyExistsException(
-        DiscountAlreadyExistsException exception) {
-
-        final Map<String, List<String>> errorsMap = formatErrorsResponse(exception.getMessage());
-
-        return new ResponseEntity<>(errorsMap, HttpStatus.CONFLICT);
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<Map<String, List<String>>> handleMethodNotAllowed(
+            final HttpRequestMethodNotSupportedException exception) {
+        return error(HttpStatus.METHOD_NOT_ALLOWED, ExceptionMessages.METHOD_NOT_ALLOWED_MESSAGE);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, List<String>>> handleException(Exception exception) {
-
-        final Map<String, List<String>> errorsMap = formatErrorsResponse(ExceptionMessages.GLOBAL_EXCEPTION);
-
-        return new ResponseEntity<>(errorsMap, HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<Map<String, List<String>>> handleUnexpectedFailure(
+            final Exception exception) {
+        log.error("Unexpected request failure", exception);
+        return error(HttpStatus.INTERNAL_SERVER_ERROR, ExceptionMessages.GLOBAL_EXCEPTION);
     }
 
-    private static Map<String, List<String>> formatErrorsResponse(String... errors) {
-        return formatErrorsResponse(Arrays.stream(errors).toList());
-    }
-
-    private static Map<String, List<String>> formatErrorsResponse(List<String> errors) {
-        final Map<String, List<String>> errorResponse = HashMap.newHashMap(4);
-        errorResponse.put("Errors", errors);
-        return errorResponse;
+    private static ResponseEntity<Map<String, List<String>>> error(
+            final HttpStatus status, final String message) {
+        return ResponseEntity.status(status).body(Map.of("Errors", List.of(message)));
     }
 }

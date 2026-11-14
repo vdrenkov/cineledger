@@ -40,3 +40,10 @@ databaseChangeLog:
         - sqlFile:
             path: db/changelog/changes/005-purchase-price-snapshots.sql
             relativeToChangelogFile: false
+  - changeSet:
+      id: 006-retain-sales-history
+      author: vdrenkov
+      changes:
+        - sqlFile:
+            path: changes/006-retain-sales-history.sql
+            relativeToChangelogFile: true
