@@ -14,7 +14,6 @@ import dev.vdrenkov.cineledger.models.entities.Projection;
 import dev.vdrenkov.cineledger.models.entities.Ticket;
 import dev.vdrenkov.cineledger.models.requests.TicketRequest;
 import dev.vdrenkov.cineledger.repositories.TicketRepository;
-import dev.vdrenkov.cineledger.testutils.constants.ReportConstants;
 import dev.vdrenkov.cineledger.testutils.constants.TicketConstants;
 import dev.vdrenkov.cineledger.testutils.factories.ProjectionFactory;
 import dev.vdrenkov.cineledger.testutils.factories.TicketFactory;
@@ -81,20 +80,20 @@ class TicketServiceTest {
     void testGetTicketById_noExceptions_success() {
         final Ticket expected = TicketFactory.getDefaultTicket();
 
-        when(ticketRepository.findById(anyInt())).thenReturn(Optional.of(expected));
+        when(ticketRepository.findByIdForUpdate(anyInt())).thenReturn(Optional.of(expected));
 
-        final Ticket result = ticketService.getTicketById(TicketConstants.ID);
+        final Ticket result = ticketService.getTicketForUpdate(TicketConstants.ID);
 
         assertEquals(expected, result);
     }
 
     @Test
     void testGetTicketById_TicketNotFoundException_fail() {
-        when(ticketRepository.findById(anyInt())).thenReturn(Optional.empty());
+        when(ticketRepository.findByIdForUpdate(anyInt())).thenReturn(Optional.empty());
 
         assertThrows(
                 TicketNotFoundException.class,
-                () -> ticketService.getTicketById(TicketConstants.ID));
+                () -> ticketService.getTicketForUpdate(TicketConstants.ID));
     }
 
     @Test
@@ -137,19 +136,5 @@ class TicketServiceTest {
         when(projectionService.getProjectionForUpdate(anyInt())).thenReturn(projection);
 
         assertThrows(DateNotValidException.class, () -> ticketService.addTicket(request));
-    }
-
-    @Test
-    void testGetTicketsByDateBetween() {
-        final List<Ticket> expected = TicketFactory.getDefaultTicketList();
-
-        when(ticketRepository.findTicketsByDateOfPurchaseBetween(any(), any()))
-                .thenReturn(expected);
-
-        List<Ticket> tickets =
-                ticketService.getTicketsByDateBetween(
-                        ReportConstants.START_DATE, ReportConstants.END_DATE);
-
-        assertEquals(expected, tickets);
     }
 }

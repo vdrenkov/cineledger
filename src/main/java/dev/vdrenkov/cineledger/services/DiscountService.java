@@ -26,7 +26,6 @@ public class DiscountService {
     public Discount addDiscount(DiscountRequest request) {
         if (discountRepository.existsByType(request.type())
                 || discountRepository.existsByCode(request.code())) {
-
             throw new DiscountAlreadyExistsException(
                     ExceptionMessages.DISCOUNT_ALREADY_EXISTS_MESSAGE);
         }

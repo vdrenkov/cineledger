@@ -29,6 +29,7 @@ import dev.vdrenkov.cineledger.utils.constants.URIConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -40,8 +41,10 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import tools.jackson.databind.ObjectMapper;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @AutoConfigureMockMvc
 @ExtendWith(MockitoExtension.class)
@@ -79,8 +82,7 @@ class OrderControllerTest {
         String json =
                 objectMapper.writeValueAsString(
                         Collections.singletonList(TicketFactory.getDefaultTicketRequest()));
-        when(orderService.makeReservationWithUserId(
-                        any(), anyInt(), org.mockito.ArgumentMatchers.isNull()))
+        when(orderService.makeReservationWithUserId(any(), anyInt(), ArgumentMatchers.isNull()))
                 .thenReturn(OrderFactory.getDefaultOrder());
 
         mockMvc.perform(
@@ -113,13 +115,13 @@ class OrderControllerTest {
                                         objectMapper.readValue(
                                                 objectMapper.writeValueAsString(
                                                         orderDto.items().getFirst()),
-                                                java.util.Map.class)))
+                                                Map.class)))
                 .andExpect(
                         jsonPath("$[0].totalPrice")
                                 .value(
                                         org.hamcrest.Matchers.comparesEqualTo(
                                                 orderDto.totalPrice()),
-                                        java.math.BigDecimal.class));
+                                        BigDecimal.class));
     }
 
     @Test
@@ -148,13 +150,13 @@ class OrderControllerTest {
                                         objectMapper.readValue(
                                                 objectMapper.writeValueAsString(
                                                         orderDto.items().getFirst()),
-                                                java.util.Map.class)))
+                                                Map.class)))
                 .andExpect(
                         jsonPath("$.totalPrice")
                                 .value(
                                         org.hamcrest.Matchers.comparesEqualTo(
                                                 orderDto.totalPrice()),
-                                        java.math.BigDecimal.class));
+                                        BigDecimal.class));
     }
 
     @Test
@@ -193,13 +195,13 @@ class OrderControllerTest {
                                         objectMapper.readValue(
                                                 objectMapper.writeValueAsString(
                                                         orderDto.items().getFirst()),
-                                                java.util.Map.class)))
+                                                Map.class)))
                 .andExpect(
                         jsonPath("$.totalPrice")
                                 .value(
                                         org.hamcrest.Matchers.comparesEqualTo(
                                                 orderDto.totalPrice()),
-                                        java.math.BigDecimal.class));
+                                        BigDecimal.class));
     }
 
     @Test

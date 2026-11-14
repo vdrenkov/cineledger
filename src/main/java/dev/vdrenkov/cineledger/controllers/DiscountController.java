@@ -5,7 +5,9 @@ import dev.vdrenkov.cineledger.models.entities.Discount;
 import dev.vdrenkov.cineledger.models.requests.DiscountRequest;
 import dev.vdrenkov.cineledger.services.DiscountService;
 import dev.vdrenkov.cineledger.utils.constants.URIConstants;
+
 import jakarta.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,10 +35,10 @@ public class DiscountController {
     public ResponseEntity<Void> addDiscount(@RequestBody @Valid DiscountRequest discountRequest) {
         final Discount discount = discountService.addDiscount(discountRequest);
 
-        URI location = UriComponentsBuilder
-            .fromUriString(URIConstants.DISCOUNTS_ID_PATH)
-            .buildAndExpand(discount.getId())
-            .toUri();
+        URI location =
+                UriComponentsBuilder.fromUriString(URIConstants.DISCOUNTS_ID_PATH)
+                        .buildAndExpand(discount.getId())
+                        .toUri();
 
         return ResponseEntity.created(location).build();
     }
@@ -56,20 +58,26 @@ public class DiscountController {
     }
 
     @PutMapping(URIConstants.DISCOUNTS_ID_PATH)
-    public ResponseEntity<DiscountDto> updateDiscount(@RequestBody @Valid DiscountRequest request, @PathVariable int id,
-        @RequestParam(required = false) Boolean returnOld) {
+    public ResponseEntity<DiscountDto> updateDiscount(
+            @RequestBody @Valid DiscountRequest request,
+            @PathVariable int id,
+            @RequestParam(required = false) Boolean returnOld) {
 
         final DiscountDto discountDto = discountService.updateDiscount(request, id);
 
-        return Boolean.TRUE.equals(returnOld) ? ResponseEntity.ok(discountDto) : ResponseEntity.noContent().build();
+        return Boolean.TRUE.equals(returnOld)
+                ? ResponseEntity.ok(discountDto)
+                : ResponseEntity.noContent().build();
     }
 
     @DeleteMapping(URIConstants.DISCOUNTS_ID_PATH)
-    public ResponseEntity<DiscountDto> deleteDiscount(@PathVariable int id,
-        @RequestParam(required = false) Boolean returnOld) {
+    public ResponseEntity<DiscountDto> deleteDiscount(
+            @PathVariable int id, @RequestParam(required = false) Boolean returnOld) {
 
         final DiscountDto discountDto = discountService.deleteDiscount(id);
 
-        return Boolean.TRUE.equals(returnOld) ? ResponseEntity.ok(discountDto) : ResponseEntity.noContent().build();
+        return Boolean.TRUE.equals(returnOld)
+                ? ResponseEntity.ok(discountDto)
+                : ResponseEntity.noContent().build();
     }
 }

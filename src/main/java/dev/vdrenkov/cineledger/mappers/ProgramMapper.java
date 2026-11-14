@@ -7,14 +7,14 @@ import java.util.List;
 
 public final class ProgramMapper {
 
-    private ProgramMapper() {
-
-    }
+    private ProgramMapper() {}
 
     public static ProgramDto mapProgramToProgramDto(Program program) {
 
-        return new ProgramDto(program.getId(), program.getProgramDate(),
-            CinemaMapper.mapCinemaToCinemaDto(program.getCinema()));
+        return new ProgramDto(
+                program.getId(),
+                program.getProgramDate(),
+                CinemaMapper.mapCinemaToCinemaDto(program.getCinema()));
     }
 
     public static List<ProgramDto> mapProgramListToProgramDtoList(List<Program> programs) {

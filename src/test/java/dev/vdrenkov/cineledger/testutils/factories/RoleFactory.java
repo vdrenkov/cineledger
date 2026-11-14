@@ -1,5 +1,9 @@
 package dev.vdrenkov.cineledger.testutils.factories;
 
+import static dev.vdrenkov.cineledger.testutils.constants.RoleConstants.ADMIN;
+import static dev.vdrenkov.cineledger.testutils.constants.RoleConstants.ID;
+import static dev.vdrenkov.cineledger.testutils.constants.RoleConstants.NAME;
+
 import dev.vdrenkov.cineledger.models.dtos.RoleDto;
 import dev.vdrenkov.cineledger.models.entities.Role;
 import dev.vdrenkov.cineledger.models.requests.RoleRequest;
@@ -7,10 +11,6 @@ import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
 
 import java.util.Collections;
 import java.util.List;
-
-import static dev.vdrenkov.cineledger.testutils.constants.RoleConstants.ADMIN;
-import static dev.vdrenkov.cineledger.testutils.constants.RoleConstants.ID;
-import static dev.vdrenkov.cineledger.testutils.constants.RoleConstants.NAME;
 
 public final class RoleFactory {
 

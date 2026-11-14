@@ -1,10 +1,34 @@
 package dev.vdrenkov.cineledger.controllers;
 
+import static dev.vdrenkov.cineledger.testutils.constants.MovieConstants.DESCRIPTION;
+import static dev.vdrenkov.cineledger.testutils.constants.MovieConstants.ID;
+import static dev.vdrenkov.cineledger.testutils.constants.MovieConstants.RATING;
+import static dev.vdrenkov.cineledger.testutils.constants.MovieConstants.RELEASE_DATE;
+import static dev.vdrenkov.cineledger.testutils.constants.MovieConstants.RUNTIME;
+import static dev.vdrenkov.cineledger.testutils.constants.MovieConstants.TITLE;
+import static dev.vdrenkov.cineledger.testutils.factories.MovieFactory.getDefaultMovieDto;
+import static dev.vdrenkov.cineledger.testutils.factories.MovieFactory.getDefaultMovieDtoList;
+import static dev.vdrenkov.cineledger.testutils.factories.MovieFactory.getDefaultMovieRequest;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyDouble;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import dev.vdrenkov.cineledger.models.dtos.MovieDto;
 import dev.vdrenkov.cineledger.services.MovieService;
 import dev.vdrenkov.cineledger.testutils.factories.CategoryFactory;
 import dev.vdrenkov.cineledger.testutils.factories.MovieFactory;
 import dev.vdrenkov.cineledger.utils.constants.URIConstants;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,33 +40,11 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
 import tools.jackson.databind.ObjectMapper;
 
 import java.util.Collections;
 import java.util.List;
-
-import static dev.vdrenkov.cineledger.testutils.constants.MovieConstants.DESCRIPTION;
-import static dev.vdrenkov.cineledger.testutils.constants.MovieConstants.ID;
-import static dev.vdrenkov.cineledger.testutils.constants.MovieConstants.RATING;
-import static dev.vdrenkov.cineledger.testutils.constants.MovieConstants.RELEASE_DATE;
-import static dev.vdrenkov.cineledger.testutils.constants.MovieConstants.RUNTIME;
-import static dev.vdrenkov.cineledger.testutils.constants.MovieConstants.TITLE;
-import static dev.vdrenkov.cineledger.testutils.factories.MovieFactory.getDefaultMovieDto;
-import static dev.vdrenkov.cineledger.testutils.factories.MovieFactory.getDefaultMovieDtoList;
-import static dev.vdrenkov.cineledger.testutils.factories.MovieFactory.getDefaultMovieRequest;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyDouble;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
 @ExtendWith(MockitoExtension.class)
@@ -50,11 +52,9 @@ class MovieControllerTest {
     private static final String RETURN_OLD = "returnOld";
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private MockMvc mockMvc;
-    @Mock
-    private MovieService movieService;
+    @Mock private MovieService movieService;
 
-    @InjectMocks
-    private MovieController movieController;
+    @InjectMocks private MovieController movieController;
 
     @BeforeEach
     void setup() {
@@ -63,22 +63,26 @@ class MovieControllerTest {
 
     @Test
     void testGetMoviesByTitle_success() throws Exception {
-        when(movieService.getMoviesByTitle(anyString(), anyDouble())).thenReturn(getDefaultMovieDtoList());
+        when(movieService.getMoviesByTitle(anyString(), anyDouble()))
+                .thenReturn(getDefaultMovieDtoList());
 
-        mockMvc
-            .perform(MockMvcRequestBuilders
-                .get(URIConstants.MOVIES_PATH)
-                .queryParam("title", TITLE)
-                .queryParam("minimalRating", String.valueOf(RATING)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$[0].id").value(ID))
-            .andExpect(jsonPath("$[0].title").value(TITLE))
-            .andExpect(jsonPath("$[0].averageRating").value(RATING))
-            .andExpect(jsonPath("$[0].description").value(DESCRIPTION))
-            .andExpect(jsonPath("$[0].releaseDate").value(RELEASE_DATE.toString()))
-            .andExpect(jsonPath("$[0].runtime").value(RUNTIME.toString()))
-            .andExpect(jsonPath("$[0].category.id").value(CategoryFactory.getDefaultCategoryDto().id()))
-            .andExpect(jsonPath("$[0].category.name").value(CategoryFactory.getDefaultCategoryDto().name()));
+        mockMvc.perform(
+                        MockMvcRequestBuilders.get(URIConstants.MOVIES_PATH)
+                                .queryParam("title", TITLE)
+                                .queryParam("minimalRating", String.valueOf(RATING)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(ID))
+                .andExpect(jsonPath("$[0].title").value(TITLE))
+                .andExpect(jsonPath("$[0].averageRating").value(RATING))
+                .andExpect(jsonPath("$[0].description").value(DESCRIPTION))
+                .andExpect(jsonPath("$[0].releaseDate").value(RELEASE_DATE.toString()))
+                .andExpect(jsonPath("$[0].runtime").value(RUNTIME.toString()))
+                .andExpect(
+                        jsonPath("$[0].category.id")
+                                .value(CategoryFactory.getDefaultCategoryDto().id()))
+                .andExpect(
+                        jsonPath("$[0].category.name")
+                                .value(CategoryFactory.getDefaultCategoryDto().name()));
     }
 
     @Test
@@ -86,55 +90,68 @@ class MovieControllerTest {
         final List<MovieDto> movieDtoList = getDefaultMovieDtoList();
         final MovieDto movieDto = movieDtoList.getFirst();
         when(movieService.getMoviesByCategory(anyInt(), anyDouble())).thenReturn(movieDtoList);
-        mockMvc
-            .perform(get(URIConstants.CATEGORIES_ID_MOVIES_PATH, ID).param("minRating", String.valueOf(RATING)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$[0].id").value(movieDto.id()))
-            .andExpect(jsonPath("$[0].title").value(TITLE))
-            .andExpect(jsonPath("$[0].averageRating").value(RATING))
-            .andExpect(jsonPath("$[0].description").value(DESCRIPTION))
-            .andExpect(jsonPath("$[0].releaseDate").value(RELEASE_DATE.toString()))
-            .andExpect(jsonPath("$[0].runtime").value(RUNTIME.toString()))
-            .andExpect(jsonPath("$[0].category.id").value(CategoryFactory.getDefaultCategoryDto().id()))
-            .andExpect(jsonPath("$[0].category.name").value(CategoryFactory.getDefaultCategoryDto().name()));
+        mockMvc.perform(
+                        get(URIConstants.CATEGORIES_ID_MOVIES_PATH, ID)
+                                .param("minRating", String.valueOf(RATING)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(movieDto.id()))
+                .andExpect(jsonPath("$[0].title").value(TITLE))
+                .andExpect(jsonPath("$[0].averageRating").value(RATING))
+                .andExpect(jsonPath("$[0].description").value(DESCRIPTION))
+                .andExpect(jsonPath("$[0].releaseDate").value(RELEASE_DATE.toString()))
+                .andExpect(jsonPath("$[0].runtime").value(RUNTIME.toString()))
+                .andExpect(
+                        jsonPath("$[0].category.id")
+                                .value(CategoryFactory.getDefaultCategoryDto().id()))
+                .andExpect(
+                        jsonPath("$[0].category.name")
+                                .value(CategoryFactory.getDefaultCategoryDto().name()));
     }
 
     @Test
     void testGetMoviesByReleaseDateAfter_success() throws Exception {
-        when(movieService.getMoviesByReleaseDate(any(), any(Double.class), anyBoolean())).thenReturn(
-            Collections.singletonList(getDefaultMovieDto()));
-        mockMvc
-            .perform(MockMvcRequestBuilders
-                .get(URIConstants.MOVIES_PATH)
-                .param("release", String.valueOf(RELEASE_DATE))
-                .param("rating", String.valueOf(RATING))
-                .param("isAfter", "true"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$[0].id").value(ID))
-            .andExpect(jsonPath("$[0].title").value(TITLE))
-            .andExpect(jsonPath("$[0].averageRating").value(RATING))
-            .andExpect(jsonPath("$[0].description").value(DESCRIPTION))
-            .andExpect(jsonPath("$[0].releaseDate").value(RELEASE_DATE.toString()))
-            .andExpect(jsonPath("$[0].runtime").value(RUNTIME.toString()))
-            .andExpect(jsonPath("$[0].category.id").value(CategoryFactory.getDefaultCategoryDto().id()))
-            .andExpect(jsonPath("$[0].category.name").value(CategoryFactory.getDefaultCategoryDto().name()));
+        when(movieService.getMoviesByReleaseDate(any(), any(Double.class), anyBoolean()))
+                .thenReturn(Collections.singletonList(getDefaultMovieDto()));
+        mockMvc.perform(
+                        MockMvcRequestBuilders.get(URIConstants.MOVIES_PATH)
+                                .param("release", String.valueOf(RELEASE_DATE))
+                                .param("rating", String.valueOf(RATING))
+                                .param("isAfter", "true"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(ID))
+                .andExpect(jsonPath("$[0].title").value(TITLE))
+                .andExpect(jsonPath("$[0].averageRating").value(RATING))
+                .andExpect(jsonPath("$[0].description").value(DESCRIPTION))
+                .andExpect(jsonPath("$[0].releaseDate").value(RELEASE_DATE.toString()))
+                .andExpect(jsonPath("$[0].runtime").value(RUNTIME.toString()))
+                .andExpect(
+                        jsonPath("$[0].category.id")
+                                .value(CategoryFactory.getDefaultCategoryDto().id()))
+                .andExpect(
+                        jsonPath("$[0].category.name")
+                                .value(CategoryFactory.getDefaultCategoryDto().name()));
     }
 
     @Test
     void testGetMoviesByMinRating_success() throws Exception {
         when(movieService.getMoviesByMinRating(anyDouble())).thenReturn(getDefaultMovieDtoList());
 
-        mockMvc
-            .perform(MockMvcRequestBuilders.get(URIConstants.MOVIES_PATH).param("minRating", String.valueOf(RATING)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$[0].id").value(ID))
-            .andExpect(jsonPath("$[0].title").value(TITLE))
-            .andExpect(jsonPath("$[0].averageRating").value(RATING))
-            .andExpect(jsonPath("$[0].description").value(DESCRIPTION))
-            .andExpect(jsonPath("$[0].releaseDate").value(RELEASE_DATE.toString()))
-            .andExpect(jsonPath("$[0].runtime").value(RUNTIME.toString()))
-            .andExpect(jsonPath("$[0].category.id").value(CategoryFactory.getDefaultCategoryDto().id()))
-            .andExpect(jsonPath("$[0].category.name").value(CategoryFactory.getDefaultCategoryDto().name()));
+        mockMvc.perform(
+                        MockMvcRequestBuilders.get(URIConstants.MOVIES_PATH)
+                                .param("minRating", String.valueOf(RATING)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(ID))
+                .andExpect(jsonPath("$[0].title").value(TITLE))
+                .andExpect(jsonPath("$[0].averageRating").value(RATING))
+                .andExpect(jsonPath("$[0].description").value(DESCRIPTION))
+                .andExpect(jsonPath("$[0].releaseDate").value(RELEASE_DATE.toString()))
+                .andExpect(jsonPath("$[0].runtime").value(RUNTIME.toString()))
+                .andExpect(
+                        jsonPath("$[0].category.id")
+                                .value(CategoryFactory.getDefaultCategoryDto().id()))
+                .andExpect(
+                        jsonPath("$[0].category.name")
+                                .value(CategoryFactory.getDefaultCategoryDto().name()));
     }
 
     @Test
@@ -143,79 +160,91 @@ class MovieControllerTest {
 
         final String json = objectMapper.writeValueAsString(getDefaultMovieRequest());
 
-        mockMvc
-            .perform(MockMvcRequestBuilders
-                .post(URIConstants.MOVIES_PATH)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
-            .andExpect(status().isCreated())
-            .andExpect(header().string("Location", URIConstants.MOVIES_PATH + "/" + ID));
+        mockMvc.perform(
+                        MockMvcRequestBuilders.post(URIConstants.MOVIES_PATH)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(json))
+                .andExpect(status().isCreated())
+                .andExpect(header().string("Location", URIConstants.MOVIES_PATH + "/" + ID));
     }
 
     @Test
     void testUpdateMovie_returnOldTrue_success() throws Exception {
-        when(movieService.updateMovie(any(), anyInt())).thenReturn(MovieFactory.getDefaultMovieDto());
+        when(movieService.updateMovie(any(), anyInt()))
+                .thenReturn(MovieFactory.getDefaultMovieDto());
 
         final String json = objectMapper.writeValueAsString(getDefaultMovieRequest());
 
-        mockMvc
-            .perform(put(URIConstants.MOVIES_ID_PATH, ID)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json)
-                .queryParam(RETURN_OLD, String.valueOf(true)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(ID))
-            .andExpect(jsonPath("$.title").value(TITLE))
-            .andExpect(jsonPath("$.averageRating").value(RATING))
-            .andExpect(jsonPath("$.description").value(DESCRIPTION))
-            .andExpect(jsonPath("$.releaseDate").value(RELEASE_DATE.toString()))
-            .andExpect(jsonPath("$.runtime").value(RUNTIME.toString()))
-            .andExpect(jsonPath("$.category.id").value(CategoryFactory.getDefaultCategoryDto().id()))
-            .andExpect(jsonPath("$.category.name").value(CategoryFactory.getDefaultCategoryDto().name()));
+        mockMvc.perform(
+                        put(URIConstants.MOVIES_ID_PATH, ID)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(json)
+                                .queryParam(RETURN_OLD, String.valueOf(true)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(ID))
+                .andExpect(jsonPath("$.title").value(TITLE))
+                .andExpect(jsonPath("$.averageRating").value(RATING))
+                .andExpect(jsonPath("$.description").value(DESCRIPTION))
+                .andExpect(jsonPath("$.releaseDate").value(RELEASE_DATE.toString()))
+                .andExpect(jsonPath("$.runtime").value(RUNTIME.toString()))
+                .andExpect(
+                        jsonPath("$.category.id")
+                                .value(CategoryFactory.getDefaultCategoryDto().id()))
+                .andExpect(
+                        jsonPath("$.category.name")
+                                .value(CategoryFactory.getDefaultCategoryDto().name()));
     }
 
     @Test
     void getMovies_retiredExternalFilter_returnsBadRequest() throws Exception {
-        mockMvc = MockMvcBuilders.standaloneSetup(movieController)
-            .setControllerAdvice(new dev.vdrenkov.cineledger.handlers.GlobalExceptionHandler()).build();
+        mockMvc =
+                MockMvcBuilders.standaloneSetup(movieController)
+                        .setControllerAdvice(
+                                new dev.vdrenkov.cineledger.handlers.GlobalExceptionHandler())
+                        .build();
 
-        mockMvc
-            .perform(MockMvcRequestBuilders
-                .get(URIConstants.MOVIES_PATH)
-                .param("imdb", "top")
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isBadRequest());
+        mockMvc.perform(
+                        MockMvcRequestBuilders.get(URIConstants.MOVIES_PATH)
+                                .param("imdb", "top")
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
     void testUpdateMovie_returnOldFalse_success() throws Exception {
-        when(movieService.updateMovie(any(), anyInt())).thenReturn(MovieFactory.getDefaultMovieDto());
+        when(movieService.updateMovie(any(), anyInt()))
+                .thenReturn(MovieFactory.getDefaultMovieDto());
 
         final String json = objectMapper.writeValueAsString(getDefaultMovieRequest());
 
-        mockMvc
-            .perform(put(URIConstants.MOVIES_ID_PATH, ID)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json)
-                .queryParam(RETURN_OLD, String.valueOf(false)))
-            .andExpect(status().isNoContent());
+        mockMvc.perform(
+                        put(URIConstants.MOVIES_ID_PATH, ID)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(json)
+                                .queryParam(RETURN_OLD, String.valueOf(false)))
+                .andExpect(status().isNoContent());
     }
 
     @Test
     void testDeleteMovie_returnOldTrue_success() throws Exception {
         when(movieService.deleteMovie(anyInt())).thenReturn(MovieFactory.getDefaultMovieDto());
 
-        mockMvc
-            .perform(delete(URIConstants.MOVIES_ID_PATH, ID).queryParam(RETURN_OLD, String.valueOf(true)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(ID))
-            .andExpect(jsonPath("$.title").value(TITLE))
-            .andExpect(jsonPath("$.averageRating").value(RATING))
-            .andExpect(jsonPath("$.description").value(DESCRIPTION))
-            .andExpect(jsonPath("$.releaseDate").value(RELEASE_DATE.toString()))
-            .andExpect(jsonPath("$.runtime").value(RUNTIME.toString()))
-            .andExpect(jsonPath("$.category.id").value(CategoryFactory.getDefaultCategoryDto().id()))
-            .andExpect(jsonPath("$.category.name").value(CategoryFactory.getDefaultCategoryDto().name()));
+        mockMvc.perform(
+                        delete(URIConstants.MOVIES_ID_PATH, ID)
+                                .queryParam(RETURN_OLD, String.valueOf(true)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(ID))
+                .andExpect(jsonPath("$.title").value(TITLE))
+                .andExpect(jsonPath("$.averageRating").value(RATING))
+                .andExpect(jsonPath("$.description").value(DESCRIPTION))
+                .andExpect(jsonPath("$.releaseDate").value(RELEASE_DATE.toString()))
+                .andExpect(jsonPath("$.runtime").value(RUNTIME.toString()))
+                .andExpect(
+                        jsonPath("$.category.id")
+                                .value(CategoryFactory.getDefaultCategoryDto().id()))
+                .andExpect(
+                        jsonPath("$.category.name")
+                                .value(CategoryFactory.getDefaultCategoryDto().name()));
     }
 
     @Test

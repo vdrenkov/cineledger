@@ -7,13 +7,12 @@ import java.util.List;
 
 public final class DiscountMapper {
 
-    private DiscountMapper() {
-
-    }
+    private DiscountMapper() {}
 
     public static DiscountDto mapDiscountToDiscountDto(Discount discount) {
 
-        return new DiscountDto(discount.getId(), discount.getType(), discount.getCode(), discount.getPercentage());
+        return new DiscountDto(
+                discount.getId(), discount.getType(), discount.getCode(), discount.getPercentage());
     }
 
     public static List<DiscountDto> mapDiscountListToDiscountDtoList(List<Discount> discounts) {

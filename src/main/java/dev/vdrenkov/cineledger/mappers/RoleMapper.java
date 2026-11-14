@@ -7,9 +7,7 @@ import java.util.List;
 
 public final class RoleMapper {
 
-    private RoleMapper() {
-
-    }
+    private RoleMapper() {}
 
     public static RoleDto mapRoleToRoleDto(Role role) {
 

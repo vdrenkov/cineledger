@@ -1,11 +1,33 @@
 package dev.vdrenkov.cineledger.controllers;
 
+import static dev.vdrenkov.cineledger.testutils.constants.HttpCookieConstants.COOKIE_NAME;
+import static dev.vdrenkov.cineledger.testutils.constants.HttpCookieConstants.COOKIE_VALUE;
+import static dev.vdrenkov.cineledger.testutils.constants.RoleConstants.NAME;
+import static dev.vdrenkov.cineledger.testutils.constants.UserConstants.EMAIL;
+import static dev.vdrenkov.cineledger.testutils.constants.UserConstants.FIRST_NAME;
+import static dev.vdrenkov.cineledger.testutils.constants.UserConstants.ID;
+import static dev.vdrenkov.cineledger.testutils.constants.UserConstants.JOIN_DATE;
+import static dev.vdrenkov.cineledger.testutils.constants.UserConstants.LAST_NAME;
+import static dev.vdrenkov.cineledger.testutils.constants.UserConstants.USERNAME;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import dev.vdrenkov.cineledger.services.UserService;
 import dev.vdrenkov.cineledger.testutils.constants.RoleConstants;
 import dev.vdrenkov.cineledger.testutils.constants.UserConstants;
 import dev.vdrenkov.cineledger.testutils.factories.HttpCookieFactory;
 import dev.vdrenkov.cineledger.testutils.factories.UserFactory;
 import dev.vdrenkov.cineledger.utils.constants.URIConstants;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,28 +39,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import tools.jackson.databind.ObjectMapper;
 
-import static dev.vdrenkov.cineledger.testutils.constants.HttpCookieConstants.COOKIE_NAME;
-import static dev.vdrenkov.cineledger.testutils.constants.HttpCookieConstants.COOKIE_VALUE;
-import static dev.vdrenkov.cineledger.testutils.constants.RoleConstants.NAME;
-import static dev.vdrenkov.cineledger.testutils.constants.UserConstants.EMAIL;
-import static dev.vdrenkov.cineledger.testutils.constants.UserConstants.FIRST_NAME;
-import static dev.vdrenkov.cineledger.testutils.constants.UserConstants.ID;
-import static dev.vdrenkov.cineledger.testutils.constants.UserConstants.JOIN_DATE;
-import static dev.vdrenkov.cineledger.testutils.constants.UserConstants.LAST_NAME;
-import static dev.vdrenkov.cineledger.testutils.constants.UserConstants.USERNAME;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import tools.jackson.databind.ObjectMapper;
 
 @AutoConfigureMockMvc
 @ExtendWith(MockitoExtension.class)
@@ -56,11 +58,9 @@ class UserControllerTest {
 
     private MockMvc mockMvc;
 
-    @Mock
-    private UserService userService;
+    @Mock private UserService userService;
 
-    @InjectMocks
-    private UserController userController;
+    @InjectMocks private UserController userController;
 
     @BeforeEach
     void setup() {
@@ -72,28 +72,27 @@ class UserControllerTest {
         final String json = objectMapper.writeValueAsString(UserFactory.getDefaultUserRequest());
         when(userService.login(any())).thenReturn(HttpCookieFactory.getDefaultHttpCookie());
 
-        mockMvc
-            .perform(MockMvcRequestBuilders
-                .post(URIConstants.LOGIN_PATH)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
-            .andExpect(status().isOk())
-            .andExpect(header().string(SET_COOKIE, COOKIE));
+        mockMvc.perform(
+                        MockMvcRequestBuilders.post(URIConstants.LOGIN_PATH)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(json))
+                .andExpect(status().isOk())
+                .andExpect(header().string(SET_COOKIE, COOKIE));
     }
 
     @Test
-    void createUser_customerRequest_returnsLocationWithoutChangingAuthentication() throws Exception {
+    void createUser_customerRequest_returnsLocationWithoutChangingAuthentication()
+            throws Exception {
         final String json = objectMapper.writeValueAsString(UserFactory.getDefaultUserRequest());
         when(userService.createUser(any())).thenReturn(UserFactory.getDefaultUser());
 
-        mockMvc
-            .perform(MockMvcRequestBuilders
-                .post(URIConstants.USERS_PATH)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
-            .andExpect(status().isCreated())
-            .andExpect(header().string("Location", "/users/" + ID))
-            .andExpect(header().doesNotExist(SET_COOKIE));
+        mockMvc.perform(
+                        MockMvcRequestBuilders.post(URIConstants.USERS_PATH)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(json))
+                .andExpect(status().isCreated())
+                .andExpect(header().string("Location", "/users/" + ID))
+                .andExpect(header().doesNotExist(SET_COOKIE));
     }
 
     @Test
@@ -101,84 +100,89 @@ class UserControllerTest {
         final String json = objectMapper.writeValueAsString(UserFactory.getDefaultAdminRequest());
         when(userService.createUser(any())).thenReturn(UserFactory.getDefaultUser());
 
-        mockMvc
-            .perform(MockMvcRequestBuilders
-                .post(URIConstants.USERS_PATH)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
-            .andExpect(status().isCreated())
-            .andExpect(header().doesNotExist(SET_COOKIE));
+        mockMvc.perform(
+                        MockMvcRequestBuilders.post(URIConstants.USERS_PATH)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(json))
+                .andExpect(status().isCreated())
+                .andExpect(header().doesNotExist(SET_COOKIE));
     }
 
     @Test
     void testGetUserByUsername_userFound_success() throws Exception {
-        when(userService.getUserDtoByUsername(anyString())).thenReturn(UserFactory.getDefaultUserDto());
+        when(userService.getUserDtoByUsername(anyString()))
+                .thenReturn(UserFactory.getDefaultUserDto());
 
-        mockMvc
-            .perform(MockMvcRequestBuilders.get(URIConstants.USERS_PATH).queryParam("username", USERNAME))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(ID))
-            .andExpect(jsonPath("$.username").value(USERNAME))
-            .andExpect(jsonPath("$.email").value(EMAIL))
-            .andExpect(jsonPath("$.firstName").value(FIRST_NAME))
-            .andExpect(jsonPath("$.lastName").value(LAST_NAME))
-            .andExpect(jsonPath("$.joinDate").value(JOIN_DATE.toString()))
-            .andExpect(jsonPath("$.roles[0].id").value(RoleConstants.ID))
-            .andExpect(jsonPath("$.roles[0].name").value(NAME));
+        mockMvc.perform(
+                        MockMvcRequestBuilders.get(URIConstants.USERS_PATH)
+                                .queryParam("username", USERNAME))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(ID))
+                .andExpect(jsonPath("$.username").value(USERNAME))
+                .andExpect(jsonPath("$.email").value(EMAIL))
+                .andExpect(jsonPath("$.firstName").value(FIRST_NAME))
+                .andExpect(jsonPath("$.lastName").value(LAST_NAME))
+                .andExpect(jsonPath("$.joinDate").value(JOIN_DATE.toString()))
+                .andExpect(jsonPath("$.roles[0].id").value(RoleConstants.ID))
+                .andExpect(jsonPath("$.roles[0].name").value(NAME));
     }
 
     @Test
     void testGetUserByEmail_userFound_success() throws Exception {
-        when(userService.getUserDtoByEmail(anyString())).thenReturn(UserFactory.getDefaultUserDto());
+        when(userService.getUserDtoByEmail(anyString()))
+                .thenReturn(UserFactory.getDefaultUserDto());
 
-        mockMvc
-            .perform(MockMvcRequestBuilders.get(URIConstants.USERS_PATH).queryParam("email", EMAIL))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(UserConstants.ID))
-            .andExpect(jsonPath("$.username").value(USERNAME))
-            .andExpect(jsonPath("$.email").value(EMAIL))
-            .andExpect(jsonPath("$.firstName").value(FIRST_NAME))
-            .andExpect(jsonPath("$.lastName").value(LAST_NAME))
-            .andExpect(jsonPath("$.joinDate").value(JOIN_DATE.toString()))
-            .andExpect(jsonPath("$.roles[0].id").value(RoleConstants.ID))
-            .andExpect(jsonPath("$.roles[0].name").value(NAME));
+        mockMvc.perform(
+                        MockMvcRequestBuilders.get(URIConstants.USERS_PATH)
+                                .queryParam("email", EMAIL))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(UserConstants.ID))
+                .andExpect(jsonPath("$.username").value(USERNAME))
+                .andExpect(jsonPath("$.email").value(EMAIL))
+                .andExpect(jsonPath("$.firstName").value(FIRST_NAME))
+                .andExpect(jsonPath("$.lastName").value(LAST_NAME))
+                .andExpect(jsonPath("$.joinDate").value(JOIN_DATE.toString()))
+                .andExpect(jsonPath("$.roles[0].id").value(RoleConstants.ID))
+                .andExpect(jsonPath("$.roles[0].name").value(NAME));
     }
 
     @Test
     void testGetUserByRoleName_userFound_success() throws Exception {
-        when(userService.getUsersDtoByRoleName(anyString())).thenReturn(UserFactory.getDefaultUserDtoList());
+        when(userService.getUsersDtoByRoleName(anyString()))
+                .thenReturn(UserFactory.getDefaultUserDtoList());
 
-        mockMvc
-            .perform(MockMvcRequestBuilders.get(URIConstants.USERS_PATH).queryParam("roleName", NAME))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$[0].id").value(ID))
-            .andExpect(jsonPath("$[0].username").value(USERNAME))
-            .andExpect(jsonPath("$[0].email").value(EMAIL))
-            .andExpect(jsonPath("$[0].firstName").value(FIRST_NAME))
-            .andExpect(jsonPath("$[0].lastName").value(LAST_NAME))
-            .andExpect(jsonPath("$[0].joinDate").value(JOIN_DATE.toString()))
-            .andExpect(jsonPath("$[0].roles[0].id").value(RoleConstants.ID))
-            .andExpect(jsonPath("$[0].roles[0].name").value(NAME));
+        mockMvc.perform(
+                        MockMvcRequestBuilders.get(URIConstants.USERS_PATH)
+                                .queryParam("roleName", NAME))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(ID))
+                .andExpect(jsonPath("$[0].username").value(USERNAME))
+                .andExpect(jsonPath("$[0].email").value(EMAIL))
+                .andExpect(jsonPath("$[0].firstName").value(FIRST_NAME))
+                .andExpect(jsonPath("$[0].lastName").value(LAST_NAME))
+                .andExpect(jsonPath("$[0].joinDate").value(JOIN_DATE.toString()))
+                .andExpect(jsonPath("$[0].roles[0].id").value(RoleConstants.ID))
+                .andExpect(jsonPath("$[0].roles[0].name").value(NAME));
     }
 
     @Test
     void testGetUsersByJoinDate_returnsUsersList_success() throws Exception {
-        when(userService.getUsersDtosByJoinDate(any(), anyBoolean())).thenReturn(UserFactory.getDefaultUserDtoList());
+        when(userService.getUsersDtosByJoinDate(any(), anyBoolean()))
+                .thenReturn(UserFactory.getDefaultUserDtoList());
 
-        mockMvc
-            .perform(MockMvcRequestBuilders
-                .get(URIConstants.USERS_PATH)
-                .queryParam(JOIN_DATE_STRING, String.valueOf(JOIN_DATE))
-                .queryParam(IS_BEFORE, String.valueOf(true)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$[0].id").value(ID))
-            .andExpect(jsonPath("$[0].username").value(USERNAME))
-            .andExpect(jsonPath("$[0].email").value(EMAIL))
-            .andExpect(jsonPath("$[0].firstName").value(FIRST_NAME))
-            .andExpect(jsonPath("$[0].lastName").value(LAST_NAME))
-            .andExpect(jsonPath("$[0].joinDate").value(JOIN_DATE.toString()))
-            .andExpect(jsonPath("$[0].roles[0].id").value(RoleConstants.ID))
-            .andExpect(jsonPath("$[0].roles[0].name").value(NAME));
+        mockMvc.perform(
+                        MockMvcRequestBuilders.get(URIConstants.USERS_PATH)
+                                .queryParam(JOIN_DATE_STRING, String.valueOf(JOIN_DATE))
+                                .queryParam(IS_BEFORE, String.valueOf(true)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(ID))
+                .andExpect(jsonPath("$[0].username").value(USERNAME))
+                .andExpect(jsonPath("$[0].email").value(EMAIL))
+                .andExpect(jsonPath("$[0].firstName").value(FIRST_NAME))
+                .andExpect(jsonPath("$[0].lastName").value(LAST_NAME))
+                .andExpect(jsonPath("$[0].joinDate").value(JOIN_DATE.toString()))
+                .andExpect(jsonPath("$[0].roles[0].id").value(RoleConstants.ID))
+                .andExpect(jsonPath("$[0].roles[0].name").value(NAME));
     }
 
     @Test
@@ -186,20 +190,20 @@ class UserControllerTest {
         when(userService.updateUser(any(), anyInt())).thenReturn(UserFactory.getDefaultUserDto());
         final String json = objectMapper.writeValueAsString(UserFactory.getDefaultUserRequest());
 
-        mockMvc
-            .perform(put(URIConstants.USERS_ID_PATH, ID)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json)
-                .queryParam(RETURN_OLD, String.valueOf(true)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(ID))
-            .andExpect(jsonPath("$.username").value(USERNAME))
-            .andExpect(jsonPath("$.email").value(EMAIL))
-            .andExpect(jsonPath("$.firstName").value(FIRST_NAME))
-            .andExpect(jsonPath("$.lastName").value(LAST_NAME))
-            .andExpect(jsonPath("$.joinDate").value(JOIN_DATE.toString()))
-            .andExpect(jsonPath("$.roles[0].id").value(RoleConstants.ID))
-            .andExpect(jsonPath("$.roles[0].name").value(NAME));
+        mockMvc.perform(
+                        put(URIConstants.USERS_ID_PATH, ID)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(json)
+                                .queryParam(RETURN_OLD, String.valueOf(true)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(ID))
+                .andExpect(jsonPath("$.username").value(USERNAME))
+                .andExpect(jsonPath("$.email").value(EMAIL))
+                .andExpect(jsonPath("$.firstName").value(FIRST_NAME))
+                .andExpect(jsonPath("$.lastName").value(LAST_NAME))
+                .andExpect(jsonPath("$.joinDate").value(JOIN_DATE.toString()))
+                .andExpect(jsonPath("$.roles[0].id").value(RoleConstants.ID))
+                .andExpect(jsonPath("$.roles[0].name").value(NAME));
     }
 
     @Test
@@ -207,57 +211,64 @@ class UserControllerTest {
         when(userService.updateUser(any(), anyInt())).thenReturn(UserFactory.getDefaultUserDto());
         final String json = objectMapper.writeValueAsString(UserFactory.getDefaultUserRequest());
 
-        mockMvc
-            .perform(put(URIConstants.USERS_ID_PATH, ID).contentType(MediaType.APPLICATION_JSON).content(json))
-            .andExpect(status().isNoContent());
+        mockMvc.perform(
+                        put(URIConstants.USERS_ID_PATH, ID)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(json))
+                .andExpect(status().isNoContent());
     }
 
     @Test
     void testUpdateUserByAdmin_returnOldTrue_success() throws Exception {
-        when(userService.updateUserByAdmin(any(), anyInt())).thenReturn(UserFactory.getDefaultUserDto());
+        when(userService.updateUserByAdmin(any(), anyInt()))
+                .thenReturn(UserFactory.getDefaultUserDto());
         final String json = objectMapper.writeValueAsString(UserFactory.getDefaultAdminRequest());
 
-        mockMvc
-            .perform(put(URIConstants.ADMINS_ID_PATH, ID)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json)
-                .queryParam(RETURN_OLD, String.valueOf(true)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(ID))
-            .andExpect(jsonPath("$.username").value(USERNAME))
-            .andExpect(jsonPath("$.email").value(EMAIL))
-            .andExpect(jsonPath("$.firstName").value(FIRST_NAME))
-            .andExpect(jsonPath("$.lastName").value(LAST_NAME))
-            .andExpect(jsonPath("$.joinDate").value(JOIN_DATE.toString()))
-            .andExpect(jsonPath("$.roles[0].id").value(RoleConstants.ID))
-            .andExpect(jsonPath("$.roles[0].name").value(NAME));
+        mockMvc.perform(
+                        put(URIConstants.ADMINS_ID_PATH, ID)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(json)
+                                .queryParam(RETURN_OLD, String.valueOf(true)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(ID))
+                .andExpect(jsonPath("$.username").value(USERNAME))
+                .andExpect(jsonPath("$.email").value(EMAIL))
+                .andExpect(jsonPath("$.firstName").value(FIRST_NAME))
+                .andExpect(jsonPath("$.lastName").value(LAST_NAME))
+                .andExpect(jsonPath("$.joinDate").value(JOIN_DATE.toString()))
+                .andExpect(jsonPath("$.roles[0].id").value(RoleConstants.ID))
+                .andExpect(jsonPath("$.roles[0].name").value(NAME));
     }
 
     @Test
     void testUpdateUserByAdmin_returnOldFalse_success() throws Exception {
-        when(userService.updateUserByAdmin(any(), anyInt())).thenReturn(UserFactory.getDefaultUserDto());
+        when(userService.updateUserByAdmin(any(), anyInt()))
+                .thenReturn(UserFactory.getDefaultUserDto());
         final String json = objectMapper.writeValueAsString(UserFactory.getDefaultAdminRequest());
 
-        mockMvc
-            .perform(put(URIConstants.ADMINS_ID_PATH, ID).contentType(MediaType.APPLICATION_JSON).content(json))
-            .andExpect(status().isNoContent());
+        mockMvc.perform(
+                        put(URIConstants.ADMINS_ID_PATH, ID)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(json))
+                .andExpect(status().isNoContent());
     }
 
     @Test
     void testDeleteUser_returnOldTrue_success() throws Exception {
         when(userService.deleteUser(anyInt())).thenReturn(UserFactory.getDefaultUserDto());
 
-        mockMvc
-            .perform(delete(URIConstants.USERS_ID_PATH, ID).queryParam(RETURN_OLD, String.valueOf(true)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(ID))
-            .andExpect(jsonPath("$.username").value(USERNAME))
-            .andExpect(jsonPath("$.email").value(EMAIL))
-            .andExpect(jsonPath("$.firstName").value(FIRST_NAME))
-            .andExpect(jsonPath("$.lastName").value(LAST_NAME))
-            .andExpect(jsonPath("$.joinDate").value(JOIN_DATE.toString()))
-            .andExpect(jsonPath("$.roles[0].id").value(RoleConstants.ID))
-            .andExpect(jsonPath("$.roles[0].name").value(NAME));
+        mockMvc.perform(
+                        delete(URIConstants.USERS_ID_PATH, ID)
+                                .queryParam(RETURN_OLD, String.valueOf(true)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(ID))
+                .andExpect(jsonPath("$.username").value(USERNAME))
+                .andExpect(jsonPath("$.email").value(EMAIL))
+                .andExpect(jsonPath("$.firstName").value(FIRST_NAME))
+                .andExpect(jsonPath("$.lastName").value(LAST_NAME))
+                .andExpect(jsonPath("$.joinDate").value(JOIN_DATE.toString()))
+                .andExpect(jsonPath("$.roles[0].id").value(RoleConstants.ID))
+                .andExpect(jsonPath("$.roles[0].name").value(NAME));
     }
 
     @Test
@@ -266,5 +277,4 @@ class UserControllerTest {
 
         mockMvc.perform(delete(URIConstants.USERS_ID_PATH, ID)).andExpect(status().isNoContent());
     }
-
 }

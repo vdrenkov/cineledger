@@ -30,7 +30,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import tools.jackson.databind.ObjectMapper;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 @AutoConfigureMockMvc
 @ExtendWith(MockitoExtension.class)
@@ -77,14 +79,13 @@ class TicketControllerTest {
                         jsonPath("$[0].projection.hall")
                                 .value(
                                         objectMapper.convertValue(
-                                                defaultTicketDto.projection().hall(),
-                                                java.util.Map.class)))
+                                                defaultTicketDto.projection().hall(), Map.class)))
                 .andExpect(
                         jsonPath("$[0].projection.price")
                                 .value(
                                         org.hamcrest.Matchers.comparesEqualTo(
                                                 defaultTicketDto.projection().price()),
-                                        java.math.BigDecimal.class))
+                                        BigDecimal.class))
                 .andExpect(
                         jsonPath("$[0].projection.program.programDate")
                                 .value(
@@ -98,7 +99,7 @@ class TicketControllerTest {
                                 .value(
                                         objectMapper.convertValue(
                                                 defaultTicketDto.projection().program().cinema(),
-                                                java.util.Map.class)))
+                                                Map.class)))
                 .andExpect(
                         jsonPath("$[0].projection.movie.id")
                                 .value(defaultTicketDto.projection().movie().id()))
@@ -127,7 +128,7 @@ class TicketControllerTest {
                                 .value(
                                         objectMapper.convertValue(
                                                 defaultTicketDto.projection().movie().category(),
-                                                java.util.Map.class)))
+                                                Map.class)))
                 .andExpect(
                         jsonPath("$[0].projection.startTime")
                                 .value(defaultTicketDto.projection().startTime().toString()));

@@ -1,9 +1,9 @@
 package dev.vdrenkov.cineledger.testutils.factories;
 
-import org.springframework.http.HttpCookie;
-
 import static dev.vdrenkov.cineledger.testutils.constants.HttpCookieConstants.COOKIE_NAME;
 import static dev.vdrenkov.cineledger.testutils.constants.HttpCookieConstants.COOKIE_VALUE;
+
+import org.springframework.http.HttpCookie;
 
 public final class HttpCookieFactory {
 

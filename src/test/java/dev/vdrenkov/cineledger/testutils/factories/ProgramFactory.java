@@ -1,5 +1,8 @@
 package dev.vdrenkov.cineledger.testutils.factories;
 
+import static dev.vdrenkov.cineledger.testutils.constants.ProgramConstants.DATE;
+import static dev.vdrenkov.cineledger.testutils.constants.ProgramConstants.ID;
+
 import dev.vdrenkov.cineledger.models.dtos.ProgramDto;
 import dev.vdrenkov.cineledger.models.entities.Program;
 import dev.vdrenkov.cineledger.models.requests.ProgramRequest;
@@ -8,9 +11,6 @@ import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
 
 import java.util.Collections;
 import java.util.List;
-
-import static dev.vdrenkov.cineledger.testutils.constants.ProgramConstants.DATE;
-import static dev.vdrenkov.cineledger.testutils.constants.ProgramConstants.ID;
 
 public final class ProgramFactory {
 

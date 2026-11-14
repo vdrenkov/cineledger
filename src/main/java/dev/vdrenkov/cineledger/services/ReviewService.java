@@ -13,6 +13,7 @@ import dev.vdrenkov.cineledger.repositories.ReviewRepository;
 import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -36,7 +37,7 @@ public class ReviewService {
         this.cinemaService = cinemaService;
     }
 
-    @org.springframework.transaction.annotation.Transactional
+    @Transactional
     public Review addMovieReview(ReviewRequest request, int movieId) {
         final User user = userService.getCurrentUser();
         final Movie movie = movieService.getMovieForUpdate(movieId);
@@ -51,7 +52,7 @@ public class ReviewService {
         return review;
     }
 
-    @org.springframework.transaction.annotation.Transactional
+    @Transactional
     public Review addCinemaReview(ReviewRequest request, int cinemaId) {
         final User user = userService.getCurrentUser();
         final Cinema cinema = cinemaService.getCinemaForUpdate(cinemaId);
@@ -100,7 +101,7 @@ public class ReviewService {
         }
     }
 
-    @org.springframework.transaction.annotation.Transactional
+    @Transactional
     public ReviewDto updateReview(ReviewRequest request, int reviewId) {
         final Review review =
                 reviewRepository
@@ -111,7 +112,6 @@ public class ReviewService {
                         });
 
         if (!userService.isCurrentUserAuthorized(review.getUser().getId())) {
-
             throw new NotAuthorizedException(ExceptionMessages.NOT_AUTHORIZED_MESSAGE);
         }
 
@@ -127,7 +127,7 @@ public class ReviewService {
         return getReviewDto(review, reviewDto);
     }
 
-    @org.springframework.transaction.annotation.Transactional
+    @Transactional
     public ReviewDto deleteReview(int reviewId) {
         Review review =
                 reviewRepository
@@ -138,7 +138,6 @@ public class ReviewService {
                         });
 
         if (!userService.isCurrentUserAuthorized(review.getUser().getId())) {
-
             throw new NotAuthorizedException(ExceptionMessages.NOT_AUTHORIZED_MESSAGE);
         }
 

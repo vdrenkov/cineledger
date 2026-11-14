@@ -1,14 +1,23 @@
 package dev.vdrenkov.cineledger.services;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
+
 import dev.vdrenkov.cineledger.exceptions.ItemAlreadyExistsException;
 import dev.vdrenkov.cineledger.exceptions.ItemNotFoundException;
-import dev.vdrenkov.cineledger.exceptions.NoAvailableItemsException;
 import dev.vdrenkov.cineledger.models.dtos.ItemDto;
 import dev.vdrenkov.cineledger.models.entities.Item;
 import dev.vdrenkov.cineledger.models.requests.ItemRequest;
 import dev.vdrenkov.cineledger.repositories.ItemRepository;
 import dev.vdrenkov.cineledger.testutils.constants.ItemConstants;
 import dev.vdrenkov.cineledger.testutils.factories.ItemFactory;
+
+import jakarta.persistence.EntityManager;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -18,22 +27,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
 class ItemServiceTest {
     final ItemRequest itemRequest = ItemFactory.getDefaultItemRequest();
 
-    @Mock
-    private ItemRepository itemRepository;
+    @Mock private ItemRepository itemRepository;
 
-    @InjectMocks
-    private ItemService itemService;
+    @Mock private EntityManager entityManager;
+
+    @InjectMocks private ItemService itemService;
 
     @Test
     void testGetAllItems_noExceptions_success() {
@@ -48,7 +50,8 @@ class ItemServiceTest {
     @Test
     void testGetItemDtoById_itemFound_success() {
         final ItemDto expected = ItemFactory.getDefaultItemDto();
-        when(itemRepository.findById(anyInt())).thenReturn(Optional.of(ItemFactory.getDefaultItem()));
+        when(itemRepository.findById(anyInt()))
+                .thenReturn(Optional.of(ItemFactory.getDefaultItem()));
 
         final ItemDto item = itemService.getItemDtoById(ItemConstants.ID);
 
@@ -58,7 +61,8 @@ class ItemServiceTest {
     @Test
     void testGetItemDtoById_itemNotFound_throwsItemNotFoundException() {
         when(itemRepository.findById(anyInt())).thenThrow(new ItemNotFoundException(anyString()));
-        assertThrows(ItemNotFoundException.class, () -> itemService.getItemDtoById(ItemConstants.ID));
+        assertThrows(
+                ItemNotFoundException.class, () -> itemService.getItemDtoById(ItemConstants.ID));
     }
 
     @Test
@@ -81,7 +85,8 @@ class ItemServiceTest {
     @Test
     void testGetItemDtoByName_noExceptions_success() {
         final ItemDto expected = ItemFactory.getDefaultItemDto();
-        when(itemRepository.findByName(anyString())).thenReturn(Optional.of(ItemFactory.getDefaultItem()));
+        when(itemRepository.findByName(anyString()))
+                .thenReturn(Optional.of(ItemFactory.getDefaultItem()));
 
         final ItemDto itemDto = itemService.getItemDtoByName(ItemConstants.NAME);
 
@@ -92,7 +97,9 @@ class ItemServiceTest {
     void testGetItemDtoByName_throwsCategoryNotFoundException() {
         when(itemRepository.findByName(anyString())).thenReturn(Optional.empty());
 
-        assertThrows(ItemNotFoundException.class, () -> itemService.getItemDtoByName(ItemConstants.NAME));
+        assertThrows(
+                ItemNotFoundException.class,
+                () -> itemService.getItemDtoByName(ItemConstants.NAME));
     }
 
     @Test
@@ -115,7 +122,8 @@ class ItemServiceTest {
     @Test
     void testUpdateItem_itemUpdated_success() {
         final ItemDto expected = ItemFactory.getDefaultItemDto();
-        when(itemRepository.findById(anyInt())).thenReturn(Optional.of(ItemFactory.getDefaultItem()));
+        when(itemRepository.findById(anyInt()))
+                .thenReturn(Optional.of(ItemFactory.getDefaultItem()));
         when(itemRepository.save(any())).thenReturn(ItemFactory.getDefaultItem());
 
         final ItemDto itemDto = itemService.editItem(itemRequest, ItemConstants.ID);
@@ -126,7 +134,8 @@ class ItemServiceTest {
     @Test
     void testDeleteItem_itemDeleted_success() {
         final ItemDto expected = ItemFactory.getDefaultItemDto();
-        when(itemRepository.findById(anyInt())).thenReturn(Optional.of(ItemFactory.getDefaultItem()));
+        when(itemRepository.findById(anyInt()))
+                .thenReturn(Optional.of(ItemFactory.getDefaultItem()));
 
         final ItemDto itemDto = itemService.removeItem(ItemConstants.ID);
 
@@ -134,42 +143,12 @@ class ItemServiceTest {
     }
 
     @Test
-    void testIncrementItemQuantity_shouldIncrementedItemQuantity_success() {
-        final Item item = new Item();
-        item.setQuantity(5);
-
-        final int incrementedQuantity = ItemService.incrementItemQuantity(item);
-
-        assertEquals(6, incrementedQuantity);
-        assertEquals(6, item.getQuantity());
-    }
-
-    @Test
-    void testDecrementItemQuantity_shouldDecrementItemQuantity_success() {
-        final Item item = new Item();
-        item.setQuantity(5);
-
-        final int decrementedQuantity = ItemService.decrementItemQuantity(item);
-
-        assertEquals(4, decrementedQuantity);
-        assertEquals(4, item.getQuantity());
-    }
-
-    @Test
-    void testDecrementItemQuantity_shouldThrowNoAvailableItemsException() {
-        final Item item = new Item();
-        item.setQuantity(0);
-
-        assertThrows(NoAvailableItemsException.class, () -> ItemService.decrementItemQuantity(item));
-    }
-
-    @Test
     void testGetItemsByQuantity_noExceptions_isBelowFalse_success() {
         final List<ItemDto> expected = ItemFactory.getDefaultItemDtoList();
         when(itemRepository.findAll()).thenReturn(ItemFactory.getDefaultItemList());
 
-        final List<ItemDto> resultList = itemService.getItemsByQuantity(ItemConstants.QUANTITY - 1,
-            ItemConstants.IS_BELLOW);
+        final List<ItemDto> resultList =
+                itemService.getItemsByQuantity(ItemConstants.QUANTITY - 1, ItemConstants.IS_BELLOW);
 
         assertEquals(expected, resultList);
     }
@@ -179,7 +158,8 @@ class ItemServiceTest {
         final List<ItemDto> expected = ItemFactory.getDefaultItemDtoList();
         when(itemRepository.findAll()).thenReturn(ItemFactory.getDefaultItemList());
 
-        final List<ItemDto> resultList = itemService.getItemsByQuantity(ItemConstants.QUANTITY + 1, true);
+        final List<ItemDto> resultList =
+                itemService.getItemsByQuantity(ItemConstants.QUANTITY + 1, true);
 
         assertEquals(expected, resultList);
     }

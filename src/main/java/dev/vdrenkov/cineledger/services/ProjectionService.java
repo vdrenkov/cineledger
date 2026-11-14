@@ -2,6 +2,7 @@ package dev.vdrenkov.cineledger.services;
 
 import dev.vdrenkov.cineledger.exceptions.HallNotAvailableException;
 import dev.vdrenkov.cineledger.exceptions.ProjectionNotFoundException;
+import dev.vdrenkov.cineledger.exceptions.ResourceInUseException;
 import dev.vdrenkov.cineledger.mappers.ProjectionMapper;
 import dev.vdrenkov.cineledger.models.dtos.ProjectionDto;
 import dev.vdrenkov.cineledger.models.entities.Hall;
@@ -10,17 +11,19 @@ import dev.vdrenkov.cineledger.models.entities.Program;
 import dev.vdrenkov.cineledger.models.entities.Projection;
 import dev.vdrenkov.cineledger.models.requests.ProjectionRequest;
 import dev.vdrenkov.cineledger.repositories.ProjectionRepository;
+import dev.vdrenkov.cineledger.repositories.TicketRepository;
 import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.LocalTime;
 import java.util.List;
 
 @Service
 public class ProjectionService {
-    private final dev.vdrenkov.cineledger.repositories.TicketRepository ticketRepository;
+    private final TicketRepository ticketRepository;
 
     private final ProjectionRepository projectionRepository;
     private final ProgramService programService;
@@ -28,7 +31,7 @@ public class ProjectionService {
     private final MovieService movieService;
 
     public ProjectionService(
-            dev.vdrenkov.cineledger.repositories.TicketRepository ticketRepository,
+            TicketRepository ticketRepository,
             ProjectionRepository projectionRepository,
             ProgramService programService,
             HallService hallService,
@@ -111,7 +114,7 @@ public class ProjectionService {
                         || request.movieId() != stored.getMovie().getId();
 
         if (identityChanged && ticketRepository.countByProjectionId(id) > 0) {
-            throw new dev.vdrenkov.cineledger.exceptions.ResourceInUseException(
+            throw new ResourceInUseException(
                     "A screening with issued tickets cannot change its movie, hall or program");
         }
 
@@ -148,7 +151,7 @@ public class ProjectionService {
             final ProjectionRequest request,
             final Hall hall,
             final Program program,
-            final java.time.Duration runtime,
+            final Duration runtime,
             final int excludedId) {
 
         if (hall.getCinema().getId() != program.getCinema().getId()) {

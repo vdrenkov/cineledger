@@ -4,11 +4,10 @@ import java.time.Duration;
 import java.time.LocalDate;
 
 public record MovieDto(
-    int id,
-    String title,
-    double averageRating,
-    String description,
-    LocalDate releaseDate,
-    Duration runtime,
-    CategoryDto category
-) {}
+        int id,
+        String title,
+        double averageRating,
+        String description,
+        LocalDate releaseDate,
+        Duration runtime,
+        CategoryDto category) {}

@@ -14,6 +14,7 @@ import dev.vdrenkov.cineledger.models.entities.Program;
 import dev.vdrenkov.cineledger.models.entities.Projection;
 import dev.vdrenkov.cineledger.models.requests.ProjectionRequest;
 import dev.vdrenkov.cineledger.repositories.ProjectionRepository;
+import dev.vdrenkov.cineledger.repositories.TicketRepository;
 import dev.vdrenkov.cineledger.testutils.constants.ProjectionConstants;
 import dev.vdrenkov.cineledger.testutils.factories.HallFactory;
 import dev.vdrenkov.cineledger.testutils.factories.MovieFactory;
@@ -24,6 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalTime;
@@ -42,7 +44,7 @@ class ProjectionServiceTest {
 
     @Mock private MovieService movieService;
 
-    @Mock private dev.vdrenkov.cineledger.repositories.TicketRepository ticketRepository;
+    @Mock private TicketRepository ticketRepository;
 
     @InjectMocks private ProjectionService projectionService;
 
@@ -209,7 +211,7 @@ class ProjectionServiceTest {
         projectionService.addProjection(request);
 
         final var startsAt = program.getProgramDate().atTime(23, 0);
-        org.mockito.Mockito.verify(projectionRepository)
+        Mockito.verify(projectionRepository)
                 .overlaps(hall.getId(), 0, startsAt, startsAt.plus(movie.getRuntime()));
     }
 }

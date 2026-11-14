@@ -7,19 +7,21 @@ import java.util.List;
 
 public final class ProjectionMapper {
 
-    private ProjectionMapper() {
-
-    }
+    private ProjectionMapper() {}
 
     public static ProjectionDto mapProjectionToProjectionDto(Projection projection) {
 
-        return new ProjectionDto(projection.getId(), projection.getPrice(),
-            HallMapper.mapHallToHallDto(projection.getHall()),
-            ProgramMapper.mapProgramToProgramDto(projection.getProgram()),
-            MovieMapper.mapMovieToMovieDto(projection.getMovie()), projection.getStartTime());
+        return new ProjectionDto(
+                projection.getId(),
+                projection.getPrice(),
+                HallMapper.mapHallToHallDto(projection.getHall()),
+                ProgramMapper.mapProgramToProgramDto(projection.getProgram()),
+                MovieMapper.mapMovieToMovieDto(projection.getMovie()),
+                projection.getStartTime());
     }
 
-    public static List<ProjectionDto> mapProjectionListToProjectionDtoList(List<Projection> projections) {
+    public static List<ProjectionDto> mapProjectionListToProjectionDtoList(
+            List<Projection> projections) {
         return projections.stream().map(ProjectionMapper::mapProjectionToProjectionDto).toList();
     }
 }

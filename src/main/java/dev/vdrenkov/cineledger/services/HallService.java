@@ -1,27 +1,30 @@
 package dev.vdrenkov.cineledger.services;
 
 import dev.vdrenkov.cineledger.exceptions.HallNotFoundException;
+import dev.vdrenkov.cineledger.exceptions.ResourceInUseException;
 import dev.vdrenkov.cineledger.mappers.HallMapper;
 import dev.vdrenkov.cineledger.models.dtos.HallDto;
 import dev.vdrenkov.cineledger.models.entities.Cinema;
 import dev.vdrenkov.cineledger.models.entities.Hall;
 import dev.vdrenkov.cineledger.models.requests.HallRequest;
 import dev.vdrenkov.cineledger.repositories.HallRepository;
+import dev.vdrenkov.cineledger.repositories.ProjectionRepository;
 import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 public class HallService {
-    private final dev.vdrenkov.cineledger.repositories.ProjectionRepository projectionRepository;
+    private final ProjectionRepository projectionRepository;
 
     private final HallRepository hallRepository;
     private final CinemaService cinemaService;
 
     public HallService(
-            dev.vdrenkov.cineledger.repositories.ProjectionRepository projectionRepository,
+            ProjectionRepository projectionRepository,
             HallRepository hallRepository,
             CinemaService cinemaService) {
         this.projectionRepository = projectionRepository;
@@ -66,7 +69,7 @@ public class HallService {
         return HallMapper.mapHallToHallDto(getHallById(id));
     }
 
-    @org.springframework.transaction.annotation.Transactional
+    @Transactional
     public HallDto updateHall(final HallRequest request, final int id) {
         final Hall stored = getHallForUpdate(id);
         final HallDto previous = HallMapper.mapHallToHallDto(stored);
@@ -74,7 +77,7 @@ public class HallService {
         if ((request.cinemaId() != stored.getCinema().getId()
                         || request.capacity() < stored.getCapacity())
                 && projectionRepository.existsByHallId(id)) {
-            throw new dev.vdrenkov.cineledger.exceptions.ResourceInUseException(
+            throw new ResourceInUseException(
                     "A hall with screenings cannot move cinema or reduce its capacity");
         }
 

@@ -15,8 +15,6 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, OrderItem.
 
     List<OrderItem> findByOrderIdIn(Collection<Integer> orderIds);
 
-    void deleteByOrderId(int orderId);
-
     @Query(
             "select coalesce(sum(line.paidTotal), 0) from OrderItem line, Order purchase "
                     + "where line.orderId = purchase.id and line.itemId = :itemId "

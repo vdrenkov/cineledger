@@ -1,13 +1,13 @@
 package dev.vdrenkov.cineledger.controllers;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.security.web.csrf.CsrfToken;
 
 import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class CsrfControllerTest {
     private final CsrfController csrfController = new CsrfController();

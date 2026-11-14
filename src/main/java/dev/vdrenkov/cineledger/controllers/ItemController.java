@@ -5,7 +5,9 @@ import dev.vdrenkov.cineledger.models.entities.Item;
 import dev.vdrenkov.cineledger.models.requests.ItemRequest;
 import dev.vdrenkov.cineledger.services.ItemService;
 import dev.vdrenkov.cineledger.utils.constants.URIConstants;
+
 import jakarta.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,10 +36,10 @@ public class ItemController {
 
         final Item item = itemService.addItem(itemRequest);
 
-        URI location = UriComponentsBuilder
-            .fromUriString(URIConstants.ITEMS_ID_PATH)
-            .buildAndExpand(item.getId())
-            .toUri();
+        URI location =
+                UriComponentsBuilder.fromUriString(URIConstants.ITEMS_ID_PATH)
+                        .buildAndExpand(item.getId())
+                        .toUri();
 
         return ResponseEntity.created(location).build();
     }
@@ -57,7 +59,8 @@ public class ItemController {
     }
 
     @GetMapping(value = URIConstants.ITEMS_PATH, params = "quantity")
-    public ResponseEntity<List<ItemDto>> getItemsByQuantity(@RequestParam int quantity, @RequestParam Boolean isBelow) {
+    public ResponseEntity<List<ItemDto>> getItemsByQuantity(
+            @RequestParam int quantity, @RequestParam Boolean isBelow) {
 
         final List<ItemDto> filteredItems = itemService.getItemsByQuantity(quantity, isBelow);
 
@@ -65,19 +68,26 @@ public class ItemController {
     }
 
     @PutMapping(URIConstants.ITEMS_ID_PATH)
-    public ResponseEntity<ItemDto> updateItem(@RequestBody @Valid ItemRequest itemRequest, @PathVariable int id,
-        @RequestParam(required = false) Boolean returnOld) {
+    public ResponseEntity<ItemDto> updateItem(
+            @RequestBody @Valid ItemRequest itemRequest,
+            @PathVariable int id,
+            @RequestParam(required = false) Boolean returnOld) {
 
         final ItemDto itemDto = itemService.editItem(itemRequest, id);
 
-        return Boolean.TRUE.equals(returnOld) ? ResponseEntity.ok(itemDto) : ResponseEntity.noContent().build();
+        return Boolean.TRUE.equals(returnOld)
+                ? ResponseEntity.ok(itemDto)
+                : ResponseEntity.noContent().build();
     }
 
     @DeleteMapping(URIConstants.ITEMS_ID_PATH)
-    public ResponseEntity<ItemDto> deleteItem(@PathVariable int id, @RequestParam(required = false) Boolean returnOld) {
+    public ResponseEntity<ItemDto> deleteItem(
+            @PathVariable int id, @RequestParam(required = false) Boolean returnOld) {
 
         final ItemDto itemDto = itemService.removeItem(id);
 
-        return Boolean.TRUE.equals(returnOld) ? ResponseEntity.ok(itemDto) : ResponseEntity.noContent().build();
+        return Boolean.TRUE.equals(returnOld)
+                ? ResponseEntity.ok(itemDto)
+                : ResponseEntity.noContent().build();
     }
 }

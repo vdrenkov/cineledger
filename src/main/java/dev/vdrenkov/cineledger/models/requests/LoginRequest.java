@@ -4,10 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
 public record LoginRequest(
-    @NotNull(message = "The username can't be empty")
-    String username,
-
-    @Pattern(regexp = "^.{8,}$", message = "The password should be at least 8 symbols long")
-    @NotNull(message = "The password can't be empty")
-    String password
-) {}
+        @NotNull(message = "The username can't be empty") String username,
+        @Pattern(regexp = "^.{8,}$", message = "The password should be at least 8 symbols long")
+                @NotNull(message = "The password can't be empty")
+                String password) {}

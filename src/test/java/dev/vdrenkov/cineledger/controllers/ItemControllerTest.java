@@ -36,6 +36,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import tools.jackson.databind.ObjectMapper;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 
 @ExtendWith(MockitoExtension.class)
@@ -80,7 +81,7 @@ class ItemControllerTest {
                         jsonPath("$[0].price")
                                 .value(
                                         org.hamcrest.Matchers.comparesEqualTo(PRICE),
-                                        java.math.BigDecimal.class))
+                                        BigDecimal.class))
                 .andExpect(jsonPath("$[0].quantity").value(QUANTITY));
     }
 
@@ -159,7 +160,7 @@ class ItemControllerTest {
                         jsonPath("$[0].price")
                                 .value(
                                         org.hamcrest.Matchers.comparesEqualTo(PRICE),
-                                        java.math.BigDecimal.class))
+                                        BigDecimal.class))
                 .andExpect(jsonPath("$[0].quantity").value(QUANTITY));
     }
 }

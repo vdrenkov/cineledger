@@ -1,5 +1,10 @@
 package dev.vdrenkov.cineledger.testutils.factories;
 
+import static dev.vdrenkov.cineledger.testutils.constants.CinemaConstants.ADDRESS;
+import static dev.vdrenkov.cineledger.testutils.constants.CinemaConstants.CITY;
+import static dev.vdrenkov.cineledger.testutils.constants.CinemaConstants.ID;
+import static dev.vdrenkov.cineledger.testutils.constants.MovieConstants.RATING;
+
 import dev.vdrenkov.cineledger.models.dtos.CinemaDto;
 import dev.vdrenkov.cineledger.models.entities.Cinema;
 import dev.vdrenkov.cineledger.models.requests.CinemaRequest;
@@ -7,11 +12,6 @@ import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
 
 import java.util.Collections;
 import java.util.List;
-
-import static dev.vdrenkov.cineledger.testutils.constants.CinemaConstants.ADDRESS;
-import static dev.vdrenkov.cineledger.testutils.constants.CinemaConstants.CITY;
-import static dev.vdrenkov.cineledger.testutils.constants.CinemaConstants.ID;
-import static dev.vdrenkov.cineledger.testutils.constants.MovieConstants.RATING;
 
 public final class CinemaFactory {
 

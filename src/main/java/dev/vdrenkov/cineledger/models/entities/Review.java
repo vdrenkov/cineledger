@@ -18,8 +18,7 @@ public class Review {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column
-    private double rating;
+    @Column private double rating;
 
     @Column(name = "review_text")
     private String reviewText;
@@ -27,14 +26,12 @@ public class Review {
     @Column(name = "date_modified")
     private LocalDate dateModified;
 
-    @ManyToOne
-    private Movie movie;
-    @ManyToOne
-    private Cinema cinema;
-    @ManyToOne
-    private User user;
+    @ManyToOne private Movie movie;
+    @ManyToOne private Cinema cinema;
+    @ManyToOne private User user;
 
-    public Review(double rating, String reviewText, LocalDate dateModified, Movie movie, User user) {
+    public Review(
+            double rating, String reviewText, LocalDate dateModified, Movie movie, User user) {
         this.rating = rating;
         this.reviewText = reviewText;
         this.dateModified = dateModified;
@@ -42,7 +39,8 @@ public class Review {
         this.user = user;
     }
 
-    public Review(double rating, String reviewText, LocalDate dateModified, Cinema cinema, User user) {
+    public Review(
+            double rating, String reviewText, LocalDate dateModified, Cinema cinema, User user) {
         this.rating = rating;
         this.reviewText = reviewText;
         this.dateModified = dateModified;
@@ -52,7 +50,14 @@ public class Review {
 
     public Review() {}
 
-    public Review(final int id, final double rating, final String reviewText, final LocalDate dateModified, final Movie movie, final Cinema cinema, final User user) {
+    public Review(
+            final int id,
+            final double rating,
+            final String reviewText,
+            final LocalDate dateModified,
+            final Movie movie,
+            final Cinema cinema,
+            final User user) {
         this.id = id;
         this.rating = rating;
         this.reviewText = reviewText;

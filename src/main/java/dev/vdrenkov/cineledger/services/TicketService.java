@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -36,8 +37,7 @@ public class TicketService {
         final LocalDate programDate = projection.getProgram().getProgramDate();
         final LocalDate dateOfPurchase = LocalDate.now();
 
-        if (!programDate.atTime(projection.getStartTime()).isAfter(java.time.LocalDateTime.now())) {
-
+        if (!programDate.atTime(projection.getStartTime()).isAfter(LocalDateTime.now())) {
             throw new DateNotValidException(ExceptionMessages.DATE_NOT_VALID_MESSAGE);
         }
 
@@ -72,27 +72,12 @@ public class TicketService {
         ticketRepository.deleteAll(tickets);
     }
 
-    public Ticket getTicketById(int id) {
-
-        return ticketRepository
-                .findById(id)
-                .orElseThrow(() -> {
-                    return new TicketNotFoundException(ExceptionMessages.TICKET_NOT_FOUND_MESSAGE);
-                });
-    }
-
-    public List<Ticket> getTicketsByDateBetween(LocalDate startDate, LocalDate endDate) {
-
-        return ticketRepository.findTicketsByDateOfPurchaseBetween(startDate, endDate);
-    }
-
     public int calculateAvailableTickets(Projection projection) {
         final int capacity = projection.getHall().getCapacity();
         final int totalTickets = ticketRepository.countByProjectionId(projection.getId());
         final int availableTickets = capacity - totalTickets;
 
         if (availableTickets <= 0) {
-
             throw new NoAvailableTicketsException(ExceptionMessages.NO_AVAILABLE_TICKETS_EXCEPTION);
         }
 

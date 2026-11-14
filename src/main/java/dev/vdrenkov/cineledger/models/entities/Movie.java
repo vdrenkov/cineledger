@@ -20,26 +20,28 @@ public class Movie {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column
-    private String title;
+    @Column private String title;
 
     @Column(name = "average_rating")
     private double averageRating;
 
-    @Column
-    private String description;
+    @Column private String description;
 
     @Column(name = "release_date")
     private LocalDate releaseDate;
 
-    @Column
-    private Duration runtime;
+    @Column private Duration runtime;
 
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
 
-    public Movie(String title, String description, LocalDate releaseDate, Duration runtime, Category category) {
+    public Movie(
+            String title,
+            String description,
+            LocalDate releaseDate,
+            Duration runtime,
+            Category category) {
         this.title = title;
         this.description = description;
         this.releaseDate = releaseDate;
@@ -47,7 +49,13 @@ public class Movie {
         this.category = category;
     }
 
-    public Movie(int id, String title, String description, LocalDate releaseDate, Duration runtime, Category category) {
+    public Movie(
+            int id,
+            String title,
+            String description,
+            LocalDate releaseDate,
+            Duration runtime,
+            Category category) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -58,7 +66,14 @@ public class Movie {
 
     public Movie() {}
 
-    public Movie(final int id, final String title, final double averageRating, final String description, final LocalDate releaseDate, final Duration runtime, final Category category) {
+    public Movie(
+            final int id,
+            final String title,
+            final double averageRating,
+            final String description,
+            final LocalDate releaseDate,
+            final Duration runtime,
+            final Category category) {
         this.id = id;
         this.title = title;
         this.averageRating = averageRating;

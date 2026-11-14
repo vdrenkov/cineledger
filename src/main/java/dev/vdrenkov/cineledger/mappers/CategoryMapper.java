@@ -7,9 +7,7 @@ import java.util.List;
 
 public final class CategoryMapper {
 
-    private CategoryMapper() {
-
-    }
+    private CategoryMapper() {}
 
     public static CategoryDto mapCategoryToCategoryDto(Category category) {
 

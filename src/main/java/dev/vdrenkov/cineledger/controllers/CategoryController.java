@@ -5,7 +5,9 @@ import dev.vdrenkov.cineledger.models.entities.Category;
 import dev.vdrenkov.cineledger.models.requests.CategoryRequest;
 import dev.vdrenkov.cineledger.services.CategoryService;
 import dev.vdrenkov.cineledger.utils.constants.URIConstants;
+
 import jakarta.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,10 +34,10 @@ public class CategoryController {
     public ResponseEntity<Void> addCategory(@RequestBody @Valid CategoryRequest categoryRequest) {
         final Category category = categoryService.addCategory(categoryRequest);
 
-        URI location = UriComponentsBuilder
-            .fromUriString(URIConstants.CATEGORIES_ID_PATH)
-            .buildAndExpand(category.getId())
-            .toUri();
+        URI location =
+                UriComponentsBuilder.fromUriString(URIConstants.CATEGORIES_ID_PATH)
+                        .buildAndExpand(category.getId())
+                        .toUri();
 
         return ResponseEntity.created(location).build();
     }
@@ -55,20 +57,26 @@ public class CategoryController {
     }
 
     @PutMapping(URIConstants.CATEGORIES_ID_PATH)
-    public ResponseEntity<CategoryDto> updateCategory(@RequestBody @Valid CategoryRequest categoryRequest,
-        @PathVariable int id, @RequestParam(required = false) Boolean returnOld) {
+    public ResponseEntity<CategoryDto> updateCategory(
+            @RequestBody @Valid CategoryRequest categoryRequest,
+            @PathVariable int id,
+            @RequestParam(required = false) Boolean returnOld) {
 
         final CategoryDto categoryDto = categoryService.updateCategory(categoryRequest, id);
 
-        return Boolean.TRUE.equals(returnOld) ? ResponseEntity.ok(categoryDto) : ResponseEntity.noContent().build();
+        return Boolean.TRUE.equals(returnOld)
+                ? ResponseEntity.ok(categoryDto)
+                : ResponseEntity.noContent().build();
     }
 
     @DeleteMapping(URIConstants.CATEGORIES_ID_PATH)
-    public ResponseEntity<CategoryDto> deleteCategory(@PathVariable int id,
-        @RequestParam(required = false) Boolean returnOld) {
+    public ResponseEntity<CategoryDto> deleteCategory(
+            @PathVariable int id, @RequestParam(required = false) Boolean returnOld) {
 
         final CategoryDto categoryDto = categoryService.deleteCategory(id);
 
-        return Boolean.TRUE.equals(returnOld) ? ResponseEntity.ok(categoryDto) : ResponseEntity.noContent().build();
+        return Boolean.TRUE.equals(returnOld)
+                ? ResponseEntity.ok(categoryDto)
+                : ResponseEntity.noContent().build();
     }
 }

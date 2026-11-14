@@ -10,6 +10,7 @@ import dev.vdrenkov.cineledger.repositories.MovieRepository;
 import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -47,14 +48,12 @@ public class MovieService {
 
     public List<MovieDto> getMoviesByTitle(String title, double minRating) {
         if (title == null || title.isEmpty()) {
-
             throw new IllegalArgumentException(
                     "Required request parameter 'title' for method parameter type String is present"
                             + " but converted to null");
         }
 
         if (minRating == 0.0) {
-
             return MovieMapper.mapMovieListToMovieDtoList(
                     movieRepository.findByTitleContaining(title));
         } else {
@@ -137,14 +136,7 @@ public class MovieService {
                 });
     }
 
-    public List<Integer> getIdsOfMoviesByTitle(String title) {
-
-        final List<Movie> movies = movieRepository.findByTitleContaining(title);
-
-        return movies.stream().map(Movie::getId).toList();
-    }
-
-    @org.springframework.transaction.annotation.Transactional
+    @Transactional
     public MovieDto updateMovie(MovieRequest request, int id) {
         final Movie stored = getMovieForUpdate(id);
         final MovieDto movieDto = MovieMapper.mapMovieToMovieDto(stored);

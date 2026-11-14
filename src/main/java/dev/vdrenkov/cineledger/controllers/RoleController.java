@@ -5,7 +5,9 @@ import dev.vdrenkov.cineledger.models.entities.Role;
 import dev.vdrenkov.cineledger.models.requests.RoleRequest;
 import dev.vdrenkov.cineledger.services.RoleService;
 import dev.vdrenkov.cineledger.utils.constants.URIConstants;
+
 import jakarta.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,10 +35,10 @@ public class RoleController {
     public ResponseEntity<Void> addRole(@RequestBody @Valid RoleRequest request) {
         final Role role = roleService.addRole(request);
 
-        URI location = UriComponentsBuilder
-            .fromUriString(URIConstants.ROLES_ID_PATH)
-            .buildAndExpand(role.getId())
-            .toUri();
+        URI location =
+                UriComponentsBuilder.fromUriString(URIConstants.ROLES_ID_PATH)
+                        .buildAndExpand(role.getId())
+                        .toUri();
 
         return ResponseEntity.created(location).build();
     }
@@ -56,18 +58,25 @@ public class RoleController {
     }
 
     @PutMapping(URIConstants.ROLES_ID_PATH)
-    public ResponseEntity<RoleDto> updateRole(@RequestBody @Valid RoleRequest request, @PathVariable int id,
-        @RequestParam(required = false) Boolean returnOld) {
+    public ResponseEntity<RoleDto> updateRole(
+            @RequestBody @Valid RoleRequest request,
+            @PathVariable int id,
+            @RequestParam(required = false) Boolean returnOld) {
 
         final RoleDto roleDto = roleService.updateRole(request, id);
 
-        return Boolean.TRUE.equals(returnOld) ? ResponseEntity.ok(roleDto) : ResponseEntity.noContent().build();
+        return Boolean.TRUE.equals(returnOld)
+                ? ResponseEntity.ok(roleDto)
+                : ResponseEntity.noContent().build();
     }
 
     @DeleteMapping(URIConstants.ROLES_ID_PATH)
-    public ResponseEntity<RoleDto> deleteRole(@PathVariable int id, @RequestParam(required = false) Boolean returnOld) {
+    public ResponseEntity<RoleDto> deleteRole(
+            @PathVariable int id, @RequestParam(required = false) Boolean returnOld) {
         final RoleDto roleDto = roleService.deleteRole(id);
 
-        return Boolean.TRUE.equals(returnOld) ? ResponseEntity.ok(roleDto) : ResponseEntity.noContent().build();
+        return Boolean.TRUE.equals(returnOld)
+                ? ResponseEntity.ok(roleDto)
+                : ResponseEntity.noContent().build();
     }
 }

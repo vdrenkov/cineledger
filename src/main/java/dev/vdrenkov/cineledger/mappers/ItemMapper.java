@@ -7,9 +7,7 @@ import java.util.List;
 
 public final class ItemMapper {
 
-    private ItemMapper() {
-
-    }
+    private ItemMapper() {}
 
     public static ItemDto mapItemToItemDto(Item item) {
 

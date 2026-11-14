@@ -1,5 +1,12 @@
 package dev.vdrenkov.cineledger.services;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
+
 import dev.vdrenkov.cineledger.exceptions.RoleAlreadyExistsException;
 import dev.vdrenkov.cineledger.exceptions.RoleNotFoundException;
 import dev.vdrenkov.cineledger.models.dtos.RoleDto;
@@ -8,6 +15,7 @@ import dev.vdrenkov.cineledger.models.requests.RoleRequest;
 import dev.vdrenkov.cineledger.repositories.RoleRepository;
 import dev.vdrenkov.cineledger.testutils.constants.RoleConstants;
 import dev.vdrenkov.cineledger.testutils.factories.RoleFactory;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -17,21 +25,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
 class RoleServiceTest {
 
-    @Mock
-    private RoleRepository roleRepository;
+    @Mock private RoleRepository roleRepository;
 
-    @InjectMocks
-    private RoleService roleService;
+    @InjectMocks private RoleService roleService;
 
     @Test
     void testAddRole_noExceptions_success() {
@@ -86,7 +85,8 @@ class RoleServiceTest {
     void testGetRoleDtoById_roleDtoFound_success() {
         final RoleDto expected = RoleFactory.getDefaultRoleDto();
 
-        when(roleRepository.findById(anyInt())).thenReturn(Optional.of(RoleFactory.getDefaultRole()));
+        when(roleRepository.findById(anyInt()))
+                .thenReturn(Optional.of(RoleFactory.getDefaultRole()));
 
         final RoleDto role = roleService.getRoleDtoById(RoleConstants.ID);
 
@@ -108,14 +108,16 @@ class RoleServiceTest {
     void testGetRoleByName_roleNotFound_throwRoleNotFoundException() {
         when(roleRepository.findRoleByName(anyString())).thenReturn(Optional.empty());
 
-        assertThrows(RoleNotFoundException.class, () -> roleService.getRoleByName(RoleConstants.NAME));
+        assertThrows(
+                RoleNotFoundException.class, () -> roleService.getRoleByName(RoleConstants.NAME));
     }
 
     @Test
     void testGetRoleDtoByName_roleDtoFound_success() {
         final RoleDto expected = RoleFactory.getDefaultRoleDto();
 
-        when(roleRepository.findRoleByName(anyString())).thenReturn(Optional.of(RoleFactory.getDefaultRole()));
+        when(roleRepository.findRoleByName(anyString()))
+                .thenReturn(Optional.of(RoleFactory.getDefaultRole()));
 
         final RoleDto role = roleService.getRoleDtoByName(RoleConstants.NAME);
 
@@ -126,10 +128,12 @@ class RoleServiceTest {
     void testUpdateRole_roleUpdated_success() {
         final RoleDto expected = RoleFactory.getDefaultRoleDto();
 
-        when(roleRepository.findById(anyInt())).thenReturn(Optional.of(RoleFactory.getDefaultRole()));
+        when(roleRepository.findById(anyInt()))
+                .thenReturn(Optional.of(RoleFactory.getDefaultRole()));
         when(roleRepository.save(any())).thenReturn(RoleFactory.getDefaultRole());
 
-        final RoleDto role = roleService.updateRole(RoleFactory.getDefaultRoleRequest(), RoleConstants.ID);
+        final RoleDto role =
+                roleService.updateRole(RoleFactory.getDefaultRoleRequest(), RoleConstants.ID);
 
         assertEquals(expected, role);
     }
@@ -146,7 +150,8 @@ class RoleServiceTest {
     void testDeleteRole_roleDeleted_success() {
         final RoleDto expected = RoleFactory.getDefaultRoleDto();
 
-        when(roleRepository.findById(anyInt())).thenReturn(Optional.of(RoleFactory.getDefaultRole()));
+        when(roleRepository.findById(anyInt()))
+                .thenReturn(Optional.of(RoleFactory.getDefaultRole()));
 
         final RoleDto role = roleService.deleteRole(RoleConstants.ID);
 

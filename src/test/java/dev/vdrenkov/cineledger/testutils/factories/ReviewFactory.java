@@ -1,13 +1,5 @@
 package dev.vdrenkov.cineledger.testutils.factories;
 
-import dev.vdrenkov.cineledger.models.dtos.ReviewDto;
-import dev.vdrenkov.cineledger.models.entities.Review;
-import dev.vdrenkov.cineledger.models.requests.ReviewRequest;
-import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
-
-import java.util.Collections;
-import java.util.List;
-
 import static dev.vdrenkov.cineledger.testutils.constants.ReviewConstants.DATE_MODIFIED;
 import static dev.vdrenkov.cineledger.testutils.constants.ReviewConstants.ID;
 import static dev.vdrenkov.cineledger.testutils.constants.ReviewConstants.RATING;
@@ -19,6 +11,14 @@ import static dev.vdrenkov.cineledger.testutils.constants.ReviewConstants.REVIEW
 import static dev.vdrenkov.cineledger.testutils.constants.ReviewConstants.REVIEW_USER;
 import static dev.vdrenkov.cineledger.testutils.constants.ReviewConstants.REVIEW_USER_DTO;
 
+import dev.vdrenkov.cineledger.models.dtos.ReviewDto;
+import dev.vdrenkov.cineledger.models.entities.Review;
+import dev.vdrenkov.cineledger.models.requests.ReviewRequest;
+import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
+
+import java.util.Collections;
+import java.util.List;
+
 public final class ReviewFactory {
 
     private ReviewFactory() {
@@ -26,7 +26,8 @@ public final class ReviewFactory {
     }
 
     public static Review getDefaultReview() {
-        return new Review(ID, RATING, REVIEW_TEXT, DATE_MODIFIED, REVIEW_MOVIE, REVIEW_CINEMA, REVIEW_USER);
+        return new Review(
+                ID, RATING, REVIEW_TEXT, DATE_MODIFIED, REVIEW_MOVIE, REVIEW_CINEMA, REVIEW_USER);
     }
 
     public static List<Review> getDefaultReviewList() {
@@ -34,11 +35,13 @@ public final class ReviewFactory {
     }
 
     public static ReviewDto getDefaultReviewDto() {
-        return new ReviewDto(ID, RATING, REVIEW_TEXT, DATE_MODIFIED, REVIEW_MOVIE_DTO, null, REVIEW_USER_DTO);
+        return new ReviewDto(
+                ID, RATING, REVIEW_TEXT, DATE_MODIFIED, REVIEW_MOVIE_DTO, null, REVIEW_USER_DTO);
     }
 
     public static ReviewDto getDefaultReviewDtoWithCinema() {
-        return new ReviewDto(ID, RATING, REVIEW_TEXT, DATE_MODIFIED, null, REVIEW_CINEMA_DTO, REVIEW_USER_DTO);
+        return new ReviewDto(
+                ID, RATING, REVIEW_TEXT, DATE_MODIFIED, null, REVIEW_CINEMA_DTO, REVIEW_USER_DTO);
     }
 
     public static Review getDefaultReviewWithCinema() {

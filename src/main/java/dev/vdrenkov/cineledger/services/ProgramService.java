@@ -3,28 +3,31 @@ package dev.vdrenkov.cineledger.services;
 import dev.vdrenkov.cineledger.exceptions.DateNotValidException;
 import dev.vdrenkov.cineledger.exceptions.ProgramAlreadyExistsException;
 import dev.vdrenkov.cineledger.exceptions.ProgramNotFoundException;
+import dev.vdrenkov.cineledger.exceptions.ResourceInUseException;
 import dev.vdrenkov.cineledger.mappers.ProgramMapper;
 import dev.vdrenkov.cineledger.models.dtos.ProgramDto;
 import dev.vdrenkov.cineledger.models.entities.Cinema;
 import dev.vdrenkov.cineledger.models.entities.Program;
 import dev.vdrenkov.cineledger.models.requests.ProgramRequest;
 import dev.vdrenkov.cineledger.repositories.ProgramRepository;
+import dev.vdrenkov.cineledger.repositories.ProjectionRepository;
 import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @Service
 public class ProgramService {
-    private final dev.vdrenkov.cineledger.repositories.ProjectionRepository projectionRepository;
+    private final ProjectionRepository projectionRepository;
 
     private final ProgramRepository programRepository;
     private final CinemaService cinemaService;
 
     public ProgramService(
-            dev.vdrenkov.cineledger.repositories.ProjectionRepository projectionRepository,
+            ProjectionRepository projectionRepository,
             ProgramRepository programRepository,
             CinemaService cinemaService) {
         this.projectionRepository = projectionRepository;
@@ -34,7 +37,6 @@ public class ProgramService {
 
     public Program addProgram(ProgramRequest request) {
         if (isDateNotValid(request.programDate())) {
-
             throw new DateNotValidException(ExceptionMessages.DATE_NOT_VALID_MESSAGE);
         }
 
@@ -52,7 +54,6 @@ public class ProgramService {
 
     public List<ProgramDto> getAllPrograms(LocalDate date) {
         if (date != null) {
-
             return ProgramMapper.mapProgramListToProgramDtoList(
                     programRepository.findAllByProgramDate(date));
         } else {
@@ -84,7 +85,7 @@ public class ProgramService {
         return ProgramMapper.mapProgramToProgramDto(getProgramById(id));
     }
 
-    @org.springframework.transaction.annotation.Transactional
+    @Transactional
     public ProgramDto updateProgram(final ProgramRequest request, final int programId) {
         final Program stored = getProgramForUpdate(programId);
         final ProgramDto previous = ProgramMapper.mapProgramToProgramDto(stored);
@@ -96,7 +97,7 @@ public class ProgramService {
         if ((!stored.getProgramDate().equals(request.programDate())
                         || stored.getCinema().getId() != request.cinemaId())
                 && projectionRepository.existsByProgramId(programId)) {
-            throw new dev.vdrenkov.cineledger.exceptions.ResourceInUseException(
+            throw new ResourceInUseException(
                     "A program with screenings cannot change its date or cinema");
         }
 

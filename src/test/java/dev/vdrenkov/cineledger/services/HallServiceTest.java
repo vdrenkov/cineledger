@@ -11,6 +11,7 @@ import dev.vdrenkov.cineledger.models.dtos.HallDto;
 import dev.vdrenkov.cineledger.models.entities.Cinema;
 import dev.vdrenkov.cineledger.models.entities.Hall;
 import dev.vdrenkov.cineledger.repositories.HallRepository;
+import dev.vdrenkov.cineledger.repositories.ProjectionRepository;
 import dev.vdrenkov.cineledger.testutils.constants.HallConstants;
 import dev.vdrenkov.cineledger.testutils.factories.CinemaFactory;
 import dev.vdrenkov.cineledger.testutils.factories.HallFactory;
@@ -31,7 +32,7 @@ class HallServiceTest {
 
     @Mock private CinemaService cinemaService;
 
-    @Mock private dev.vdrenkov.cineledger.repositories.ProjectionRepository projectionRepository;
+    @Mock private ProjectionRepository projectionRepository;
 
     @InjectMocks private HallService hallService;
 

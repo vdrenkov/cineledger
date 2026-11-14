@@ -1,11 +1,22 @@
 package dev.vdrenkov.cineledger.jwt;
 
+import static dev.vdrenkov.cineledger.testutils.constants.JwtConstants.JWT_USERNAME;
+
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
+
 import dev.vdrenkov.cineledger.testutils.factories.JwtFactory;
+
 import io.jsonwebtoken.JwtException;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,35 +29,22 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.io.IOException;
 
-import static dev.vdrenkov.cineledger.testutils.constants.JwtConstants.JWT_USERNAME;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
 class JwtRequestFilterTest {
-    private static final String SECRET = "xJ4nRq8sUv2mKe7pTd5yLa9cBh3wNz6fQg1rMs8vPk4tYd7uCe2hWn5qLb9xRa3mF";
+    private static final String SECRET =
+            "xJ4nRq8sUv2mKe7pTd5yLa9cBh3wNz6fQg1rMs8vPk4tYd7uCe2hWn5qLb9xRa3mF";
 
-    @Mock
-    private HttpServletRequest request;
+    @Mock private HttpServletRequest request;
 
-    @Mock
-    private HttpServletResponse response;
+    @Mock private HttpServletResponse response;
 
-    @Mock
-    private FilterChain filterChain;
+    @Mock private FilterChain filterChain;
 
-    @Mock
-    private JwtTokenUtil tokenUtil;
+    @Mock private JwtTokenUtil tokenUtil;
 
-    @Mock
-    private JwtUserDetailsService userDetailsService;
+    @Mock private JwtUserDetailsService userDetailsService;
 
-    @InjectMocks
-    private JwtRequestFilter requestFilter;
+    @InjectMocks private JwtRequestFilter requestFilter;
 
     @BeforeEach
     void setUp() {
@@ -59,8 +57,10 @@ class JwtRequestFilterTest {
         SecurityContextHolder.setContext(securityContext);
         when(securityContext.getAuthentication()).thenReturn(null);
         when(request.getCookies()).thenReturn(JwtFactory.getDefaultCookieArray());
-        when(tokenUtil.parseToken(anyString())).thenReturn(new JwtTokenUtil(SECRET).parseToken(JwtFactory.getDefaultJwtToken()));
-        when(userDetailsService.loadUserByUsername(anyString())).thenReturn(JwtFactory.getDefaultUserDetails());
+        when(tokenUtil.parseToken(anyString()))
+                .thenReturn(new JwtTokenUtil(SECRET).parseToken(JwtFactory.getDefaultJwtToken()));
+        when(userDetailsService.loadUserByUsername(anyString()))
+                .thenReturn(JwtFactory.getDefaultUserDetails());
 
         requestFilter.doFilterInternal(request, response, filterChain);
 
@@ -79,7 +79,8 @@ class JwtRequestFilterTest {
     }
 
     @Test
-    void testDoFilterInternal_invalidJwt_doesNotAuthenticate() throws ServletException, IOException {
+    void testDoFilterInternal_invalidJwt_doesNotAuthenticate()
+            throws ServletException, IOException {
         final SecurityContext securityContext = Mockito.mock(SecurityContext.class);
         SecurityContextHolder.setContext(securityContext);
         when(securityContext.getAuthentication()).thenReturn(null);

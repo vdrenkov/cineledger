@@ -1,6 +1,11 @@
 package dev.vdrenkov.cineledger.configurations;
 
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.Mockito.when;
+
 import dev.vdrenkov.cineledger.jwt.JwtRequestFilter;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -11,24 +16,16 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
 class WebSecurityConfigurationTest {
 
-    @Mock
-    private JwtRequestFilter jwtRequestFilter;
+    @Mock private JwtRequestFilter jwtRequestFilter;
 
-    @Mock
-    private AuthenticationConfiguration authenticationConfiguration;
+    @Mock private AuthenticationConfiguration authenticationConfiguration;
 
-    @Mock
-    private AuthenticationManager authenticationManager;
+    @Mock private AuthenticationManager authenticationManager;
 
-    @InjectMocks
-    private WebSecurityConfiguration webSecurityConfiguration;
+    @InjectMocks private WebSecurityConfiguration webSecurityConfiguration;
 
     @Test
     void passwordEncoder_ShouldReturnBCryptPasswordEncoder() {
@@ -39,10 +36,11 @@ class WebSecurityConfigurationTest {
 
     @Test
     void authenticationManager_ShouldReturnConfiguredAuthenticationManager() throws Exception {
-        when(authenticationConfiguration.getAuthenticationManager()).thenReturn(authenticationManager);
+        when(authenticationConfiguration.getAuthenticationManager())
+                .thenReturn(authenticationManager);
 
-        final AuthenticationManager result = webSecurityConfiguration.authenticationManager(
-            authenticationConfiguration);
+        final AuthenticationManager result =
+                webSecurityConfiguration.authenticationManager(authenticationConfiguration);
 
         assertSame(authenticationManager, result);
     }

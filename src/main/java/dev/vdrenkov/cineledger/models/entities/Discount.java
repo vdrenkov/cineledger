@@ -15,14 +15,11 @@ public class Discount {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column
-    private String type;
+    @Column private String type;
 
-    @Column
-    private String code;
+    @Column private String code;
 
-    @Column
-    private int percentage;
+    @Column private int percentage;
 
     public Discount(String type, String code, int percentage) {
         this.type = type;

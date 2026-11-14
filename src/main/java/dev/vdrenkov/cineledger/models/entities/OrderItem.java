@@ -1,5 +1,6 @@
 package dev.vdrenkov.cineledger.models.entities;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
@@ -17,10 +18,10 @@ public class OrderItem {
     private String name;
     private int quantity;
 
-    @jakarta.persistence.Column(precision = 19, scale = 2, nullable = false)
+    @Column(precision = 19, scale = 2, nullable = false)
     private BigDecimal unitPrice;
 
-    @jakarta.persistence.Column(precision = 19, scale = 2, nullable = false)
+    @Column(precision = 19, scale = 2, nullable = false)
     private BigDecimal paidTotal;
 
     protected OrderItem() {}

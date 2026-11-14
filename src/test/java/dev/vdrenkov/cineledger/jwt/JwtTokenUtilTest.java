@@ -1,23 +1,27 @@
 package dev.vdrenkov.cineledger.jwt;
 
-import dev.vdrenkov.cineledger.testutils.factories.JwtFactory;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import static dev.vdrenkov.cineledger.testutils.constants.JwtConstants.JWT_USERNAME;
 
-import java.time.Instant;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import dev.vdrenkov.cineledger.testutils.factories.JwtFactory;
+
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import java.nio.charset.StandardCharsets;
 
-import static dev.vdrenkov.cineledger.testutils.constants.JwtConstants.JWT_USERNAME;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 
 class JwtTokenUtilTest {
-    private static final String SECRET = "gD7rL2vQ9mX4pNc8sH1tWy5kZa3uEf6jRb0qMn7cTy2wKs9hPv4xLd8nFg5rQb1sU";
+    private static final String SECRET =
+            "gD7rL2vQ9mX4pNc8sH1tWy5kZa3uEf6jRb0qMn7cTy2wKs9hPv4xLd8nFg5rQb1sU";
 
     private final JwtTokenUtil jwtTokenUtil = new JwtTokenUtil(SECRET);
 
@@ -28,14 +32,18 @@ class JwtTokenUtilTest {
 
     @Test
     void testGetUsernameFromToken_usernameExtracted_success() {
-        final String token = jwtTokenUtil.getUsernameFromToken(JwtFactory.getDefaultJwtToken());
+        final String token = jwtTokenUtil.parseToken(JwtFactory.getDefaultJwtToken()).getSubject();
 
         assertEquals(JWT_USERNAME, token);
     }
 
     @Test
     void testGetExpirationInstantFromToken_dateValid_returnsTrue() {
-        final Instant expiration = jwtTokenUtil.getExpirationInstantFromToken(JwtFactory.getDefaultJwtToken());
+        final Instant expiration =
+                jwtTokenUtil
+                        .parseToken(JwtFactory.getDefaultJwtToken())
+                        .getExpiration()
+                        .toInstant();
 
         assertTrue(expiration.isAfter(Instant.now().minusSeconds(1)));
     }
@@ -48,31 +56,29 @@ class JwtTokenUtilTest {
     }
 
     @Test
-    void testValidateToken_tokenValidated_success() {
-        final boolean result = jwtTokenUtil.validateToken(JwtFactory.getDefaultJwtToken(),
-            JwtFactory.getDefaultUserDetails());
+    void parseToken_missingExpiry_rejectsToken() {
+        final String token =
+                Jwts.builder()
+                        .subject(JWT_USERNAME)
+                        .signWith(
+                                Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8)),
+                                Jwts.SIG.HS512)
+                        .compact();
 
-        assertTrue(result);
+        assertThrows(JwtException.class, () -> jwtTokenUtil.parseToken(token));
     }
 
     @Test
-    void getUsernameFromToken_missingExpiry_rejectsToken() {
-        final String token = Jwts.builder()
-            .subject(JWT_USERNAME)
-            .signWith(Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8)), Jwts.SIG.HS512)
-            .compact();
+    void parseToken_otherAlgorithm_rejectsToken() {
+        final String token =
+                Jwts.builder()
+                        .subject(JWT_USERNAME)
+                        .expiration(java.util.Date.from(Instant.now().plusSeconds(60)))
+                        .signWith(
+                                Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8)),
+                                Jwts.SIG.HS256)
+                        .compact();
 
-        assertThrows(JwtException.class, () -> jwtTokenUtil.getUsernameFromToken(token));
-    }
-
-    @Test
-    void getUsernameFromToken_otherAlgorithm_rejectsToken() {
-        final String token = Jwts.builder()
-            .subject(JWT_USERNAME)
-            .expiration(java.util.Date.from(Instant.now().plusSeconds(60)))
-            .signWith(Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8)), Jwts.SIG.HS256)
-            .compact();
-
-        assertThrows(JwtException.class, () -> jwtTokenUtil.getUsernameFromToken(token));
+        assertThrows(JwtException.class, () -> jwtTokenUtil.parseToken(token));
     }
 }

@@ -1,6 +1,7 @@
 package dev.vdrenkov.cineledger.repositories;
 
 import dev.vdrenkov.cineledger.models.entities.Category;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

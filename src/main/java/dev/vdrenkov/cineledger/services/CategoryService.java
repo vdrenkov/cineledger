@@ -8,6 +8,7 @@ import dev.vdrenkov.cineledger.models.entities.Category;
 import dev.vdrenkov.cineledger.models.requests.CategoryRequest;
 import dev.vdrenkov.cineledger.repositories.CategoryRepository;
 import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
+
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -40,18 +41,23 @@ public class CategoryService {
 
     public CategoryDto getCategoryDtoByName(String name) {
 
-        return CategoryMapper.mapCategoryToCategoryDto(categoryRepository.findByName(name).orElseThrow(() -> {
-
-            return new CategoryNotFoundException(ExceptionMessages.CATEGORY_NOT_FOUND_MESSAGE);
-        }));
+        return CategoryMapper.mapCategoryToCategoryDto(
+                categoryRepository
+                        .findByName(name)
+                        .orElseThrow(() -> {
+                            return new CategoryNotFoundException(
+                                    ExceptionMessages.CATEGORY_NOT_FOUND_MESSAGE);
+                        }));
     }
 
     public Category getCategoryById(int id) {
 
-        return categoryRepository.findById(id).orElseThrow(() -> {
-
-            return new CategoryNotFoundException(ExceptionMessages.CATEGORY_NOT_FOUND_MESSAGE);
-        });
+        return categoryRepository
+                .findById(id)
+                .orElseThrow(() -> {
+                    return new CategoryNotFoundException(
+                            ExceptionMessages.CATEGORY_NOT_FOUND_MESSAGE);
+                });
     }
 
     public CategoryDto updateCategory(CategoryRequest categoryRequest, int categoryId) {
@@ -69,9 +75,11 @@ public class CategoryService {
     }
 
     private void categoryValidation(CategoryRequest categoryRequest) {
-        categoryRepository.findByName(categoryRequest.name()).ifPresent(category -> {
-
-            throw new CategoryAlreadyExistsException(ExceptionMessages.CATEGORY_ALREADY_EXISTS_MESSAGE);
-        });
+        categoryRepository
+                .findByName(categoryRequest.name())
+                .ifPresent(category -> {
+                    throw new CategoryAlreadyExistsException(
+                            ExceptionMessages.CATEGORY_ALREADY_EXISTS_MESSAGE);
+                });
     }
 }

@@ -20,8 +20,10 @@ import dev.vdrenkov.cineledger.testutils.factories.MovieFactory;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
@@ -278,16 +280,6 @@ class MovieServiceTest {
     }
 
     @Test
-    void testGetIdsOfMoviesByTitle_success() {
-        when(movieRepository.findByTitleContaining(anyString()))
-                .thenReturn(MovieFactory.getDefaultMovieList());
-
-        final List<Integer> result = movieService.getIdsOfMoviesByTitle(MovieConstants.TITLE);
-
-        assertEquals(1, result.size());
-    }
-
-    @Test
     void testUpdateMovieAverageRating_success() {
         final double newRating = 4.5;
 
@@ -328,8 +320,8 @@ class MovieServiceTest {
 
         movieService.updateMovie(MovieFactory.getDefaultMovieRequest(), stored.getId());
 
-        final var saved = org.mockito.ArgumentCaptor.forClass(Movie.class);
-        org.mockito.Mockito.verify(movieRepository).save(saved.capture());
+        final var saved = ArgumentCaptor.forClass(Movie.class);
+        Mockito.verify(movieRepository).save(saved.capture());
         assertEquals(4.5, saved.getValue().getAverageRating());
     }
 }

@@ -22,17 +22,14 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column
-    private String username;
+    @Column private String username;
 
-    @Column
-    private String password;
+    @Column private String password;
 
     @Column(nullable = false)
     private long credentialsVersion;
 
-    @Column
-    private String email;
+    @Column private String email;
 
     @Column(name = "first_name")
     private String firstName;
@@ -44,12 +41,20 @@ public class User {
     private LocalDate joinDate;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id"),
-        inverseJoinColumns = @JoinColumn(name = "role_id"))
+    @JoinTable(
+            name = "users_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
     private List<Role> roles;
 
-    public User(String username, String password, String email, String firstName, String lastName, LocalDate joinDate,
-        List<Role> roles) {
+    public User(
+            String username,
+            String password,
+            String email,
+            String firstName,
+            String lastName,
+            LocalDate joinDate,
+            List<Role> roles) {
         this.username = username;
         this.password = password;
         this.email = email;
@@ -61,7 +66,15 @@ public class User {
 
     public User() {}
 
-    public User(final int id, final String username, final String password, final String email, final String firstName, final String lastName, final LocalDate joinDate, final List<Role> roles) {
+    public User(
+            final int id,
+            final String username,
+            final String password,
+            final String email,
+            final String firstName,
+            final String lastName,
+            final LocalDate joinDate,
+            final List<Role> roles) {
         this.id = id;
         this.username = username;
         this.password = password;

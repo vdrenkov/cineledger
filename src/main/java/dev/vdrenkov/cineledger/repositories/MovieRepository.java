@@ -2,7 +2,11 @@ package dev.vdrenkov.cineledger.repositories;
 
 import dev.vdrenkov.cineledger.models.entities.Movie;
 
+import jakarta.persistence.LockModeType;
+
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -35,9 +39,7 @@ public interface MovieRepository extends JpaRepository<Movie, Integer> {
     List<Movie> findByReleaseDateBeforeAndAverageRatingGreaterThanEqual(
             LocalDate date, double rating);
 
-    @org.springframework.data.jpa.repository.Lock(
-            jakarta.persistence.LockModeType.PESSIMISTIC_WRITE)
-    @org.springframework.data.jpa.repository.Query(
-            "select entity from Movie entity where entity.id = :id")
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select entity from Movie entity where entity.id = :id")
     Optional<Movie> findByIdForUpdate(int id);
 }

@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -24,25 +25,23 @@ public interface TicketRepository extends JpaRepository<Ticket, Integer> {
 
     int countByProjectionId(int projectionId);
 
-    List<Ticket> findTicketsByDateOfPurchaseBetween(LocalDate startDate, LocalDate endDate);
-
     @Query(
             "select coalesce(sum(ticket.paidPrice), 0) from Order purchase join purchase.tickets"
                 + " ticket where ticket.projection.hall.cinema.id = :id and purchase.dateOfPurchase"
                 + " between :startDate and :endDate")
-    java.math.BigDecimal incomeByCinemaId(int id, LocalDate startDate, LocalDate endDate);
+    BigDecimal incomeByCinemaId(int id, LocalDate startDate, LocalDate endDate);
 
     @Query(
             "select coalesce(sum(ticket.paidPrice), 0) from Order purchase join purchase.tickets"
-                + " ticket where ticket.projection.hall.id = :id and purchase.dateOfPurchase"
-                + " between :startDate and :endDate")
-    java.math.BigDecimal incomeByHallId(int id, LocalDate startDate, LocalDate endDate);
+                    + " ticket where ticket.projection.hall.id = :id and purchase.dateOfPurchase"
+                    + " between :startDate and :endDate")
+    BigDecimal incomeByHallId(int id, LocalDate startDate, LocalDate endDate);
 
     @Query(
             "select coalesce(sum(ticket.paidPrice), 0) from Order purchase join purchase.tickets"
-                + " ticket where ticket.projection.movie.id = :id and purchase.dateOfPurchase"
-                + " between :startDate and :endDate")
-    java.math.BigDecimal incomeByMovieId(int id, LocalDate startDate, LocalDate endDate);
+                    + " ticket where ticket.projection.movie.id = :id and purchase.dateOfPurchase"
+                    + " between :startDate and :endDate")
+    BigDecimal incomeByMovieId(int id, LocalDate startDate, LocalDate endDate);
 
     @Query(
             "select count(ticket) from Order purchase join purchase.tickets ticket where"
@@ -52,7 +51,7 @@ public interface TicketRepository extends JpaRepository<Ticket, Integer> {
 
     @Query(
             "select count(ticket) from Order purchase join purchase.tickets ticket where"
-                + " ticket.projection.movie.id = :movieId and purchase.dateOfPurchase between"
-                + " :startDate and :endDate")
+                    + " ticket.projection.movie.id = :movieId and purchase.dateOfPurchase between"
+                    + " :startDate and :endDate")
     long purchasedCountByMovieId(int movieId, LocalDate startDate, LocalDate endDate);
 }

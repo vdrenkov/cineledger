@@ -8,11 +8,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import dev.vdrenkov.cineledger.services.EmailService;
+import dev.vdrenkov.cineledger.services.MovieService;
 
 import jakarta.servlet.http.Cookie;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
@@ -20,9 +24,12 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -31,8 +38,20 @@ import org.testcontainers.utility.DockerImageName;
 
 import tools.jackson.databind.ObjectMapper;
 
+import java.math.BigDecimal;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.IntStream;
 
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
@@ -47,8 +66,7 @@ import java.util.UUID;
 @AutoConfigureMockMvc
 @Testcontainers
 class CineLedgerIT {
-    private static final java.util.concurrent.atomic.AtomicInteger DISCOUNT_CODE =
-            new java.util.concurrent.atomic.AtomicInteger(1000);
+    private static final AtomicInteger DISCOUNT_CODE = new AtomicInteger(1000);
     private static final String PASSWORD = "IntegrationPassword123";
 
     @Container @ServiceConnection
@@ -66,14 +84,13 @@ class CineLedgerIT {
 
     @MockitoBean private EmailService emailService;
 
-    @MockitoBean private java.time.Clock clock;
+    @MockitoBean private Clock clock;
 
-    @org.springframework.test.context.bean.override.mockito.MockitoSpyBean
-    private dev.vdrenkov.cineledger.services.MovieService movieService;
+    @MockitoSpyBean private MovieService movieService;
 
     @BeforeEach
     void setClock() {
-        org.mockito.Mockito.when(clock.instant()).thenAnswer(_ -> java.time.Instant.now());
+        Mockito.when(clock.instant()).thenAnswer(_ -> Instant.now());
     }
 
     @Test
@@ -162,7 +179,7 @@ class CineLedgerIT {
                                                         "lastName",
                                                         "Customer",
                                                         "roleNames",
-                                                        java.util.List.of("ADMIN")))))
+                                                        List.of("ADMIN")))))
                 .andExpect(status().isForbidden());
     }
 
@@ -198,9 +215,9 @@ class CineLedgerIT {
                                         objectMapper.writeValueAsString(
                                                 Map.of("username", username))))
                 .andExpect(status().isAccepted());
-        final var token = org.mockito.ArgumentCaptor.forClass(String.class);
-        org.mockito.Mockito.verify(emailService)
-                .sendPasswordResetEmail(org.mockito.ArgumentMatchers.any(), token.capture());
+        final var token = ArgumentCaptor.forClass(String.class);
+        Mockito.verify(emailService)
+                .sendPasswordResetEmail(ArgumentMatchers.any(), token.capture());
         assertEquals(43, token.getValue().length());
         login(username);
         final String replacement = "ChangedPassword123";
@@ -260,9 +277,8 @@ class CineLedgerIT {
                                         objectMapper.writeValueAsString(
                                                 Map.of("username", "unknown-customer"))))
                 .andExpect(status().isAccepted());
-        org.mockito.Mockito.verify(emailService, org.mockito.Mockito.never())
-                .sendPasswordResetEmail(
-                        org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any());
+        Mockito.verify(emailService, Mockito.never())
+                .sendPasswordResetEmail(ArgumentMatchers.any(), ArgumentMatchers.any());
     }
 
     @Test
@@ -283,8 +299,7 @@ class CineLedgerIT {
     @Test
     void passwordRecovery_expiredToken_preservesOriginalPassword() throws Exception {
         final RecoveryFixture fixture = recoveryFixture();
-        org.mockito.Mockito.when(clock.instant())
-                .thenReturn(java.time.Instant.now().plusSeconds(1801));
+        Mockito.when(clock.instant()).thenReturn(Instant.now().plusSeconds(1801));
 
         mockMvc.perform(
                         withCsrf(post("/password-resets"))
@@ -303,11 +318,10 @@ class CineLedgerIT {
     @Test
     void passwordRecovery_concurrentTokenUse_succeedsExactlyOnce() throws Exception {
         final RecoveryFixture fixture = recoveryFixture();
-        final var start = new java.util.concurrent.CountDownLatch(1);
-        try (final var executor =
-                java.util.concurrent.Executors.newVirtualThreadPerTaskExecutor()) {
+        final var start = new CountDownLatch(1);
+        try (final var executor = Executors.newVirtualThreadPerTaskExecutor()) {
             final var attempts =
-                    java.util.stream.IntStream.range(0, 2)
+                    IntStream.range(0, 2)
                             .mapToObj(_ ->
                                     executor.submit(() -> {
                                         start.await();
@@ -330,11 +344,11 @@ class CineLedgerIT {
                                     }))
                             .toList();
             start.countDown();
-            final var statuses = new java.util.ArrayList<Integer>();
+            final var statuses = new ArrayList<Integer>();
             for (final var attempt : attempts) {
-                statuses.add(attempt.get(20, java.util.concurrent.TimeUnit.SECONDS));
+                statuses.add(attempt.get(20, TimeUnit.SECONDS));
             }
-            assertEquals(java.util.List.of(204, 400), statuses.stream().sorted().toList());
+            assertEquals(List.of(204, 400), statuses.stream().sorted().toList());
         }
     }
 
@@ -347,7 +361,7 @@ class CineLedgerIT {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(
                                         objectMapper.writeValueAsString(
-                                                java.util.List.of(
+                                                List.of(
                                                         Map.of(
                                                                 "projectionId",
                                                                 fixture.projectionId())))))
@@ -358,11 +372,10 @@ class CineLedgerIT {
     void reservations_lastSeat_concurrentRequestsSucceedOnce() throws Exception {
         final Session admin = login("integration_admin");
         final Fixture fixture = fixture(admin, 1, 1);
-        final var start = new java.util.concurrent.CountDownLatch(1);
-        try (final var executor =
-                java.util.concurrent.Executors.newVirtualThreadPerTaskExecutor()) {
+        final var start = new CountDownLatch(1);
+        try (final var executor = Executors.newVirtualThreadPerTaskExecutor()) {
             final var attempts =
-                    java.util.stream.IntStream.range(0, 6)
+                    IntStream.range(0, 6)
                             .mapToObj(_ ->
                                     executor.submit(() -> {
                                         start.await();
@@ -396,9 +409,8 @@ class CineLedgerIT {
                                     }))
                             .toList();
             start.countDown();
-            final var statuses = new java.util.ArrayList<Integer>();
-            for (final var attempt : attempts)
-                statuses.add(attempt.get(30, java.util.concurrent.TimeUnit.SECONDS));
+            final var statuses = new ArrayList<Integer>();
+            for (final var attempt : attempts) statuses.add(attempt.get(30, TimeUnit.SECONDS));
             assertEquals(1, statuses.stream().filter(status -> status == 201).count());
             assertTrue(statuses.stream().allMatch(status -> status == 201 || status == 400));
         }
@@ -418,21 +430,14 @@ class CineLedgerIT {
                                 "userId",
                                 fixture.customerId(),
                                 "ticketsIds",
-                                java.util.List.of(ticketId),
+                                List.of(ticketId),
                                 "itemsIds",
-                                java.util.List.of(fixture.itemId())));
-        mockMvc.perform(
-                        authenticated(
-                                org.springframework.test.web.servlet.request.MockMvcRequestBuilders
-                                        .delete("/orders/" + orderId),
-                                admin))
+                                List.of(fixture.itemId())));
+        mockMvc.perform(authenticated(MockMvcRequestBuilders.delete("/orders/" + orderId), admin))
                 .andExpect(status().isNoContent());
         mockMvc.perform(authenticated(get("/items").param("itemName", fixture.itemName()), admin))
                 .andExpect(status().isOk())
-                .andExpect(
-                        org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath(
-                                        "$.quantity")
-                                .value(1));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.quantity").value(1));
         create(admin, "/tickets", Map.of("projectionId", fixture.projectionId()));
     }
 
@@ -451,18 +456,15 @@ class CineLedgerIT {
                                                         "userId",
                                                         fixture.customerId(),
                                                         "ticketsIds",
-                                                        java.util.List.of(ticketId),
+                                                        List.of(ticketId),
                                                         "itemsIds",
-                                                        java.util.List.of(
+                                                        List.of(
                                                                 fixture.itemId(),
                                                                 fixture.itemId())))))
                 .andExpect(status().isBadRequest());
         mockMvc.perform(authenticated(get("/items").param("itemName", fixture.itemName()), admin))
                 .andExpect(status().isOk())
-                .andExpect(
-                        org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath(
-                                        "$.quantity")
-                                .value(1));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.quantity").value(1));
     }
 
     @Test
@@ -504,7 +506,7 @@ class CineLedgerIT {
                                                         "userId",
                                                         fixture.customerId(),
                                                         "ticketsIds",
-                                                        java.util.List.of(ticketId, ticketId)))))
+                                                        List.of(ticketId, ticketId)))))
                 .andExpect(status().isBadRequest());
     }
 
@@ -512,13 +514,12 @@ class CineLedgerIT {
     void orders_lastItem_concurrentPurchasesSucceedOnce() throws Exception {
         final Session admin = login("integration_admin");
         final Fixture fixture = fixture(admin, 6, 1);
-        final var tickets = new java.util.ArrayList<Integer>();
+        final var tickets = new ArrayList<Integer>();
         for (int index = 0; index < 6; index++) {
             tickets.add(create(admin, "/tickets", Map.of("projectionId", fixture.projectionId())));
         }
-        final var start = new java.util.concurrent.CountDownLatch(1);
-        try (final var executor =
-                java.util.concurrent.Executors.newVirtualThreadPerTaskExecutor()) {
+        final var start = new CountDownLatch(1);
+        try (final var executor = Executors.newVirtualThreadPerTaskExecutor()) {
             final var attempts =
                     tickets.stream()
                             .map(ticketId ->
@@ -554,9 +555,8 @@ class CineLedgerIT {
                                     }))
                             .toList();
             start.countDown();
-            final var statuses = new java.util.ArrayList<Integer>();
-            for (final var attempt : attempts)
-                statuses.add(attempt.get(30, java.util.concurrent.TimeUnit.SECONDS));
+            final var statuses = new ArrayList<Integer>();
+            for (final var attempt : attempts) statuses.add(attempt.get(30, TimeUnit.SECONDS));
             assertEquals(1, statuses.stream().filter(status -> status == 201).count());
             assertTrue(statuses.stream().allMatch(status -> status == 201 || status == 400));
         }
@@ -573,7 +573,7 @@ class CineLedgerIT {
                         "/programs",
                         Map.of(
                                 "programDate",
-                                java.time.LocalDate.now().plusDays(3).toString(),
+                                LocalDate.now().plusDays(3).toString(),
                                 "cinemaId",
                                 fixture.cinemaId()));
         mockMvc.perform(
@@ -616,8 +616,7 @@ class CineLedgerIT {
                                                         "quantity",
                                                         1))))
                 .andExpect(status().isNoContent());
-        final var screening =
-                new java.util.HashMap<String, Object>(projection(fixture, "18:00:00"));
+        final var screening = new HashMap<String, Object>(projection(fixture, "18:00:00"));
         screening.put("price", 0.10);
         mockMvc.perform(
                         authenticated(
@@ -637,9 +636,9 @@ class CineLedgerIT {
                         "userId",
                         fixture.customerId(),
                         "ticketsIds",
-                        java.util.List.of(ticketId),
+                        List.of(ticketId),
                         "itemsIds",
-                        java.util.List.of(fixture.itemId())));
+                        List.of(fixture.itemId())));
         final var response =
                 mockMvc.perform(
                                 authenticated(
@@ -649,10 +648,7 @@ class CineLedgerIT {
                         .getResponse();
         final var amount =
                 objectMapper.readTree(response.getContentAsString()).get(0).path("totalPrice");
-        assertEquals(
-                0,
-                new java.math.BigDecimal("0.30")
-                        .compareTo(new java.math.BigDecimal(amount.asString())));
+        assertEquals(0, new BigDecimal("0.30").compareTo(new BigDecimal(amount.asString())));
     }
 
     @Test
@@ -668,9 +664,9 @@ class CineLedgerIT {
                         "userId",
                         fixture.customerId(),
                         "ticketsIds",
-                        java.util.List.of(ticketId),
+                        List.of(ticketId),
                         "itemsIds",
-                        java.util.List.of(fixture.itemId()),
+                        List.of(fixture.itemId()),
                         "discountCode",
                         fixture.discountCode()));
         mockMvc.perform(
@@ -690,8 +686,7 @@ class CineLedgerIT {
                                                         "quantity",
                                                         1))))
                 .andExpect(status().isNoContent());
-        final var screening =
-                new java.util.HashMap<String, Object>(projection(fixture, "18:00:00"));
+        final var screening = new HashMap<String, Object>(projection(fixture, "18:00:00"));
         screening.put("price", 100);
         mockMvc.perform(
                         authenticated(
@@ -725,9 +720,9 @@ class CineLedgerIT {
                         "userId",
                         first.customerId(),
                         "ticketsIds",
-                        java.util.List.of(firstTicket, secondTicket),
+                        List.of(firstTicket, secondTicket),
                         "itemsIds",
-                        java.util.List.of(first.itemId())));
+                        List.of(first.itemId())));
         assertIncome(admin, "users", first.customerId(), "23.25");
         assertIncome(admin, "cinemas", first.cinemaId(), "10.25");
         assertIncome(admin, "cinemas", second.cinemaId(), "10.25");
@@ -762,7 +757,7 @@ class CineLedgerIT {
 
     @Test
     void getMovies_releaseFilterWithoutDirection_usesDefaultDirection() throws Exception {
-        mockMvc.perform(get("/movies").param("release", java.time.LocalDate.now().toString()))
+        mockMvc.perform(get("/movies").param("release", LocalDate.now().toString()))
                 .andExpect(status().isOk());
     }
 
@@ -781,9 +776,7 @@ class CineLedgerIT {
                                         objectMapper.writeValueAsString(
                                                 Map.of(
                                                         "programDate",
-                                                        java.time.LocalDate.now()
-                                                                .plusDays(3)
-                                                                .toString(),
+                                                        LocalDate.now().plusDays(3).toString(),
                                                         "cinemaId",
                                                         fixture.cinemaId()))))
                 .andExpect(status().isConflict());
@@ -839,23 +832,16 @@ class CineLedgerIT {
                 create(
                         admin,
                         "/orders",
-                        Map.of(
-                                "userId",
-                                fixture.customerId(),
-                                "ticketsIds",
-                                java.util.List.of(ticketId)));
+                        Map.of("userId", fixture.customerId(), "ticketsIds", List.of(ticketId)));
         mockMvc.perform(
                         authenticated(
-                                org.springframework.test.web.servlet.request.MockMvcRequestBuilders
-                                        .delete("/projections/" + fixture.projectionId()),
+                                MockMvcRequestBuilders.delete(
+                                        "/projections/" + fixture.projectionId()),
                                 admin))
                 .andExpect(status().isConflict());
         mockMvc.perform(authenticated(get("/orders/" + orderId), admin))
                 .andExpect(status().isOk())
-                .andExpect(
-                        org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath(
-                                        "$.tickets.length()")
-                                .value(1));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.tickets.length()").value(1));
         assertIncome(admin, "movies", fixture.movieId(), "10.25");
     }
 
@@ -863,11 +849,10 @@ class CineLedgerIT {
     void addMovieReview_ratingUpdateFails_rollsBackReview() throws Exception {
         final Session admin = login("integration_admin");
         final Fixture fixture = fixture(admin, 1, 1);
-        org.mockito.Mockito.doThrow(new IllegalStateException("Simulated rating update failure"))
+        Mockito.doThrow(new IllegalStateException("Simulated rating update failure"))
                 .when(movieService)
                 .updateMovieAverageRating(
-                        org.mockito.ArgumentMatchers.anyDouble(),
-                        org.mockito.ArgumentMatchers.eq(fixture.movieId()));
+                        ArgumentMatchers.anyDouble(), ArgumentMatchers.eq(fixture.movieId()));
 
         mockMvc.perform(
                         authenticated(post("/movies/" + fixture.movieId() + "/reviews"), admin)
@@ -879,10 +864,7 @@ class CineLedgerIT {
 
         mockMvc.perform(get("/movies/" + fixture.movieId() + "/reviews"))
                 .andExpect(status().isOk())
-                .andExpect(
-                        org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath(
-                                        "$.length()")
-                                .value(0));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(0));
     }
 
     private void assertIncome(
@@ -893,17 +875,14 @@ class CineLedgerIT {
                                 authenticated(
                                                 get("/reports/" + resource + "/" + id + "/incomes"),
                                                 admin)
-                                        .param(
-                                                "startDate",
-                                                java.time.LocalDate.now().minusDays(1).toString())
-                                        .param("endDate", java.time.LocalDate.now().toString()))
+                                        .param("startDate", LocalDate.now().minusDays(1).toString())
+                                        .param("endDate", LocalDate.now().toString()))
                         .andExpect(status().isOk())
                         .andReturn()
                         .getResponse();
         assertEquals(
                 0,
-                new java.math.BigDecimal(expected)
-                        .compareTo(new java.math.BigDecimal(response.getContentAsString())));
+                new BigDecimal(expected).compareTo(new BigDecimal(response.getContentAsString())));
     }
 
     private Fixture fixture(final Session admin, final int capacity, final int quantity)
@@ -923,7 +902,7 @@ class CineLedgerIT {
                                 "description",
                                 "Test movie",
                                 "releaseDate",
-                                java.time.LocalDate.now().plusDays(1).toString(),
+                                LocalDate.now().plusDays(1).toString(),
                                 "runtime",
                                 "PT2H",
                                 "categoryId",
@@ -934,7 +913,7 @@ class CineLedgerIT {
                         "/programs",
                         Map.of(
                                 "programDate",
-                                java.time.LocalDate.now().plusDays(2).toString(),
+                                LocalDate.now().plusDays(2).toString(),
                                 "cinemaId",
                                 cinemaId));
         final int projectionId =
@@ -1047,9 +1026,9 @@ class CineLedgerIT {
                                         objectMapper.writeValueAsString(
                                                 Map.of("username", username))))
                 .andExpect(status().isAccepted());
-        final var token = org.mockito.ArgumentCaptor.forClass(String.class);
-        org.mockito.Mockito.verify(emailService)
-                .sendPasswordResetEmail(org.mockito.ArgumentMatchers.any(), token.capture());
+        final var token = ArgumentCaptor.forClass(String.class);
+        Mockito.verify(emailService)
+                .sendPasswordResetEmail(ArgumentMatchers.any(), token.capture());
         return new RecoveryFixture(username, token.getValue());
     }
 

@@ -15,11 +15,9 @@ public class Cinema {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column
-    private String address;
+    @Column private String address;
 
-    @Column
-    private String city;
+    @Column private String city;
 
     @Column(name = "average_rating")
     private double averageRating;
@@ -32,7 +30,8 @@ public class Cinema {
 
     public Cinema() {}
 
-    public Cinema(final int id, final String address, final String city, final double averageRating) {
+    public Cinema(
+            final int id, final String address, final String city, final double averageRating) {
         this.id = id;
         this.address = address;
         this.city = city;

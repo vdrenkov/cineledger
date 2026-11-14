@@ -1,18 +1,22 @@
 package dev.vdrenkov.cineledger.jwt;
 
 import dev.vdrenkov.cineledger.utils.constants.JwtConstants;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import javax.crypto.SecretKey;
+
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Date;
+
+import javax.crypto.SecretKey;
 
 @Component
 public class JwtTokenUtil {
@@ -27,47 +31,39 @@ public class JwtTokenUtil {
         }
 
         signingKey = Keys.hmacShaKeyFor(keyBytes);
-        parser = Jwts.parser()
-            .verifyWith(signingKey)
-            .sig()
-            .clear()
-            .add(Jwts.SIG.HS512)
-            .and()
-            .build();
+        parser =
+                Jwts.parser()
+                        .verifyWith(signingKey)
+                        .sig()
+                        .clear()
+                        .add(Jwts.SIG.HS512)
+                        .and()
+                        .build();
     }
 
     public String generateToken(final UserDetails userDetails) {
-if (!(userDetails instanceof AuthenticatedUser user)) {
-    throw new IllegalArgumentException("Unsupported authentication principal");
-}
+        if (!(userDetails instanceof AuthenticatedUser user)) {
+            throw new IllegalArgumentException("Unsupported authentication principal");
+        }
 
-final Instant now = Instant.now();
+        final Instant now = Instant.now();
         return Jwts.builder()
-            .subject(userDetails.getUsername())
-            .claim("version", user.credentialsVersion())
-            .issuedAt(Date.from(now))
-            .expiration(Date.from(now.plusSeconds(JwtConstants.JWT_TOKEN_VALIDITY_SECONDS)))
-            .signWith(signingKey, Jwts.SIG.HS512)
-            .compact();
-    }
-
-    public String getUsernameFromToken(final String token) {
-        return parseToken(token).getSubject();
-    }
-
-    public Instant getExpirationInstantFromToken(final String token) {
-        return parseToken(token).getExpiration().toInstant();
-    }
-
-    public boolean validateToken(final String token, final UserDetails userDetails) {
-        return getUsernameFromToken(token).equals(userDetails.getUsername());
+                .subject(userDetails.getUsername())
+                .claim("version", user.credentialsVersion())
+                .issuedAt(Date.from(now))
+                .expiration(Date.from(now.plusSeconds(JwtConstants.JWT_TOKEN_VALIDITY_SECONDS)))
+                .signWith(signingKey, Jwts.SIG.HS512)
+                .compact();
     }
 
     public Claims parseToken(final String token) {
         final Claims claims = parser.parseSignedClaims(token).getPayload();
 
-        if (claims.getSubject() == null || claims.getSubject().isBlank() || claims.getExpiration() == null
-            || claims.get("version", Long.class) == null || claims.get("version", Long.class) < 0) {
+        if (claims.getSubject() == null
+                || claims.getSubject().isBlank()
+                || claims.getExpiration() == null
+                || claims.get("version", Long.class) == null
+                || claims.get("version", Long.class) < 0) {
             throw new JwtException("Authentication token requires a subject and expiry");
         }
 

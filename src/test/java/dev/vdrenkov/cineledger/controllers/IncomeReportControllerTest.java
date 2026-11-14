@@ -25,6 +25,8 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.math.BigDecimal;
+
 @ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc
 class IncomeReportControllerTest {
@@ -53,7 +55,7 @@ class IncomeReportControllerTest {
                         jsonPath("$")
                                 .value(
                                         org.hamcrest.Matchers.comparesEqualTo(INCOMES),
-                                        java.math.BigDecimal.class));
+                                        BigDecimal.class));
     }
 
     @Test
@@ -69,7 +71,7 @@ class IncomeReportControllerTest {
                         jsonPath("$")
                                 .value(
                                         org.hamcrest.Matchers.comparesEqualTo(INCOMES),
-                                        java.math.BigDecimal.class));
+                                        BigDecimal.class));
     }
 
     @Test
@@ -85,7 +87,7 @@ class IncomeReportControllerTest {
                         jsonPath("$")
                                 .value(
                                         org.hamcrest.Matchers.comparesEqualTo(INCOMES),
-                                        java.math.BigDecimal.class));
+                                        BigDecimal.class));
     }
 
     @Test
@@ -102,7 +104,7 @@ class IncomeReportControllerTest {
                         jsonPath("$")
                                 .value(
                                         org.hamcrest.Matchers.comparesEqualTo(INCOMES),
-                                        java.math.BigDecimal.class));
+                                        BigDecimal.class));
     }
 
     @Test
@@ -118,6 +120,6 @@ class IncomeReportControllerTest {
                         jsonPath("$")
                                 .value(
                                         org.hamcrest.Matchers.comparesEqualTo(INCOMES),
-                                        java.math.BigDecimal.class));
+                                        BigDecimal.class));
     }
 }

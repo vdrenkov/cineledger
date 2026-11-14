@@ -1,5 +1,8 @@
 package dev.vdrenkov.cineledger.testutils.factories;
 
+import static dev.vdrenkov.cineledger.testutils.constants.HallConstants.CAPACITY;
+import static dev.vdrenkov.cineledger.testutils.constants.HallConstants.ID;
+
 import dev.vdrenkov.cineledger.models.dtos.HallDto;
 import dev.vdrenkov.cineledger.models.entities.Hall;
 import dev.vdrenkov.cineledger.models.requests.HallRequest;
@@ -7,9 +10,6 @@ import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
 
 import java.util.Collections;
 import java.util.List;
-
-import static dev.vdrenkov.cineledger.testutils.constants.HallConstants.CAPACITY;
-import static dev.vdrenkov.cineledger.testutils.constants.HallConstants.ID;
 
 public final class HallFactory {
 

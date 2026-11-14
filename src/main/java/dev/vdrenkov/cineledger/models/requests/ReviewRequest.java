@@ -1,6 +1,3 @@
 package dev.vdrenkov.cineledger.models.requests;
 
-public record ReviewRequest(
-    double rating,
-    String reviewText
-) {}
+public record ReviewRequest(double rating, String reviewText) {}

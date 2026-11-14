@@ -10,6 +10,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalTime;
 
 @Entity
@@ -38,9 +39,9 @@ public class Projection {
     @Column(name = "start_time")
     private LocalTime startTime;
 
-    private java.time.Duration runtime;
+    private Duration runtime;
 
-    public java.time.Duration getRuntime() {
+    public Duration getRuntime() {
         return runtime;
     }
 

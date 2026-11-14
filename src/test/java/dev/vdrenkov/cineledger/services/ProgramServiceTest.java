@@ -14,6 +14,7 @@ import dev.vdrenkov.cineledger.models.dtos.ProgramDto;
 import dev.vdrenkov.cineledger.models.entities.Program;
 import dev.vdrenkov.cineledger.models.requests.ProgramRequest;
 import dev.vdrenkov.cineledger.repositories.ProgramRepository;
+import dev.vdrenkov.cineledger.repositories.ProjectionRepository;
 import dev.vdrenkov.cineledger.testutils.constants.ProgramConstants;
 import dev.vdrenkov.cineledger.testutils.factories.CinemaFactory;
 import dev.vdrenkov.cineledger.testutils.factories.ProgramFactory;
@@ -37,7 +38,7 @@ class ProgramServiceTest {
 
     @Mock private CinemaService cinemaService;
 
-    @Mock private dev.vdrenkov.cineledger.repositories.ProjectionRepository projectionRepository;
+    @Mock private ProjectionRepository projectionRepository;
 
     @InjectMocks private ProgramService programService;
 

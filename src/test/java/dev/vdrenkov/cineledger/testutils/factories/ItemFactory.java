@@ -1,5 +1,10 @@
 package dev.vdrenkov.cineledger.testutils.factories;
 
+import static dev.vdrenkov.cineledger.testutils.constants.ItemConstants.ID;
+import static dev.vdrenkov.cineledger.testutils.constants.ItemConstants.NAME;
+import static dev.vdrenkov.cineledger.testutils.constants.ItemConstants.PRICE;
+import static dev.vdrenkov.cineledger.testutils.constants.ItemConstants.QUANTITY;
+
 import dev.vdrenkov.cineledger.models.dtos.ItemDto;
 import dev.vdrenkov.cineledger.models.entities.Item;
 import dev.vdrenkov.cineledger.models.requests.ItemRequest;
@@ -7,11 +12,6 @@ import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
 
 import java.util.Collections;
 import java.util.List;
-
-import static dev.vdrenkov.cineledger.testutils.constants.ItemConstants.ID;
-import static dev.vdrenkov.cineledger.testutils.constants.ItemConstants.NAME;
-import static dev.vdrenkov.cineledger.testutils.constants.ItemConstants.PRICE;
-import static dev.vdrenkov.cineledger.testutils.constants.ItemConstants.QUANTITY;
 
 public final class ItemFactory {
 

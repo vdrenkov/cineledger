@@ -1,10 +1,12 @@
 package dev.vdrenkov.cineledger.controllers;
 
 import dev.vdrenkov.cineledger.services.PasswordRecoveryService;
+
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,6 +34,7 @@ public class PasswordRecoveryController {
 
     public record ResetRequest(@NotBlank @Size(max = 100) String username) {}
 
-    public record ResetConfirmation(@NotBlank @Pattern(regexp = "[A-Za-z0-9_-]{43}") String token,
-                                    @NotBlank @Size(min = 8, max = 72) String password) {}
+    public record ResetConfirmation(
+            @NotBlank @Pattern(regexp = "[A-Za-z0-9_-]{43}") String token,
+            @NotBlank @Size(min = 8, max = 72) String password) {}
 }

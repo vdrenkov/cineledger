@@ -74,7 +74,8 @@ public final class URIConstants {
 
     public static final String ROLES_ID_PATH = "/roles/{id}";
 
-    public static final String REPORTS_MOVIES_CATEGORIES_ID_TICKETS_COUNT_PATH = "/reports/movies/categories/{id}/tickets-count";
+    public static final String REPORTS_MOVIES_CATEGORIES_ID_TICKETS_COUNT_PATH =
+            "/reports/movies/categories/{id}/tickets-count";
 
     public static final String REPORTS_MOVIES_TICKETS_COUNT_PATH = "/reports/movies/tickets-count";
 

@@ -1,5 +1,9 @@
 package dev.vdrenkov.cineledger.testutils.factories;
 
+import static dev.vdrenkov.cineledger.testutils.constants.ProjectionConstants.ID;
+import static dev.vdrenkov.cineledger.testutils.constants.ProjectionConstants.PRICE;
+import static dev.vdrenkov.cineledger.testutils.constants.ProjectionConstants.START_TIME;
+
 import dev.vdrenkov.cineledger.models.dtos.ProjectionDto;
 import dev.vdrenkov.cineledger.models.entities.Projection;
 import dev.vdrenkov.cineledger.models.requests.ProjectionRequest;
@@ -8,10 +12,6 @@ import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
 import java.util.Collections;
 import java.util.List;
 
-import static dev.vdrenkov.cineledger.testutils.constants.ProjectionConstants.ID;
-import static dev.vdrenkov.cineledger.testutils.constants.ProjectionConstants.PRICE;
-import static dev.vdrenkov.cineledger.testutils.constants.ProjectionConstants.START_TIME;
-
 public final class ProjectionFactory {
 
     private ProjectionFactory() {
@@ -19,13 +19,22 @@ public final class ProjectionFactory {
     }
 
     public static ProjectionRequest getDefaultProjectionRequest() {
-        return new ProjectionRequest(PRICE, HallFactory.getDefaultHall().getId(),
-            ProgramFactory.getDefaultProgram().getId(), MovieFactory.getDefaultMovie().getId(), START_TIME);
+        return new ProjectionRequest(
+                PRICE,
+                HallFactory.getDefaultHall().getId(),
+                ProgramFactory.getDefaultProgram().getId(),
+                MovieFactory.getDefaultMovie().getId(),
+                START_TIME);
     }
 
     public static Projection getDefaultProjection() {
-        return new Projection(ID, PRICE, HallFactory.getDefaultHall(), ProgramFactory.getDefaultProgram(),
-            MovieFactory.getDefaultMovie(), START_TIME);
+        return new Projection(
+                ID,
+                PRICE,
+                HallFactory.getDefaultHall(),
+                ProgramFactory.getDefaultProgram(),
+                MovieFactory.getDefaultMovie(),
+                START_TIME);
     }
 
     public static List<Projection> getDefaultProjectionList() {
@@ -33,8 +42,13 @@ public final class ProjectionFactory {
     }
 
     public static ProjectionDto getDefaultProjectionDto() {
-        return new ProjectionDto(ID, PRICE, HallFactory.getDefaultHallDto(), ProgramFactory.getDefaultProgramDto(),
-            MovieFactory.getDefaultMovieDto(), START_TIME);
+        return new ProjectionDto(
+                ID,
+                PRICE,
+                HallFactory.getDefaultHallDto(),
+                ProgramFactory.getDefaultProgramDto(),
+                MovieFactory.getDefaultMovieDto(),
+                START_TIME);
     }
 
     public static List<ProjectionDto> getDefaultProjectionDtoList() {

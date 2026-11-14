@@ -17,8 +17,7 @@ public class Hall {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column
-    private int capacity;
+    @Column private int capacity;
 
     @ManyToOne
     @JoinColumn(name = "cinema_id")

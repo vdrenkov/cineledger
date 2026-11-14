@@ -5,7 +5,9 @@ import dev.vdrenkov.cineledger.models.entities.Program;
 import dev.vdrenkov.cineledger.models.requests.ProgramRequest;
 import dev.vdrenkov.cineledger.services.ProgramService;
 import dev.vdrenkov.cineledger.utils.constants.URIConstants;
+
 import jakarta.validation.Valid;
+
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -34,17 +36,18 @@ public class ProgramController {
     public ResponseEntity<Void> addProgram(@RequestBody @Valid ProgramRequest programRequest) {
         final Program program = programService.addProgram(programRequest);
 
-        URI location = UriComponentsBuilder
-            .fromUriString(URIConstants.PROGRAMS_ID_PATH)
-            .buildAndExpand(program.getId())
-            .toUri();
+        URI location =
+                UriComponentsBuilder.fromUriString(URIConstants.PROGRAMS_ID_PATH)
+                        .buildAndExpand(program.getId())
+                        .toUri();
 
         return ResponseEntity.created(location).build();
     }
 
     @GetMapping(URIConstants.PROGRAMS_PATH)
     public ResponseEntity<List<ProgramDto>> getProgramsByDate(
-        @RequestParam(value = "date", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
+            @RequestParam(value = "date", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd")
+                    LocalDate date) {
 
         final List<ProgramDto> programs = programService.getAllPrograms(date);
 
@@ -59,20 +62,26 @@ public class ProgramController {
     }
 
     @PutMapping(URIConstants.PROGRAMS_ID_PATH)
-    public ResponseEntity<ProgramDto> updateProgram(@RequestBody @Valid ProgramRequest programRequest,
-        @PathVariable int id, @RequestParam(required = false) Boolean returnOld) {
+    public ResponseEntity<ProgramDto> updateProgram(
+            @RequestBody @Valid ProgramRequest programRequest,
+            @PathVariable int id,
+            @RequestParam(required = false) Boolean returnOld) {
 
         final ProgramDto programDto = programService.updateProgram(programRequest, id);
 
-        return Boolean.TRUE.equals(returnOld) ? ResponseEntity.ok(programDto) : ResponseEntity.noContent().build();
+        return Boolean.TRUE.equals(returnOld)
+                ? ResponseEntity.ok(programDto)
+                : ResponseEntity.noContent().build();
     }
 
     @DeleteMapping(URIConstants.PROGRAMS_ID_PATH)
-    public ResponseEntity<ProgramDto> deleteProgram(@PathVariable int id,
-        @RequestParam(required = false) Boolean returnOld) {
+    public ResponseEntity<ProgramDto> deleteProgram(
+            @PathVariable int id, @RequestParam(required = false) Boolean returnOld) {
 
         final ProgramDto programDto = programService.deleteProgram(id);
 
-        return Boolean.TRUE.equals(returnOld) ? ResponseEntity.ok(programDto) : ResponseEntity.noContent().build();
+        return Boolean.TRUE.equals(returnOld)
+                ? ResponseEntity.ok(programDto)
+                : ResponseEntity.noContent().build();
     }
 }

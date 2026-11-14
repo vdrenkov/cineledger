@@ -10,6 +10,7 @@ import dev.vdrenkov.cineledger.repositories.CinemaRepository;
 import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -31,14 +32,11 @@ public class CinemaService {
 
     public List<CinemaDto> getAllCinemas(String city, String address) {
         if (city == null && address == null) {
-
             throw new IllegalArgumentException("You haven't provided any query parameters");
         } else if (city != null && address != null) {
-
             return CinemaMapper.mapCinemaToCinemaDtoList(
                     cinemaRepository.findAllByCityAndAddress(city, address));
         } else if (city != null) {
-
             return CinemaMapper.mapCinemaToCinemaDtoList(cinemaRepository.findAllByCity(city));
         } else {
 
@@ -61,7 +59,7 @@ public class CinemaService {
         return CinemaMapper.mapCinemaToCinemaDto(getCinemaById(id));
     }
 
-    @org.springframework.transaction.annotation.Transactional
+    @Transactional
     public CinemaDto updateCinema(CinemaRequest cinemaRequest, int id) {
         final Cinema stored = getCinemaForUpdate(id);
         final CinemaDto cinemaDto = CinemaMapper.mapCinemaToCinemaDto(stored);

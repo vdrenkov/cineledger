@@ -1,5 +1,10 @@
 package dev.vdrenkov.cineledger.testutils.factories;
 
+import static dev.vdrenkov.cineledger.testutils.constants.DiscountConstants.CODE;
+import static dev.vdrenkov.cineledger.testutils.constants.DiscountConstants.ID;
+import static dev.vdrenkov.cineledger.testutils.constants.DiscountConstants.PERCENTAGE;
+import static dev.vdrenkov.cineledger.testutils.constants.DiscountConstants.TYPE;
+
 import dev.vdrenkov.cineledger.models.dtos.DiscountDto;
 import dev.vdrenkov.cineledger.models.entities.Discount;
 import dev.vdrenkov.cineledger.models.requests.DiscountRequest;
@@ -7,11 +12,6 @@ import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
 
 import java.util.Collections;
 import java.util.List;
-
-import static dev.vdrenkov.cineledger.testutils.constants.DiscountConstants.CODE;
-import static dev.vdrenkov.cineledger.testutils.constants.DiscountConstants.ID;
-import static dev.vdrenkov.cineledger.testutils.constants.DiscountConstants.PERCENTAGE;
-import static dev.vdrenkov.cineledger.testutils.constants.DiscountConstants.TYPE;
 
 public final class DiscountFactory {
 

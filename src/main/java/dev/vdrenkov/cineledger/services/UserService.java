@@ -127,7 +127,6 @@ public class UserService {
 
     public List<Role> getUserRoles(final List<String> roleNames) {
         if (roleNames != null && !roleNames.isEmpty()) {
-
             return roleNames.stream().map(this::getRoleByName).toList();
         } else {
             throw new RoleNotChosenException(ExceptionMessages.ROLE_NOT_CHOSEN_MESSAGE);
@@ -196,20 +195,17 @@ public class UserService {
         return UserMapper.mapUsersToUserDtos(getUsersByJoinDate(joinDate, isBefore));
     }
 
-    private User getUserByUsernameOnLogin(final String username) {
-        return userRepository
-                .findUserByUsername(username)
-                .orElseThrow(() -> {
-                    return new UserNotFoundException(ExceptionMessages.USER_NOT_FOUND_MESSAGE);
-                });
-    }
-
     public User getCurrentUser() {
         final Authentication authentication =
                 SecurityContextHolder.getContext().getAuthentication();
-        final String currentUsername =
-                Objects.isNull(authentication) ? "" : authentication.getName();
-        return getUserByUsername(currentUsername);
+
+        if (authentication == null
+                || authentication.getName() == null
+                || UserConstants.DEFAULT_GUEST_USERNAME.equals(authentication.getName())) {
+            throw new NotLoggedInException(ExceptionMessages.NOT_LOGGED_IN_MESSAGE);
+        }
+
+        return getUserByUsername(authentication.getName());
     }
 
     @Transactional
@@ -237,7 +233,7 @@ public class UserService {
     @Transactional
     public UserDto updateUser(final UserRequest request, final int id) {
 
-        if (!isAuthorized(id)) {
+        if (!isCurrentUserAuthorized(id)) {
             throw new NotAuthorizedException(ExceptionMessages.NOT_AUTHORIZED_MESSAGE);
         }
 
@@ -256,8 +252,7 @@ public class UserService {
     public UserDto deleteUser(final int id) {
         final UserDto userDto = getUserDtoById(id);
 
-        if (!isAuthorized(id)) {
-
+        if (!isCurrentUserAuthorized(id)) {
             throw new NotAuthorizedException(ExceptionMessages.NOT_AUTHORIZED_MESSAGE);
         }
 
@@ -279,12 +274,9 @@ public class UserService {
 
     public boolean isCurrentUserAuthorized(final int userId) {
         final User currentUser = getCurrentUser();
-
-        if (isCurrentUserAdmin()) {
-            return true;
-        }
-
-        return currentUser.getId() == userId;
+        return currentUser.getId() == userId
+                || currentUser.getRoles().stream()
+                        .anyMatch(role -> RoleConstants.DEFAULT_ADMIN_ROLE.equals(role.getName()));
     }
 
     private void applyProfile(final User user, final UserRequest request) {
@@ -294,35 +286,6 @@ public class UserService {
         user.setEmail(request.email());
         user.setFirstName(request.firstName());
         user.setLastName(request.lastName());
-    }
-
-    private boolean isAuthorized(final int userId) {
-        String currentUsername = null;
-
-        SecurityContextHolder.getContext();
-        if (SecurityContextHolder.getContext().getAuthentication() != null) {
-            final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            if (Objects.nonNull(auth)) {
-                currentUsername = auth.getName();
-            }
-        }
-
-        if (currentUsername == null
-                || Objects.equals(UserConstants.DEFAULT_GUEST_USERNAME, currentUsername)) {
-
-            throw new NotLoggedInException(ExceptionMessages.NOT_LOGGED_IN_MESSAGE);
-        }
-
-        final User currentUser = getUserByUsernameOnLogin(currentUsername);
-        final Role adminRole = getRoleByName(RoleConstants.DEFAULT_ADMIN_ROLE);
-
-        for (Role role : currentUser.getRoles()) {
-            if (Objects.equals(role.getName(), adminRole.getName())) {
-                return true;
-            }
-        }
-
-        return userId == currentUser.getId();
     }
 
     private void userValidation(final String username, final String email) {

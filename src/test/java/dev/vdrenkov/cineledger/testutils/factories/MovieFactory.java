@@ -1,5 +1,12 @@
 package dev.vdrenkov.cineledger.testutils.factories;
 
+import static dev.vdrenkov.cineledger.testutils.constants.MovieConstants.DESCRIPTION;
+import static dev.vdrenkov.cineledger.testutils.constants.MovieConstants.ID;
+import static dev.vdrenkov.cineledger.testutils.constants.MovieConstants.RATING;
+import static dev.vdrenkov.cineledger.testutils.constants.MovieConstants.RELEASE_DATE;
+import static dev.vdrenkov.cineledger.testutils.constants.MovieConstants.RUNTIME;
+import static dev.vdrenkov.cineledger.testutils.constants.MovieConstants.TITLE;
+
 import dev.vdrenkov.cineledger.models.dtos.MovieDto;
 import dev.vdrenkov.cineledger.models.entities.Movie;
 import dev.vdrenkov.cineledger.models.requests.MovieRequest;
@@ -7,13 +14,6 @@ import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
 
 import java.util.Collections;
 import java.util.List;
-
-import static dev.vdrenkov.cineledger.testutils.constants.MovieConstants.DESCRIPTION;
-import static dev.vdrenkov.cineledger.testutils.constants.MovieConstants.ID;
-import static dev.vdrenkov.cineledger.testutils.constants.MovieConstants.RATING;
-import static dev.vdrenkov.cineledger.testutils.constants.MovieConstants.RELEASE_DATE;
-import static dev.vdrenkov.cineledger.testutils.constants.MovieConstants.RUNTIME;
-import static dev.vdrenkov.cineledger.testutils.constants.MovieConstants.TITLE;
 
 public final class MovieFactory {
 
@@ -26,7 +26,14 @@ public final class MovieFactory {
     }
 
     public static Movie getDefaultMovie() {
-        return new Movie(ID, TITLE, RATING, DESCRIPTION, RELEASE_DATE, RUNTIME, CategoryFactory.getDefaultCategory());
+        return new Movie(
+                ID,
+                TITLE,
+                RATING,
+                DESCRIPTION,
+                RELEASE_DATE,
+                RUNTIME,
+                CategoryFactory.getDefaultCategory());
     }
 
     public static List<Movie> getDefaultMovieList() {
@@ -34,8 +41,14 @@ public final class MovieFactory {
     }
 
     public static MovieDto getDefaultMovieDto() {
-        return new MovieDto(ID, TITLE, RATING, DESCRIPTION, RELEASE_DATE, RUNTIME,
-            CategoryFactory.getDefaultCategoryDto());
+        return new MovieDto(
+                ID,
+                TITLE,
+                RATING,
+                DESCRIPTION,
+                RELEASE_DATE,
+                RUNTIME,
+                CategoryFactory.getDefaultCategoryDto());
     }
 
     public static List<MovieDto> getDefaultMovieDtoList() {

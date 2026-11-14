@@ -44,7 +44,7 @@ public final class OrderFactory {
                 DATE_OF_PURCHASE,
                 UserFactory.getDefaultUserDto(),
                 TicketFactory.getDefaultTicketDtoList(),
-                java.util.List.of(
+                List.of(
                         new dev.vdrenkov.cineledger.models.dtos.OrderItemDto(
                                 1,
                                 "Name",

@@ -39,3 +39,5 @@ logs
 *.properties
 application.properties
 !.mvn/wrapper/maven-wrapper.properties
+
+.sonar/

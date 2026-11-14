@@ -1,5 +1,8 @@
 package dev.vdrenkov.cineledger.testutils.factories;
 
+import static dev.vdrenkov.cineledger.testutils.constants.CategoryConstants.ID;
+import static dev.vdrenkov.cineledger.testutils.constants.CategoryConstants.NAME;
+
 import dev.vdrenkov.cineledger.models.dtos.CategoryDto;
 import dev.vdrenkov.cineledger.models.entities.Category;
 import dev.vdrenkov.cineledger.models.requests.CategoryRequest;
@@ -7,9 +10,6 @@ import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
 
 import java.util.Collections;
 import java.util.List;
-
-import static dev.vdrenkov.cineledger.testutils.constants.CategoryConstants.ID;
-import static dev.vdrenkov.cineledger.testutils.constants.CategoryConstants.NAME;
 
 public final class CategoryFactory {
 

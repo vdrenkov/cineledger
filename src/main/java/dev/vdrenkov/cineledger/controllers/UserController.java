@@ -2,12 +2,14 @@ package dev.vdrenkov.cineledger.controllers;
 
 import dev.vdrenkov.cineledger.models.dtos.UserDto;
 import dev.vdrenkov.cineledger.models.requests.AdminRequest;
+import dev.vdrenkov.cineledger.models.requests.CreateUserRequest;
 import dev.vdrenkov.cineledger.models.requests.LoginRequest;
 import dev.vdrenkov.cineledger.models.requests.UserRequest;
-import dev.vdrenkov.cineledger.models.requests.CreateUserRequest;
 import dev.vdrenkov.cineledger.services.UserService;
 import dev.vdrenkov.cineledger.utils.constants.URIConstants;
+
 import jakarta.validation.Valid;
+
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpCookie;
 import org.springframework.http.HttpHeaders;
@@ -22,8 +24,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDate;
 import java.net.URI;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -39,7 +41,9 @@ public class UserController {
     public ResponseEntity<Void> login(@RequestBody @Valid LoginRequest request) {
         final HttpCookie cookie = userService.login(request);
 
-        return ResponseEntity.status(HttpStatus.OK).header(HttpHeaders.SET_COOKIE, cookie.toString()).build();
+        return ResponseEntity.status(HttpStatus.OK)
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .build();
     }
 
     @PostMapping(URIConstants.USERS_PATH)
@@ -74,10 +78,12 @@ public class UserController {
         return ResponseEntity.ok(userDtos);
     }
 
-    @GetMapping(value = URIConstants.USERS_PATH, params = { "joinDate", "isBefore" })
+    @GetMapping(
+            value = URIConstants.USERS_PATH,
+            params = {"joinDate", "isBefore"})
     public ResponseEntity<List<UserDto>> getUsersByJoinDate(
-        @RequestParam("joinDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate joinDate,
-        @RequestParam boolean isBefore) {
+            @RequestParam("joinDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate joinDate,
+            @RequestParam boolean isBefore) {
 
         final List<UserDto> userDtos = userService.getUsersDtosByJoinDate(joinDate, isBefore);
 
@@ -85,28 +91,38 @@ public class UserController {
     }
 
     @PutMapping(URIConstants.USERS_ID_PATH)
-    public ResponseEntity<UserDto> updateUser(@RequestBody @Valid UserRequest request, @PathVariable int id,
-        @RequestParam(required = false) Boolean returnOld) {
+    public ResponseEntity<UserDto> updateUser(
+            @RequestBody @Valid UserRequest request,
+            @PathVariable int id,
+            @RequestParam(required = false) Boolean returnOld) {
 
         final UserDto userDto = userService.updateUser(request, id);
 
-        return Boolean.TRUE.equals(returnOld) ? ResponseEntity.ok(userDto) : ResponseEntity.noContent().build();
+        return Boolean.TRUE.equals(returnOld)
+                ? ResponseEntity.ok(userDto)
+                : ResponseEntity.noContent().build();
     }
 
     @PutMapping(URIConstants.ADMINS_ID_PATH)
-    public ResponseEntity<UserDto> updateUserByAdmin(@RequestBody @Valid AdminRequest request, @PathVariable int id,
-        @RequestParam(required = false) Boolean returnOld) {
+    public ResponseEntity<UserDto> updateUserByAdmin(
+            @RequestBody @Valid AdminRequest request,
+            @PathVariable int id,
+            @RequestParam(required = false) Boolean returnOld) {
 
         final UserDto userDto = userService.updateUserByAdmin(request, id);
 
-        return Boolean.TRUE.equals(returnOld) ? ResponseEntity.ok(userDto) : ResponseEntity.noContent().build();
+        return Boolean.TRUE.equals(returnOld)
+                ? ResponseEntity.ok(userDto)
+                : ResponseEntity.noContent().build();
     }
 
     @DeleteMapping(URIConstants.USERS_ID_PATH)
-    public ResponseEntity<UserDto> deleteUser(@PathVariable int id, @RequestParam(required = false) Boolean returnOld) {
+    public ResponseEntity<UserDto> deleteUser(
+            @PathVariable int id, @RequestParam(required = false) Boolean returnOld) {
         final UserDto userDto = userService.deleteUser(id);
 
-        return Boolean.TRUE.equals(returnOld) ? ResponseEntity.ok(userDto) : ResponseEntity.noContent().build();
+        return Boolean.TRUE.equals(returnOld)
+                ? ResponseEntity.ok(userDto)
+                : ResponseEntity.noContent().build();
     }
-
 }

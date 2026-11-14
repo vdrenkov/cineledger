@@ -5,6 +5,7 @@ import dev.vdrenkov.cineledger.models.entities.User;
 import dev.vdrenkov.cineledger.repositories.RoleRepository;
 import dev.vdrenkov.cineledger.repositories.UserRepository;
 import dev.vdrenkov.cineledger.utils.constants.RoleConstants;
+
 import org.jspecify.annotations.NonNull;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,8 +24,11 @@ public class RoleBootstrapRunner implements CommandLineRunner {
     private final PasswordEncoder passwordEncoder;
     private final BootstrapProperties bootstrapProperties;
 
-    public RoleBootstrapRunner(final RoleRepository roleRepository, final UserRepository userRepository,
-        final PasswordEncoder passwordEncoder, final BootstrapProperties bootstrapProperties) {
+    public RoleBootstrapRunner(
+            final RoleRepository roleRepository,
+            final UserRepository userRepository,
+            final PasswordEncoder passwordEncoder,
+            final BootstrapProperties bootstrapProperties) {
         this.roleRepository = roleRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -35,7 +39,6 @@ public class RoleBootstrapRunner implements CommandLineRunner {
     @Transactional
     public void run(final String @NonNull ... args) {
         if (!bootstrapProperties.roles()) {
-
             return;
         }
 
@@ -48,15 +51,15 @@ public class RoleBootstrapRunner implements CommandLineRunner {
     private void ensureRoleExists(final String roleName) {
         if (!roleRepository.existsByName(roleName)) {
             roleRepository.save(new Role(roleName));
-
         }
     }
 
     private void bootstrapAdminUserIfConfigured() {
         final BootstrapProperties.Admin admin = bootstrapProperties.admin();
 
-        if (!StringUtils.hasText(admin.username()) || !StringUtils.hasText(admin.password())
-            || !StringUtils.hasText(admin.email())) {
+        if (!StringUtils.hasText(admin.username())
+                || !StringUtils.hasText(admin.password())
+                || !StringUtils.hasText(admin.email())) {
             return;
         }
 
@@ -64,16 +67,21 @@ public class RoleBootstrapRunner implements CommandLineRunner {
             return;
         }
 
-        final Role adminRole = roleRepository
-            .findRoleByName(RoleConstants.DEFAULT_ADMIN_ROLE)
-            .orElseThrow(() -> new IllegalStateException("ADMIN role is missing"));
+        final Role adminRole =
+                roleRepository
+                        .findRoleByName(RoleConstants.DEFAULT_ADMIN_ROLE)
+                        .orElseThrow(() -> new IllegalStateException("ADMIN role is missing"));
 
-        final User bootstrappedAdmin = new User(admin.username(), passwordEncoder.encode(admin.password()),
-            admin.email(), StringUtils.hasText(admin.firstName()) ? admin.firstName() : "Admin",
-            StringUtils.hasText(admin.lastName()) ? admin.lastName() : "User", LocalDate.now(),
-            List.of(adminRole));
+        final User bootstrappedAdmin =
+                new User(
+                        admin.username(),
+                        passwordEncoder.encode(admin.password()),
+                        admin.email(),
+                        StringUtils.hasText(admin.firstName()) ? admin.firstName() : "Admin",
+                        StringUtils.hasText(admin.lastName()) ? admin.lastName() : "User",
+                        LocalDate.now(),
+                        List.of(adminRole));
 
         userRepository.save(bootstrappedAdmin);
-
     }
 }

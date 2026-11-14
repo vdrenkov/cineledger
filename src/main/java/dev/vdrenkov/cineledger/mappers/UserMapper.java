@@ -7,14 +7,18 @@ import java.util.List;
 
 public final class UserMapper {
 
-    private UserMapper() {
-
-    }
+    private UserMapper() {}
 
     public static UserDto mapUserToUserDto(User user) {
 
-        return new UserDto(user.getId(), user.getUsername(), user.getEmail(), user.getFirstName(), user.getLastName(),
-            user.getJoinDate(), RoleMapper.mapRolesToRoleDtos(user.getRoles()));
+        return new UserDto(
+                user.getId(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getJoinDate(),
+                RoleMapper.mapRolesToRoleDtos(user.getRoles()));
     }
 
     public static List<UserDto> mapUsersToUserDtos(List<User> users) {

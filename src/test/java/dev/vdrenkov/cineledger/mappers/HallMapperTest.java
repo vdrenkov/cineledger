@@ -1,16 +1,17 @@
 package dev.vdrenkov.cineledger.mappers;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import dev.vdrenkov.cineledger.models.dtos.HallDto;
 import dev.vdrenkov.cineledger.testutils.constants.HallConstants;
 import dev.vdrenkov.cineledger.testutils.factories.HallFactory;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ExtendWith(MockitoExtension.class)
 class HallMapperTest {
@@ -26,7 +27,8 @@ class HallMapperTest {
 
     @Test
     void testMapHallListToHallDtoList_success() {
-        final List<HallDto> hallDtoList = HallMapper.mapHallListToHallDtoList(HallFactory.getDefaultHallList());
+        final List<HallDto> hallDtoList =
+                HallMapper.mapHallListToHallDtoList(HallFactory.getDefaultHallList());
         final HallDto hallDto = hallDtoList.getFirst();
 
         assertEquals(HallConstants.ID, hallDto.id());

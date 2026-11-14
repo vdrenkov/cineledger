@@ -5,7 +5,9 @@ import dev.vdrenkov.cineledger.models.entities.Ticket;
 import dev.vdrenkov.cineledger.models.requests.TicketRequest;
 import dev.vdrenkov.cineledger.services.TicketService;
 import dev.vdrenkov.cineledger.utils.constants.URIConstants;
+
 import jakarta.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,10 +32,10 @@ public class TicketController {
     public ResponseEntity<Void> addTicket(@RequestBody @Valid TicketRequest request) {
         final Ticket ticket = ticketService.addTicket(request);
 
-        URI location = UriComponentsBuilder
-            .fromUriString(URIConstants.TICKETS_ID_PATH)
-            .buildAndExpand(ticket.getId())
-            .toUri();
+        URI location =
+                UriComponentsBuilder.fromUriString(URIConstants.TICKETS_ID_PATH)
+                        .buildAndExpand(ticket.getId())
+                        .toUri();
 
         return ResponseEntity.created(location).build();
     }

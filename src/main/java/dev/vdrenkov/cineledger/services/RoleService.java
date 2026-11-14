@@ -8,6 +8,7 @@ import dev.vdrenkov.cineledger.models.entities.Role;
 import dev.vdrenkov.cineledger.models.requests.RoleRequest;
 import dev.vdrenkov.cineledger.repositories.RoleRepository;
 import dev.vdrenkov.cineledger.utils.constants.ExceptionMessages;
+
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -40,10 +41,11 @@ public class RoleService {
 
     public Role getRoleById(int id) {
 
-        return roleRepository.findById(id).orElseThrow(() -> {
-
-            return new RoleNotFoundException(ExceptionMessages.ROLE_NOT_FOUND_MESSAGE);
-        });
+        return roleRepository
+                .findById(id)
+                .orElseThrow(() -> {
+                    return new RoleNotFoundException(ExceptionMessages.ROLE_NOT_FOUND_MESSAGE);
+                });
     }
 
     public RoleDto getRoleDtoById(int id) {
@@ -53,10 +55,11 @@ public class RoleService {
 
     public Role getRoleByName(String name) {
 
-        return roleRepository.findRoleByName(name.toUpperCase()).orElseThrow(() -> {
-
-            return new RoleNotFoundException(ExceptionMessages.ROLE_NOT_FOUND_MESSAGE);
-        });
+        return roleRepository
+                .findRoleByName(name.toUpperCase())
+                .orElseThrow(() -> {
+                    return new RoleNotFoundException(ExceptionMessages.ROLE_NOT_FOUND_MESSAGE);
+                });
     }
 
     public RoleDto getRoleDtoByName(String name) {
@@ -81,9 +84,11 @@ public class RoleService {
     }
 
     private void roleValidation(RoleRequest roleRequest) {
-        roleRepository.findRoleByName(roleRequest.name()).ifPresent(role -> {
-
-            throw new RoleAlreadyExistsException(ExceptionMessages.ROLE_ALREADY_EXISTS_MESSAGE);
-        });
+        roleRepository
+                .findRoleByName(roleRequest.name())
+                .ifPresent(role -> {
+                    throw new RoleAlreadyExistsException(
+                            ExceptionMessages.ROLE_ALREADY_EXISTS_MESSAGE);
+                });
     }
 }

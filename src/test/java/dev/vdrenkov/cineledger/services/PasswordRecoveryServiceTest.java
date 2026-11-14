@@ -1,10 +1,15 @@
 package dev.vdrenkov.cineledger.services;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
 import dev.vdrenkov.cineledger.models.entities.PasswordResetToken;
 import dev.vdrenkov.cineledger.models.entities.User;
 import dev.vdrenkov.cineledger.repositories.PasswordResetTokenRepository;
 import dev.vdrenkov.cineledger.repositories.UserRepository;
 import dev.vdrenkov.cineledger.testutils.factories.UserFactory;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,6 +17,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.time.Clock;
@@ -19,10 +25,6 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.HexFormat;
 import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class PasswordRecoveryServiceTest {
@@ -37,8 +39,13 @@ class PasswordRecoveryServiceTest {
 
     @BeforeEach
     void setUp() {
-        recoveryService = new PasswordRecoveryService(userRepository, tokenRepository, passwordEncoder, emailService,
-            Clock.fixed(NOW, ZoneOffset.UTC));
+        recoveryService =
+                new PasswordRecoveryService(
+                        userRepository,
+                        tokenRepository,
+                        passwordEncoder,
+                        emailService,
+                        Clock.fixed(NOW, ZoneOffset.UTC));
         user = UserFactory.getDefaultUser();
     }
 
@@ -75,8 +82,14 @@ class PasswordRecoveryServiceTest {
     void requestReset_recentRequest_preservesExistingToken() {
         when(userRepository.findUserByUsername(user.getUsername())).thenReturn(Optional.of(user));
         when(userRepository.findByIdForUpdate(user.getId())).thenReturn(Optional.of(user));
-        when(tokenRepository.findById(user.getId())).thenReturn(Optional.of(new PasswordResetToken(user.getId(),
-            "existing", NOW.minusSeconds(59), NOW.plusSeconds(1741))));
+        when(tokenRepository.findById(user.getId()))
+                .thenReturn(
+                        Optional.of(
+                                new PasswordResetToken(
+                                        user.getId(),
+                                        "existing",
+                                        NOW.minusSeconds(59),
+                                        NOW.plusSeconds(1741))));
 
         recoveryService.requestReset(user.getUsername());
 
@@ -87,7 +100,8 @@ class PasswordRecoveryServiceTest {
     @Test
     void resetPassword_validToken_changesCredentialsAndConsumesToken() throws Exception {
         final var token = storedToken(NOW.plusSeconds(1));
-        when(tokenRepository.findUserIdByTokenHash(hash(TOKEN))).thenReturn(Optional.of(user.getId()));
+        when(tokenRepository.findUserIdByTokenHash(hash(TOKEN)))
+                .thenReturn(Optional.of(user.getId()));
         when(userRepository.findByIdForUpdate(user.getId())).thenReturn(Optional.of(user));
         when(tokenRepository.findById(user.getId())).thenReturn(Optional.of(token));
         when(passwordEncoder.encode("ChangedPassword123")).thenReturn("new-password-hash");
@@ -102,11 +116,14 @@ class PasswordRecoveryServiceTest {
     @Test
     void resetPassword_tokenExpiresNow_preservesCredentials() throws Exception {
         final String previousPassword = user.getPassword();
-        when(tokenRepository.findUserIdByTokenHash(hash(TOKEN))).thenReturn(Optional.of(user.getId()));
+        when(tokenRepository.findUserIdByTokenHash(hash(TOKEN)))
+                .thenReturn(Optional.of(user.getId()));
         when(userRepository.findByIdForUpdate(user.getId())).thenReturn(Optional.of(user));
         when(tokenRepository.findById(user.getId())).thenReturn(Optional.of(storedToken(NOW)));
 
-        assertThrows(IllegalArgumentException.class, () -> recoveryService.resetPassword(TOKEN, "ChangedPassword123"));
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> recoveryService.resetPassword(TOKEN, "ChangedPassword123"));
 
         assertEquals(previousPassword, user.getPassword());
         verifyNoInteractions(passwordEncoder);
@@ -117,19 +134,30 @@ class PasswordRecoveryServiceTest {
     void resetPassword_unknownToken_preservesCredentials() {
         when(tokenRepository.findUserIdByTokenHash(anyString())).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class, () -> recoveryService.resetPassword(TOKEN, "ChangedPassword123"));
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> recoveryService.resetPassword(TOKEN, "ChangedPassword123"));
 
         verifyNoInteractions(passwordEncoder, userRepository);
     }
 
     @Test
     void resetPassword_tokenReplacedWhileWaitingForLock_preservesCredentials() throws Exception {
-        when(tokenRepository.findUserIdByTokenHash(hash(TOKEN))).thenReturn(Optional.of(user.getId()));
+        when(tokenRepository.findUserIdByTokenHash(hash(TOKEN)))
+                .thenReturn(Optional.of(user.getId()));
         when(userRepository.findByIdForUpdate(user.getId())).thenReturn(Optional.of(user));
-        when(tokenRepository.findById(user.getId())).thenReturn(Optional.of(new PasswordResetToken(user.getId(),
-            "another-token-hash", NOW, NOW.plusSeconds(1800))));
+        when(tokenRepository.findById(user.getId()))
+                .thenReturn(
+                        Optional.of(
+                                new PasswordResetToken(
+                                        user.getId(),
+                                        "another-token-hash",
+                                        NOW,
+                                        NOW.plusSeconds(1800))));
 
-        assertThrows(IllegalArgumentException.class, () -> recoveryService.resetPassword(TOKEN, "ChangedPassword123"));
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> recoveryService.resetPassword(TOKEN, "ChangedPassword123"));
 
         verifyNoInteractions(passwordEncoder);
         verify(tokenRepository, never()).delete(any());
@@ -140,6 +168,9 @@ class PasswordRecoveryServiceTest {
     }
 
     private static String hash(final String token) throws Exception {
-        return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(token.getBytes(StandardCharsets.UTF_8)));
+        return HexFormat.of()
+                .formatHex(
+                        MessageDigest.getInstance("SHA-256")
+                                .digest(token.getBytes(StandardCharsets.UTF_8)));
     }
 }

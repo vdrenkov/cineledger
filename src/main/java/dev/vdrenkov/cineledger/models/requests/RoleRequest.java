@@ -4,7 +4,10 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
 public record RoleRequest(
-    @Pattern(regexp = "^[A-Z_]+$", message = "The role is allowed to contain only capital letters and underscores")
-    @NotNull(message = "The role can't be empty")
-    String name
-) {}
+        @Pattern(
+                        regexp = "^[A-Z_]+$",
+                        message =
+                                "The role is allowed to contain only capital letters and"
+                                        + " underscores")
+                @NotNull(message = "The role can't be empty")
+                String name) {}

@@ -2,11 +2,14 @@ package dev.vdrenkov.cineledger.utils.constants;
 
 public final class ExceptionMessages {
 
-    public static final String CATEGORY_NOT_FOUND_MESSAGE = "No such category was found in the database!";
+    public static final String CATEGORY_NOT_FOUND_MESSAGE =
+            "No such category was found in the database!";
 
-    public static final String CINEMA_NOT_FOUND_MESSAGE = "No such cinema was found in the database!";
+    public static final String CINEMA_NOT_FOUND_MESSAGE =
+            "No such cinema was found in the database!";
 
-    public static final String PROGRAM_NOT_FOUND_MESSAGE = "No such program was found in the database!";
+    public static final String PROGRAM_NOT_FOUND_MESSAGE =
+            "No such program was found in the database!";
 
     public static final String USER_NOT_FOUND_MESSAGE = "No such user was found in the database!";
 
@@ -14,7 +17,8 @@ public final class ExceptionMessages {
 
     public static final String HALL_NOT_FOUND_MESSAGE = "No such hall was found in the database!";
 
-    public static final String PROJECTION_NOT_FOUND_MESSAGE = "No such projection was found in the database!";
+    public static final String PROJECTION_NOT_FOUND_MESSAGE =
+            "No such projection was found in the database!";
 
     public static final String MOVIE_NOT_FOUND_MESSAGE = "No such movie was found in the database!";
 
@@ -24,25 +28,32 @@ public final class ExceptionMessages {
 
     public static final String ROLE_NOT_CHOSEN_MESSAGE = "You haven't specified any roles!";
 
-    public static final String REVIEW_NOT_FOUND_MESSAGE = "No such review was found in the database!";
+    public static final String REVIEW_NOT_FOUND_MESSAGE =
+            "No such review was found in the database!";
 
-    public static final String TICKET_NOT_FOUND_MESSAGE = "No such ticket was found in the database!";
+    public static final String TICKET_NOT_FOUND_MESSAGE =
+            "No such ticket was found in the database!";
 
-    public static final String DISCOUNT_NOT_FOUND_MESSAGE = "No such discount was found in the database!";
+    public static final String DISCOUNT_NOT_FOUND_MESSAGE =
+            "No such discount was found in the database!";
 
-    public static final String NOT_AUTHORIZED_MESSAGE = "You are not authorized to perform this action!";
+    public static final String NOT_AUTHORIZED_MESSAGE =
+            "You are not authorized to perform this action!";
 
     public static final String NOT_LOGGED_IN_MESSAGE = "You are not logged in!";
 
     public static final String DATE_NOT_VALID_MESSAGE = "Date not valid.";
 
-    public static final String HALL_NOT_AVAILABLE_EXCEPTION = "The hall is not available for the desired start time.";
+    public static final String HALL_NOT_AVAILABLE_EXCEPTION =
+            "The hall is not available for the desired start time.";
 
     public static final String DISCOUNT_CODE_NOT_VALID_MESSAGE = "Discount code not valid.";
 
-    public static final String NO_AVAILABLE_TICKETS_EXCEPTION = "No more tickets available for this projection.";
+    public static final String NO_AVAILABLE_TICKETS_EXCEPTION =
+            "No more tickets available for this projection.";
 
-    public static final String NO_AVAILABLE_ITEMS_EXCEPTION = "No more items of this kind available.";
+    public static final String NO_AVAILABLE_ITEMS_EXCEPTION =
+            "No more items of this kind available.";
 
     public static final String CATEGORY_ALREADY_EXISTS_MESSAGE = "Category already exists!";
 
@@ -70,7 +81,8 @@ public final class ExceptionMessages {
 
     public static final String INVALID_REQUEST_MESSAGE = "The request is invalid.";
 
-    public static final String METHOD_NOT_ALLOWED_MESSAGE = "The requested HTTP method is not supported.";
+    public static final String METHOD_NOT_ALLOWED_MESSAGE =
+            "The requested HTTP method is not supported.";
 
     public static final String AUTHENTICATION_FAILED_MESSAGE = "Authentication failed.";
 

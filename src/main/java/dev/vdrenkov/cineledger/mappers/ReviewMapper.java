@@ -8,19 +8,29 @@ import java.util.Objects;
 
 public final class ReviewMapper {
 
-    private ReviewMapper() {
-
-    }
+    private ReviewMapper() {}
 
     public static ReviewDto mapReviewToReviewDto(Review review) {
 
         if (Objects.nonNull(review.getMovie())) {
-            return new ReviewDto(review.getId(), review.getRating(), review.getReviewText(), review.getDateModified(),
-                MovieMapper.mapMovieToMovieDto(review.getMovie()), null, UserMapper.mapUserToUserDto(review.getUser()));
+            return new ReviewDto(
+                    review.getId(),
+                    review.getRating(),
+                    review.getReviewText(),
+                    review.getDateModified(),
+                    MovieMapper.mapMovieToMovieDto(review.getMovie()),
+                    null,
+                    UserMapper.mapUserToUserDto(review.getUser()));
         }
 
-        return new ReviewDto(review.getId(), review.getRating(), review.getReviewText(), review.getDateModified(), null,
-            CinemaMapper.mapCinemaToCinemaDto(review.getCinema()), UserMapper.mapUserToUserDto(review.getUser()));
+        return new ReviewDto(
+                review.getId(),
+                review.getRating(),
+                review.getReviewText(),
+                review.getDateModified(),
+                null,
+                CinemaMapper.mapCinemaToCinemaDto(review.getCinema()),
+                UserMapper.mapUserToUserDto(review.getUser()));
     }
 
     public static List<ReviewDto> mapReviewListToReviewDtoList(List<Review> reviews) {

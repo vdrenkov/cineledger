@@ -1,22 +1,24 @@
 package dev.vdrenkov.cineledger.mappers;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import dev.vdrenkov.cineledger.models.dtos.CinemaDto;
 import dev.vdrenkov.cineledger.testutils.constants.CinemaConstants;
 import dev.vdrenkov.cineledger.testutils.factories.CinemaFactory;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 @ExtendWith(MockitoExtension.class)
 class CinemaMapperTest {
 
     @Test
     void testMapCinemaToCinemaDto_success() {
-        final CinemaDto cinemaDto = CinemaMapper.mapCinemaToCinemaDto(CinemaFactory.getDefaultCinema());
+        final CinemaDto cinemaDto =
+                CinemaMapper.mapCinemaToCinemaDto(CinemaFactory.getDefaultCinema());
 
         assertEquals(CinemaConstants.ID, cinemaDto.id());
         assertEquals(CinemaConstants.ADDRESS, cinemaDto.address());
@@ -26,7 +28,8 @@ class CinemaMapperTest {
 
     @Test
     void testMapCinemaToCinemaDtoList() {
-        final List<CinemaDto> cinemaDtos = CinemaMapper.mapCinemaToCinemaDtoList(CinemaFactory.getDefaultCinemaList());
+        final List<CinemaDto> cinemaDtos =
+                CinemaMapper.mapCinemaToCinemaDtoList(CinemaFactory.getDefaultCinemaList());
 
         final CinemaDto cinemaDto = cinemaDtos.getFirst();
         assertEquals(CinemaConstants.ID, cinemaDto.id());

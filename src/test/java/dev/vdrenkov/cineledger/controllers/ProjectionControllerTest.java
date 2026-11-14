@@ -42,6 +42,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import tools.jackson.databind.ObjectMapper;
 
+import java.math.BigDecimal;
+import java.util.Map;
+
 @AutoConfigureMockMvc
 @ExtendWith(MockitoExtension.class)
 class ProjectionControllerTest {
@@ -87,13 +90,12 @@ class ProjectionControllerTest {
                         jsonPath("$[0].hall")
                                 .value(
                                         objectMapper.convertValue(
-                                                HallFactory.getDefaultHallDto(),
-                                                java.util.Map.class)))
+                                                HallFactory.getDefaultHallDto(), Map.class)))
                 .andExpect(
                         jsonPath("$[0].price")
                                 .value(
                                         org.hamcrest.Matchers.comparesEqualTo(PRICE),
-                                        java.math.BigDecimal.class))
+                                        BigDecimal.class))
                 .andExpect(jsonPath("$[0].program.id").value(ProgramConstants.ID))
                 .andExpect(
                         jsonPath("$[0].program.programDate", is(ProgramConstants.DATE.toString())))
@@ -101,8 +103,7 @@ class ProjectionControllerTest {
                         jsonPath("$[0].program.cinema")
                                 .value(
                                         objectMapper.convertValue(
-                                                CinemaFactory.getDefaultCinemaDto(),
-                                                java.util.Map.class)))
+                                                CinemaFactory.getDefaultCinemaDto(), Map.class)))
                 .andExpect(jsonPath("$[0].movie.id").value(MovieConstants.ID))
                 .andExpect(jsonPath("$[0].movie.title").value(MovieConstants.TITLE))
                 .andExpect(jsonPath("$[0].movie.averageRating").value(MovieConstants.RATING))
@@ -117,7 +118,7 @@ class ProjectionControllerTest {
                                 .value(
                                         objectMapper.convertValue(
                                                 CategoryFactory.getDefaultCategoryDto(),
-                                                java.util.Map.class)))
+                                                Map.class)))
                 .andExpect(jsonPath("$[0].startTime", is(START_TIME.toString())));
     }
 
@@ -133,13 +134,12 @@ class ProjectionControllerTest {
                         jsonPath("$[0].hall")
                                 .value(
                                         objectMapper.convertValue(
-                                                HallFactory.getDefaultHallDto(),
-                                                java.util.Map.class)))
+                                                HallFactory.getDefaultHallDto(), Map.class)))
                 .andExpect(
                         jsonPath("$[0].price")
                                 .value(
                                         org.hamcrest.Matchers.comparesEqualTo(PRICE),
-                                        java.math.BigDecimal.class))
+                                        BigDecimal.class))
                 .andExpect(jsonPath("$[0].program.id").value(ProgramConstants.ID))
                 .andExpect(
                         jsonPath("$[0].program.programDate", is(ProgramConstants.DATE.toString())))
@@ -147,8 +147,7 @@ class ProjectionControllerTest {
                         jsonPath("$[0].program.cinema")
                                 .value(
                                         objectMapper.convertValue(
-                                                CinemaFactory.getDefaultCinemaDto(),
-                                                java.util.Map.class)))
+                                                CinemaFactory.getDefaultCinemaDto(), Map.class)))
                 .andExpect(jsonPath("$[0].movie.id").value(MovieConstants.ID))
                 .andExpect(jsonPath("$[0].movie.title").value(MovieConstants.TITLE))
                 .andExpect(jsonPath("$[0].movie.averageRating").value(MovieConstants.RATING))
@@ -163,7 +162,7 @@ class ProjectionControllerTest {
                                 .value(
                                         objectMapper.convertValue(
                                                 CategoryFactory.getDefaultCategoryDto(),
-                                                java.util.Map.class)))
+                                                Map.class)))
                 .andExpect(jsonPath("$[0].startTime", is(START_TIME.toString())));
     }
 
@@ -182,13 +181,12 @@ class ProjectionControllerTest {
                         jsonPath("$[0].hall")
                                 .value(
                                         objectMapper.convertValue(
-                                                HallFactory.getDefaultHallDto(),
-                                                java.util.Map.class)))
+                                                HallFactory.getDefaultHallDto(), Map.class)))
                 .andExpect(
                         jsonPath("$[0].price")
                                 .value(
                                         org.hamcrest.Matchers.comparesEqualTo(PRICE),
-                                        java.math.BigDecimal.class))
+                                        BigDecimal.class))
                 .andExpect(jsonPath("$[0].program.id").value(ProgramConstants.ID))
                 .andExpect(
                         jsonPath("$[0].program.programDate", is(ProgramConstants.DATE.toString())))
@@ -196,8 +194,7 @@ class ProjectionControllerTest {
                         jsonPath("$[0].program.cinema")
                                 .value(
                                         objectMapper.convertValue(
-                                                CinemaFactory.getDefaultCinemaDto(),
-                                                java.util.Map.class)))
+                                                CinemaFactory.getDefaultCinemaDto(), Map.class)))
                 .andExpect(jsonPath("$[0].movie.id").value(MovieConstants.ID))
                 .andExpect(jsonPath("$[0].movie.title").value(MovieConstants.TITLE))
                 .andExpect(jsonPath("$[0].movie.averageRating").value(MovieConstants.RATING))
@@ -212,7 +209,7 @@ class ProjectionControllerTest {
                                 .value(
                                         objectMapper.convertValue(
                                                 CategoryFactory.getDefaultCategoryDto(),
-                                                java.util.Map.class)))
+                                                Map.class)))
                 .andExpect(jsonPath("$[0].startTime", is(START_TIME.toString())));
     }
 
@@ -234,21 +231,19 @@ class ProjectionControllerTest {
                         jsonPath("$.hall")
                                 .value(
                                         objectMapper.convertValue(
-                                                HallFactory.getDefaultHallDto(),
-                                                java.util.Map.class)))
+                                                HallFactory.getDefaultHallDto(), Map.class)))
                 .andExpect(
                         jsonPath("$.price")
                                 .value(
                                         org.hamcrest.Matchers.comparesEqualTo(PRICE),
-                                        java.math.BigDecimal.class))
+                                        BigDecimal.class))
                 .andExpect(jsonPath("$.program.id").value(ProgramConstants.ID))
                 .andExpect(jsonPath("$.program.programDate", is(ProgramConstants.DATE.toString())))
                 .andExpect(
                         jsonPath("$.program.cinema")
                                 .value(
                                         objectMapper.convertValue(
-                                                CinemaFactory.getDefaultCinemaDto(),
-                                                java.util.Map.class)))
+                                                CinemaFactory.getDefaultCinemaDto(), Map.class)))
                 .andExpect(jsonPath("$.movie.id").value(MovieConstants.ID))
                 .andExpect(jsonPath("$.movie.title").value(MovieConstants.TITLE))
                 .andExpect(jsonPath("$.movie.averageRating").value(MovieConstants.RATING))
@@ -261,7 +256,7 @@ class ProjectionControllerTest {
                                 .value(
                                         objectMapper.convertValue(
                                                 CategoryFactory.getDefaultCategoryDto(),
-                                                java.util.Map.class)))
+                                                Map.class)))
                 .andExpect(jsonPath("$.startTime", is(START_TIME.toString())));
     }
 
@@ -293,21 +288,19 @@ class ProjectionControllerTest {
                         jsonPath("$.hall")
                                 .value(
                                         objectMapper.convertValue(
-                                                HallFactory.getDefaultHallDto(),
-                                                java.util.Map.class)))
+                                                HallFactory.getDefaultHallDto(), Map.class)))
                 .andExpect(
                         jsonPath("$.price")
                                 .value(
                                         org.hamcrest.Matchers.comparesEqualTo(PRICE),
-                                        java.math.BigDecimal.class))
+                                        BigDecimal.class))
                 .andExpect(jsonPath("$.program.id").value(ProgramConstants.ID))
                 .andExpect(jsonPath("$.program.programDate", is(ProgramConstants.DATE.toString())))
                 .andExpect(
                         jsonPath("$.program.cinema")
                                 .value(
                                         objectMapper.convertValue(
-                                                CinemaFactory.getDefaultCinemaDto(),
-                                                java.util.Map.class)))
+                                                CinemaFactory.getDefaultCinemaDto(), Map.class)))
                 .andExpect(jsonPath("$.movie.id").value(MovieConstants.ID))
                 .andExpect(jsonPath("$.movie.title").value(MovieConstants.TITLE))
                 .andExpect(jsonPath("$.movie.averageRating").value(MovieConstants.RATING))
@@ -320,7 +313,7 @@ class ProjectionControllerTest {
                                 .value(
                                         objectMapper.convertValue(
                                                 CategoryFactory.getDefaultCategoryDto(),
-                                                java.util.Map.class)))
+                                                Map.class)))
                 .andExpect(jsonPath("$.startTime", is(START_TIME.toString())));
     }
 
